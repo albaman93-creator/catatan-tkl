@@ -56,8 +56,9 @@ kbd{font:600 12px var(--mono);background:#fff;border:1px solid var(--line);borde
 .btn-ghost{background:#fff;border-color:var(--line);color:var(--ink2);box-shadow:0 2px 0 #e2e9ee}
 .btn-ghost:hover{border-color:#b8c6d0;color:var(--ink);transform:translateY(-1px)}
 .btn-ghost:active{transform:translateY(1px);box-shadow:none}
-.btn-add{background:#fff;border:1px dashed #9fc3ad;color:var(--green-d);padding:8px 14px}
+.btn-add{background:#fff;border:1.5px dashed #9fc3ad;color:var(--green-d);padding:10px 14px}
 .btn-add:hover{background:var(--green-bg);border-style:solid}
+.add-below{width:100%;margin-top:12px}
 
 /* ============ LEMBAR A4 ============ */
 .sheet{max-width:var(--page);margin:20px auto 46px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 30px 70px -35px rgba(13,33,53,.45);overflow:hidden;animation:rise .5s cubic-bezier(.22,.8,.3,1) both}
@@ -300,10 +301,8 @@ td.dur{text-align:center;width:80px}
       <span class="no">01</span>
       <div>
         <h2>Log Sheet Harian</h2>
-        <div class="sub2">Jam Selesai otomatis = Jam Mulai baris berikutnya · ketik 0740 → 07:40</div>
+        <div class="sub2">Jam Selesai otomatis = Jam Mulai baris berikutnya · ketik 0740 → 07:40 · default 20 baris</div>
       </div>
-      <span class="spacer"></span>
-      <button class="btn btn-add" id="btnAdd" type="button">+ Tambah Baris</button>
     </div>
     <div class="legend">
       <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned DT</span>
@@ -325,6 +324,8 @@ td.dur{text-align:center;width:80px}
         <tbody id="tbody"></tbody>
       </table>
     </div>
+    <!-- tombol tambah baris kini di BAWAH input -->
+    <button class="btn btn-add add-below" id="btnAdd" type="button">+ Tambah Baris</button>
     <div class="sec-f">
       <span>Σ durasi tercatat: <b id="sumDur">0</b> / 1.440 mnt</span><span>·</span>
       <span><b id="rowN">0</b> baris</span>
@@ -468,6 +469,7 @@ var PLANNED=new Set([5,6,7,8]), UNPLANNED=new Set([1,3,4,9]);
 var NAV_FIELDS=['kode','mulai','selesai','kegiatan'];
 var FLABEL={kode:'KODE',mulai:'JAM MULAI',selesai:'JAM SELESAI',kegiatan:'KEGIATAN'};
 var DB_KEY='fima_oee_db_v2';
+var DEFAULT_ROWS=20; /* default 20 baris */
 var SHIFT_A=[510,480,450];
 function shiftOf(m){ if(m==null)return null; if(m>=420&&m<930)return 0; if(m>=930&&m<1410)return 1; return 2; }
 function $(id){return document.getElementById(id);}
@@ -495,6 +497,7 @@ function applyModeUI(){
   hintEl.innerHTML=navMode==='v'
    ?'<kbd>Tab</kbd>/<kbd>Enter</kbd> ↓ kolom · <kbd>Shift+Tab</kbd> ↑ · <kbd>⌫</kbd> mundur saat kosong · <kbd>←</kbd><kbd>→</kbd> pindah kolom'
    :'<kbd>Tab</kbd>/<kbd>Enter</kbd> → baris · <kbd>Shift+Tab</kbd> ← · <kbd>⌫</kbd> mundur saat kosong · <kbd>↑</kbd><kbd>↓</kbd> pindah baris';
+  applyTabOrder(); /* urutan "Next" keyboard ponsel mengikuti mode */
 }
 Array.prototype.forEach.call(document.querySelectorAll('.navmode button'),function(b){
   b.addEventListener('click',function(){
@@ -519,7 +522,7 @@ Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),funct
     evalShift=parseInt(b.getAttribute('data-shift'),10)||0;
     try{localStorage.setItem('fima_eval_shift',String(evalShift));}catch(e){}
     applyShiftUI();
-    loadRecord(); /* ganti shift = ganti slot → auto-load */
+    loadRecord();
     toast('Shift '+(evalShift+1)+' · A = '+SHIFT_A[evalShift]+' mnt');
   });
 });
@@ -548,6 +551,18 @@ function navCells(){
   ['hActual','defect','stdRate'].forEach(function(id){var el=$(id);list.push({el:el,f:id,ci:99,ri:-1,param:el.getAttribute('data-plabel')||id});});
   list.push({el:$('btnSave'),f:'save',ci:100,ri:-1,param:'SIMPAN DATA'});
   return list;
+}
+/* ===== PERBAIKAN MOBILE: tabindex dinamis =====
+   Tombol "Next"/"⏎" di keyboard ponsel mengikuti urutan fokus native
+   (tabindex). Dengan men-set tabindex sesuai urutan mode aktif,
+   Next di ponsel bergerak VERTIKAL saat mode vertikal, dan horizontal
+   saat mode horizontal — sama seperti Tab/Enter di desktop. */
+function applyTabOrder(){
+  var cells=navCells();
+  for(var i=0;i<cells.length;i++){
+    var el=cells[i].el;
+    if(el&&el.tagName==='INPUT')el.tabIndex=i+1;
+  }
 }
 function flash(el){if(!el.classList||!el.classList.contains('in'))return;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');}
 function updatePos(c){posEl.innerHTML='<span class="pos-dot"></span>'+(c.ri>=0?('BARIS '+(c.ri+1)+' · '+FLABEL[c.f]):(c.param||''));}
@@ -677,12 +692,10 @@ function recalc(){
   else dEl.innerHTML=issues.map(function(s){return '<div class="d-item">⚠ '+s+'</div>';}).join('');
 
   $('sumDur').textContent=nf0(tot);$('rowN').textContent=rows().length;
+  applyTabOrder(); /* jaga urutan Next ponsel tetap sinkron saat baris berubah */
 }
 
-/* ============================================================
-   SISTEM SIMPAN PER SLOT — fima_oee_db_v2
-   kunci: {tanggal}|S{shift}|L{line}|{stage}
-   ============================================================ */
+/* ---------- SISTEM SIMPAN PER SLOT ---------- */
 function dbGet(){try{return JSON.parse(localStorage.getItem(DB_KEY))||{};}catch(e){return {};}}
 function dbSet(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch(e){}}
 function curKey(){return ($('fDate').value||todayLocal())+'|S'+(evalShift+1)+'|L'+$('fLine').value+'|'+$('fStage').value;}
@@ -716,7 +729,7 @@ function updateEditInfo(d){
 function applyRecord(d){
   tbody.innerHTML='';
   if(d&&d.rows&&d.rows.length){d.rows.forEach(function(r){makeRow(r);});}
-  else{for(var i=0;i<6;i++)makeRow();}
+  else{for(var i=0;i<DEFAULT_ROWS;i++)makeRow();} /* default 20 baris */
   $('hActual').value=(d&&d.h)||'';$('defect').value=(d&&d.k)||'';$('stdRate').value=(d&&d.rate)||'';
   recalc();updateEditInfo(d);
 }
@@ -729,8 +742,6 @@ function saveData(){
   updateEditInfo(db[curKey()]);
   toast('Data tersimpan ✓ '+labelFilter());
 }
-
-/* filter berubah → auto-load */
 ['fDate','fLine','fStage'].forEach(function(id){$(id).addEventListener('change',loadRecord);});
 
 /* ---------- toast ---------- */
@@ -741,7 +752,7 @@ function toast(msg){var el=$('toast');el.textContent=msg;el.classList.add('show'
 $('btnSave').addEventListener('click',saveData);
 $('btnReset').addEventListener('click',function(){
   if(!confirm('Reset seluruh form? Data yang belum disimpan akan hilang.'))return;
-  applyRecord(null); /* hanya kosongkan form, localStorage TIDAK dihapus */
+  applyRecord(null);
   toast('Form dikosongkan ↺');
 });
 $('btnAdd').addEventListener('click',function(){
