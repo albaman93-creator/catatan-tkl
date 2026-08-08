@@ -11,58 +11,41 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --ink:#0f2437; --ink2:#41586c; --mut:#6b8093;
-  --paper:#eef2f5; --card:#fff; --line:#d6dee5; --line2:#e8eef2;
+  --paper:#e8edf1; --card:#fff; --line:#d6dee5; --line2:#e8eef2;
   --green:#12a150; --green-d:#0c7c3d; --green-bg:rgba(18,161,80,.12);
   --amber:#d97706; --red:#dc2626; --navy:#0d2135;
   --mono:'IBM Plex Mono',monospace; --disp:'Barlow Condensed',sans-serif; --body:'IBM Plex Sans',sans-serif;
-  --wrap:100%;
+  --page:880px;
 }
 html{scroll-behavior:smooth}
 body{
   font-family:var(--body);font-size:16px;color:var(--ink);min-height:100vh;
   background:
-    radial-gradient(1100px 520px at 88% -10%, rgba(18,161,80,.09), transparent 60%),
-    linear-gradient(rgba(15,36,55,.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15,36,55,.045) 1px, transparent 1px),
+    radial-gradient(900px 420px at 50% -10%, rgba(18,161,80,.10), transparent 60%),
+    linear-gradient(rgba(15,36,55,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,36,55,.05) 1px, transparent 1px),
     var(--paper);
-  background-size:auto,28px 28px,28px 28px,auto;
+  background-size:auto,26px 26px,26px 26px,auto;
   overflow-x:hidden;
 }
 ::selection{background:rgba(18,161,80,.25)}
-button,input{touch-action:manipulation}
+button,input,select{touch-action:manipulation}
 .spacer{flex:1}
 kbd{font:600 12px var(--mono);background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 6px;color:var(--ink2)}
 
-/* ============ HEADER ============ */
-header{background:linear-gradient(180deg,#16324c 0%,#0d2135 100%);color:#fff;position:relative}
-header::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 28px);pointer-events:none}
-.hwrap{max-width:var(--wrap);margin:0 auto;padding:22px 26px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;z-index:1}
-.brand{display:flex;align-items:center;gap:16px}
-.mark{width:58px;height:58px;border-radius:12px;background:linear-gradient(160deg,#1cbe68,#0c7c3d);display:grid;place-items:center;font:700 27px var(--disp);letter-spacing:1px;color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 6px 16px -6px rgba(18,161,80,.6);flex:none}
-.kicker{font:600 11px var(--mono);letter-spacing:2.5px;color:#6fd39c;margin-bottom:3px}
-h1{font:700 clamp(28px,4vw,40px)/1 var(--disp);letter-spacing:.8px;text-transform:uppercase}
-.sub{font-size:13.5px;color:#93a9bc;margin-top:4px}
-.hud{display:flex;align-items:center;gap:16px}
-.clock{font:600 clamp(24px,3vw,34px) var(--mono);letter-spacing:1px;font-variant-numeric:tabular-nums}
-.date{font:12.5px var(--mono);color:#93a9bc}
-.led{display:inline-flex;align-items:center;gap:7px;font:600 11px var(--mono);letter-spacing:1.5px;color:#7fd7a8;border:1px solid rgba(127,215,168,.4);padding:6px 12px;border-radius:99px}
-.led i{width:8px;height:8px;border-radius:50%;background:#2ee27e;animation:pulse 1.6s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,226,126,.5)}70%{box-shadow:0 0 0 7px rgba(46,226,126,0)}100%{box-shadow:0 0 0 0 rgba(46,226,126,0)}}
-.stripe{height:6px;background:repeating-linear-gradient(-45deg,var(--green) 0 14px,var(--navy) 14px 28px)}
-
 /* ============ TOOLBAR ============ */
-.toolbar{position:sticky;top:0;z-index:50;background:rgba(238,242,245,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
-.twrap{max-width:var(--wrap);margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 26px}
-.pos{display:inline-flex;align-items:center;gap:9px;font:600 13px var(--mono);color:var(--ink);background:#fff;border:1px solid var(--line);padding:10px 14px;border-radius:7px;min-width:230px}
+.toolbar{position:sticky;top:0;z-index:50;background:rgba(238,242,245,.95);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:10px 14px}
+.twrap{max-width:var(--page);margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pos{display:inline-flex;align-items:center;gap:9px;font:600 13px var(--mono);color:var(--ink);background:#fff;border:1px solid var(--line);padding:10px 14px;border-radius:7px;min-width:200px}
 .pos-dot{width:9px;height:9px;background:var(--green);border-radius:2px;animation:blink 1.2s steps(2) infinite;flex:none}
 @keyframes blink{50%{opacity:.25}}
 .navmode,.shiftsel{display:inline-flex;align-items:center;background:#fff;border:1px solid var(--line);border-radius:9px;padding:3px;gap:3px}
 .nm-cap{font:600 10px var(--mono);letter-spacing:1.5px;color:var(--mut);padding:0 5px 0 9px}
-.navmode button,.shiftsel button{border:0;background:transparent;font:600 12.5px var(--mono);letter-spacing:.6px;padding:9px 14px;border-radius:7px;color:var(--mut);cursor:pointer;transition:.2s;display:inline-flex;gap:6px;align-items:center}
+.navmode button,.shiftsel button{border:0;background:transparent;font:600 12.5px var(--mono);letter-spacing:.6px;padding:9px 12px;border-radius:7px;color:var(--mut);cursor:pointer;transition:.2s;display:inline-flex;gap:6px;align-items:center}
 .navmode button.on{background:var(--navy);color:#fff;box-shadow:0 2px 6px -2px rgba(13,33,53,.55)}
 .shiftsel button.on{background:var(--green-d);color:#fff;box-shadow:0 2px 6px -2px rgba(12,124,61,.6)}
 .navmode button:not(.on):hover,.shiftsel button:not(.on):hover{color:var(--ink);background:#f2f6f8}
-.hint{font-size:12px;font-family:var(--mono);color:var(--mut)}
+.hint{font-size:12px;font-family:var(--mono);color:var(--mut);flex-basis:100%}
 #lastSaved{font:12px var(--mono);color:var(--green-d)}
 
 /* ============ BUTTONS ============ */
@@ -73,35 +56,63 @@ h1{font:700 clamp(28px,4vw,40px)/1 var(--disp);letter-spacing:.8px;text-transfor
 .btn-ghost{background:#fff;border-color:var(--line);color:var(--ink2);box-shadow:0 2px 0 #e2e9ee}
 .btn-ghost:hover{border-color:#b8c6d0;color:var(--ink);transform:translateY(-1px)}
 .btn-ghost:active{transform:translateY(1px);box-shadow:none}
-.btn-add{background:#fff;border:1px dashed #9fc3ad;color:var(--green-d)}
+.btn-add{background:#fff;border:1.5px dashed #9fc3ad;color:var(--green-d);padding:10px 14px}
 .btn-add:hover{background:var(--green-bg);border-style:solid}
+.add-below{width:100%;margin-top:12px}
 
-/* ============ LAYOUT ============ */
-main{display:grid;grid-template-columns:1fr;gap:22px;padding:24px 26px 12px;max-width:var(--wrap);margin:0 auto;align-items:start}
-.col-main,.col-side{display:grid;gap:22px;min-width:0}
-
-/* ============ CARD ============ */
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(15,36,55,.05),0 14px 30px -22px rgba(15,36,55,.3);overflow:hidden;animation:rise .55s cubic-bezier(.22,.8,.3,1) both}
+/* ============ LEMBAR A4 ============ */
+.sheet{max-width:var(--page);margin:20px auto 46px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 30px 70px -35px rgba(13,33,53,.45);overflow:hidden;animation:rise .5s cubic-bezier(.22,.8,.3,1) both}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}
-.card-h{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--line2);background:linear-gradient(180deg,#fbfcfd,#f5f8fa)}
-.card-h .no{font:700 17px var(--disp);color:#fff;background:var(--navy);padding:4px 9px;border-radius:6px;letter-spacing:1px;flex:none}
-.card-h h2{font:600 22px/1.05 var(--disp);letter-spacing:1.2px;text-transform:uppercase}
-.card-h .sub2{font:12px var(--mono);color:var(--mut);margin-top:2px}
-.card-b{padding:18px 20px}
-.card-f{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 20px;border-top:1px solid var(--line2);background:#fafcfd;font:12.5px var(--mono);color:var(--mut)}
-.card-f b{color:var(--ink)}
+.hwrap{background:linear-gradient(180deg,#16324c 0%,#0d2135 100%);color:#fff;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;position:relative}
+.hwrap::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 26px);pointer-events:none}
+.brand{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.mark{width:50px;height:50px;border-radius:10px;background:linear-gradient(160deg,#1cbe68,#0c7c3d);display:grid;place-items:center;font:700 23px var(--disp);letter-spacing:1px;color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);flex:none}
+.kicker{font:600 10.5px var(--mono);letter-spacing:2.5px;color:#6fd39c;margin-bottom:3px}
+h1{font:700 clamp(24px,5vw,34px)/1 var(--disp);letter-spacing:.8px;text-transform:uppercase}
+.sub{font-size:12.5px;color:#93a9bc;margin-top:4px}
+.hud{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.clock{font:600 26px var(--mono);letter-spacing:1px;font-variant-numeric:tabular-nums}
+.date{font:11.5px var(--mono);color:#93a9bc}
+.led{display:inline-flex;align-items:center;gap:7px;font:600 10.5px var(--mono);letter-spacing:1.5px;color:#7fd7a8;border:1px solid rgba(127,215,168,.4);padding:6px 11px;border-radius:99px}
+.led i{width:8px;height:8px;border-radius:50%;background:#2ee27e;animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,226,126,.5)}70%{box-shadow:0 0 0 7px rgba(46,226,126,0)}100%{box-shadow:0 0 0 0 rgba(46,226,126,0)}}
+.stripe{height:6px;background:repeating-linear-gradient(-45deg,var(--green) 0 14px,var(--navy) 14px 28px)}
 
-/* ============ LOG TABLE ============ */
-.legend{display:flex;gap:8px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--line2);background:#fafcfd}
-.lg{display:inline-flex;align-items:center;gap:7px;font:500 12.5px var(--mono);color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 12px;transition:transform .15s}
-.lg:hover{transform:translateY(-1px)}
+/* ============ SEKSI ============ */
+.sec{padding:20px 28px}
+.sec + .sec{border-top:2px dashed var(--line)}
+.sec-h{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sec-h .no{font:700 17px var(--disp);color:#fff;background:var(--navy);padding:4px 9px;border-radius:6px;letter-spacing:1px;flex:none}
+.sec-h h2{font:600 23px/1.05 var(--disp);letter-spacing:1.2px;text-transform:uppercase}
+.sec-h .sub2{font:12px var(--mono);color:var(--mut);margin-top:2px}
+.sec-f{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;font:12.5px var(--mono);color:var(--mut)}
+.sec-f b{color:var(--ink)}
+
+/* ============ FILTER PENYIMPANAN ============ */
+.filter-grid{display:grid;grid-template-columns:1.2fr 1fr 1.2fr;gap:12px}
+.edit-info{font:600 11.5px var(--mono);color:var(--mut);background:#f4f7f9;border:1px dashed var(--line);border-radius:99px;padding:6px 12px}
+.edit-info.ok{color:var(--green-d);border-color:rgba(18,161,80,.4);background:var(--green-bg)}
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{display:flex;justify-content:space-between;align-items:baseline;font:600 12.5px var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.unit{font-size:11.5px;color:var(--mut);text-transform:none}
+.field input,.field select{width:100%;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font:600 16px var(--mono);color:var(--ink);background:#fbfcfd;transition:.15s;caret-color:var(--green)}
+.field input:hover,.field select:hover{background:#f4f8fa}
+.field input:focus,.field select:focus{outline:none;border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(18,161,80,.16)}
+.field .big{font-size:18px}
+
+/* legend kode */
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.lg{display:inline-flex;align-items:center;gap:7px;font:500 12.5px var(--mono);color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 12px}
 .sw{width:10px;height:10px;border-radius:2px;flex:none}
 .sw-a{background:var(--amber)}.sw-r{background:var(--red)}.sw-g{background:var(--green)}
+
+/* ============ TABEL ============ */
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse}
-.log th{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.9px;color:var(--mut);text-align:left;padding:11px 10px;background:#f4f7f9;border-bottom:2px solid var(--line);white-space:nowrap;transition:color .15s,background .15s}
+.log th{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.9px;color:var(--mut);text-align:left;padding:10px 8px;background:#f4f7f9;border-bottom:2px solid var(--line);white-space:nowrap;transition:color .15s,background .15s}
 .log th.on{color:var(--green-d);background:var(--green-bg)}
-.log td{padding:4px 6px;border-bottom:1px solid var(--line2);vertical-align:middle}
+.log td{padding:4px 5px;border-bottom:1px solid var(--line2);vertical-align:middle}
 .log tbody tr{transition:background .15s,opacity .19s,transform .19s;animation:rowin .25s ease both}
 @keyframes rowin{from{opacity:0;transform:translateY(-4px)}}
 .log tbody tr:hover{background:#f6faf8}
@@ -116,15 +127,15 @@ tr[data-cat="prod"] td:first-child::before{background:var(--green)}
 tr[data-cat="planned"] .dot{background:var(--amber);box-shadow:0 0 0 3px rgba(217,119,6,.15)}
 tr[data-cat="unplanned"] .dot{background:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.15)}
 tr[data-cat="prod"] .dot{background:var(--green);box-shadow:0 0 0 3px rgba(18,161,80,.15)}
-td.dur{text-align:center;width:92px}
-.dur-v{font:600 14.5px var(--mono);color:var(--ink2)}
-.c-aksi{text-align:center;width:52px}
-.del{width:32px;height:32px;border-radius:7px;border:1px solid transparent;background:transparent;color:#a4b4c0;cursor:pointer;font-size:13px;transition:.15s}
+td.dur{text-align:center;width:80px}
+.dur-v{font:600 15px var(--mono);color:var(--ink2)}
+.c-aksi{text-align:center;width:46px}
+.del{width:34px;height:34px;border-radius:7px;border:1px solid transparent;background:transparent;color:#a4b4c0;cursor:pointer;font-size:13px;transition:.15s}
 .del:hover{background:rgba(220,38,38,.1);color:var(--red);border-color:rgba(220,38,38,.3);transform:scale(1.08)}
 
-/* ============ INPUTS (besar & nyaman) ============ */
-.in{width:100%;border:1px solid transparent;background:transparent;padding:10px;border-radius:7px;font:500 15.5px var(--body);color:var(--ink);caret-color:var(--green);transition:background .15s,border-color .15s,box-shadow .15s}
-.in.mono{font-family:var(--mono);font-size:15px}
+/* ============ INPUT BARIS ============ */
+.in{width:100%;border:1px solid transparent;background:transparent;padding:10px 8px;border-radius:7px;font:500 16px var(--body);color:var(--ink);caret-color:var(--green);transition:background .15s,border-color .15s,box-shadow .15s}
+.in.mono{font-family:var(--mono);font-size:15.5px}
 .in.ctr{text-align:center}
 .in::placeholder{color:#b6c4cf}
 .in:hover{background:#f2f6f8}
@@ -134,56 +145,36 @@ td.dur{text-align:center;width:92px}
 .in.flash{animation:flashbg .6s}
 @keyframes flashbg{0%{background:rgba(18,161,80,.3)}100%{background:transparent}}
 
-/* ============ SHIFT TABLE ============ */
-.shift th{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--mut);background:#f4f7f9;border-bottom:2px solid var(--line);padding:10px 12px;text-align:right;cursor:help}
-.shift td{padding:9px 12px;text-align:right;font-family:var(--mono);font-size:14px;border-bottom:1px solid var(--line2);color:var(--ink2)}
+/* tabel shift */
+.shift th{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--mut);background:#f4f7f9;border-bottom:2px solid var(--line);padding:10px 10px;text-align:right;cursor:help}
+.shift td{padding:9px 10px;text-align:right;font-family:var(--mono);font-size:14.5px;border-bottom:1px solid var(--line2);color:var(--ink2)}
 .shift th:first-child,.shift td:first-child{text-align:left}
 .shift tfoot td{font-weight:600;color:var(--ink);background:#f4f7f9;border-top:2px solid var(--line)}
 .fv{font-weight:600;color:var(--ink)!important}
 
-/* ============ PARAMETER ============ */
-.field{margin-bottom:14px}
-.field label{display:flex;justify-content:space-between;align-items:baseline;font:600 12px var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
-.unit{font-size:11.5px;color:var(--mut);text-transform:none}
-.field input{width:100%;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font:600 18px var(--mono);color:var(--ink);background:#fbfcfd;transition:.15s;caret-color:var(--green)}
-.field input:hover{background:#f4f8fa}
-.field input:focus{outline:none;border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(18,161,80,.16)}
-.filter-grid{display:grid;grid-template-columns:1.2fr 1fr 1.2fr;gap:12px}
-.field select{width:100%;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font:600 16px var(--mono);color:var(--ink);background:#fbfcfd;transition:.15s;cursor:pointer}
-.field select:hover{background:#f4f8fa}
-.field select:focus{outline:none;border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(18,161,80,.16)}
-.field input[type="date"]{width:100%;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font:600 16px var(--mono);color:var(--ink);background:#fbfcfd;transition:.15s}
-.field input[type="date"]:hover{background:#f4f8fa}
-.field input[type="date"]:focus{outline:none;border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(18,161,80,.16)}
-.edit-info{display:inline-flex;align-items:center;font:600 11.5px var(--mono);color:var(--mut);background:#f4f7f9;border:1px dashed var(--line);border-radius:99px;padding:6px 12px;white-space:nowrap}
-.edit-info.ok{color:var(--green-d);border-color:rgba(18,161,80,.4);background:var(--green-bg)}
-@media(max-width:640px){.filter-grid{grid-template-columns:1fr}}
-
-/* ============ PERFORMANCE & QUALITY ============ */
-.pq{border:1px solid var(--line2);border-radius:10px;padding:14px 16px;background:#fbfcfd;margin-bottom:14px;transition:border-color .2s}
-.pq:hover{border-color:#c4d4de}
+/* ============ PQ ============ */
+.pq{border:1px solid var(--line2);border-radius:10px;padding:14px 16px;background:#fbfcfd;margin-bottom:14px}
 .pq:last-child{margin-bottom:0}
-.pq-h{display:flex;justify-content:space-between;align-items:baseline;font:700 15px var(--disp);letter-spacing:1.5px;color:var(--ink2);margin-bottom:9px}
+.pq-h{display:flex;justify-content:space-between;align-items:baseline;font:700 16px var(--disp);letter-spacing:1.5px;color:var(--ink2);margin-bottom:9px}
 .pq-h b{font:600 15px var(--mono);color:var(--green-d)}
-.pq-grid{display:grid;grid-template-columns:1fr auto;gap:5px 10px;font-size:13.5px;color:var(--mut)}
-.pq-grid b{font:600 13.5px var(--mono);color:var(--ink);text-align:right}
+.pq-grid{display:grid;grid-template-columns:1fr auto;gap:5px 10px;font-size:14px;color:var(--mut)}
+.pq-grid b{font:600 14px var(--mono);color:var(--ink);text-align:right}
 .bar{height:8px;border-radius:99px;background:#e5ecf1;margin-top:10px;overflow:hidden}
 .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--green-d),#2ee27e);transition:width .5s cubic-bezier(.22,.8,.3,1)}
 .pq-note{font:11.5px var(--mono);color:#9aabba;margin-top:8px}
 
-/* ============ RINCIAN OEE ============ */
-.ov-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 2px;border-bottom:1px dashed var(--line2);font-size:14px;color:var(--ink2);transition:background .15s}
-.ov-row:hover{background:#f8fbfc}
-.ov-row b{font:600 14px var(--mono);color:var(--ink)}
+/* ============ RINCIAN ============ */
+.ov-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 2px;border-bottom:1px dashed var(--line2);font-size:14.5px;color:var(--ink2)}
+.ov-row b{font:600 14.5px var(--mono);color:var(--ink)}
 .tag{font:600 11px var(--mono);color:#fff;background:var(--navy);border-radius:4px;padding:2px 7px;margin-right:8px}
 .tag.hl{background:var(--green-d)}
-.ov-sep{display:flex;align-items:center;gap:8px;margin:16px 0 5px;font:700 14px var(--disp);letter-spacing:2.2px;color:var(--ink2)}
+.ov-sep{display:flex;align-items:center;gap:8px;margin:16px 0 5px;font:700 15px var(--disp);letter-spacing:2.2px;color:var(--ink2)}
 .ov-sep:first-child{margin-top:2px}
 .ov-sep::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
 .ov-sep::before{content:'';width:14px;height:2px;background:var(--line);flex:none}
-.score{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:18px;background:linear-gradient(180deg,#123049,#0d2135);color:#fff;overflow:hidden}
+.score{margin-top:16px;border-radius:12px;padding:18px;background:linear-gradient(180deg,#123049,#0d2135);color:#fff;overflow:hidden}
 .score-k{font:600 11px var(--mono);letter-spacing:2.5px;color:#7fd7a8}
-.score-num{font:700 clamp(52px,6vw,72px)/1 var(--disp);letter-spacing:1px;margin:8px 0 14px;font-variant-numeric:tabular-nums}
+.score-num{font:700 clamp(52px,9vw,68px)/1 var(--disp);letter-spacing:1px;margin:8px 0 14px;font-variant-numeric:tabular-nums}
 .score-num span{font-size:.5em;color:#7fd7a8;margin-left:3px}
 .gauge{height:12px;border-radius:99px;background:rgba(255,255,255,.14);position:relative}
 .gauge-fill{position:absolute;top:0;bottom:0;left:0;width:0%;border-radius:99px;background:linear-gradient(90deg,#17b26a,#2ee27e);transition:width .6s cubic-bezier(.22,.8,.3,1),background .3s}
@@ -195,54 +186,59 @@ td.dur{text-align:center;width:92px}
 .d-item{display:flex;gap:8px;align-items:flex-start;font:500 12.5px/1.55 var(--mono);color:#ffc9c9;background:rgba(220,38,38,.16);border:1px solid rgba(248,113,113,.35);padding:8px 11px;border-radius:7px;animation:rise .3s ease both}
 .d-item.ok{color:#9ff0c0;background:rgba(46,226,126,.12);border:1px solid rgba(46,226,126,.35)}
 
-/* ============ TOAST / FOOTER ============ */
+.sheet-f{padding:14px 28px;border-top:1px solid var(--line);background:#fafcfd;font:12px var(--mono);color:#8fa2b2;display:flex;gap:16px;flex-wrap:wrap}
+
 #toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:var(--navy);color:#fff;padding:14px 22px 14px 18px;border-radius:10px;border-left:4px solid var(--green);box-shadow:0 12px 30px -10px rgba(13,33,53,.5);font:500 15px var(--body);transition:.3s cubic-bezier(.22,.8,.3,1);z-index:99;max-width:calc(100vw - 32px);text-align:center}
 #toast.show{opacity:1;transform:translate(-50%,0)}
-footer{max-width:var(--wrap);margin:0 auto;padding:10px 26px 32px;font:12px var(--mono);color:#8fa2b2;display:flex;gap:18px;flex-wrap:wrap}
 
-/* ============ MOBILE FRIENDLY ============ */
-@media(max-width:760px){
-  .hwrap{padding:14px 14px;gap:12px}
-  .mark{width:48px;height:48px;font-size:22px;border-radius:10px}
-  .sub{font-size:12px}
-  .hud{gap:10px}
-  .twrap{padding:10px 12px;gap:8px}
-  .pos{flex:1 1 100%;min-width:230;justify-content:center}
+@media(max-width:640px){
+  .twrap{gap:8px}
+  .pos{flex:1 1 100%;min-width:0;justify-content:center}
   .navmode,.shiftsel{flex:1 1 45%}
   .navmode button,.shiftsel button{flex:1;justify-content:center;padding:11px 4px;font-size:12px}
   .nm-cap{display:none}
   .hint{display:none}
   #lastSaved{flex:1 1 100%;text-align:center}
   #btnReset,#btnSave{flex:1 1 40%;padding:13px 10px}
-  main{padding:14px 12px 8px;gap:14px}
-  .col-main,.col-side{gap:14px}
-  .card-h{padding:13px 14px}
-  .card-h h2{font-size:20px}
-  .card-b{padding:14px}
-  .card-f{padding:11px 14px;font-size:12px}
-  .legend{padding:10px 12px}
-  .lg{font-size:11.5px;padding:5px 10px}
-  /* input 16px → mencegah auto-zoom iOS saat fokus */
-  .in{font-size:16px;padding:12px 10px}
+  .sheet{margin:12px 10px 30px}
+  .hwrap{padding:16px 16px}
+  .sec{padding:16px 14px}
+  .sec-h h2{font-size:21px}
+  .filter-grid{grid-template-columns:1fr}
+  .in{font-size:16px;padding:12px 8px}
   .in.mono{font-size:16px}
   .log{min-width:640px}
-  .shift{min-width:560px}
-  .del{width:36px;height:36px;font-size:14px}
-  .field input{font-size:18px}
-  .score-num{font-size:56px}
-  footer{padding:8px 14px 26px;gap:10px}
-}
-@media(max-width:400px){
-  h1{font-size:25px}
-  .clock{font-size:22px}
-  .score-num{font-size:48px}
-  .navmode button,.shiftsel button{font-size:11px}
+  .shift{min-width:540px}
+  .sheet-f{padding:12px 14px}
 }
 </style>
 </head>
 <body>
 
-<header>
+<div class="toolbar">
+  <div class="twrap">
+    <span class="pos" id="pos"><span class="pos-dot"></span>SIAP · KLIK SEL / MULAI KETIK</span>
+    <div class="navmode" title="Pilih mode navigasi Tab / Enter">
+      <span class="nm-cap">MODE TAB</span>
+      <button type="button" data-mode="v" class="on">⇅ VERTIKAL</button>
+      <button type="button" data-mode="h">⇄ HORIZONTAL</button>
+    </div>
+    <div class="shiftsel" title="Shift evaluasi & komponen kunci simpan">
+      <span class="nm-cap">SHIFT</span>
+      <button type="button" data-shift="0" class="on">S1·510</button>
+      <button type="button" data-shift="1">S2·480</button>
+      <button type="button" data-shift="2">S3·450</button>
+    </div>
+    <span class="hint" id="hint"></span>
+    <span class="spacer"></span>
+    <span id="lastSaved"></span>
+    <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
+    <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
+  </div>
+</div>
+
+<div class="sheet">
+
   <div class="hwrap">
     <div class="brand">
       <div class="mark">FF</div>
@@ -260,47 +256,25 @@ footer{max-width:var(--wrap);margin:0 auto;padding:10px 26px 32px;font:12px var(
       <div class="led"><i></i>LIVE</div>
     </div>
   </div>
-</header>
-<div class="stripe"></div>
+  <div class="stripe"></div>
 
-<div class="toolbar">
-  <div class="twrap">
-    <span class="pos" id="pos"><span class="pos-dot"></span>SIAP · KLIK SEL / MULAI KETIK</span>
-    <div class="navmode" title="Pilih mode navigasi Tab / Enter">
-      <span class="nm-cap">MODE TAB</span>
-      <button type="button" data-mode="v" class="on">⇅ VERTIKAL</button>
-      <button type="button" data-mode="h">⇄ HORIZONTAL</button>
-    </div>
-    <div class="shiftsel" title="Pilih shift untuk evaluasi OEE">
-      <span class="nm-cap">SHIFT</span>
-      <button type="button" data-shift="0" class="on">S1·510</button>
-      <button type="button" data-shift="1">S2·480</button>
-      <button type="button" data-shift="2">S3·450</button>
-    </div>
-    <span class="hint" id="hint"></span>
-    <span class="spacer"></span>
-    <span id="lastSaved"></span>
-    <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
-    <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
-  </div>
-</div>
-
-<main>
-  <!-- ================= FILTER DATA & PENYIMPANAN ================= -->
-  <section class="sec" style="margin-bottom:24px;border-radius:12px;border:1px solid var(--line);background:var(--card)">
-    <div class="sec-h" style="border-bottom:1px solid var(--line2);padding:16px 20px;background:linear-gradient(180deg,#fbfcfd,#f5f8fa)">
-      <div style="display:flex;align-items:center;gap:14px;flex:1">
-        <h2 style="font:600 18px/1 var(--disp);letter-spacing:1px;text-transform:uppercase;color:var(--ink);margin:0">📊 Data &amp; Penyimpanan</h2>
-        <div style="font:12px var(--mono);color:var(--mut)">Satu slot per Tanggal · Shift · Line · Tahapan</div>
+  <!-- ============ DATA & PENYIMPANAN ============ -->
+  <section class="sec">
+    <div class="sec-h">
+      <span class="no">📊</span>
+      <div>
+        <h2>Data &amp; Penyimpanan</h2>
+        <div class="sub2">Satu slot per Tanggal · Shift · Line · Tahapan — ganti filter = data auto-load</div>
       </div>
+      <span class="spacer"></span>
       <span id="editInfo" class="edit-info">belum ada data tersimpan</span>
     </div>
-    <div class="filter-grid" style="padding:18px 20px">
-      <div class="field">
+    <div class="filter-grid">
+      <div class="field" style="margin-bottom:0">
         <label>Tanggal <span class="unit">log sheet</span></label>
         <input type="date" id="fDate">
       </div>
-      <div class="field">
+      <div class="field" style="margin-bottom:0">
         <label>Line <span class="unit">produksi</span></label>
         <select id="fLine">
           <option value="1">Line 1</option>
@@ -308,7 +282,7 @@ footer{max-width:var(--wrap);margin:0 auto;padding:10px 26px 32px;font:12px var(
           <option value="4">Line 4</option>
         </select>
       </div>
-      <div class="field">
+      <div class="field" style="margin-bottom:0">
         <label>Tahapan Proses</label>
         <select id="fStage">
           <option value="mixing">Mixing</option>
@@ -321,178 +295,182 @@ footer{max-width:var(--wrap);margin:0 auto;padding:10px 26px 32px;font:12px var(
     </div>
   </section>
 
-  <!-- ================= KOLOM KIRI ================= -->
-  <section class="col-main">
-
-    <div class="card" style="animation-delay:.05s">
-      <div class="card-h">
-        <span class="no">01</span>
-        <div>
-          <h2>Log Sheet Harian</h2>
-          <div class="sub2">Jam Selesai otomatis = Jam Mulai baris berikutnya · ketik 0740 → 07:40</div>
-        </div>
-        <span class="spacer"></span>
-        <button class="btn btn-add" id="btnAdd" type="button">+ Tambah Baris</button>
-      </div>
-      <div class="legend">
-        <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned DT</span>
-        <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned DT</span>
-        <span class="lg"><i class="sw sw-g"></i>Lainnya (misal 2) → Produksi</span>
-      </div>
-      <div class="tbl-wrap">
-        <table class="log">
-          <thead>
-            <tr>
-              <th style="width:84px">Kode</th>
-              <th style="width:104px">Jam Mulai</th>
-              <th style="width:104px">Jam Selesai</th>
-              <th style="width:92px">Durasi (m)</th>
-              <th>Kegiatan</th>
-              <th style="width:52px">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-      <div class="card-f">
-        <span>Σ durasi tercatat: <b id="sumDur">0</b> / 1.440 mnt</span><span>·</span>
-        <span><b id="rowN">0</b> baris</span>
-        <span class="spacer"></span>
-        <span>Tanda ":" dipasang otomatis saat mengetik jam</span>
+  <!-- ============ 01 LOG SHEET ============ -->
+  <section class="sec">
+    <div class="sec-h">
+      <span class="no">01</span>
+      <div>
+        <h2>Log Sheet Harian</h2>
+        <div class="sub2">Jam Selesai otomatis = Jam Mulai baris berikutnya · ketik 0740 → 07:40 · default 30 baris</div>
       </div>
     </div>
-
-    <div class="card" style="animation-delay:.12s">
-      <div class="card-h">
-        <span class="no">02</span>
-        <div>
-          <h2>Availability per Shift</h2>
-          <div class="sub2">S1 07.00–15.30 (510 mnt) · S2 15.30–23.30 (480 mnt) · S3 23.30–07.00 (450 mnt)</div>
-        </div>
-      </div>
-      <div class="tbl-wrap">
-        <table class="shift">
-          <thead>
-            <tr>
-              <th>Shift</th><th title="Menit tersedia per shift">A (mnt)</th>
-              <th title="Planned DT">B (mnt)</th><th title="C = A − B">C (mnt)</th>
-              <th title="Unplanned DT">D (mnt)</th><th title="E = C − D">E (mnt)</th>
-              <th title="F = E ÷ C × 100">F (%)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>1</td><td>510</td><td id="s1B">0</td><td id="s1C">510</td><td id="s1D">0</td><td id="s1E">510</td><td id="s1F" class="fv">0,00</td></tr>
-            <tr><td>2</td><td>480</td><td id="s2B">0</td><td id="s2C">480</td><td id="s2D">0</td><td id="s2E">480</td><td id="s2F" class="fv">0,00</td></tr>
-            <tr><td>3</td><td>450</td><td id="s3B">0</td><td id="s3C">450</td><td id="s3D">0</td><td id="s3E">450</td><td id="s3F" class="fv">0,00</td></tr>
-          </tbody>
-          <tfoot>
-            <tr><td>Total</td><td>1.440</td><td id="tB">0</td><td id="tC">1.440</td><td id="tD">0</td><td id="tE">1.440</td><td id="tF" class="fv">0,00</td></tr>
-          </tfoot>
-        </table>
-      </div>
-      <div class="card-f">
-        <span><b>B</b> = Planned DT (kode 5,6,7,8)</span><span>·</span>
-        <span><b>D</b> = Unplanned DT (kode 1,3,4,9)</span>
-      </div>
+    <div class="legend">
+      <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned DT</span>
+      <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned DT</span>
+      <span class="lg"><i class="sw sw-g"></i>Lainnya (misal 2) → Produksi</span>
     </div>
-
-    <div class="card" style="animation-delay:.15s">
-      <div class="card-h">
-        <span class="no">03</span>
-        <div><h2>Parameter OEE</h2><div class="sub2">Input output &amp; standar untuk shift terpilih</div></div>
-      </div>
-      <div class="card-b">
-        <div class="field">
-          <label>H / J — Total Output Aktual <span class="unit">unit</span></label>
-          <input id="hActual" data-nav data-plabel="H · OUTPUT AKTUAL" inputmode="decimal" placeholder="0">
-        </div>
-        <div class="field">
-          <label>K — Total Defect <span class="unit">unit</span></label>
-          <input id="defect" data-nav data-plabel="K · DEFECT" inputmode="decimal" placeholder="0">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Kecepatan Standar <span class="unit">unit/mnt</span></label>
-          <input id="stdRate" data-nav data-plabel="KECEPATAN STANDAR" inputmode="decimal" placeholder="0">
-        </div>
-      </div>
+    <div class="tbl-wrap">
+      <table class="log">
+        <thead>
+          <tr>
+            <th style="width:44px;text-align:center">#</th>
+            <th style="width:66px">Kode</th>
+            <th style="width:96px">Jam Mulai</th>
+            <th style="width:96px">Jam Selesai</th>
+            <th style="width:80px">Durasi (m)</th>
+            <th>Kegiatan</th>
+            <th style="width:46px">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot>
+          <tr style="background:#f4f7f9;border-top:2px solid var(--line);">
+            <td style="text-align:center;padding:10px 6px;" colspan="4">
+              <span style="font:600 13px var(--mono);color:var(--ink);">TOTAL DURASI TERCATAT</span>
+            </td>
+            <td style="text-align:center;padding:10px 6px;">
+              <b id="totalDurasi" style="font:700 16px var(--mono);color:var(--green-d);">0</b>
+              <span style="font:12px var(--mono);color:var(--mut);"> mnt</span>
+            </td>
+            <td colspan="2" style="text-align:center;font:11px var(--mono);color:var(--mut);">
+              dari 1.440 mnt
+            </td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
-
-    <div class="card" style="animation-delay:.17s">
-      <div class="card-h">
-        <span class="no">04</span>
-        <div><h2>Performance &amp; Quality</h2><div class="sub2" id="pqSub">Evaluasi Shift 1 (510 mnt)</div></div>
-      </div>
-      <div class="card-b">
-        <div class="pq">
-          <div class="pq-h">% PERFORMANCE <b id="pqI">0,00 %</b></div>
-          <div class="pq-grid">
-            <span>G — Target Output</span><b id="pqG">0 unit</b>
-            <span>H — Output Aktual</span><b id="pqH">0 unit</b>
-          </div>
-          <div class="bar"><i id="pqIbar"></i></div>
-          <div class="pq-note">G = durasi kode produksi shift terpilih × kecepatan standar</div>
-        </div>
-        <div class="pq">
-          <div class="pq-h">% QUALITY <b id="qqM">0,00 %</b></div>
-          <div class="pq-grid">
-            <span>J — Output Aktual</span><b id="qqJ">0 unit</b>
-            <span>K — Defect</span><b id="qqK">0 unit</b>
-            <span>L — Produk Bagus</span><b id="qqL">0 unit</b>
-          </div>
-          <div class="bar"><i id="qqMbar"></i></div>
-          <div class="pq-note">L = J − K &nbsp;·&nbsp; M = L ÷ J × 100</div>
-        </div>
-      </div>
+    <button class="btn btn-add add-below" id="btnAdd" type="button">+ Tambah Baris</button>
+    <div class="sec-f">
+      <span>Σ durasi tercatat: <b id="sumDur">0</b> / 1.440 mnt</span><span>·</span>
+      <span><b id="rowN">0</b> baris</span>
+      <span class="spacer"></span>
+      <span>Tanda ":" dipasang otomatis saat mengetik jam</span>
     </div>
-
   </section>
 
-  <!-- ================= KOLOM KANAN ================= -->
-  <aside class="col-side">
-
-    <div class="card" style="animation-delay:.1s">
-      <div class="card-h">
-        <span class="no">05</span>
-        <div><h2>Rincian OEE</h2><div class="sub2" id="rincSub">Evaluasi Shift 1 · A = 510 mnt</div></div>
-      </div>
-      <div class="card-b">
-        <div class="ov-sep"><i class="sw sw-g"></i>AVAILABILITY</div>
-        <div class="ov-row"><span><span class="tag">A</span>Op. Pabrik</span><b><span id="oA">510</span> mnt</b></div>
-        <div class="ov-row"><span><span class="tag">B</span>Planned DT</span><b><span id="oB">0</span> mnt</b></div>
-        <div class="ov-row"><span><span class="tag">C</span>Prod. Terencana</span><b><span id="oC">510</span> mnt</b></div>
-        <div class="ov-row"><span><span class="tag">D</span>Unplanned DT</span><b><span id="oD">0</span> mnt</b></div>
-        <div class="ov-row"><span><span class="tag">E</span>Waktu Operasional</span><b><span id="oE">510</span> mnt</b></div>
-        <div class="ov-row"><span><span class="tag hl">F</span>Availability</span><b><span id="oF">0,00</span> %</b></div>
-
-        <div class="ov-sep"><i class="sw sw-a"></i>PERFORMANCE</div>
-        <div class="ov-row"><span><span class="tag">G</span>Target Output</span><b><span id="oG">0</span> unit</b></div>
-        <div class="ov-row"><span><span class="tag">H</span>Output Aktual</span><b><span id="oH">0</span> unit</b></div>
-        <div class="ov-row"><span><span class="tag hl">I</span>Performance</span><b><span id="oI">0,00</span> %</b></div>
-
-        <div class="ov-sep"><i class="sw sw-r"></i>QUALITY</div>
-        <div class="ov-row"><span><span class="tag">J</span>Output Aktual</span><b><span id="oJ">0</span> unit</b></div>
-        <div class="ov-row"><span><span class="tag">K</span>Defect</span><b><span id="oK">0</span> unit</b></div>
-        <div class="ov-row"><span><span class="tag">L</span>Produk Bagus</span><b><span id="oL">0</span> unit</b></div>
-        <div class="ov-row"><span><span class="tag hl">M</span>Quality</span><b><span id="oM">0,00</span> %</b></div>
-
-        <div class="score">
-          <div class="score-k">SKOR AKHIR OEE — <span id="scoreShift">SHIFT 1</span></div>
-          <div class="score-num" id="oee">0,00<span>%</span></div>
-          <div class="gauge"><div class="gauge-fill" id="gaugeFill"></div><div class="gauge-tick"></div></div>
-          <div class="score-cap"><span>OEE = F × I × M</span><span>target ≥ 85%</span></div>
-          <div class="diag" id="diag"></div>
-        </div>
+  <!-- ============ 02 AVAILABILITY ============ -->
+  <section class="sec">
+    <div class="sec-h">
+      <span class="no">02</span>
+      <div>
+        <h2>Availability per Shift</h2>
+        <div class="sub2">S1 07.00–15.30 (510 mnt) · S2 15.30–23.30 (480 mnt) · S3 23.30–07.00 (450 mnt)</div>
       </div>
     </div>
+    <div class="tbl-wrap">
+      <table class="shift">
+        <thead>
+          <tr>
+            <th>Shift</th><th title="Menit tersedia per shift">A (mnt)</th>
+            <th title="Planned DT">B (mnt)</th><th title="C = A − B">C (mnt)</th>
+            <th title="Unplanned DT">D (mnt)</th><th title="E = C − D">E (mnt)</th>
+            <th title="F = E ÷ C × 100">F (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>510</td><td id="s1B">0</td><td id="s1C">510</td><td id="s1D">0</td><td id="s1E">510</td><td id="s1F" class="fv">0,00</td></tr>
+          <tr><td>2</td><td>480</td><td id="s2B">0</td><td id="s2C">480</td><td id="s2D">0</td><td id="s2E">480</td><td id="s2F" class="fv">0,00</td></tr>
+          <tr><td>3</td><td>450</td><td id="s3B">0</td><td id="s3C">450</td><td id="s3D">0</td><td id="s3E">450</td><td id="s3F" class="fv">0,00</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>Total</td><td>1.440</td><td id="tB">0</td><td id="tC">1.440</td><td id="tD">0</td><td id="tE">1.440</td><td id="tF" class="fv">0,00</td></tr>
+        </tfoot>
+      </table>
+    </div>
+    <div class="sec-f">
+      <span><b>B</b> = Planned DT (kode 5,6,7,8)</span><span>·</span>
+      <span><b>D</b> = Unplanned DT (kode 1,3,4,9)</span>
+    </div>
+  </section>
 
-  </aside>
-</main>
+  <!-- ============ 03 PARAMETER ============ -->
+  <section class="sec">
+    <div class="sec-h">
+      <span class="no">03</span>
+      <div><h2>Parameter OEE</h2><div class="sub2">Input output &amp; standar untuk shift terpilih</div></div>
+    </div>
+    <div class="field">
+      <label>H / J — Total Output Aktual <span class="unit">unit</span></label>
+      <input id="hActual" class="big" data-nav data-plabel="H · OUTPUT AKTUAL" inputmode="decimal" placeholder="0">
+    </div>
+    <div class="field">
+      <label>K — Total Defect <span class="unit">unit</span></label>
+      <input id="defect" class="big" data-nav data-plabel="K · DEFECT" inputmode="decimal" placeholder="0">
+    </div>
+    <div class="field">
+      <label>Kecepatan Standar <span class="unit">unit/mnt</span></label>
+      <input id="stdRate" class="big" data-nav data-plabel="KECEPATAN STANDAR" inputmode="decimal" placeholder="0">
+    </div>
+  </section>
 
-<footer>
-  <span><kbd>Ctrl</kbd>+<kbd>S</kbd> simpan cepat</span>
-  <span>Shift: S1 07.00–15.30 · S2 15.30–23.30 · S3 23.30–07.00 (mengikuti jam mulai)</span>
-  <span>Fima Farma OEE System</span>
-</footer>
+  <!-- ============ 04 PERFORMANCE & QUALITY ============ -->
+  <section class="sec">
+    <div class="sec-h">
+      <span class="no">04</span>
+      <div><h2>Performance &amp; Quality</h2><div class="sub2" id="pqSub">Evaluasi Shift 1 (510 mnt)</div></div>
+    </div>
+    <div class="pq">
+      <div class="pq-h">% PERFORMANCE <b id="pqI">0,00 %</b></div>
+      <div class="pq-grid">
+        <span>G — Target Output</span><b id="pqG">0 unit</b>
+        <span>H — Output Aktual</span><b id="pqH">0 unit</b>
+      </div>
+      <div class="bar"><i id="pqIbar"></i></div>
+      <div class="pq-note">G = durasi kode produksi shift terpilih × kecepatan standar</div>
+    </div>
+    <div class="pq">
+      <div class="pq-h">% QUALITY <b id="qqM">0,00 %</b></div>
+      <div class="pq-grid">
+        <span>J — Output Aktual</span><b id="qqJ">0 unit</b>
+        <span>K — Defect</span><b id="qqK">0 unit</b>
+        <span>L — Produk Bagus</span><b id="qqL">0 unit</b>
+      </div>
+      <div class="bar"><i id="qqMbar"></i></div>
+      <div class="pq-note">L = J − K &nbsp;·&nbsp; M = L ÷ J × 100</div>
+    </div>
+  </section>
+
+  <!-- ============ 05 RINCIAN OEE ============ -->
+  <section class="sec">
+    <div class="sec-h">
+      <span class="no">05</span>
+      <div><h2>Rincian OEE</h2><div class="sub2" id="rincSub">Evaluasi Shift 1 · A = 510 mnt</div></div>
+    </div>
+    <div class="ov-sep"><i class="sw sw-g"></i>AVAILABILITY</div>
+    <div class="ov-row"><span><span class="tag">A</span>Op. Pabrik</span><b><span id="oA">510</span> mnt</b></div>
+    <div class="ov-row"><span><span class="tag">B</span>Planned DT</span><b><span id="oB">0</span> mnt</b></div>
+    <div class="ov-row"><span><span class="tag">C</span>Prod. Terencana</span><b><span id="oC">510</span> mnt</b></div>
+    <div class="ov-row"><span><span class="tag">D</span>Unplanned DT</span><b><span id="oD">0</span> mnt</b></div>
+    <div class="ov-row"><span><span class="tag">E</span>Waktu Operasional</span><b><span id="oE">510</span> mnt</b></div>
+    <div class="ov-row"><span><span class="tag hl">F</span>Availability</span><b><span id="oF">0,00</span> %</b></div>
+
+    <div class="ov-sep"><i class="sw sw-a"></i>PERFORMANCE</div>
+    <div class="ov-row"><span><span class="tag">G</span>Target Output</span><b><span id="oG">0</span> unit</b></div>
+    <div class="ov-row"><span><span class="tag">H</span>Output Aktual</span><b><span id="oH">0</span> unit</b></div>
+    <div class="ov-row"><span><span class="tag hl">I</span>Performance</span><b><span id="oI">0,00</span> %</b></div>
+
+    <div class="ov-sep"><i class="sw sw-r"></i>QUALITY</div>
+    <div class="ov-row"><span><span class="tag">J</span>Output Aktual</span><b><span id="oJ">0</span> unit</b></div>
+    <div class="ov-row"><span><span class="tag">K</span>Defect</span><b><span id="oK">0</span> unit</b></div>
+    <div class="ov-row"><span><span class="tag">L</span>Produk Bagus</span><b><span id="oL">0</span> unit</b></div>
+    <div class="ov-row"><span><span class="tag hl">M</span>Quality</span><b><span id="oM">0,00</span> %</b></div>
+
+    <div class="score">
+      <div class="score-k">SKOR AKHIR OEE — <span id="scoreShift">SHIFT 1</span></div>
+      <div class="score-num" id="oee">0,00<span>%</span></div>
+      <div class="gauge"><div class="gauge-fill" id="gaugeFill"></div><div class="gauge-tick"></div></div>
+      <div class="score-cap"><span>OEE = F × I × M</span><span>target ≥ 85%</span></div>
+      <div class="diag" id="diag"></div>
+    </div>
+  </section>
+
+  <div class="sheet-f">
+    <span><kbd>Ctrl</kbd>+<kbd>S</kbd> simpan cepat</span>
+    <span>Shift: S1 07.00–15.30 · S2 15.30–23.30 · S3 23.30–07.00</span>
+    <span>Fima Farma OEE System</span>
+  </div>
+
+</div>
 
 <div id="toast"></div>
 
@@ -500,91 +478,55 @@ footer{max-width:var(--wrap);margin:0 auto;padding:10px 26px 32px;font:12px var(
 (function(){
 'use strict';
 
-/* ---------- konstanta & util ---------- */
-var PLANNED   = new Set([5,6,7,8]);
-var UNPLANNED = new Set([1,3,4,9]);
-var NAV_FIELDS = ['kode','mulai','selesai','kegiatan'];
-var FLABEL = {kode:'KODE', mulai:'JAM MULAI', selesai:'JAM SELESAI', kegiatan:'KEGIATAN'};
-var LS_KEY = 'fima_oee_logsheet_v1';
-
-/* Shift: S1 07:00–15:30 (510) · S2 15:30–23:30 (480) · S3 23:30–07:00 (450) */
-var SHIFT_A = [510,480,450];
-var DEFAULT_ROWS = 30;
-function shiftOf(mins){
-  if(mins==null) return null;
-  if(mins>=420 && mins<930)  return 0;
-  if(mins>=930 && mins<1410) return 1;
-  return 2;
-}
-
-function $(id){ return document.getElementById(id); }
-var tbody = $('tbody'), posEl = $('pos'), hintEl = $('hint');
-
-var nf0 = function(n){ return Math.round(n).toLocaleString('id-ID'); };
-var nf2 = function(n){ return (+n).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}); };
-var num = function(el){ var v=parseFloat(String(el.value).replace(',','.')); return isFinite(v)?v:0; };
-
-function parseTime(s){
-  var m=/^\s*(\d{1,2}):(\d{2})\s*$/.exec(s||'');
-  if(!m) return null;
-  var h=+m[1], mi=+m[2];
-  return (h<24 && mi<60) ? h*60+mi : null;
-}
+/* ---------- konstanta ---------- */
+var PLANNED=new Set([5,6,7,8]), UNPLANNED=new Set([1,3,4,9]);
+var NAV_FIELDS=['kode','mulai','selesai','kegiatan'];
+var FLABEL={kode:'KODE',mulai:'JAM MULAI',selesai:'JAM SELESAI',kegiatan:'KEGIATAN'};
+var DB_KEY='fima_oee_db_v2';
+var DEFAULT_ROWS=30; /* default 30 baris kosong */
+var SHIFT_A=[510,480,450];
+function shiftOf(m){ if(m==null)return null; if(m>=420&&m<930)return 0; if(m>=930&&m<1410)return 1; return 2; }
+function $(id){return document.getElementById(id);}
+var tbody=$('tbody'),posEl=$('pos'),hintEl=$('hint');
+var nf0=function(n){return Math.round(n).toLocaleString('id-ID');};
+var nf2=function(n){return (+n).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2});};
+var num=function(el){var v=parseFloat(String(el.value).replace(',','.'));return isFinite(v)?v:0;};
+function todayLocal(){var n=new Date();return new Date(n.getTime()-n.getTimezoneOffset()*60000).toISOString().slice(0,10);}
+function parseTime(s){var m=/^\s*(\d{1,2}):(\d{2})\s*$/.exec(s||'');if(!m)return null;var h=+m[1],mi=+m[2];return (h<24&&mi<60)?h*60+mi:null;}
 function maskTime(raw){
   raw=raw||'';
-  if(raw.indexOf(':')>=0){
-    var p=raw.split(':');
-    var h=p[0].replace(/\D/g,'').slice(0,2);
-    var m=(p[1]||'').replace(/\D/g,'').slice(0,2);
-    return (raw.slice(-1)===':'||m) ? h+':'+m : h;
-  }
+  if(raw.indexOf(':')>=0){var p=raw.split(':');var h=p[0].replace(/\D/g,'').slice(0,2);var m=(p[1]||'').replace(/\D/g,'').slice(0,2);return (raw.slice(-1)===':'||m)?h+':'+m:h;}
   var d=raw.replace(/\D/g,'').slice(0,4);
-  if(d.length>=3) return d.slice(0,2)+':'+d.slice(2);
+  if(d.length>=3)return d.slice(0,2)+':'+d.slice(2);
   return d;
 }
-function normTime(v){
-  v=(v||'').trim();
-  if(!v) return '';
-  if(/^\d{1,2}$/.test(v)) v=v.padStart(2,'0')+':00';
-  else if(/^\d{3,4}$/.test(v)){ v=v.padStart(4,'0'); v=v.slice(0,2)+':'+v.slice(2); }
-  return parseTime(v)!=null ? v : null;
-}
-function catOf(kode){
-  if(kode===''||kode==null) return null;
-  var k=parseInt(kode,10);
-  if(isNaN(k)) return null;
-  if(PLANNED.has(k))   return 'planned';
-  if(UNPLANNED.has(k)) return 'unplanned';
-  return 'prod';
-}
+function normTime(v){v=(v||'').trim();if(!v)return '';if(/^\d{1,2}$/.test(v))v=v.padStart(2,'0')+':00';else if(/^\d{3,4}$/.test(v)){v=v.padStart(4,'0');v=v.slice(0,2)+':'+v.slice(2);}return parseTime(v)!=null?v:null;}
+function catOf(k){if(k===''||k==null)return null;var n=parseInt(k,10);if(isNaN(n))return null;if(PLANNED.has(n))return 'planned';if(UNPLANNED.has(n))return 'unplanned';return 'prod';}
 
-/* ---------- mode navigasi (v/h) ---------- */
+/* ---------- mode navigasi ---------- */
 var navMode='v';
-try{ navMode = localStorage.getItem('fima_nav_mode')==='h' ? 'h' : 'v'; }catch(err){}
+try{navMode=localStorage.getItem('fima_nav_mode')==='h'?'h':'v';}catch(e){}
 function applyModeUI(){
-  Array.prototype.forEach.call(document.querySelectorAll('.navmode button'),function(b){
-    b.classList.toggle('on', b.getAttribute('data-mode')===navMode);
-  });
-  hintEl.innerHTML = navMode==='v'
-    ? '<kbd>Tab</kbd>/<kbd>Enter</kbd> ↓ kolom &nbsp;<kbd>Shift+Tab</kbd> ↑ &nbsp;<kbd>⌫</kbd> mundur saat kosong &nbsp;<kbd>←</kbd><kbd>→</kbd> pindah kolom'
-    : '<kbd>Tab</kbd>/<kbd>Enter</kbd> → baris &nbsp;<kbd>Shift+Tab</kbd> ← &nbsp;<kbd>⌫</kbd> mundur saat kosong &nbsp;<kbd>↑</kbd><kbd>↓</kbd> pindah baris';
+  Array.prototype.forEach.call(document.querySelectorAll('.navmode button'),function(b){b.classList.toggle('on',b.getAttribute('data-mode')===navMode);});
+  hintEl.innerHTML=navMode==='v'
+   ?'<kbd>Tab</kbd>/<kbd>Enter</kbd> ↓ kolom · <kbd>Shift+Tab</kbd> ↑ · <kbd>⌫</kbd> mundur saat kosong · <kbd>←</kbd><kbd>→</kbd> pindah kolom'
+   :'<kbd>Tab</kbd>/<kbd>Enter</kbd> → baris · <kbd>Shift+Tab</kbd> ← · <kbd>⌫</kbd> mundur saat kosong · <kbd>↑</kbd><kbd>↓</kbd> pindah baris';
+  applyTabOrder();
 }
 Array.prototype.forEach.call(document.querySelectorAll('.navmode button'),function(b){
   b.addEventListener('click',function(){
     navMode=b.getAttribute('data-mode');
-    try{ localStorage.setItem('fima_nav_mode',navMode); }catch(err){}
+    try{localStorage.setItem('fima_nav_mode',navMode);}catch(e){}
     applyModeUI();
-    toast(navMode==='v' ? 'Mode navigasi: ⇅ VERTIKAL' : 'Mode navigasi: ⇄ HORIZONTAL');
+    toast(navMode==='v'?'Mode navigasi: ⇅ VERTIKAL':'Mode navigasi: ⇄ HORIZONTAL');
   });
 });
 
 /* ---------- shift evaluasi ---------- */
 var evalShift=0;
-try{ var _es=parseInt(localStorage.getItem('fima_eval_shift'),10); if(_es>=0&&_es<=2) evalShift=_es; }catch(err){}
+try{var _e=parseInt(localStorage.getItem('fima_eval_shift'),10);if(_e>=0&&_e<=2)evalShift=_e;}catch(e){}
 function applyShiftUI(){
-  Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),function(b){
-    b.classList.toggle('on', parseInt(b.getAttribute('data-shift'),10)===evalShift);
-  });
+  Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),function(b){b.classList.toggle('on',parseInt(b.getAttribute('data-shift'),10)===evalShift);});
   $('rincSub').textContent='Evaluasi Shift '+(evalShift+1)+' · A = '+SHIFT_A[evalShift]+' mnt';
   $('pqSub').textContent='Evaluasi Shift '+(evalShift+1)+' ('+SHIFT_A[evalShift]+' mnt)';
   $('scoreShift').textContent='SHIFT '+(evalShift+1);
@@ -592,322 +534,209 @@ function applyShiftUI(){
 Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),function(b){
   b.addEventListener('click',function(){
     evalShift=parseInt(b.getAttribute('data-shift'),10)||0;
-    try{ localStorage.setItem('fima_eval_shift',String(evalShift)); }catch(err){}
-    applyShiftUI(); loadRecord();
-    toast('Evaluasi Shift '+(evalShift+1)+' · A = '+SHIFT_A[evalShift]+' mnt');
+    try{localStorage.setItem('fima_eval_shift',String(evalShift));}catch(e){}
+    applyShiftUI();
+    loadRecord();
+    toast('Shift '+(evalShift+1)+' · A = '+SHIFT_A[evalShift]+' mnt');
   });
 });
 
-/* ---------- baris log ---------- */
+/* ---------- baris log (dengan kolom nomor) ---------- */
 function makeRow(data){
-  var tr=document.createElement('tr');
-  tr.className='log-row';
-  tr.innerHTML =
-    '<td><div class="c-kode"><span class="dot"></span><input data-f="kode" data-nav class="in mono ctr" inputmode="numeric" maxlength="2" placeholder="•" aria-label="Kode"></div></td>'+
-    '<td><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>'+
-    '<td><input data-f="selesai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Selesai"></td>'+
-    '<td class="dur"><b class="dur-v">—</b></td>'+
-    '<td><input data-f="kegiatan" data-nav class="in" placeholder="Deskripsi kegiatan…" aria-label="Kegiatan"></td>'+
-    '<td class="c-aksi"><button type="button" class="del" title="Hapus baris">✕</button></td>';
-  if(data){
-    ['kode','mulai','selesai','kegiatan'].forEach(function(f){
-      var el=tr.querySelector('[data-f="'+f+'"]');
-      if(el && data[f]!=null) el.value=data[f];
-    });
-  }
-  tbody.appendChild(tr);
-  applyCat(tr);
-  return tr;
+  var tr=document.createElement('tr');tr.className='log-row';
+  tr.innerHTML=
+   '<td class="row-num" style="text-align:center;font:600 13px var(--mono);color:var(--mut);padding:4px 6px;">'+(rows().length+1)+'</td>'+
+   '<td><div class="c-kode"><span class="dot"></span><input data-f="kode" data-nav class="in mono ctr" inputmode="numeric" maxlength="2" placeholder="•" aria-label="Kode"></div></td>'+
+   '<td><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>'+
+   '<td><input data-f="selesai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Selesai"></td>'+
+   '<td class="dur"><b class="dur-v">—</b></td>'+
+   '<td><input data-f="kegiatan" data-nav class="in" placeholder="Deskripsi kegiatan…" aria-label="Kegiatan"></td>'+
+   '<td class="c-aksi"><button type="button" class="del" title="Hapus baris">✕</button></td>';
+  if(data){['kode','mulai','selesai','kegiatan'].forEach(function(f){var el=tr.querySelector('[data-f="'+f+'"]');if(el&&data[f]!=null)el.value=data[f];});}
+  tbody.appendChild(tr);applyCat(tr);return tr;
 }
-function applyCat(tr){
-  var v=tr.querySelector('[data-f="kode"]').value.trim();
-  var c=catOf(v);
-  if(c) tr.dataset.cat=c; else delete tr.dataset.cat;
-}
-function rows(){ return Array.prototype.slice.call(tbody.querySelectorAll('tr.log-row')); }
-
-/* ---------- SMART NAVIGASI ---------- */
-function navCells(){
-  var list=[], rs=rows();
-  if(navMode==='v'){
-    NAV_FIELDS.forEach(function(f,ci){
-      rs.forEach(function(r,ri){
-        var el=r.querySelector('[data-f="'+f+'"]');
-        if(el) list.push({el:el,f:f,ci:ci,ri:ri});
-      });
-    });
-  }else{
-    rs.forEach(function(r,ri){
-      NAV_FIELDS.forEach(function(f,ci){
-        var el=r.querySelector('[data-f="'+f+'"]');
-        if(el) list.push({el:el,f:f,ci:ci,ri:ri});
-      });
-    });
-  }
-  ['hActual','defect','stdRate'].forEach(function(id){
-    var el=$(id);
-    list.push({el:el,f:id,ci:99,ri:-1,param:el.getAttribute('data-plabel')||id});
+function applyCat(tr){var v=tr.querySelector('[data-f="kode"]').value.trim();var c=catOf(v);if(c)tr.dataset.cat=c;else delete tr.dataset.cat;}
+function rows(){return Array.prototype.slice.call(tbody.querySelectorAll('tr.log-row'));}
+/* penomoran ulang otomatis saat tambah/hapus/muat baris */
+function updateRowNumbers(){
+  var rs=rows();
+  rs.forEach(function(tr,i){
+    var numCell=tr.querySelector('.row-num');
+    if(numCell)numCell.textContent=i+1;
   });
+}
+
+/* ---------- navigasi cerdas ---------- */
+function navCells(){
+  var list=[],rs=rows();
+  if(navMode==='v'){NAV_FIELDS.forEach(function(f,ci){rs.forEach(function(r,ri){var el=r.querySelector('[data-f="'+f+'"]');if(el)list.push({el:el,f:f,ci:ci,ri:ri});});});}
+  else{rs.forEach(function(r,ri){NAV_FIELDS.forEach(function(f,ci){var el=r.querySelector('[data-f="'+f+'"]');if(el)list.push({el:el,f:f,ci:ci,ri:ri});});});}
+  ['hActual','defect','stdRate'].forEach(function(id){var el=$(id);list.push({el:el,f:id,ci:99,ri:-1,param:el.getAttribute('data-plabel')||id});});
   list.push({el:$('btnSave'),f:'save',ci:100,ri:-1,param:'SIMPAN DATA'});
   return list;
 }
-function flash(el){
-  if(!el.classList || !el.classList.contains('in')) return;
-  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+function applyTabOrder(){
+  var cells=navCells();
+  for(var i=0;i<cells.length;i++){
+    var el=cells[i].el;
+    if(el&&el.tagName==='INPUT')el.tabIndex=i+1;
+  }
 }
-function updatePos(c){
-  var txt = c.ri>=0 ? ('BARIS '+(c.ri+1)+' · '+FLABEL[c.f]) : (c.param||'');
-  posEl.innerHTML='<span class="pos-dot"></span>'+txt;
-}
+function flash(el){if(!el.classList||!el.classList.contains('in'))return;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');}
+function updatePos(c){posEl.innerHTML='<span class="pos-dot"></span>'+(c.ri>=0?('BARIS '+(c.ri+1)+' · '+FLABEL[c.f]):(c.param||''));}
 function hlColumn(c){
   var ths=document.querySelectorAll('.log th');
-  Array.prototype.forEach.call(ths,function(th){ th.classList.remove('on'); });
-  if(c.ri>=0){
-    var td=c.el.closest('td'), tr=td && td.parentElement;
-    if(tr){
-      var idx=Array.prototype.indexOf.call(tr.children,td);
-      if(ths[idx]) ths[idx].classList.add('on');
-    }
-  }
+  Array.prototype.forEach.call(ths,function(th){th.classList.remove('on');});
+  if(c.ri>=0){var td=c.el.closest('td'),tr=td&&td.parentElement;if(tr){var i=Array.prototype.indexOf.call(tr.children,td);if(ths[i+1])ths[i+1].classList.add('on');}}
 }
-function focusCell(c){
-  c.el.focus();
-  if(c.el.select) c.el.select();
-  flash(c.el); updatePos(c); hlColumn(c);
-}
+function focusCell(c){c.el.focus();if(c.el.select)c.el.select();flash(c.el);updatePos(c);hlColumn(c);}
 
 document.addEventListener('keydown',function(e){
-  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
   var t=e.target;
-  if(!(t instanceof HTMLInputElement) || !t.hasAttribute('data-nav')) return;
-  var cells=navCells();
-  var idx=-1;
-  for(var i=0;i<cells.length;i++){ if(cells[i].el===t){ idx=i; break; } }
-  if(idx<0) return;
-  var cur=cells[idx], last=cells.length-1;
-
-  if(e.key==='Tab'){
-    e.preventDefault();
-    var n=e.shiftKey?idx-1:idx+1;
-    if(n>=0 && n<=last) focusCell(cells[n]);
-    return;
-  }
+  if(!(t instanceof HTMLInputElement)||!t.hasAttribute('data-nav'))return;
+  var cells=navCells(),idx=-1;
+  for(var i=0;i<cells.length;i++){if(cells[i].el===t){idx=i;break;}}
+  if(idx<0)return;
+  var cur=cells[idx],last=cells.length-1;
+  if(e.key==='Tab'){e.preventDefault();var n=e.shiftKey?idx-1:idx+1;if(n>=0&&n<=last)focusCell(cells[n]);return;}
   if(e.key==='Enter'){
     e.preventDefault();
-    if(cur.f==='kegiatan' && cur.ri===rows().length-1 && t.value.trim()!==''){
-      var tr=makeRow(); recalc();
-      var nc=navCells();
-      for(var j=0;j<nc.length;j++){
-        if(nc[j].f==='kode' && nc[j].ri===rows().length-1){ focusCell(nc[j]); break; }
-      }
-      tr.scrollIntoView({block:'nearest',behavior:'smooth'});
-      return;
+    if(cur.f==='kegiatan'&&cur.ri===rows().length-1&&t.value.trim()!==''){
+      var tr=makeRow();updateRowNumbers();recalc();var nc=navCells();
+      for(var j=0;j<nc.length;j++){if(nc[j].f==='kode'&&nc[j].ri===rows().length-1){focusCell(nc[j]);break;}}
+      tr.scrollIntoView({block:'nearest',behavior:'smooth'});return;
     }
-    if(idx<last) focusCell(cells[idx+1]);
-    return;
+    if(idx<last)focusCell(cells[idx+1]);return;
   }
-  if(e.key==='ArrowDown'){
-    e.preventDefault();
-    var dn=null;
-    for(var a=0;a<cells.length;a++){ if(cells[a].ci===cur.ci && cells[a].ri===cur.ri+1){ dn=cells[a]; break; } }
-    focusCell(dn || (idx<last?cells[idx+1]:cur));
-    return;
-  }
-  if(e.key==='ArrowUp'){
-    e.preventDefault();
-    var up=null;
-    for(var b=0;b<cells.length;b++){ if(cells[b].ci===cur.ci && cells[b].ri===cur.ri-1){ up=cells[b]; break; } }
-    focusCell(up || (idx>0?cells[idx-1]:cur));
-    return;
-  }
-  if(e.key==='Backspace' && t.value===''){
-    e.preventDefault();
-    if(idx>0) focusCell(cells[idx-1]);
-    return;
-  }
-  if(e.key==='ArrowLeft' && t.selectionStart===0 && t.selectionEnd===0){
-    var pl=null;
-    for(var c=0;c<cells.length;c++){ if(cells[c].ci===cur.ci-1 && cells[c].ri===cur.ri){ pl=cells[c]; break; } }
-    if(pl){ e.preventDefault(); focusCell(pl); }
-    return;
-  }
-  if(e.key==='ArrowRight' && t.selectionStart===t.value.length && t.selectionEnd===t.value.length){
-    var pr=null;
-    for(var d=0;d<cells.length;d++){ if(cells[d].ci===cur.ci+1 && cells[d].ri===cur.ri){ pr=cells[d]; break; } }
-    if(pr){ e.preventDefault(); focusCell(pr); }
-  }
+  if(e.key==='ArrowDown'){e.preventDefault();var dn=null;for(var a=0;a<cells.length;a++){if(cells[a].ci===cur.ci&&cells[a].ri===cur.ri+1){dn=cells[a];break;}}focusCell(dn||(idx<last?cells[idx+1]:cur));return;}
+  if(e.key==='ArrowUp'){e.preventDefault();var up=null;for(var b=0;b<cells.length;b++){if(cells[b].ci===cur.ci&&cells[b].ri===cur.ri-1){up=cells[b];break;}}focusCell(up||(idx>0?cells[idx-1]:cur));return;}
+  if(e.key==='Backspace'&&t.value===''){e.preventDefault();if(idx>0)focusCell(cells[idx-1]);return;}
+  if(e.key==='ArrowLeft'&&t.selectionStart===0&&t.selectionEnd===0){var pl=null;for(var c=0;c<cells.length;c++){if(cells[c].ci===cur.ci-1&&cells[c].ri===cur.ri){pl=cells[c];break;}}if(pl){e.preventDefault();focusCell(pl);}return;}
+  if(e.key==='ArrowRight'&&t.selectionStart===t.value.length&&t.selectionEnd===t.value.length){var pr=null;for(var d=0;d<cells.length;d++){if(cells[d].ci===cur.ci+1&&cells[d].ri===cur.ri){pr=cells[d];break;}}if(pr){e.preventDefault();focusCell(pr);}}
 });
 
 /* ---------- event tabel ---------- */
 tbody.addEventListener('input',function(e){
   var t=e.target;
-  if(t.getAttribute('data-f')==='kode') applyCat(t.closest('tr'));
-
+  if(t.getAttribute('data-f')==='kode')applyCat(t.closest('tr'));
+  /* AUTO-FILL: Jam Selesai baris atas SELALU diperbarui + berkedip */
   if(t.getAttribute('data-f')==='mulai'){
-    var tr=t.closest('tr');
-    var prev=tr ? tr.previousElementSibling : null;
-    while(prev && !prev.classList.contains('log-row')) prev=prev.previousElementSibling;
+    var tr=t.closest('tr'),prev=tr?tr.previousElementSibling:null;
+    while(prev&&!prev.classList.contains('log-row'))prev=prev.previousElementSibling;
     if(prev){
       var sv=prev.querySelector('[data-f="selesai"]');
-      if(sv && sv.value!==t.value){
+      if(sv){
         sv.value=t.value;
         sv.classList.remove('invalid');
         flash(sv);
       }
     }
   }
-
-  if(t.classList.contains('t-time')){
-    var v=maskTime(t.value);
-    if(v!==t.value) t.value=v;
-    t.classList.remove('invalid');
-  }
+  if(t.classList.contains('t-time')){var v=maskTime(t.value);if(v!==t.value)t.value=v;t.classList.remove('invalid');}
   recalc();
 });
 tbody.addEventListener('focusout',function(e){
   var t=e.target;
-  if(t.classList && t.classList.contains('t-time')){
+  if(t.classList&&t.classList.contains('t-time')){
     var n=normTime(t.value);
-    if(t.value.trim()!=='' && n===null) t.classList.add('invalid');
-    else { t.value=n; t.classList.remove('invalid'); }
+    if(t.value.trim()!==''&&n===null)t.classList.add('invalid');
+    else{t.value=n;t.classList.remove('invalid');}
     recalc();
   }
 });
 tbody.addEventListener('click',function(e){
-  var btn=e.target.closest('.del');
-  if(!btn) return;
-  var tr=btn.closest('tr');
-  tr.classList.add('out');
-  setTimeout(function(){
-    tr.remove();
-    if(!rows().length) makeRow();
-    recalc();
-  },190);
+  var btn=e.target.closest('.del');if(!btn)return;
+  var tr=btn.closest('tr');tr.classList.add('out');
+  setTimeout(function(){tr.remove();updateRowNumbers();if(!rows().length)makeRow();recalc();},190);
 });
 document.addEventListener('focusin',function(e){
   var t=e.target;
-  if(!(t instanceof HTMLElement) || !t.hasAttribute('data-nav')) return;
+  if(!(t instanceof HTMLElement)||!t.hasAttribute('data-nav'))return;
   var cells=navCells();
-  for(var i=0;i<cells.length;i++){
-    if(cells[i].el===t){ updatePos(cells[i]); hlColumn(cells[i]); break; }
-  }
+  for(var i=0;i<cells.length;i++){if(cells[i].el===t){updatePos(cells[i]);hlColumn(cells[i]);break;}}
 });
 
-/* ---------- perhitungan OEE + DIAGNOSTIK ---------- */
+/* ---------- perhitungan OEE + diagnostik ---------- */
 function recalc(){
   var B=0,D=0,P=0,tot=0,nShift=0;
   var sh=[{B:0,D:0,P:0},{B:0,D:0,P:0},{B:0,D:0,P:0}];
-
   rows().forEach(function(tr){
-    var g=function(f){ return tr.querySelector('[data-f="'+f+'"]').value; };
-    var kode=g('kode').trim();
-    var mulai=parseTime(g('mulai')), selesai=parseTime(g('selesai'));
+    var g=function(f){return tr.querySelector('[data-f="'+f+'"]').value;};
+    var kode=g('kode').trim(),mulai=parseTime(g('mulai')),selesai=parseTime(g('selesai'));
     var durEl=tr.querySelector('.dur-v');
-    if(mulai==null || selesai==null){ durEl.textContent='—'; durEl.removeAttribute('title'); return; }
+    if(mulai==null||selesai==null){durEl.textContent='—';durEl.removeAttribute('title');return;}
     var dur=(selesai-mulai+1440)%1440;
     durEl.textContent=nf0(dur);
-    if(selesai<mulai) durEl.title='Lintas tengah malam (+24 jam)'; else durEl.removeAttribute('title');
+    if(selesai<mulai)durEl.title='Lintas tengah malam (+24 jam)';else durEl.removeAttribute('title');
     tot+=dur;
-    var c=catOf(kode), si=shiftOf(mulai);
-    if(si===evalShift) nShift++;
-    if(c==='planned'){ B+=dur; if(si!=null) sh[si].B+=dur; }
-    else if(c==='unplanned'){ D+=dur; if(si!=null) sh[si].D+=dur; }
-    else if(c==='prod'){ P+=dur; if(si!=null) sh[si].P+=dur; }
+    var c=catOf(kode),si=shiftOf(mulai);
+    if(si===evalShift)nShift++;
+    if(c==='planned'){B+=dur;if(si!=null)sh[si].B+=dur;}
+    else if(c==='unplanned'){D+=dur;if(si!=null)sh[si].D+=dur;}
+    else if(c==='prod'){P+=dur;if(si!=null)sh[si].P+=dur;}
   });
-
   sh.forEach(function(s,i){
-    var a=SHIFT_A[i], c=Math.max(a-s.B,0), e=Math.max(c-s.D,0), f=c>0?e/c*100:0, n=i+1;
-    $('s'+n+'B').textContent=nf0(s.B); $('s'+n+'C').textContent=nf0(c);
-    $('s'+n+'D').textContent=nf0(s.D); $('s'+n+'E').textContent=nf0(e);
+    var a=SHIFT_A[i],c=Math.max(a-s.B,0),e=Math.max(c-s.D,0),f=c>0?e/c*100:0,n=i+1;
+    $('s'+n+'B').textContent=nf0(s.B);$('s'+n+'C').textContent=nf0(c);
+    $('s'+n+'D').textContent=nf0(s.D);$('s'+n+'E').textContent=nf0(e);
     $('s'+n+'F').textContent=nf2(f);
   });
-  var A=1440, C=A-B, E=Math.max(C-D,0), F=C>0?E/C*100:0;
-  $('tB').textContent=nf0(B); $('tC').textContent=nf0(C);
-  $('tD').textContent=nf0(D); $('tE').textContent=nf0(E);
-  $('tF').textContent=nf2(F);
+  var A=1440,C=A-B,E=Math.max(C-D,0),F=C>0?E/C*100:0;
+  $('tB').textContent=nf0(B);$('tC').textContent=nf0(C);$('tD').textContent=nf0(D);$('tE').textContent=nf0(E);$('tF').textContent=nf2(F);
 
-  var sA=SHIFT_A[evalShift];
-  var sB=sh[evalShift].B, sC=Math.max(sA-sB,0);
-  var sD=sh[evalShift].D, sE=Math.max(sC-sD,0);
-  var sF=sC>0 ? sE/sC*100 : 0;
+  var sA=SHIFT_A[evalShift],sB=sh[evalShift].B,sC=Math.max(sA-sB,0),sD=sh[evalShift].D,sE=Math.max(sC-sD,0),sF=sC>0?sE/sC*100:0;
+  var rate=num($('stdRate')),H=num($('hActual')),K=num($('defect'));
+  var G=sh[evalShift].P*rate,I=G>0?H/G*100:0,L=Math.max(H-K,0),M=H>0?L/H*100:0,oee=sF*I*M/10000;
 
-  var rate=num($('stdRate')), H=num($('hActual')), K=num($('defect'));
-  var G=sh[evalShift].P*rate;
-  var I=G>0?H/G*100:0;
-  var L=Math.max(H-K,0);
-  var M=H>0?L/H*100:0;
-  var oee=sF*I*M/10000;
-
-  $('pqG').textContent=nf0(G)+' unit';
-  $('pqH').textContent=nf0(H)+' unit';
-  $('pqI').textContent=nf2(I)+' %';
-  $('pqIbar').style.width=Math.min(I,100)+'%';
-  $('qqJ').textContent=nf0(H)+' unit';
-  $('qqK').textContent=nf0(K)+' unit';
-  $('qqL').textContent=nf0(L)+' unit';
-  $('qqM').textContent=nf2(M)+' %';
-  $('qqMbar').style.width=Math.min(M,100)+'%';
-
-  $('oA').textContent=nf0(sA); $('oB').textContent=nf0(sB); $('oC').textContent=nf0(sC);
-  $('oD').textContent=nf0(sD); $('oE').textContent=nf0(sE); $('oF').textContent=nf2(sF)+' %';
-  $('oG').textContent=nf0(G); $('oH').textContent=nf0(H); $('oI').textContent=nf2(I)+' %';
-  $('oJ').textContent=nf0(H); $('oK').textContent=nf0(K); $('oL').textContent=nf0(L);
-  $('oM').textContent=nf2(M)+' %';
+  $('pqG').textContent=nf0(G)+' unit';$('pqH').textContent=nf0(H)+' unit';$('pqI').textContent=nf2(I)+' %';$('pqIbar').style.width=Math.min(I,100)+'%';
+  $('qqJ').textContent=nf0(H)+' unit';$('qqK').textContent=nf0(K)+' unit';$('qqL').textContent=nf0(L)+' unit';$('qqM').textContent=nf2(M)+' %';$('qqMbar').style.width=Math.min(M,100)+'%';
+  $('oA').textContent=nf0(sA);$('oB').textContent=nf0(sB);$('oC').textContent=nf0(sC);
+  $('oD').textContent=nf0(sD);$('oE').textContent=nf0(sE);$('oF').textContent=nf2(sF)+' %';
+  $('oG').textContent=nf0(G);$('oH').textContent=nf0(H);$('oI').textContent=nf2(I)+' %';
+  $('oJ').textContent=nf0(H);$('oK').textContent=nf0(K);$('oL').textContent=nf0(L);$('oM').textContent=nf2(M)+' %';
   $('oee').innerHTML=nf2(oee)+'<span>%</span>';
-
   var gf=$('gaugeFill');
   gf.style.width=Math.min(oee,100)+'%';
   gf.className='gauge-fill'+(oee>=85?' g-ok':oee>=70?' g-warn':oee>0?' g-bad':'');
 
   var issues=[];
-  if(nShift===0) issues.push('Tidak ada baris log pada jam Shift '+(evalShift+1)+' — cek tombol SHIFT atau jam mulai.');
-  if(sC<=0)      issues.push('Availability 0% — Planned DT (B) ≥ menit shift (A).');
-  else if(sE<=0) issues.push('Availability 0% — Unplanned DT (D) ≥ waktu terencana (C).');
+  if(nShift===0)issues.push('Tidak ada baris log pada jam Shift '+(evalShift+1)+' — cek tombol SHIFT atau jam mulai.');
+  if(sC<=0)issues.push('Availability 0% — Planned DT (B) ≥ menit shift (A).');
+  else if(sE<=0)issues.push('Availability 0% — Unplanned DT (D) ≥ waktu terencana (C).');
   if(I<=0){
-    if(sh[evalShift].P<=0) issues.push('Performance 0% — belum ada durasi kode PRODUKSI (mis. kode 2) pada shift ini.');
-    else if(rate<=0)       issues.push('Performance 0% — Kecepatan Standar belum diisi.');
-    else if(H<=0)          issues.push('Performance 0% — Output Aktual (H/J) belum diisi.');
+    if(sh[evalShift].P<=0)issues.push('Performance 0% — belum ada durasi kode PRODUKSI (mis. kode 2) pada shift ini.');
+    else if(rate<=0)issues.push('Performance 0% — Kecepatan Standar belum diisi.');
+    else if(H<=0)issues.push('Performance 0% — Output Aktual (H/J) belum diisi.');
   }
   if(M<=0){
-    if(H<=0) issues.push('Quality 0% — Output Aktual (H/J) belum diisi.');
-    else     issues.push('Quality 0% — Defect (K) sama dengan / lebih besar dari Output.');
+    if(H<=0)issues.push('Quality 0% — Output Aktual (H/J) belum diisi.');
+    else issues.push('Quality 0% — Defect (K) sama dengan / lebih besar dari Output.');
   }
-  var diagEl=$('diag');
-  if(issues.length===0){
-    diagEl.innerHTML='<div class="d-item ok">✓ Semua komponen lengkap — OEE = '+nf2(sF)+'% × '+nf2(I)+'% × '+nf2(M)+'% = '+nf2(oee)+'%</div>';
-  }else{
-    diagEl.innerHTML=issues.map(function(s){ return '<div class="d-item">⚠ '+s+'</div>'; }).join('');
-  }
+  var dEl=$('diag');
+  if(issues.length===0)dEl.innerHTML='<div class="d-item ok">✓ Semua komponen lengkap — OEE = '+nf2(sF)+'% × '+nf2(I)+'% × '+nf2(M)+'% = '+nf2(oee)+'%</div>';
+  else dEl.innerHTML=issues.map(function(s){return '<div class="d-item">⚠ '+s+'</div>';}).join('');
 
+  updateRowNumbers();
   $('sumDur').textContent=nf0(tot);
+  $('totalDurasi').textContent=nf0(tot);
   $('rowN').textContent=rows().length;
+  applyTabOrder();
 }
 
-/* ---------- simpan / muat / reset ---------- */
-var toastTimer=null;
-function toast(msg){
-  var el=$('toast');
-  el.textContent=msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(function(){ el.classList.remove('show'); },2400);
-}
-var DB_KEY='fima_oee_db_v2';
-function dbGet(){ try{ return JSON.parse(localStorage.getItem(DB_KEY))||{}; }catch(e){ return {}; } }
-function dbSet(db){ try{ localStorage.setItem(DB_KEY,JSON.stringify(db)); }catch(e){} }
-function curKey(){
-  var dv=$('fDate').value||new Date().toISOString().slice(0,10);
-  return dv+'|S'+(evalShift+1)+'|L'+$('fLine').value+'|'+$('fStage').value;
-}
+/* ---------- SISTEM SIMPAN PER SLOT ---------- */
+function dbGet(){try{return JSON.parse(localStorage.getItem(DB_KEY))||{};}catch(e){return {};}}
+function dbSet(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch(e){}}
+function curKey(){return ($('fDate').value||todayLocal())+'|S'+(evalShift+1)+'|L'+$('fLine').value+'|'+$('fStage').value;}
 function labelFilter(){
-  var d=new Date(($('fDate').value||'')+'T00:00:00');
+  var d=new Date(($('fDate').value||todayLocal())+'T00:00:00');
   return d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
     +' · Shift '+(evalShift+1)+' · Line '+$('fLine').value+' · '+$('fStage').value.toUpperCase();
 }
 function collect(){
   return {
     rows:rows().map(function(tr){
-      var g=function(f){ return tr.querySelector('[data-f="'+f+'"]').value; };
+      var g=function(f){return tr.querySelector('[data-f="'+f+'"]').value;};
       return {kode:g('kode'),mulai:g('mulai'),selesai:g('selesai'),kegiatan:g('kegiatan')};
     }),
     h:$('hActual').value,k:$('defect').value,rate:$('stdRate').value,
@@ -928,12 +757,13 @@ function updateEditInfo(d){
 }
 function applyRecord(d){
   tbody.innerHTML='';
-  if(d&&d.rows&&d.rows.length){ d.rows.forEach(function(r){ makeRow(r); }); }
-  else{ for(var i=0;i<DEFAULT_ROWS;i++) makeRow(); }
-  $('hActual').value=(d&&d.h)||''; $('defect').value=(d&&d.k)||''; $('stdRate').value=(d&&d.rate)||'';
-  recalc(); updateEditInfo(d);
+  if(d&&d.rows&&d.rows.length){d.rows.forEach(function(r){makeRow(r);});}
+  else{for(var i=0;i<DEFAULT_ROWS;i++)makeRow();} /* 30 baris kosong */
+  updateRowNumbers();
+  $('hActual').value=(d&&d.h)||'';$('defect').value=(d&&d.k)||'';$('stdRate').value=(d&&d.rate)||'';
+  recalc();updateEditInfo(d);
 }
-function loadRecord(){ applyRecord(dbGet()[curKey()]||null); }
+function loadRecord(){applyRecord(dbGet()[curKey()]||null);}
 function saveData(){
   var db=dbGet();
   db[curKey()]=collect();
@@ -942,47 +772,41 @@ function saveData(){
   updateEditInfo(db[curKey()]);
   toast('Data tersimpan ✓ '+labelFilter());
 }
+['fDate','fLine','fStage'].forEach(function(id){$(id).addEventListener('change',loadRecord);});
 
+/* ---------- toast ---------- */
+var toastTimer=null;
+function toast(msg){var el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.remove('show');},2400);}
+
+/* ---------- tombol ---------- */
 $('btnSave').addEventListener('click',saveData);
 $('btnReset').addEventListener('click',function(){
-  if(!confirm('Kosongkan form untuk filter ini? Data tersimpan TIDAK dihapus.')) return;
-  applyRecord(null);
+  if(!confirm('Reset seluruh form? Data yang belum disimpan akan hilang.'))return;
+  applyRecord(null); /* menghasilkan DEFAULT_ROWS (30) baris kosong bernomor */
   toast('Form dikosongkan ↺');
 });
 $('btnAdd').addEventListener('click',function(){
-  var tr=makeRow(); recalc();
+  var tr=makeRow();updateRowNumbers();recalc();
   tr.scrollIntoView({block:'nearest',behavior:'smooth'});
   var cells=navCells();
-  for(var i=0;i<cells.length;i++){
-    if(cells[i].f==='kode' && cells[i].ri===rows().length-1){ focusCell(cells[i]); break; }
-  }
+  for(var i=0;i<cells.length;i++){if(cells[i].f==='kode'&&cells[i].ri===rows().length-1){focusCell(cells[i]);break;}}
 });
-window.addEventListener('keydown',function(e){
-  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){ e.preventDefault(); saveData(); }
-});
+window.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveData();}});
 
 ['hActual','defect','stdRate'].forEach(function(id){
-  $(id).addEventListener('input',function(){
-    var v=this.value.replace(/[^\d.,]/g,'');
-    if(v!==this.value) this.value=v;
-    recalc();
-  });
+  $(id).addEventListener('input',function(){var v=this.value.replace(/[^\d.,]/g,'');if(v!==this.value)this.value=v;recalc();});
 });
 
-['fDate','fLine','fStage'].forEach(function(id){
-  $(id).addEventListener('change',loadRecord);
-});
-
-/* ---------- jam hidup ---------- */
+/* ---------- jam live ---------- */
 function tick(){
   var n=new Date();
   $('clock').textContent=n.toLocaleTimeString('id-ID',{hour12:false});
   $('dateEl').textContent=n.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
-setInterval(tick,1000); tick();
+setInterval(tick,1000);tick();
 
 /* ---------- init ---------- */
-$('fDate').value=new Date().toISOString().slice(0,10);
+$('fDate').value=todayLocal();
 applyModeUI();
 applyShiftUI();
 loadRecord();
