@@ -1,10 +1,9 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Log Sheet &amp; OEE — TKL 2026</title>
+<title>Log Sheet &amp; OEE — TKL-Produksi-OEE 2026</title>
 
 <!-- PWA Meta Tags -->
 <link rel="manifest" href="./manifest.webmanifest">
@@ -90,7 +89,6 @@ kbd{font:600 12px var(--mono);background:#fff;border:1px solid var(--line);borde
 }
 .login-error.show { display: block; animation: shake .3s; }
 
-/* Wrapper Konten Utama (Disembunyikan sebelum login berhasil) */
 #appContainer { display: none; }
 #appContainer.show { display: block; }
 
@@ -108,7 +106,7 @@ kbd{font:600 12px var(--mono);background:#fff;border:1px solid var(--line);borde
 .hint{font-size:12px;font-family:var(--mono);color:var(--mut);flex-basis:100%}
 #lastSaved{font:12px var(--mono);color:var(--green-d)}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 14px var(--body);letter-spacing:.3px;padding:11px 18px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:transform .12s,box-shadow .12s,background .15s,border-color .15s;user-select:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 14px var(--body);letter-spacing:.3px;padding:11px 18px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:transform .12s,box-shadow .12s,background .15s,border-color .15s;text-decoration:none;user-select:none}
 .btn-primary{background:var(--green-d);color:#fff;box-shadow:0 2px 0 #085c2d}
 .btn-primary:hover{background:var(--green);transform:translateY(-1px);box-shadow:0 3px 0 #085c2d}
 .btn-primary:active{transform:translateY(1px);box-shadow:none}
@@ -172,7 +170,6 @@ h1{font:700 clamp(24px,5vw,34px)/1 var(--disp);letter-spacing:.8px;text-transfor
 .sw{width:10px;height:10px;border-radius:2px;flex:none}
 .sw-a{background:var(--amber)}.sw-r{background:var(--red)}.sw-g{background:var(--green)}
 
-/* Panel Toggle Kolom */
 .col-toggle-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;background:#f4f7f9;padding:8px 12px;border-radius:8px;border:1px solid var(--line)}
 .col-toggle-bar span{font:600 11.5px var(--mono);color:var(--mut);letter-spacing:.8px;text-transform:uppercase}
 .col-toggle-bar label{font:500 12px var(--mono);color:var(--ink2);display:inline-flex;align-items:center;gap:4px;cursor:pointer;background:#fff;padding:3px 8px;border:1px solid var(--line);border-radius:6px;user-select:none}
@@ -238,7 +235,6 @@ textarea.in {
 .in.flash{animation:flashbg .6s}
 @keyframes flashbg{0%{background:rgba(18,161,80,.3)}100%{background:transparent}}
 
-/* Styling tabel matriks OEE 3 Kolom */
 .oee-matrix-tbl {
   width: 100%;
   border-collapse: collapse;
@@ -297,28 +293,12 @@ textarea.in {
 #toast.show{opacity:1;transform:translate(-50%,0)}
 #toast.err{border-left-color:var(--red)}
 
-/* ============ PRINT CSS (A4 LANDSCAPE) ============ */
 @media print {
-  @page {
-    size: A4 landscape;
-    margin: 8mm;
-  }
-  body {
-    background: #fff !important;
-  }
-  #loginOverlay, .toolbar, .btn, .col-toggle-bar, #toast {
-    display: none !important;
-  }
-  #appContainer {
-    display: block !important;
-  }
-  .sheet {
-    box-shadow: none !important;
-    border: none !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-  }
+  @page { size: A4 landscape; margin: 8mm; }
+  body { background: #fff !important; }
+  #loginOverlay, .toolbar, .btn, .col-toggle-bar, #toast { display: none !important; }
+  #appContainer { display: block !important; }
+  .sheet { box-shadow: none !important; border: none !important; margin: 0 !important; max-width: 100% !important; width: 100% !important; }
 }
 
 @media(max-width:768px){
@@ -343,11 +323,10 @@ textarea.in {
 </head>
 <body>
 
-<!-- ============ OVERLAY LOGIN ============ -->
 <div id="loginOverlay">
   <div class="login-card">
     <div class="login-header">
-      <div class="login-logo">TK</div>
+      <div class="login-logo">TKL</div>
       <h2>OEE System Login</h2>
       <p>Masukkan PIN Akses Operator / Admin</p>
     </div>
@@ -369,7 +348,6 @@ textarea.in {
   </div>
 </div>
 
-<!-- ============ KONTEN APLIKASI UTAMA ============ -->
 <div id="appContainer">
   <div class="toolbar">
     <div class="twrap">
@@ -389,6 +367,7 @@ textarea.in {
       <span class="spacer"></span>
       <span id="lastSaved"></span>
       <button class="btn btn-install" id="pwa-install-btn">📱 Install Aplikasi</button>
+      <a href="https://docs.google.com/spreadsheets/d/16N5vCzssLshBb3_eKqOq9wRdAtr9NkM4E_CXHC3yFTI/edit?gid=1800639959#gid=1800639959" target="_blank" class="btn btn-ghost" title="Buka Database Spreadsheet">📂 Lihat Database</a>
       <button class="btn btn-ghost btn-logout" id="btnLogout" type="button" onclick="handleLogout()" title="Keluar sesi">🔒 Keluar</button>
       <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
       <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
@@ -396,12 +375,11 @@ textarea.in {
   </div>
 
   <div class="sheet">
-
     <div class="hwrap">
       <div class="brand">
-        <div class="mark">TK</div>
+        <div class="mark">TKL</div>
         <div>
-          <div class="kicker">TKL-OEE 2026 · SYSTEM</div>
+          <div class="kicker">TKL-Produksi-OEE 2026 · SYSTEM</div>
           <h1>Log Sheet &amp; Perhitungan OEE</h1>
           <div class="sub">Availability · Performance · Quality — Overall Equipment Effectiveness</div>
         </div>
@@ -416,7 +394,6 @@ textarea.in {
     </div>
     <div class="stripe"></div>
 
-    <!-- ============ DATA & PENYIMPANAN ============ -->
     <section class="sec">
       <div class="sec-h">
         <span class="no">📊</span>
@@ -453,44 +430,24 @@ textarea.in {
       </div>
     </section>
 
-    <!-- ============ INISIAL OPERATOR ============ -->
     <section class="sec">
       <div class="sec-h">
         <span class="no">👤</span>
         <div>
-          <h2>Inisial Operator &amp; Paraf</h2>
+          <h2>Inisial Operator</h2>
           <div class="sub2">Masukkan inisial operator yang bertugas pada shift ini (maksimal 3 huruf per kolom)</div>
         </div>
       </div>
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px;">
-        <div class="field" style="margin-bottom:0">
-          <label>Operator 1</label>
-          <input type="text" id="op1" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Operator 2</label>
-          <input type="text" id="op2" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Operator 3</label>
-          <input type="text" id="op3" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Operator 4</label>
-          <input type="text" id="op4" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Operator 5</label>
-          <input type="text" id="op5" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Operator 6</label>
-          <input type="text" id="op6" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono">
-        </div>
+        <div class="field" style="margin-bottom:0"><label>Operator 1</label><input type="text" id="op1" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
+        <div class="field" style="margin-bottom:0"><label>Operator 2</label><input type="text" id="op2" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
+        <div class="field" style="margin-bottom:0"><label>Operator 3</label><input type="text" id="op3" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
+        <div class="field" style="margin-bottom:0"><label>Operator 4</label><input type="text" id="op4" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
+        <div class="field" style="margin-bottom:0"><label>Operator 5</label><input type="text" id="op5" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
+        <div class="field" style="margin-bottom:0"><label>Operator 6</label><input type="text" id="op6" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
       </div>
     </section>
 
-    <!-- ============ MASTER PRODUK & KECEPATAN ============ -->
     <section class="sec">
       <div class="sec-h">
         <span class="no">⚙️</span>
@@ -503,14 +460,14 @@ textarea.in {
         <div class="field" style="margin-bottom:0">
           <label>Produk 1 (Nama &amp; Kecepatan)</label>
           <div style="display:flex; gap:6px;">
-            <input type="text" id="prodName1" placeholder="Misal: VTT" style="flex:2;">
+            <input type="text" id="prodName1" placeholder="Misal: VTTS1 l030001" style="flex:2;">
             <input type="number" id="prodRate1" placeholder="Rate/mnt" style="flex:1;" inputmode="decimal">
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
           <label>Produk 2 (Cadangan)</label>
           <div style="display:flex; gap:6px;">
-            <input type="text" id="prodName2" placeholder="Misal: VKM" style="flex:2;">
+            <input type="text" id="prodName2" placeholder="Misal: VPEL1 L027001" style="flex:2;">
             <input type="number" id="prodRate2" placeholder="Rate/mnt" style="flex:1;" inputmode="decimal">
           </div>
         </div>
@@ -524,7 +481,6 @@ textarea.in {
       </div>
     </section>
 
-    <!-- ============ 01 LOG SHEET ============ -->
     <section class="sec">
       <div class="sec-h">
         <span class="no">01</span>
@@ -534,12 +490,11 @@ textarea.in {
         </div>
       </div>
       <div class="legend">
-        <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned DT (Putih)</span>
-        <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned DT (Merah Tipis)</span>
-        <span class="lg"><i class="sw sw-g"></i>Kode 2 / Lainnya → Produk/Aktif (Hijau Tipis)</span>
+        <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned Down Time (Putih)</span>
+        <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned Down Time (Merah)</span>
+        <span class="lg"><i class="sw sw-g"></i>Kode 2 / Lainnya → Produksi terencana (Hijau)</span>
       </div>
 
-      <!-- Panel Toggle Kolom -->
       <div class="col-toggle-bar">
         <span>Tampilkan Kolom:</span>
         <label><input type="checkbox" data-col="col-num" checked> #</label>
@@ -609,7 +564,6 @@ textarea.in {
       </div>
     </section>
 
-    <!-- ============ RINCIAN PERFORMA PER PRODUK (DI ATAS) ============ -->
     <section class="sec">
       <div class="sec-h">
         <span class="no">📊</span>
@@ -626,20 +580,15 @@ textarea.in {
               <th title="Total durasi produk berjalan di log sheet">Durasi (mnt)</th>
               <th title="Kecepatan standar (unit/menit)">Rate (u/mnt)</th>
               <th title="Target G = Durasi × Rate">Target (G)</th>
-              <th title="Aktual Good yang diinput pada log ber-produk terkait">Aktual (H)</th>
+              <th title="Aktual (Good + Defect) yang diinput pada log ber-produk terkait">Aktual (H)</th>
               <th title="Performance = Aktual ÷ Target × 100">% Perf</th>
             </tr>
           </thead>
-          <tbody id="tbodyProdDetail">
-            <!-- Diisi otomatis oleh JavaScript -->
-          </tbody>
+          <tbody id="tbodyProdDetail"></tbody>
         </table>
       </div>
     </section>
 
-    
-
-    <!-- ============ PERHITUNGAN PENCAPAIAN OEE ============ -->
     <section class="sec">
       <div class="sec-h">
         <span class="no">02</span>
@@ -660,111 +609,51 @@ textarea.in {
             </tr>
           </thead>
           <tbody>
-            <!-- AVAILABILITY SECTION -->
             <tr class="sec-header"><td colspan="5">% Availability</td></tr>
-            <tr>
-              <td class="code-col">A</td>
-              <td class="desc-col">Waktu Operasional Pabrik (menit) → Sh1=510, Sh2=510, Sh3=495</td>
-              <td class="val-col" style="text-align:center;" colspan="3"><span id="oA">510</span> mnt</td>
-            </tr>
-            <tr>
-              <td class="code-col">B</td>
-              <td class="desc-col">Waktu Berhenti Terencana (menit) → (Total keg. kode 5,6,7,8)</td>
-              <td class="val-col" style="text-align:center;" colspan="3"><span id="oB">0</span> mnt</td>
-            </tr>
-            <tr>
-              <td class="code-col">C</td>
-              <td class="desc-col">Waktu Produksi Terencana (menit) → ( A − B )</td>
-              <td class="val-col" style="text-align:center;" colspan="3"><span id="oC">510</span> mnt</td>
-            </tr>
-            <tr>
-              <td class="code-col">D</td>
-              <td class="desc-col">Waktu Berhenti Tidak Terencana (menit) → (Total keg. kode 1,3,4,9)</td>
-              <td class="val-col" style="text-align:center;" colspan="3"><span id="oD">0</span> mnt</td>
-            </tr>
-            <tr>
-              <td class="code-col">E</td>
-              <td class="desc-col">Waktu Operasional (menit) → ( C − D )</td>
-              <td class="val-col" style="text-align:center;" colspan="3"><span id="oE">510</span> mnt</td>
-            </tr>
-            <tr>
-              <td class="code-col">F</td>
-              <td class="desc-col"><b>% A</b> → ( E ÷ C )<br><span style="font-size:11px;color:var(--mut)">Target %A = 90%</span></td>
-              <td class="val-col" style="text-align:center;font-size:15px;color:var(--green-d);" colspan="3"><span id="oF">0,00</span> %</td>
-            </tr>
+            <tr><td class="code-col">A</td><td class="desc-col">Waktu Operasional Pabrik (menit) → Sh1=510, Sh2=510, Sh3=495</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oA">510</span> mnt</td></tr>
+            <tr><td class="code-col">B</td><td class="desc-col">Waktu Berhenti Terencana (menit) → (Total keg. kode 5,6,7,8)</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oB">0</span> mnt</td></tr>
+            <tr><td class="code-col">C</td><td class="desc-col">Waktu Produksi Terencana (menit) → ( A − B )</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oC">510</span> mnt</td></tr>
+            <tr><td class="code-col">D</td><td class="desc-col">Waktu Berhenti Tidak Terencana (menit) → (Total keg. kode 1,3,4,9)</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oD">0</span> mnt</td></tr>
+            <tr><td class="code-col">E</td><td class="desc-col">Waktu Operasional (menit) → ( C − D )</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oE">510</span> mnt</td></tr>
+            <tr><td class="code-col">F</td><td class="desc-col"><b>% A</b> → ( E ÷ C )<br><span style="font-size:11px;color:var(--mut)">Target %A = 90%</span></td><td class="val-col" style="text-align:center;font-size:15px;" colspan="3"><span id="oF">0,00</span> %</td></tr>
 
-            <!-- PERFORMANCE SECTION -->
             <tr class="sec-header"><td colspan="5">% Performance (Breakdown per Produk)</td></tr>
-            <tr>
-              <td class="code-col">G</td>
-              <td class="desc-col">Target output produksi → (Kec. Standar × Durasi produk)</td>
-              <td class="val-col"><span id="oG1">0</span> unit</td>
-              <td class="val-col"><span id="oG2">0</span> unit</td>
-              <td class="val-col"><span id="oG3">0</span> unit</td>
-            </tr>
-            <tr>
-              <td class="code-col">H</td>
-              <td class="desc-col">Total output produksi (actual Good)</td>
-              <td class="val-col"><span id="oH1">0</span> unit</td>
-              <td class="val-col"><span id="oH2">0</span> unit</td>
-              <td class="val-col"><span id="oH3">0</span> unit</td>
-            </tr>
+            <tr><td class="code-col">G</td><td class="desc-col">Target output produksi → (Kec. Standar × Durasi produk)</td><td class="val-col"><span id="oG1">0</span> unit</td><td class="val-col"><span id="oG2">0</span> unit</td><td class="val-col"><span id="oG3">0</span> unit</td></tr>
+            <tr><td class="code-col">H</td><td class="desc-col">Total output produksi aktual (Good + Defect)</td><td class="val-col"><span id="oH1">0</span> unit</td><td class="val-col"><span id="oH2">0</span> unit</td><td class="val-col"><span id="oH3">0</span> unit</td></tr>
             <tr>
               <td class="code-col">I</td>
               <td class="desc-col">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                   <span><b>% P</b> → ( H ÷ G ) per produk &amp; Rata-rata</span>
-                  <span style="background:var(--green-bg); color:var(--green-d); padding:2px 8px; border-radius:6px; font-weight:700; font-size:13px; border:1px solid rgba(18,161,80,0.3);">Average: <span id="oITotal">0,00</span> %</span>
+                  <span id="badgeAvgP" style="background:var(--green-bg); color:var(--green-d); padding:2px 8px; border-radius:6px; font-weight:700; font-size:13px; border:1px solid rgba(18,161,80,0.3);">Average: <span id="oITotal">0,00</span> %</span>
                 </div>
                 <span style="font-size:11px;color:var(--mut)">Target %P = 98%</span>
               </td>
-              <td class="val-col" style="color:var(--green-d);"><span id="oI1">0,00</span> %</td>
-              <td class="val-col" style="color:var(--green-d);"><span id="oI2">0,00</span> %</td>
-              <td class="val-col" style="color:var(--green-d);"><span id="oI3">0,00</span> %</td>
+              <td class="val-col" id="colI1"><span id="oI1">0,00</span> %</td>
+              <td class="val-col" id="colI2"><span id="oI2">0,00</span> %</td>
+              <td class="val-col" id="colI3"><span id="oI3">0,00</span> %</td>
             </tr>
 
-            <!-- QUALITY SECTION -->
             <tr class="sec-header"><td colspan="5">% Quality</td></tr>
-            <tr>
-              <td class="code-col">J</td>
-              <td class="desc-col">Total output produksi (actual total)</td>
-              <td class="val-col" style="text-align:center;" colspan="3"><span id="oJ">0</span> unit</td>
-            </tr>
-            <tr>
-              <td class="code-col">K</td>
-              <td class="desc-col">Total Defect / produk cacat (actual)</td>
-              <td class="val-col" style="text-align:center;" colspan="3"><span id="oK">0</span> unit</td>
-            </tr>
-            <tr>
-              <td class="code-col">L</td>
-              <td class="desc-col">Total Produksi Bagus (Good Quality) → ( J − K )</td>
-              <td class="val-col" style="text-align:center;" colspan="3"><span id="oL">0</span> unit</td>
-            </tr>
-            <tr>
-              <td class="code-col">M</td>
-              <td class="desc-col"><b>% Q</b> → ( L ÷ J )<br><span style="font-size:11px;color:var(--mut)">Target %Q = 99,50%</span></td>
-              <td class="val-col" style="text-align:center;color:var(--green-d);" colspan="3"><span id="oM">0,00</span> %</td>
-            </tr>
+            <tr><td class="code-col">J</td><td class="desc-col">Total output produksi (actual total = Good + Defect)</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oJ">0</span> unit</td></tr>
+            <tr><td class="code-col">K</td><td class="desc-col">Total Defect / produk cacat (actual)</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oK">0</span> unit</td></tr>
+            <tr><td class="code-col">L</td><td class="desc-col">Total Produksi Bagus (Good Quality) → ( J − K )</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oL">0</span> unit</td></tr>
+            <tr><td class="code-col">M</td><td class="desc-col"><b>% Q</b> → ( L ÷ J )<br><span style="font-size:11px;color:var(--mut)">Target %Q = 99,50%</span></td><td class="val-col" style="text-align:center;" colspan="3"><span id="oM">0,00</span> %</td></tr>
 
-            <!-- FINAL OEE SCORE -->
             <tr class="highlight-res">
               <td colspan="2" style="text-align:right;letter-spacing:1px;font-family:var(--disp);font-size:16px;">
                 % OVERALL EQUIPMENT EFFECTIVENESS (OEE) &nbsp;·&nbsp; <span style="font-size:11px;color:#7fd7a8">Target %OEE = 88%</span><br>
                 <span style="font-size:10px;color:#94a3b8;font-weight:400;">OEE = %Availability × %Performance (Average) × %Quality</span>
               </td>
-              <td style="text-align:right;font-size:22px;font-family:var(--disp);color:#2ee27e;" colspan="3" id="oee">
-                0,00%
-              </td>
+              <td style="text-align:right;font-size:22px;font-family:var(--disp);" colspan="3" id="oee">0,00%</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Diagnostik / Keterangan bawah -->
       <div class="diag" id="diag" style="margin-top:14px;"></div>
     </section>
 
-    <!-- Input tersembunyi agar fungsi JS kalkulasi tetap berjalan sempurna -->
     <div style="display:none;">
       <input id="hActual" value="0">
       <input id="defect" value="0">
@@ -774,16 +663,14 @@ textarea.in {
     <div class="sheet-f">
       <span><kbd>Ctrl</kbd>+<kbd>S</kbd> simpan cepat &amp; sinkron cloud</span>
       <span>Shift: S1 07.00–15.30 · S2 15.30–23.30 · S3 23.30–07.00</span>
-      <span>TKL-OEE 2026 System</span>
+      <span>TKL-Produksi-OEE 2026 System</span>
     </div>
-
   </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// --- LOGIC AUTHENTICATION (LOGIN/LOGOUT) ---
 var CORRECT_PIN = '2026';
 var AUTH_KEY = 'fima_oee_logged_in';
 
@@ -834,7 +721,6 @@ window.addEventListener('DOMContentLoaded', function(){
   initAppSession();
 });
 
-// --- SCRIPT UTAMA APLIKASI OEE ---
 function startMainApp(){
 'use strict';
 
@@ -846,7 +732,6 @@ var DEFAULT_ROWS=30;
 var SHIFT_A=[510,480,450];
 
 var HARDCODED_SERVER = 'https://script.google.com/macros/s/AKfycbzO3LR5QZNxIUTLC6Htpm1z-T7oszjo1PS7s6j54g2CtfPDWCsrjH1nmDz84vkpc-32pw/exec';
-var HARDCODED_TOKEN  = 'oee-fima-2026-secret';
 
 function shiftOf(m){ if(m==null)return null; if(m>=420&&m<930)return 0; if(m>=930&&m<1410)return 1; return 2; }
 function $(id){return document.getElementById(id);}
@@ -982,7 +867,7 @@ function makeRow(data){
 
   tr.innerHTML=
    '<td class="col-num" style="text-align:center;font:600 13px var(--mono);color:var(--mut);padding:4px 6px;">'+(rows().length+1)+'</td>'+
-   '<td class="col-kode"><div class="c-kode"><span class="dot"></span><input data-f="kode" data-nav class="in mono ctr" type="text" maxlength="2" placeholder="•" aria-label="Kode"></div></td>'+
+   '<td class="col-kode"><div class="c-kode"><span class="dot"></span><input data-f="kode" data-nav class="in mono ctr" type="tel" inputmode="numeric" maxlength="2" placeholder="•" aria-label="Kode"></div></td>'+
    '<td class="col-mulai"><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>'+
    '<td class="col-panggil"><input data-f="panggil" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Panggil Teknik"></td>'+
    '<td class="col-teknik"><input data-f="teknik" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Teknik Datang"></td>'+
@@ -1084,6 +969,7 @@ tbody.addEventListener('input',function(e){
     autoResizeTextarea(t);
   }
   if(t.getAttribute('data-f')==='kode'){
+    t.value = t.value.replace(/\D/g,'');
     applyCat(t.closest('tr'));
   }
   if(t.getAttribute('data-f')==='mulai'){
@@ -1168,6 +1054,8 @@ function updateProductDetailTable() {
     var mulai=parseTime(g('mulai')), selesai=parseTime(g('selesai'));
     var prodName = g('batch');
     var goodVal = parseFloat(g('good').replace(',','.')) || 0;
+    var defectVal = parseFloat(g('defect').replace(',','.')) || 0;
+    var rowActual = goodVal + defectVal; // H = Good + Defect
 
     if(mulai==null||selesai==null) return;
     var dur=(selesai-mulai+1440)%1440;
@@ -1175,7 +1063,7 @@ function updateProductDetailTable() {
 
     if(si === evalShift && prodName && summary[prodName]){
       summary[prodName].durasi += dur;
-      summary[prodName].actual += goodVal;
+      summary[prodName].actual += rowActual;
     }
   });
 
@@ -1186,6 +1074,8 @@ function updateProductDetailTable() {
     var perfP = targetG > 0 ? (item.actual / targetG) * 100 : 0;
     if(item.durasi > 0 || item.actual > 0) hasData = true;
 
+    var perfColorClass = (perfP >= 98) ? 'color:var(--green-d);font-weight:700;' : 'color:var(--red);font-weight:700;';
+
     var tr = document.createElement('tr');
     tr.innerHTML = 
       '<td style="text-align:left;font-weight:600;color:var(--ink);">'+p+'</td>'+
@@ -1193,7 +1083,7 @@ function updateProductDetailTable() {
       '<td>'+nf0(item.rate)+'</td>'+
       '<td>'+nf0(targetG)+'</td>'+
       '<td>'+nf0(item.actual)+'</td>'+
-      '<td class="fv">'+nf2(perfP)+' %</td>';
+      '<td class="fv" style="'+perfColorClass+'">'+nf2(perfP)+' %</td>';
     tbodyDetail.appendChild(tr);
   });
 
@@ -1227,6 +1117,8 @@ function recalc(){
     
     var gVal = parseFloat(g('good').replace(',','.')) || 0;
     var dVal = parseFloat(g('defect').replace(',','.')) || 0;
+    var rowActual = gVal + dVal; // Aktual baris = Good + Defect
+
     sumGood += gVal;
     sumDefect += dVal;
 
@@ -1245,14 +1137,15 @@ function recalc(){
         for(var i=0; i<3; i++){
           if(pNames[i] && pNames[i] === prodName){
             prodStats[i].dur += dur;
-            prodStats[i].actual += gVal;
+            prodStats[i].actual += rowActual; // H = Good + Defect per produk
           }
         }
       }
     }
   });
 
-  $('hActual').value = sumGood > 0 ? sumGood : '';
+  var totalOutputJ = sumGood + sumDefect;
+  $('hActual').value = totalOutputJ > 0 ? totalOutputJ : '';
   $('defect').value = sumDefect > 0 ? sumDefect : '';
 
   var sA=SHIFT_A[evalShift],sB=sh[evalShift].B,sC=Math.max(sA-sB,0),sD=sh[evalShift].D,sE=Math.max(sC-sD,0),sF=sC>0?sE/sC*100:0;
@@ -1262,14 +1155,18 @@ function recalc(){
   $('oC').textContent=nf0(sC);
   $('oD').textContent=nf0(sD);
   $('oE').textContent=nf0(sE);
-  $('oF').textContent=nf2(sF);
+  
+  var oFEl = $('oF');
+  oFEl.textContent = nf2(sF);
+  oFEl.style.color = (sF >= 90) ? 'var(--green-d)' : 'var(--red)';
+  oFEl.style.fontWeight = '700';
 
   var totalPerfSum = 0;
   var activeCount = 0;
 
   for(var i=0; i<3; i++){
     var gTarget = prodStats[i].dur * prodStats[i].rate;
-    var hAct = prodStats[i].actual;
+    var hAct = prodStats[i].actual; // H aktual = Good + Defect
     var perfI = gTarget > 0 ? (hAct / gTarget) * 100 : 0;
 
     if(pNames[i]) {
@@ -1279,29 +1176,43 @@ function recalc(){
 
     $('oG' + (i+1)).textContent = nf0(gTarget);
     $('oH' + (i+1)).textContent = nf0(hAct);
-    $('oI' + (i+1)).textContent = nf2(perfI);
+    
+    var elI = $('oI' + (i+1));
+    elI.textContent = nf2(perfI);
+    elI.style.color = (perfI >= 98) ? 'var(--green-d)' : 'var(--red)';
+    elI.style.fontWeight = '700';
   }
 
   var avgPerfI = activeCount > 0 ? (totalPerfSum / activeCount) : 0;
   $('oITotal').textContent = nf2(avgPerfI);
+  var badgeAvgP = $('badgeAvgP');
+  badgeAvgP.style.color = (avgPerfI >= 98) ? 'var(--green-d)' : 'var(--red)';
+  badgeAvgP.style.borderColor = (avgPerfI >= 98) ? 'rgba(18,161,80,0.3)' : 'rgba(220,38,38,0.3)';
 
   var K=num($('defect'));
-  var J=sumGood;
-  var L=Math.max(J-K,0);
+  var J=totalOutputJ;
+  var L=Math.max(sumGood,0); // Quality L = Total Good (atau J - K)
   var M=J>0?L/J*100:0;
   var oee=sF*(avgPerfI)*M/10000;
 
   $('oJ').textContent=nf0(J);
   $('oK').textContent=nf0(K);
   $('oL').textContent=nf0(L);
-  $('oM').textContent=nf2(M);
-  $('oee').textContent=nf2(oee)+'%';
+  
+  var oMEl = $('oM');
+  oMEl.textContent=nf2(M);
+  oMEl.style.color = (M >= 99.50) ? 'var(--green-d)' : 'var(--red)';
+  oMEl.style.fontWeight = '700';
+
+  var oeeEl = $('oee');
+  oeeEl.textContent=nf2(oee)+'%';
+  oeeEl.style.color = (oee >= 88) ? '#2ee27e' : '#f87171';
 
   var issues=[];
   if(nShift===0)issues.push('Tidak ada baris log pada jam Shift '+(evalShift+1)+' — cek tombol SHIFT atau jam mulai.');
   if(sC<=0)issues.push('Availability 0% — Planned DT (B) ≥ menit shift (A).');
   else if(sE<=0)issues.push('Availability 0% — Unplanned DT (D) ≥ waktu terencana (C).');
-  if(J<=0)issues.push('Quality / Performance 0% — Output Aktual (Good) belum diisi.');
+  if(J<=0)issues.push('Quality / Performance 0% — Output Aktual belum diisi.');
   
   var dEl=$('diag');
   if(issues.length===0)dEl.innerHTML='<div class="d-item ok" style="padding:10px 14px;border-radius:8px;font-family:var(--mono);font-size:13px;background:rgba(46,226,126,0.12);border:1px solid rgba(46,226,126,0.35);color:#0c7c3d;">✓ Semua komponen lengkap — OEE = '+nf2(sF)+'% × '+nf2(avgPerfI)+'% × '+nf2(M)+'% = '+nf2(oee)+'%</div>';
@@ -1411,41 +1322,6 @@ function setSyncStatus(kind,text){
 function loadRecord(){
   var k=curKey(), db=dbGet();
   applyRecord(db[k]||null);
-  
-  setSyncStatus('sync','memuat cloud…');
-  var body = {
-    action: 'load',
-    token: HARDCODED_TOKEN,
-    date: $('fDate').value || todayLocal(),
-    shift: evalShift+1,
-    line: $('fLine').value,
-    stage: $('fStage').value
-  };
-  fetch(HARDCODED_SERVER,{
-    method: 'POST',
-    headers: {'Content-Type':'text/plain;charset=utf-8'},
-    body: JSON.stringify(body)
-  })
-  .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-  .then(function(j){
-    if(!j || j.ok===false) throw new Error((j&&j.error)||'server error');
-    var cloud = j.data;
-    if(cloud){
-      var local=db[k];
-      if(!local || !local.savedAt || (cloud.savedAt && cloud.savedAt>local.savedAt)){
-        db[k]=cloud; dbSet(db);
-        applyRecord(cloud);
-        setSyncStatus('ok','✓ cloud terbaru');
-      }else{
-        setSyncStatus('ok','✓ lokal lebih baru');
-      }
-    }else{
-      setSyncStatus('ok','✓ cloud kosong');
-    }
-  })
-  .catch(function(err){
-    setSyncStatus('err','⚠ cloud: '+err.message);
-  });
 }
 
 function saveData(opts){
@@ -1459,7 +1335,6 @@ function saveData(opts){
   setSyncStatus('sync','mengunggah…');
   var bodyObj = {
     action: 'save',
-    token: HARDCODED_TOKEN,
     date: $('fDate').value || todayLocal(),
     shift: evalShift+1,
     line: $('fLine').value,
