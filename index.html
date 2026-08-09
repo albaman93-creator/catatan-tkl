@@ -1,9 +1,21 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Log Sheet &amp; OEE — Fima Farma</title>
+
+<!-- PWA Meta Tags -->
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#0d2135">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="OEE Fima">
+<link rel="icon" href="./icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -60,6 +72,9 @@ kbd{font:600 12px var(--mono);background:#fff;border:1px solid var(--line);borde
 .btn-sync{background:#fff;border:1px solid var(--line);color:var(--navy);padding:11px 14px;font-size:13px;white-space:nowrap}
 .btn-sync:hover{background:#eaf3fb;border-color:var(--blue)}
 .btn-sync.busy{opacity:.6;cursor:wait;pointer-events:none}
+.btn-install{background:#0d2135;color:#fff;border:1px solid #1a3b5c;padding:8px 14px;font-size:13px;white-space:nowrap;border-radius:8px;cursor:pointer;transition:.2s;display:none}
+.btn-install:hover{background:#1a3b5c;transform:translateY(-1px)}
+.btn-install.show{display:inline-flex}
 
 .sheet{max-width:var(--page);margin:20px auto 46px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 30px 70px -35px rgba(13,33,53,.45);overflow:hidden;animation:rise .5s cubic-bezier(.22,.8,.3,1) both}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}
@@ -239,6 +254,7 @@ td.dur{text-align:center;width:80px}
     <span class="hint" id="hint"></span>
     <span class="spacer"></span>
     <span id="lastSaved"></span>
+    <button class="btn btn-install" id="pwa-install-btn">📱 Install Aplikasi</button>
     <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
     <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
   </div>
@@ -786,7 +802,6 @@ function updateEditChip(d){
   }else{
     base='belum ada data tersimpan untuk filter ini';
   }
-  // status sync ditulis terpisah oleh setSyncStatus()
   syncEl.dataset.edit = base;
   applyChip();
 }
@@ -813,7 +828,7 @@ function syncConfigured(){var s=getServer(),t=getToken();return s.indexOf('https
 
 function loadRecord(){
   var k=curKey(), db=dbGet();
-  applyRecord(db[k]||null);             // instan dari localStorage
+  applyRecord(db[k]||null);
   if(!syncConfigured()){
     setSyncStatus('','sync belum dikonfigurasi');
     return;
@@ -847,7 +862,7 @@ function loadRecord(){
 function saveData(opts){
   opts=opts||{};
   var rec=collect(),db=dbGet();
-  db[curKey()]=rec; dbSet(db);                              // offline-first
+  db[curKey()]=rec; dbSet(db);
   $('lastSaved').textContent='✓ tersimpan '+new Date().toLocaleTimeString('id-ID');
   updateEditChip(rec);
   if(!opts.silent) toast('Data tersimpan lokal ✓');
@@ -861,7 +876,7 @@ function saveData(opts){
   var payload=JSON.stringify({key:curKey(),data:rec,token:getToken()});
   fetch(getServer()+'?token='+encodeURIComponent(getToken()),{
     method:'POST',
-    mode:'no-cors',                                         // GAS Web App + browser
+    mode:'no-cors',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:payload
   }).then(function(){
@@ -926,11 +941,54 @@ function tick(){
 }
 setInterval(tick,1000);tick();
 
+/* ---------- PWA Install Button ---------- */
+var installBtn = document.getElementById('pwa-install-btn');
+var deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.classList.add('show');
+});
+
+installBtn.addEventListener('click', function(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(result){
+      if(result.outcome === 'accepted'){
+        toast('Aplikasi berhasil diinstall ✓');
+      } else {
+        toast('Installasi dibatalkan');
+      }
+      deferredPrompt = null;
+      installBtn.classList.remove('show');
+    });
+  }
+});
+
+window.addEventListener('appinstalled', function(){
+  installBtn.classList.remove('show');
+  toast('Aplikasi terinstall ✓');
+});
+
 /* ---------- init ---------- */
 $('fDate').value=todayLocal();
 applyModeUI();
 applyShiftUI();
 loadRecord();
+
+/* ---------- Service Worker Registration ---------- */
+if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')){
+  navigator.serviceWorker.register('./sw.js', { scope: './' })
+    .then(function(reg){
+      console.log('✅ Service Worker registered:', reg);
+    })
+    .catch(function(err){
+      console.warn('⚠️ Service Worker registration failed:', err);
+    });
+} else {
+  console.info('Service Worker tidak didaftarkan (non-HTTPS/non-localhost)');
+}
 
 })();
 </script>
