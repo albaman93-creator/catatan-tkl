@@ -22,7 +22,6 @@ function doGet(e){
 
 function doPost(e){
   try{
-    // Read raw contents (supports text/plain JSON)
     var raw = null;
     if(e && e.postData && e.postData.contents){
       raw = e.postData.contents;
@@ -47,12 +46,10 @@ function doPost(e){
       return jsonResponse({ok:false,error:'UNKNOWN_ACTION'});
     }
 
-    // Auth for load/save
     if(!req.token || String(req.token) !== String(serverToken)){
       return jsonResponse({ok:false,error:'UNAUTHORIZED'});
     }
 
-    // Validate required fields
     var date = (req.date || '').toString();
     var shift = req.shift;
     var line = (req.line || '').toString();
@@ -61,7 +58,6 @@ function doPost(e){
     if(!date || !shift || !line || !stage){
       return jsonResponse({ok:false,error:'BAD_REQUEST',message:'missing required fields'});
     }
-    // Accept numeric 1/2/3 for shift
     var sNum = Number(shift);
     if([1,2,3].indexOf(sNum) === -1){
       return jsonResponse({ok:false,error:'BAD_REQUEST',message:'invalid shift'});
@@ -69,7 +65,6 @@ function doPost(e){
 
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     if(!ss){
-      // create a container spreadsheet if none bound (will live in user's Drive)
       ss = SpreadsheetApp.create('fima-oee-sync-data');
     }
     var sheet = ss.getSheetByName('Records');
@@ -81,7 +76,6 @@ function doPost(e){
 
     var key = date + '|S' + sNum + '|L' + line + '|' + stage;
 
-    // find row by key (search column A)
     var lastRow = Math.max(sheet.getLastRow(),1);
     var data = [];
     if(lastRow >= 2){

@@ -69,13 +69,6 @@ kbd{font:600 12px var(--mono);background:#fff;border:1px solid var(--line);borde
 .btn-ghost:active{transform:translateY(1px);box-shadow:none}
 .btn-add{background:#fff;border:1.5px dashed #9fc3ad;color:var(--green-d);padding:10px 14px;width:100%;margin-top:12px}
 .btn-add:hover{background:var(--green-bg);border-style:solid}
-.btn-sync{background:#fff;border:1px solid var(--line);color:var(--navy);padding:11px 14px;font-size:13px;white-space:nowrap}
-.btn-sync:hover{background:#eaf3fb;border-color:var(--blue)}
-.btn-sync.busy{opacity:.6;cursor:wait;pointer-events:none}
-.sync-config-hidden{display:none !important}
-.sync-toggle{background:transparent;border:1px solid var(--line);color:var(--mut);padding:6px 12px;border-radius:99px;font:600 11.5px var(--mono);cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;margin-left:6px}
-.sync-toggle:hover{color:var(--ink);background:#f2f6f8;border-color:#b8c6d0}
-.sync-toggle.active{color:var(--green-d);border-color:rgba(18,161,80,.4);background:var(--green-bg)}
 .btn-install{background:#0d2135;color:#fff;border:1px solid #1a3b5c;padding:8px 14px;font-size:13px;white-space:nowrap;border-radius:8px;cursor:pointer;transition:.2s;display:none}
 .btn-install:hover{background:#1a3b5c;transform:translateY(-1px)}
 .btn-install.show{display:inline-flex}
@@ -107,7 +100,6 @@ h1{font:700 clamp(24px,5vw,34px)/1 var(--disp);letter-spacing:.8px;text-transfor
 .sec-f b{color:var(--ink)}
 
 .filter-grid{display:grid;grid-template-columns:1.2fr 1fr 1.2fr;gap:12px}
-.sync-grid{display:grid;grid-template-columns:2fr 1fr auto;gap:12px;margin-top:12px}
 .edit-info{font:600 11.5px var(--mono);color:var(--mut);background:#f4f7f9;border:1px dashed var(--line);border-radius:99px;padding:6px 12px;display:inline-flex;align-items:center;gap:6px;cursor:default}
 .edit-info.ok{color:var(--green-d);border-color:rgba(18,161,80,.4);background:var(--green-bg)}
 .edit-info.sync{color:var(--blue);border-color:rgba(12,99,168,.3);background:rgba(12,99,168,.08)}
@@ -125,11 +117,6 @@ h1{font:700 clamp(24px,5vw,34px)/1 var(--disp);letter-spacing:.8px;text-transfor
 .field input:hover,.field select:hover{background:#f4f8fa}
 .field input:focus,.field select:focus{outline:none;border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(18,161,80,.16)}
 .field .big{font-size:18px}
-.field input[type="password"]{letter-spacing:2px}
-.token-wrap{position:relative}
-.token-wrap input{padding-right:46px}
-.token-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:transparent;border:0;cursor:pointer;color:var(--mut);font-size:16px;padding:6px 8px;border-radius:6px}
-.token-eye:hover{background:#eef2f5;color:var(--ink)}
 
 .legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .lg{display:inline-flex;align-items:center;gap:7px;font:500 12.5px var(--mono);color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 12px}
@@ -230,7 +217,6 @@ td.dur{text-align:center;width:80px}
   .sec{padding:16px 14px}
   .sec-h h2{font-size:21px}
   .filter-grid{grid-template-columns:1fr}
-  .sync-grid{grid-template-columns:1fr}
   .in{font-size:16px;padding:12px 8px}
   .in.mono{font-size:16px}
   .log{min-width:640px}
@@ -285,17 +271,16 @@ td.dur{text-align:center;width:80px}
   </div>
   <div class="stripe"></div>
 
-  <!-- ============ DATA & PENYIMPANAN + CLOUD SYNC ============ -->
+  <!-- ============ DATA & PENYIMPANAN ============ -->
   <section class="sec">
     <div class="sec-h">
       <span class="no">📊</span>
       <div>
         <h2>Data &amp; Penyimpanan</h2>
-        <div class="sub2">Satu slot per Tanggal · Shift · Line · Tahapan — sinkron antar perangkat via Google Sheets</div>
+        <div class="sub2">Satu slot per Tanggal · Shift · Line · Tahapan — sinkron otomatis via Google Sheets</div>
       </div>
       <span class="spacer"></span>
-      <span id="syncStatus" class="edit-info"><i class="sync-dot"></i>sync belum dikonfigurasi</span>
-      <button type="button" id="btn-toggle-sync" class="sync-toggle" title="Pengaturan Sync">⚙ Sync</button>
+      <span id="syncStatus" class="edit-info"><i class="sync-dot"></i>tersambung otomatis</span>
     </div>
     <div class="filter-grid">
       <div class="field" style="margin-bottom:0">
@@ -319,25 +304,6 @@ td.dur{text-align:center;width:80px}
           <option value="visual">Visual</option>
           <option value="kemas">Kemas</option>
         </select>
-      </div>
-    </div>
-
-    <div id="sync-config-panel">
-      <div class="sync-grid">
-        <div class="field" style="margin-bottom:0">
-          <label>URL Server Sync <span class="unit">Google Apps Script Web App</span></label>
-          <input id="fServer" placeholder="https://script.google.com/macros/s/…/exec">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Token API</label>
-          <div class="token-wrap">
-            <input id="fToken" type="password" placeholder="oee-fima-2024-secret">
-            <button type="button" class="token-eye" id="btnEye" title="Tampilkan / sembunyikan">👁</button>
-          </div>
-        </div>
-        <div class="field" style="margin-bottom:0;display:flex;align-items:flex-end;">
-          <button type="button" class="btn btn-sync" id="btnSync" style="width:100%;">🔄 Sync</button>
-        </div>
       </div>
     </div>
   </section>
@@ -512,7 +478,7 @@ td.dur{text-align:center;width:80px}
   </section>
 
   <div class="sheet-f">
-    <span><kbd>Ctrl</kbd>+<kbd>S</kbd> simpan cepat + sync</span>
+    <span><kbd>Ctrl</kbd>+<kbd>S</kbd> simpan cepat &amp; sinkron cloud</span>
     <span>Shift: S1 07.00–15.30 · S2 15.30–23.30 · S3 23.30–07.00</span>
     <span>Fima Farma OEE System</span>
   </div>
@@ -525,15 +491,17 @@ td.dur{text-align:center;width:80px}
 (function(){
 'use strict';
 
-/* ---------- konstanta ---------- */
+/* ---------- konstanta & hardcoded cloud config ---------- */
 var PLANNED=new Set([5,6,7,8]), UNPLANNED=new Set([1,3,4,9]);
 var NAV_FIELDS=['kode','mulai','selesai','kegiatan'];
 var FLABEL={kode:'KODE',mulai:'JAM MULAI',selesai:'JAM SELESAI',kegiatan:'KEGIATAN'};
 var DB_KEY='fima_oee_db_v2';
 var DEFAULT_ROWS=30;
 var SHIFT_A=[510,480,450];
-var KEY_SERVER='fima_sync_server';
-var KEY_TOKEN ='fima_sync_token';
+
+// Konfigurasi paten (hardcoded) agar terhubung otomatis ke Google Sheets
+var HARDCODED_SERVER = 'https://script.google.com/macros/s/AKfycbzO3LR5QZNxIUTLC6Htpm1z-T7oszjo1PS7s6j54g2CtfPDWCsrjH1nmDz84vkpc-32pw/exec';
+var HARDCODED_TOKEN  = 'oee-fima-2026-secret';
 
 function shiftOf(m){ if(m==null)return null; if(m>=420&&m<930)return 0; if(m>=930&&m<1410)return 1; return 2; }
 function $(id){return document.getElementById(id);}
@@ -769,7 +737,7 @@ function recalc(){
 }
 
 /* ============================================================
-   SISTEM SIMPAN — localStorage (offline-first) + Google Sheets (cloud)
+   SISTEM PENYIMPANAN — localStorage (offline-first) + Google Sheets Cloud Sync
    ============================================================ */
 function dbGet(){try{return JSON.parse(localStorage.getItem(DB_KEY))||{};}catch(e){return {};}}
 function dbSet(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch(e){}}
@@ -826,31 +794,20 @@ function setSyncStatus(kind,text){
   applyChip();
 }
 
-/* ---------- cloud helpers ---------- */
-function getServer(){try{return localStorage.getItem(KEY_SERVER)||'';}catch(e){return '';}}
-function getToken(){try{return localStorage.getItem(KEY_TOKEN)||'';}catch(e){return '';}}
-function setServer(v){try{localStorage.setItem(KEY_SERVER,v||'');}catch(e){}}
-function setToken(v){try{localStorage.setItem(KEY_TOKEN,v||'');}catch(e){}}
-function syncConfigured(){var s=getServer(),t=getToken();return s.indexOf('https://')===0 && t.length>0;}
-
 function loadRecord(){
   var k=curKey(), db=dbGet();
   applyRecord(db[k]||null);
-  if(!syncConfigured()){
-    setSyncStatus('','sync belum dikonfigurasi');
-    return;
-  }
+  
   setSyncStatus('sync','memuat cloud…');
-  var url = getServer();
   var body = {
     action: 'load',
-    token: getToken(),
+    token: HARDCODED_TOKEN,
     date: $('fDate').value || todayLocal(),
     shift: evalShift+1,
     line: $('fLine').value,
     stage: $('fStage').value
   };
-  fetch(url,{
+  fetch(HARDCODED_SERVER,{
     method: 'POST',
     headers: {'Content-Type':'text/plain;charset=utf-8'},
     body: JSON.stringify(body)
@@ -865,7 +822,6 @@ function loadRecord(){
         db[k]=cloud; dbSet(db);
         applyRecord(cloud);
         setSyncStatus('ok','✓ cloud terbaru');
-        toast('Data cloud dimuat ✓ '+labelFilter());
       }else{
         setSyncStatus('ok','✓ lokal lebih baru');
       }
@@ -886,29 +842,23 @@ function saveData(opts){
   updateEditChip(rec);
   if(!opts.silent) toast('Data tersimpan lokal ✓');
 
-  if(!syncConfigured()){
-    setSyncStatus('','sync belum dikonfigurasi');
-    return;
-  }
-  var btn=$('btnSync'); if(btn){btn.classList.add('busy');btn.textContent='⏳ Sync…';}
   setSyncStatus('sync','mengunggah…');
   var bodyObj = {
     action: 'save',
-    token: getToken(),
+    token: HARDCODED_TOKEN,
     date: $('fDate').value || todayLocal(),
     shift: evalShift+1,
     line: $('fLine').value,
     stage: $('fStage').value,
     payload: rec
   };
-  fetch(getServer(),{
+  fetch(HARDCODED_SERVER,{
     method:'POST',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify(bodyObj)
   }).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
   .then(function(j){
     if(!j || j.ok===false) throw new Error((j&&j.error)||'server error');
-    if(btn){btn.classList.remove('busy');btn.textContent='🔄 Sync';}
     setSyncStatus('ok','✓ tersinkron cloud');
     if(j.updatedAt){
       rec.savedAt = j.updatedAt;
@@ -917,53 +867,13 @@ function saveData(opts){
     }
     if(!opts.silent) toast('Sync cloud ✓ '+labelFilter());
   }).catch(function(err){
-    if(btn){btn.classList.remove('busy');btn.textContent='🔄 Sync';}
     setSyncStatus('err','⚠ sync gagal: '+err.message);
     if(!opts.silent) toast('Tersimpan LOKAL — sync gagal ⚠',true);
   });
 }
 
-/* ---------- event sync ---------- */
+/* ---------- event ganti filter ---------- */
 ['fDate','fLine','fStage'].forEach(function(id){$(id).addEventListener('change',loadRecord);});
-
-$('fServer').value=getServer();
-$('fToken').value=getToken();
-
-/* ---------- sync config toggle (sembunyi jika URL & token sudah terisi) ---------- */
-function updateSyncPanelVisibility(){
-  var panel = $('sync-config-panel');
-  var btn   = $('btn-toggle-sync');
-  if(!panel) return;
-  var server = ($('fServer').value||'').trim();
-  var token  = ($('fToken').value||'').trim();
-  var configured = server.indexOf('https://')===0 && token.length>0;
-  if(configured){
-    panel.classList.add('sync-config-hidden');
-    if(btn) btn.classList.add('active');
-  }else{
-    panel.classList.remove('sync-config-hidden');
-    if(btn) btn.classList.remove('active');
-  }
-}
-updateSyncPanelVisibility();
-var _toggleBtn = $('btn-toggle-sync');
-if(_toggleBtn){
-  _toggleBtn.addEventListener('click',function(){
-    var panel = $('sync-config-panel');
-    if(!panel) return;
-    panel.classList.toggle('sync-config-hidden');
-  });
-}
-
-$('fServer').addEventListener('change',function(){setServer(this.value.trim());updateSyncPanelVisibility();loadRecord();});
-$('fToken').addEventListener('change',function(){setToken(this.value.trim());updateSyncPanelVisibility();loadRecord();});
-$('btnEye').addEventListener('click',function(){
-  var i=$('fToken'); i.type=(i.type==='password')?'text':'password';
-});
-$('btnSync').addEventListener('click',function(){
-  if(!syncConfigured()){ toast('Isi URL Server & Token API terlebih dahulu',true); return; }
-  saveData();
-});
 
 /* ---------- toast ---------- */
 var toastTimer=null;
@@ -974,7 +884,7 @@ function toast(msg,isErr){
   toastTimer=setTimeout(function(){el.classList.remove('show');el.classList.remove('err');},2400);
 }
 
-/* ---------- tombol ---------- */
+/* ---------- tombol aksi ---------- */
 $('btnSave').addEventListener('click',function(){saveData();});
 $('btnReset').addEventListener('click',function(){
   if(!confirm('Reset seluruh form? Data yang belum disimpan akan hilang.'))return;
