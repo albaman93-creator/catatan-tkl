@@ -28,7 +28,7 @@
   --amber:#d97706; --red:#dc2626; --navy:#0d2135;
   --blue:#0c63a8;
   --mono:'IBM Plex Mono',monospace; --disp:'Barlow Condensed',sans-serif; --body:'IBM Plex Sans',sans-serif;
-  --page:1260px;
+  --page:1360px;
 }
 html{scroll-behavior:smooth}
 body{
@@ -122,7 +122,7 @@ h1{font:700 clamp(24px,5vw,34px)/1 var(--disp);letter-spacing:.8px;text-transfor
 .sw{width:10px;height:10px;border-radius:2px;flex:none}
 .sw-a{background:var(--amber)}.sw-r{background:var(--red)}.sw-g{background:var(--green)}
 
-/* Toggle Kolom Panel */
+/* Panel Toggle Kolom */
 .col-toggle-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;background:#f4f7f9;padding:8px 12px;border-radius:8px;border:1px solid var(--line)}
 .col-toggle-bar span{font:600 11.5px var(--mono);color:var(--mut);letter-spacing:.8px;text-transform:uppercase}
 .col-toggle-bar label{font:500 12px var(--mono);color:var(--ink2);display:inline-flex;align-items:center;gap:4px;cursor:pointer;background:#fff;padding:3px 8px;border:1px solid var(--line);border-radius:6px;user-select:none}
@@ -156,9 +156,28 @@ td.dur{text-align:center;width:70px}
 /* Kelas Sembunyi Kolom */
 .col-hide{display:none !important}
 
+/* Penyesuaian Kolom Textarea Otomatis (Wrap Text / Expand ke Bawah) */
+.col-kegiatan, .col-masalah, .col-disposisi {
+  min-width: 240px;
+  max-width: 320px;
+  width: 260px;
+  white-space: normal !important;
+}
+
 .in{width:100%;border:1px solid transparent;background:transparent;padding:9px 10px;border-radius:7px;font:500 15px var(--body);color:var(--ink);caret-color:var(--green);transition:background .15s,border-color .15s,box-shadow .15s}
 .in.mono{font-family:var(--mono);font-size:14.5px}
 .in.ctr{text-align:center}
+
+/* Mengubah input teks untuk kegiatan, masalah, disposisi menjadi otomatis melipat teks ke bawah (textarea-like behavior via JS) */
+textarea.in {
+  resize: none;
+  overflow: hidden;
+  line-height: 1.4;
+  height: 38px;
+  min-height: 38px;
+  display: block;
+}
+
 .in::placeholder{color:#b6c4cf}
 .in:hover{background:#f2f6f8}
 .in:focus{outline:none;background:#fff;border-color:var(--green);box-shadow:0 0 0 3px rgba(18,161,80,.16)}
@@ -226,7 +245,7 @@ td.dur{text-align:center;width:70px}
   .sec-h h2{font-size:21px}
   .filter-grid{grid-template-columns:1fr}
   .in{font-size:15px;padding:9px 10px}
-  .log{min-width:1300px}
+  .log{min-width:1450px}
   .shift{min-width:540px}
   .sheet-f{padding:12px 14px}
 }
@@ -361,11 +380,11 @@ td.dur{text-align:center;width:70px}
             <th class="col-teknik" style="width:92px" rowspan="2">Teknik Datang</th>
             <th class="col-selesai" style="width:86px" rowspan="2">Jam Selesai</th>
             <th class="col-durasi" style="width:70px" rowspan="2">Durasi (m)</th>
-            <th class="col-kegiatan" style="min-width:200px;" rowspan="2">Kegiatan</th>
-            <th class="col-masalah" style="min-width:200px;" rowspan="2">Masalah / Penyebab (Alasan yang terjadi masalah)</th>
-            <th class="col-disposisi" style="min-width:200px;" rowspan="2">Disposisi / Tindakan Sementara (Tindakan pengatasan)</th>
+            <th class="col-kegiatan" rowspan="2">Kegiatan</th>
+            <th class="col-masalah" rowspan="2">Masalah / Penyebab (Alasan yang terjadi masalah)</th>
+            <th class="col-disposisi" rowspan="2">Disposisi / Tindakan Sementara (Tindakan pengatasan)</th>
             <th class="col-wo" style="width:110px" rowspan="2">Nomor WO (Wajib tulis)</th>
-            <th class="col-batch" style="min-width:180px;" rowspan="2">Kode Produk &amp; Batch Number</th>
+            <th class="col-batch" style="width:180px" rowspan="2">Kode Produk &amp; Batch Number</th>
             <th colspan="2" style="text-align:center;">Total Output</th>
             <th class="col-aksi" style="width:42px" rowspan="2">Aksi</th>
           </tr>
@@ -607,6 +626,12 @@ Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),funct
 });
 
 /* ---------- baris log ---------- */
+function autoResizeTextarea(ta){
+  if(!ta)return;
+  ta.style.height='auto';
+  ta.style.height=(ta.scrollHeight)+'px';
+}
+
 function makeRow(data){
   var tr=document.createElement('tr');tr.className='log-row';
   tr.innerHTML=
@@ -617,15 +642,26 @@ function makeRow(data){
    '<td class="col-teknik"><input data-f="teknik" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Teknik Datang"></td>'+
    '<td class="col-selesai"><input data-f="selesai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Selesai"></td>'+
    '<td class="col-durasi dur"><b class="dur-v">—</b></td>'+
-   '<td class="col-kegiatan"><input data-f="kegiatan" data-nav class="in" placeholder="Kegiatan…" aria-label="Kegiatan"></td>'+
-   '<td class="col-masalah"><input data-f="masalah" data-nav class="in" placeholder="Penyebab…" aria-label="Masalah"></td>'+
-   '<td class="col-disposisi"><input data-f="disposisi" data-nav class="in" placeholder="Tindakan…" aria-label="Disposisi"></td>'+
+   '<td class="col-kegiatan"><textarea data-f="kegiatan" data-nav class="in" placeholder="Kegiatan…" aria-label="Kegiatan" rows="1"></textarea></td>'+
+   '<td class="col-masalah"><textarea data-f="masalah" data-nav class="in" placeholder="Penyebab…" aria-label="Masalah" rows="1"></textarea></td>'+
+   '<td class="col-disposisi"><textarea data-f="disposisi" data-nav class="in" placeholder="Tindakan…" aria-label="Disposisi" rows="1"></textarea></td>'+
    '<td class="col-wo"><input data-f="wo" data-nav class="in mono" placeholder="No WO…" aria-label="Nomor WO"></td>'+
    '<td class="col-batch"><input data-f="batch" data-nav class="in mono" placeholder="Produk & Batch…" aria-label="Kode & Batch"></td>'+
    '<td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Good"></td>'+
    '<td class="col-defect"><input data-f="defect" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Defect"></td>'+
    '<td class="col-aksi c-aksi"><button type="button" class="del" title="Hapus baris">✕</button></td>';
-  if(data){NAV_FIELDS.forEach(function(f){var el=tr.querySelector('[data-f="'+f+'"]');if(el&&data[f]!=null)el.value=data[f];});}
+   
+  if(data){
+    NAV_FIELDS.forEach(function(f){
+      var el=tr.querySelector('[data-f="'+f+'"]');
+      if(el&&data[f]!=null){
+        el.value=data[f];
+        if(f==='kegiatan'||f==='masalah'||f==='disposisi') {
+          setTimeout(function(){ autoResizeTextarea(el); }, 10);
+        }
+      }
+    });
+  }
   tbody.appendChild(tr);applyCat(tr);
   syncColumnVisibility();
   return tr;
@@ -653,7 +689,7 @@ function applyTabOrder(){
   var cells=navCells();
   for(var i=0;i<cells.length;i++){
     var el=cells[i].el;
-    if(el&&el.tagName==='INPUT')el.tabIndex=i+1;
+    if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'))el.tabIndex=i+1;
   }
 }
 function flash(el){if(!el.classList||!el.classList.contains('in'))return;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');}
@@ -668,13 +704,13 @@ function focusCell(c){c.el.focus();if(c.el.select)c.el.select();flash(c.el);upda
 document.addEventListener('keydown',function(e){
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   var t=e.target;
-  if(!(t instanceof HTMLInputElement)||!t.hasAttribute('data-nav'))return;
+  if(!(t instanceof HTMLInputElement || t instanceof HTMLTextArea) || !t.hasAttribute('data-nav'))return;
   var cells=navCells(),idx=-1;
   for(var i=0;i<cells.length;i++){if(cells[i].el===t){idx=i;break;}}
   if(idx<0)return;
   var cur=cells[idx],last=cells.length-1;
   if(e.key==='Tab'){e.preventDefault();var n=e.shiftKey?idx-1:idx+1;if(n>=0&&n<=last)focusCell(cells[n]);return;}
-  if(e.key==='Enter'){
+  if(e.key==='Enter' && t.tagName==='INPUT'){
     e.preventDefault();
     if(cur.f==='defect'&&cur.ri===rows().length-1&&t.value.trim()!==''){
       var tr=makeRow();updateRowNumbers();recalc();var nc=navCells();
@@ -683,9 +719,9 @@ document.addEventListener('keydown',function(e){
     }
     if(idx<last)focusCell(cells[idx+1]);return;
   }
-  if(e.key==='ArrowDown'){e.preventDefault();var dn=null;for(var a=0;a<cells.length;a++){if(cells[a].ci===cur.ci&&cells[a].ri===cur.ri+1){dn=cells[a];break;}}focusCell(dn||(idx<last?cells[idx+1]:cur));return;}
-  if(e.key==='ArrowUp'){e.preventDefault();var up=null;for(var b=0;b<cells.length;b++){if(cells[b].ci===cur.ci&&cells[b].ri===cur.ri-1){up=cells[b];break;}}focusCell(up||(idx>0?cells[idx-1]:cur));return;}
-  if(e.key==='Backspace'&&t.value===''){e.preventDefault();if(idx>0)focusCell(cells[idx-1]);return;}
+  if(e.key==='ArrowDown'&&t.tagName==='INPUT'){e.preventDefault();var dn=null;for(var a=0;a<cells.length;a++){if(cells[a].ci===cur.ci&&cells[a].ri===cur.ri+1){dn=cells[a];break;}}focusCell(dn||(idx<last?cells[idx+1]:cur));return;}
+  if(e.key==='ArrowUp'&&t.tagName==='INPUT'){e.preventDefault();var up=null;for(var b=0;b<cells.length;b++){if(cells[b].ci===cur.ci&&cells[b].ri===cur.ri-1){up=cells[b];break;}}focusCell(up||(idx>0?cells[idx-1]:cur));return;}
+  if(e.key==='Backspace'&&t.value===''&&t.tagName==='INPUT'){e.preventDefault();if(idx>0)focusCell(cells[idx-1]);return;}
   if(e.key==='ArrowLeft'&&t.selectionStart===0&&t.selectionEnd===0){var pl=null;for(var c=0;c<cells.length;c++){if(cells[c].ci===cur.ci-1&&cells[c].ri===cur.ri){pl=cells[c];break;}}if(pl){e.preventDefault();focusCell(pl);}return;}
   if(e.key==='ArrowRight'&&t.selectionStart===t.value.length&&t.selectionEnd===t.value.length){var pr=null;for(var d=0;d<cells.length;d++){if(cells[d].ci===cur.ci+1&&cells[d].ri===cur.ri){pr=cells[d];break;}}if(pr){e.preventDefault();focusCell(pr);}}
 });
@@ -693,6 +729,9 @@ document.addEventListener('keydown',function(e){
 /* ---------- event tabel ---------- */
 tbody.addEventListener('input',function(e){
   var t=e.target;
+  if(t.tagName==='TEXTAREA' && (t.getAttribute('data-f')==='kegiatan'||t.getAttribute('data-f')==='masalah'||t.getAttribute('data-f')==='disposisi')){
+    autoResizeTextarea(t);
+  }
   if(t.getAttribute('data-f')==='kode')applyCat(t.closest('tr'));
   if(t.getAttribute('data-f')==='mulai'){
     var tr=t.closest('tr'),prev=tr?tr.previousElementSibling:null;
@@ -1023,13 +1062,13 @@ installBtn.addEventListener('click', function(){
   if(deferredPrompt){
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then(function(result){
-      if(result.outcome === 'accepted'){
-        toast('Aplikasi berhasil diinstall ✓');
-      } else {
-        toast('Installasi dibatalkan');
-      }
-      deferredPrompt = null;
-      installBtn.classList.remove('show');
+        if(result.outcome === 'accepted'){
+          toast('Aplikasi berhasil diinstall ✓');
+        } else {
+          toast('Installasi dibatalkan');
+        }
+        deferredPrompt = null;
+        installBtn.classList.remove('show');
     });
   }
 });
