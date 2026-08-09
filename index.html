@@ -1333,6 +1333,12 @@ function collect(){
       op1:$('op1').value, op2:$('op2').value, op3:$('op3').value,
       op4:$('op4').value, op5:$('op5').value, op6:$('op6').value
     },
+    summary:{
+      availability: $('oF').textContent,
+      performance: $('oITotal').textContent,
+      quality: $('oM').textContent,
+      oee: $('oee').textContent
+    },
     rows:rows().map(function(tr){
       var g=function(f){var el=tr.querySelector('[data-f="'+f+'"]');return el?el.value:'';};
       return {
