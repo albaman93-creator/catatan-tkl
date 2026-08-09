@@ -235,6 +235,13 @@ textarea.in {
 .in.flash{animation:flashbg .6s}
 @keyframes flashbg{0%{background:rgba(18,161,80,.3)}100%{background:transparent}}
 
+/* Kelas khusus untuk Peringatan Jam di luar shift (Kuning) */
+.in.warn-shift {
+  background-color: #fef08a !important;
+  border-color: #eab308 !important;
+  color: #713f12 !important;
+}
+
 .oee-matrix-tbl {
   width: 100%;
   border-collapse: collapse;
@@ -292,6 +299,7 @@ textarea.in {
 #toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:var(--navy);color:#fff;padding:14px 22px 14px 18px;border-radius:10px;border-left:4px solid var(--green);box-shadow:0 12px 30px -10px rgba(13,33,53,.5);font:500 15px var(--body);transition:.3s cubic-bezier(.22,.8,.3,1);z-index:99;max-width:calc(100vw - 32px);text-align:center}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 #toast.err{border-left-color:var(--red)}
+#toast.warn{border-left-color:var(--amber); background:#713f12; color:#fef08a;}
 
 @media print {
   @page { size: A4 landscape; margin: 8mm; }
@@ -460,14 +468,14 @@ textarea.in {
         <div class="field" style="margin-bottom:0">
           <label>Produk 1 (Nama &amp; Kecepatan)</label>
           <div style="display:flex; gap:6px;">
-            <input type="text" id="prodName1" placeholder="Misal: VTTS1 l030001" style="flex:2;">
+            <input type="text" id="prodName1" placeholder="Misal: VTT" style="flex:2;">
             <input type="number" id="prodRate1" placeholder="Rate/mnt" style="flex:1;" inputmode="decimal">
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
           <label>Produk 2 (Cadangan)</label>
           <div style="display:flex; gap:6px;">
-            <input type="text" id="prodName2" placeholder="Misal: VPEL1 L027001" style="flex:2;">
+            <input type="text" id="prodName2" placeholder="Misal: VKM" style="flex:2;">
             <input type="number" id="prodRate2" placeholder="Rate/mnt" style="flex:1;" inputmode="decimal">
           </div>
         </div>
@@ -839,6 +847,7 @@ function applyShiftUI(){
   $('rincSub').textContent='Evaluasi Shift '+(evalShift+1)+' · A = '+maxMnt+' mnt';
   $('maxShiftMnt').textContent=maxMnt;
   $('maxShiftMnt2').textContent=maxMnt;
+  validateAllTimeInputs(); // Periksa ulang peringatan shift saat tombol shift diubah
 }
 Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),function(b){
   b.addEventListener('click',function(){
@@ -963,6 +972,35 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight'&&t.selectionStart===t.value.length&&t.selectionEnd===t.value.length){var pr=null;for(var d=0;d<cells.length;d++){if(cells[d].ci===cur.ci+1&&cells[d].ri===cur.ri){pr=cells[d];break;}}if(pr){e.preventDefault();focusCell(pr);}}
 });
 
+// Fungsi Validasi Kesesuaian Jam dengan Shift yang Dipilih
+function validateTimeInput(inputEl) {
+  var val = inputEl.value.trim();
+  var fieldName = inputEl.getAttribute('data-f');
+  if((fieldName !== 'mulai' && fieldName !== 'selesai') || !val || val.length < 5) {
+    inputEl.classList.remove('warn-shift');
+    return;
+  }
+  var mins = parseTime(val);
+  if(mins === null) return;
+  var actualShift = shiftOf(mins);
+  
+  if(actualShift !== evalShift) {
+    inputEl.classList.add('warn-shift');
+    toast('Pastikan shift yang anda pilih benar ⚠', true, 'warn');
+  } else {
+    inputEl.classList.remove('warn-shift');
+  }
+}
+
+function validateAllTimeInputs(){
+  rows().forEach(function(tr){
+    var mEl = tr.querySelector('[data-f="mulai"]');
+    var sEl = tr.querySelector('[data-f="selesai"]');
+    if(mEl) validateTimeInput(mEl);
+    if(sEl) validateTimeInput(sEl);
+  });
+}
+
 tbody.addEventListener('input',function(e){
   var t=e.target;
   if(t.tagName==='TEXTAREA' && (t.getAttribute('data-f')==='kegiatan'||t.getAttribute('data-f')==='masalah'||t.getAttribute('data-f')==='disposisi')){
@@ -977,10 +1015,15 @@ tbody.addEventListener('input',function(e){
     while(prev&&!prev.classList.contains('log-row'))prev=prev.previousElementSibling;
     if(prev){
       var sv=prev.querySelector('[data-f="selesai"]');
-      if(sv){sv.value=t.value;sv.classList.remove('invalid');flash(sv);}
+      if(sv){sv.value=t.value;sv.classList.remove('invalid');flash(sv);validateTimeInput(sv);}
     }
   }
-  if(t.classList.contains('t-time')){var v=maskTime(t.value);if(v!==t.value)t.value=v;t.classList.remove('invalid');}
+  if(t.classList.contains('t-time')){
+    var v=maskTime(t.value);
+    if(v!==t.value)t.value=v;
+    t.classList.remove('invalid');
+    validateTimeInput(t);
+  }
   recalc();
 });
 
@@ -995,6 +1038,7 @@ tbody.addEventListener('focusout',function(e){
     var n=normTime(t.value);
     if(t.value.trim()!==''&&n===null)t.classList.add('invalid');
     else{t.value=n;t.classList.remove('invalid');}
+    validateTimeInput(t);
     recalc();
   }
 });
@@ -1055,7 +1099,7 @@ function updateProductDetailTable() {
     var prodName = g('batch');
     var goodVal = parseFloat(g('good').replace(',','.')) || 0;
     var defectVal = parseFloat(g('defect').replace(',','.')) || 0;
-    var rowActual = goodVal + defectVal; // H = Good + Defect
+    var rowActual = goodVal + defectVal;
 
     if(mulai==null||selesai==null) return;
     var dur=(selesai-mulai+1440)%1440;
@@ -1117,7 +1161,7 @@ function recalc(){
     
     var gVal = parseFloat(g('good').replace(',','.')) || 0;
     var dVal = parseFloat(g('defect').replace(',','.')) || 0;
-    var rowActual = gVal + dVal; // Aktual baris = Good + Defect
+    var rowActual = gVal + dVal;
 
     sumGood += gVal;
     sumDefect += dVal;
@@ -1137,7 +1181,7 @@ function recalc(){
         for(var i=0; i<3; i++){
           if(pNames[i] && pNames[i] === prodName){
             prodStats[i].dur += dur;
-            prodStats[i].actual += rowActual; // H = Good + Defect per produk
+            prodStats[i].actual += rowActual;
           }
         }
       }
@@ -1166,7 +1210,7 @@ function recalc(){
 
   for(var i=0; i<3; i++){
     var gTarget = prodStats[i].dur * prodStats[i].rate;
-    var hAct = prodStats[i].actual; // H aktual = Good + Defect
+    var hAct = prodStats[i].actual;
     var perfI = gTarget > 0 ? (hAct / gTarget) * 100 : 0;
 
     if(pNames[i]) {
@@ -1191,7 +1235,7 @@ function recalc(){
 
   var K=num($('defect'));
   var J=totalOutputJ;
-  var L=Math.max(sumGood,0); // Quality L = Total Good (atau J - K)
+  var L=Math.max(sumGood,0);
   var M=J>0?L/J*100:0;
   var oee=sF*(avgPerfI)*M/10000;
 
@@ -1290,6 +1334,7 @@ function applyRecord(d){
   else{for(var i=0;i<DEFAULT_ROWS;i++)makeRow();}
   updateRowNumbers();
   recalc();
+  validateAllTimeInputs();
   updateEditChip(d);
 }
 
@@ -1364,11 +1409,14 @@ function saveData(opts){
 ['fDate','fLine','fStage'].forEach(function(id){$(id).addEventListener('change',loadRecord);});
 
 var toastTimer=null;
-function toast(msg,isErr){
+function toast(msg,isErr,type){
   var el=$('toast');el.textContent=msg;
-  el.classList.toggle('err',!!isErr);
+  el.className = '';
+  if(type === 'warn') el.classList.add('warn');
+  else if(isErr) el.classList.add('err');
+  
   el.classList.add('show');clearTimeout(toastTimer);
-  toastTimer=setTimeout(function(){el.classList.remove('show');el.classList.remove('err');},2400);
+  toastTimer=setTimeout(function(){el.classList.remove('show','err','warn');},3000);
 }
 
 $('btnSave').addEventListener('click',function(){saveData();});
