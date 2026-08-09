@@ -128,14 +128,34 @@ h1{font:700 clamp(24px,5vw,34px)/1 var(--disp);letter-spacing:.8px;text-transfor
 .col-toggle-bar label{font:500 12px var(--mono);color:var(--ink2);display:inline-flex;align-items:center;gap:4px;cursor:pointer;background:#fff;padding:3px 8px;border:1px solid var(--line);border-radius:6px;user-select:none}
 .col-toggle-bar input[type="checkbox"]{accent-color:var(--green-d);cursor:pointer}
 
+
+.col-kode {
+  min-width: 90px !important;
+  width: 90px !important;
+}
+
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse}
 .log th{font:600 11.5px var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--mut);text-align:left;padding:10px 8px;background:#f4f7f9;border-bottom:2px solid var(--line);white-space:nowrap;transition:color .15s,background .15s;vertical-align:middle}
 .log th.on{color:var(--green-d);background:var(--green-bg)}
 .log td{padding:4px 5px;border-bottom:1px solid var(--line2);vertical-align:middle}
-.log tbody tr{transition:background .15s,opacity .19s,transform .19s;animation:rowin .25s ease both}
+.log tbody tr{transition:background .2s,opacity .19s,transform .19s;animation:rowin .25s ease both}
 @keyframes rowin{from{opacity:0;transform:translateY(-4px)}}
 .log tbody tr:hover{background:#f6faf8}
+
+/* Pengaturan Warna Baris Sesuai Permintaan Baru */
+/* Kode 5,6,7,8 -> Planned DT (Putih / Default) */
+tr.log-row[data-cat="planned"] { background-color: #ffffff; }
+tr.log-row[data-cat="planned"]:hover { background-color: #fafcfd; }
+
+/* Kode 1,3,4,9 -> Unplanned DT (Merah Tipis) */
+tr.log-row[data-cat="unplanned"] { background-color: rgba(220, 38, 38, 0.25); }
+tr.log-row[data-cat="unplanned"]:hover { background-color: rgba(220, 38, 38, 0.33); }
+
+/* Kode 2 / Lainnya -> Produk / Aktif (Hijau Tipis) */
+tr.log-row[data-cat="prod"] { background-color: rgba(18, 161, 80, 0.25); }
+tr.log-row[data-cat="prod"]:hover { background-color: rgba(18, 161, 80, 0.35); }
+
 tr.out{opacity:0;transform:translateX(12px)}
 tr.log-row td:first-child{position:relative}
 tr.log-row td:first-child::before{content:'';position:absolute;left:0;top:18%;bottom:18%;width:3px;border-radius:3px;background:transparent;transition:background .2s}
@@ -156,19 +176,23 @@ td.dur{text-align:center;width:70px}
 /* Kelas Sembunyi Kolom */
 .col-hide{display:none !important}
 
-/* Penyesuaian Kolom Textarea Otomatis (Wrap Text / Expand ke Bawah) */
-.col-kegiatan, .col-masalah, .col-disposisi {
-  min-width: 240px;
-  max-width: 320px;
-  width: 260px;
+.col-kegiatan, .col-masalah, .col-disposisi, .col-batch {
+  min-width: 200px;
+  max-width: 280px;
+  width: 220px;
   white-space: normal !important;
 }
 
-.in{width:100%;border:1px solid transparent;background:transparent;padding:9px 10px;border-radius:7px;font:500 15px var(--body);color:var(--ink);caret-color:var(--green);transition:background .15s,border-color .15s,box-shadow .15s}
+/* Memperlebar Kolom Good dan Defect */
+.col-good, .col-defect {
+  min-width: 110px !important;
+  width: 120px !important;
+}
+
+.in, select.in{width:100%;border:1px solid transparent;background:transparent;padding:9px 10px;border-radius:7px;font:500 15px var(--body);color:var(--ink);caret-color:var(--green);transition:background .15s,border-color .15s,box-shadow .15s}
 .in.mono{font-family:var(--mono);font-size:14.5px}
 .in.ctr{text-align:center}
 
-/* Mengubah input teks untuk kegiatan, masalah, disposisi menjadi otomatis melipat teks ke bawah (textarea-like behavior via JS) */
 textarea.in {
   resize: none;
   overflow: hidden;
@@ -179,7 +203,7 @@ textarea.in {
 }
 
 .in::placeholder{color:#b6c4cf}
-.in:hover{background:#f2f6f8}
+.in:hover{background:rgba(255,255,255,0.6)}
 .in:focus{outline:none;background:#fff;border-color:var(--green);box-shadow:0 0 0 3px rgba(18,161,80,.16)}
 .in.invalid{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.14);animation:shake .3s}
 @keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
@@ -334,6 +358,40 @@ textarea.in {
     </div>
   </section>
 
+  <!-- ============ MASTER PRODUK & KECEPATAN ============ -->
+  <section class="sec">
+    <div class="sec-h">
+      <span class="no">⚙️</span>
+      <div>
+        <h2>Master Produk &amp; Kecepatan Standar</h2>
+        <div class="sub2">Daftarkan produk yang berjalan pada shift ini beserta kecepatan standarnya (unit/menit)</div>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
+      <div class="field" style="margin-bottom:0">
+        <label>Produk 1 (Nama &amp; Kecepatan)</label>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="prodName1" placeholder="Misal: VTT" style="flex:2;">
+          <input type="number" id="prodRate1" placeholder="Rate/mnt" style="flex:1;" inputmode="decimal">
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Produk 2 (Cadangan)</label>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="prodName2" placeholder="Misal: VKM" style="flex:2;">
+          <input type="number" id="prodRate2" placeholder="Rate/mnt" style="flex:1;" inputmode="decimal">
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Produk 3 (Cadangan)</label>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="prodName3" placeholder="Misal: PROD-C" style="flex:2;">
+          <input type="number" id="prodRate3" placeholder="Rate/mnt" style="flex:1;" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ 01 LOG SHEET ============ -->
   <section class="sec">
     <div class="sec-h">
@@ -344,9 +402,9 @@ textarea.in {
       </div>
     </div>
     <div class="legend">
-      <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned DT</span>
-      <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned DT</span>
-      <span class="lg"><i class="sw sw-g"></i>Lainnya (misal 2) → Produksi</span>
+      <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned DT (Putih)</span>
+      <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned DT (Merah Tipis)</span>
+      <span class="lg"><i class="sw sw-g"></i>Kode 2 / Lainnya → Produk/Aktif (Hijau Tipis)</span>
     </div>
 
     <!-- Panel Toggle Kolom -->
@@ -363,7 +421,7 @@ textarea.in {
       <label><input type="checkbox" data-col="col-masalah" checked> Masalah / Penyebab</label>
       <label><input type="checkbox" data-col="col-disposisi" checked> Disposisi / Tindakan</label>
       <label><input type="checkbox" data-col="col-wo" checked> No. WO</label>
-      <label><input type="checkbox" data-col="col-batch" checked> Kode &amp; Batch</label>
+      <label><input type="checkbox" data-col="col-batch" checked> Produk &amp; Batch</label>
       <label><input type="checkbox" data-col="col-good" checked> Good</label>
       <label><input type="checkbox" data-col="col-defect" checked> Defect</label>
       <label><input type="checkbox" data-col="col-aksi" checked> Aksi</label>
@@ -384,13 +442,13 @@ textarea.in {
             <th class="col-masalah" rowspan="2">Masalah / Penyebab (Alasan yang terjadi masalah)</th>
             <th class="col-disposisi" rowspan="2">Disposisi / Tindakan Sementara (Tindakan pengatasan)</th>
             <th class="col-wo" style="width:110px" rowspan="2">Nomor WO (Wajib tulis)</th>
-            <th class="col-batch" style="width:180px" rowspan="2">Kode Produk &amp; Batch Number</th>
+            <th class="col-batch" rowspan="2">Kode Produk &amp; Batch Number</th>
             <th colspan="2" style="text-align:center;">Total Output</th>
             <th class="col-aksi" style="width:42px" rowspan="2">Aksi</th>
           </tr>
           <tr>
-            <th class="col-good" style="width:80px;text-align:center;">Good</th>
-            <th class="col-defect" style="width:80px;text-align:center;">Defect</th>
+            <th class="col-good" style="width:110px;text-align:center;">Good</th>
+            <th class="col-defect" style="width:110px;text-align:center;">Defect</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -471,9 +529,11 @@ textarea.in {
       <label>K — Total Defect <span class="unit">unit (Otomatis dari total kolom Defect baris log)</span></label>
       <input id="defect" class="big" data-nav data-plabel="K · DEFECT" inputmode="decimal" placeholder="0" readonly style="background:#f2f6f8;cursor:not-allowed;">
     </div>
-    <div class="field">
-      <label>Kecepatan Standar <span class="unit">unit/mnt</span></label>
-      <input id="stdRate" class="big" data-nav data-plabel="KECEPATAN STANDAR" inputmode="decimal" placeholder="0">
+    <div class="field" style="display:none;">
+      <input id="stdRate" value="0">
+    </div>
+    <div style="font:13px var(--mono); color:var(--green-d); background:var(--green-bg); padding:10px 14px; border-radius:8px; border:1px solid rgba(18,161,80,0.3);">
+      💡 <b>Target G dihitung otomatis proporsional</b> berdasarkan durasi dan kecepatan standar masing-masing produk yang diinput pada Master Produk &amp; baris log sheet.
     </div>
   </section>
 
@@ -486,11 +546,11 @@ textarea.in {
     <div class="pq">
       <div class="pq-h">% PERFORMANCE <b id="pqI">0,00 %</b></div>
       <div class="pq-grid">
-        <span>G — Target Output</span><b id="pqG">0 unit</b>
+        <span>G — Target Output (Akumulasi Produk)</span><b id="pqG">0 unit</b>
         <span>H — Output Aktual</span><b id="pqH">0 unit</b>
       </div>
       <div class="bar"><i id="pqIbar"></i></div>
-      <div class="pq-note">G = durasi kode produksi shift terpilih × kecepatan standar</div>
+      <div class="pq-note">G = Σ (Durasi produk berjalan × Kecepatan standar produk masing-masing)</div>
     </div>
     <div class="pq">
       <div class="pq-h">% QUALITY <b id="qqM">0,00 %</b></div>
@@ -555,12 +615,11 @@ textarea.in {
 /* ---------- konstanta & hardcoded cloud config ---------- */
 var PLANNED=new Set([5,6,7,8]), UNPLANNED=new Set([1,3,4,9]);
 var NAV_FIELDS=['kode','mulai','panggil','teknik','selesai','kegiatan','masalah','disposisi','wo','batch','good','defect'];
-var FLABEL={kode:'KODE',mulai:'JAM MULAI',panggil:'PANGGIL TEKNIK',teknik:'TEKNIK DATANG',selesai:'JAM SELESAI',kegiatan:'KEGIATAN',masalah:'MASALAH',disposisi:'DISPOSISI',wo:'NOMOR WO',batch:'KODE & BATCH',good:'GOOD',defect:'DEFECT'};
-var DB_KEY='fima_oee_db_v2';
+var FLABEL={kode:'KODE',mulai:'JAM MULAI',panggil:'PANGGIL TEKNIK',teknik:'TEKNIK DATANG',selesai:'JAM SELESAI',kegiatan:'KEGIATAN',masalah:'MASALAH',disposisi:'DISPOSISI',wo:'NOMOR WO',batch:'PRODUK & BATCH',good:'GOOD',defect:'DEFECT'};
+var DB_KEY='fima_oee_db_v3';
 var DEFAULT_ROWS=30;
 var SHIFT_A=[510,480,450];
 
-// Konfigurasi paten (hardcoded) agar terhubung otomatis ke Google Sheets
 var HARDCODED_SERVER = 'https://script.google.com/macros/s/AKfycbzO3LR5QZNxIUTLC6Htpm1z-T7oszjo1PS7s6j54g2CtfPDWCsrjH1nmDz84vkpc-32pw/exec';
 var HARDCODED_TOKEN  = 'oee-fima-2026-secret';
 
@@ -580,7 +639,60 @@ function maskTime(raw){
   return d;
 }
 function normTime(v){v=(v||'').trim();if(!v)return '';if(/^\d{1,2}$/.test(v))v=v.padStart(2,'0')+':00';else if(/^\d{3,4}$/.test(v)){v=v.padStart(4,'0');v=v.slice(0,2)+':'+v.slice(2);}return parseTime(v)!=null?v:null;}
-function catOf(k){if(k===''||k==null)return null;var n=parseInt(k,10);if(isNaN(n))return null;if(PLANNED.has(n))return 'planned';if(UNPLANNED.has(n))return 'unplanned';return 'prod';}
+function catOf(k){
+  if(k===''||k==null)return null;
+  var n=parseInt(k,10);
+  if(isNaN(n))return null;
+  if(PLANNED.has(n))return 'planned';
+  if(UNPLANNED.has(n))return 'unplanned';
+  return 'prod';
+}
+
+/* ---------- update pilihan dropdown produk di seluruh baris ---------- */
+function getActiveProducts(){
+  var p1 = $('prodName1').value.trim();
+  var p2 = $('prodName2').value.trim();
+  var p3 = $('prodName3').value.trim();
+  var list = [];
+  if(p1) list.push(p1);
+  if(p2) list.push(p2);
+  if(p3) list.push(p3);
+  return list;
+}
+
+function updateAllDropdowns(){
+  var prods = getActiveProducts();
+  var selects = tbody.querySelectorAll('select[data-f="batch"]');
+  selects.forEach(function(sel){
+    var currentVal = sel.value;
+    sel.innerHTML = '<option value="">-- Pilih Produk --</option>';
+    prods.forEach(function(p){
+      var opt = document.createElement('option');
+      opt.value = p;
+      opt.textContent = p;
+      if(p === currentVal) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3'].forEach(function(id){
+  $(id).addEventListener('input',function(){
+    updateAllDropdowns();
+    recalc();
+  });
+});
+
+function getRateForProduct(prodName){
+  if(!prodName) return 0;
+  var p1 = $('prodName1').value.trim();
+  var p2 = $('prodName2').value.trim();
+  var p3 = $('prodName3').value.trim();
+  if(prodName === p1) return parseFloat($('prodRate1').value) || 0;
+  if(prodName === p2) return parseFloat($('prodRate2').value) || 0;
+  if(prodName === p3) return parseFloat($('prodRate3').value) || 0;
+  return 0;
+}
 
 /* ---------- mode navigasi ---------- */
 var navMode='v';
@@ -634,9 +746,16 @@ function autoResizeTextarea(ta){
 
 function makeRow(data){
   var tr=document.createElement('tr');tr.className='log-row';
+  
+  var prods = getActiveProducts();
+  var optionsHtml = '<option value="">-- Pilih Produk --</option>';
+  prods.forEach(function(p){
+    optionsHtml += '<option value="'+p+'">'+p+'</option>';
+  });
+
   tr.innerHTML=
    '<td class="col-num" style="text-align:center;font:600 13px var(--mono);color:var(--mut);padding:4px 6px;">'+(rows().length+1)+'</td>'+
-   '<td class="col-kode"><div class="c-kode"><span class="dot"></span><input data-f="kode" data-nav class="in mono ctr" inputmode="numeric" maxlength="2" placeholder="•" aria-label="Kode"></div></td>'+
+   '<td class="col-kode"><div class="c-kode"><span class="dot"></span><input data-f="kode" data-nav class="in mono ctr" type="text" maxlength="2" placeholder="•" aria-label="Kode"></div></td>'+
    '<td class="col-mulai"><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>'+
    '<td class="col-panggil"><input data-f="panggil" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Panggil Teknik"></td>'+
    '<td class="col-teknik"><input data-f="teknik" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Teknik Datang"></td>'+
@@ -646,7 +765,7 @@ function makeRow(data){
    '<td class="col-masalah"><textarea data-f="masalah" data-nav class="in" placeholder="Penyebab…" aria-label="Masalah" rows="1"></textarea></td>'+
    '<td class="col-disposisi"><textarea data-f="disposisi" data-nav class="in" placeholder="Tindakan…" aria-label="Disposisi" rows="1"></textarea></td>'+
    '<td class="col-wo"><input data-f="wo" data-nav class="in mono" placeholder="No WO…" aria-label="Nomor WO"></td>'+
-   '<td class="col-batch"><input data-f="batch" data-nav class="in mono" placeholder="Produk & Batch…" aria-label="Kode & Batch"></td>'+
+   '<td class="col-batch"><select data-f="batch" data-nav class="in mono" aria-label="Produk & Batch">'+optionsHtml+'</select></td>'+
    '<td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Good"></td>'+
    '<td class="col-defect"><input data-f="defect" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Defect"></td>'+
    '<td class="col-aksi c-aksi"><button type="button" class="del" title="Hapus baris">✕</button></td>';
@@ -666,7 +785,14 @@ function makeRow(data){
   syncColumnVisibility();
   return tr;
 }
-function applyCat(tr){var v=tr.querySelector('[data-f="kode"]').value.trim();var c=catOf(v);if(c)tr.dataset.cat=c;else delete tr.dataset.cat;}
+function applyCat(tr){
+  var kodeInput = tr.querySelector('[data-f="kode"]');
+  if(!kodeInput) return;
+  var v = kodeInput.value.trim();
+  var c = catOf(v);
+  if(c) tr.dataset.cat = c;
+  else delete tr.dataset.cat;
+}
 function rows(){return Array.prototype.slice.call(tbody.querySelectorAll('tr.log-row'));}
 function updateRowNumbers(){
   var rs=rows();
@@ -681,7 +807,7 @@ function navCells(){
   var list=[],rs=rows();
   if(navMode==='v'){NAV_FIELDS.forEach(function(f,ci){rs.forEach(function(r,ri){var el=r.querySelector('[data-f="'+f+'"]');if(el&&!el.closest('td').classList.contains('col-hide'))list.push({el:el,f:f,ci:ci,ri:ri});});});}
   else{rs.forEach(function(r,ri){NAV_FIELDS.forEach(function(f,ci){var el=r.querySelector('[data-f="'+f+'"]');if(el&&!el.closest('td').classList.contains('col-hide'))list.push({el:el,f:f,ci:ci,ri:ri});});});}
-  ['hActual','defect','stdRate'].forEach(function(id){var el=$(id);list.push({el:el,f:id,ci:99,ri:-1,param:el.getAttribute('data-plabel')||id});});
+  ['hActual','defect','stdRate'].forEach(function(id){var el=$(id);if(el){list.push({el:el,f:id,ci:99,ri:-1,param:el.getAttribute('data-plabel')||id});}});
   list.push({el:$('btnSave'),f:'save',ci:100,ri:-1,param:'SIMPAN DATA'});
   return list;
 }
@@ -689,7 +815,7 @@ function applyTabOrder(){
   var cells=navCells();
   for(var i=0;i<cells.length;i++){
     var el=cells[i].el;
-    if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'))el.tabIndex=i+1;
+    if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'))el.tabIndex=i+1;
   }
 }
 function flash(el){if(!el.classList||!el.classList.contains('in'))return;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');}
@@ -704,7 +830,7 @@ function focusCell(c){c.el.focus();if(c.el.select)c.el.select();flash(c.el);upda
 document.addEventListener('keydown',function(e){
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   var t=e.target;
-  if(!(t instanceof HTMLInputElement || t instanceof HTMLTextArea) || !t.hasAttribute('data-nav'))return;
+  if(!(t instanceof HTMLInputElement || t instanceof HTMLTextArea || t instanceof HTMLSelectElement) || !t.hasAttribute('data-nav'))return;
   var cells=navCells(),idx=-1;
   for(var i=0;i<cells.length;i++){if(cells[i].el===t){idx=i;break;}}
   if(idx<0)return;
@@ -719,8 +845,8 @@ document.addEventListener('keydown',function(e){
     }
     if(idx<last)focusCell(cells[idx+1]);return;
   }
-  if(e.key==='ArrowDown'&&t.tagName==='INPUT'){e.preventDefault();var dn=null;for(var a=0;a<cells.length;a++){if(cells[a].ci===cur.ci&&cells[a].ri===cur.ri+1){dn=cells[a];break;}}focusCell(dn||(idx<last?cells[idx+1]:cur));return;}
-  if(e.key==='ArrowUp'&&t.tagName==='INPUT'){e.preventDefault();var up=null;for(var b=0;b<cells.length;b++){if(cells[b].ci===cur.ci&&cells[b].ri===cur.ri-1){up=cells[b];break;}}focusCell(up||(idx>0?cells[idx-1]:cur));return;}
+  if(e.key==='ArrowDown'&&(t.tagName==='INPUT'||t.tagName==='SELECT')){e.preventDefault();var dn=null;for(var a=0;a<cells.length;a++){if(cells[a].ci===cur.ci&&cells[a].ri===cur.ri+1){dn=cells[a];break;}}focusCell(dn||(idx<last?cells[idx+1]:cur));return;}
+  if(e.key==='ArrowUp'&&(t.tagName==='INPUT'||t.tagName==='SELECT')){e.preventDefault();var up=null;for(var b=0;b<cells.length;b++){if(cells[b].ci===cur.ci&&cells[b].ri===cur.ri-1){up=cells[b];break;}}focusCell(up||(idx>0?cells[idx-1]:cur));return;}
   if(e.key==='Backspace'&&t.value===''&&t.tagName==='INPUT'){e.preventDefault();if(idx>0)focusCell(cells[idx-1]);return;}
   if(e.key==='ArrowLeft'&&t.selectionStart===0&&t.selectionEnd===0){var pl=null;for(var c=0;c<cells.length;c++){if(cells[c].ci===cur.ci-1&&cells[c].ri===cur.ri){pl=cells[c];break;}}if(pl){e.preventDefault();focusCell(pl);}return;}
   if(e.key==='ArrowRight'&&t.selectionStart===t.value.length&&t.selectionEnd===t.value.length){var pr=null;for(var d=0;d<cells.length;d++){if(cells[d].ci===cur.ci+1&&cells[d].ri===cur.ri){pr=cells[d];break;}}if(pr){e.preventDefault();focusCell(pr);}}
@@ -732,7 +858,9 @@ tbody.addEventListener('input',function(e){
   if(t.tagName==='TEXTAREA' && (t.getAttribute('data-f')==='kegiatan'||t.getAttribute('data-f')==='masalah'||t.getAttribute('data-f')==='disposisi')){
     autoResizeTextarea(t);
   }
-  if(t.getAttribute('data-f')==='kode')applyCat(t.closest('tr'));
+  if(t.getAttribute('data-f')==='kode'){
+    applyCat(t.closest('tr'));
+  }
   if(t.getAttribute('data-f')==='mulai'){
     var tr=t.closest('tr'),prev=tr?tr.previousElementSibling:null;
     while(prev&&!prev.classList.contains('log-row'))prev=prev.previousElementSibling;
@@ -744,6 +872,12 @@ tbody.addEventListener('input',function(e){
   if(t.classList.contains('t-time')){var v=maskTime(t.value);if(v!==t.value)t.value=v;t.classList.remove('invalid');}
   recalc();
 });
+
+tbody.addEventListener('change',function(e){
+  if(e.target.getAttribute('data-f')==='batch') recalc();
+  if(e.target.getAttribute('data-f')==='kode') applyCat(e.target.closest('tr'));
+});
+
 tbody.addEventListener('focusout',function(e){
   var t=e.target;
   if(t.classList&&t.classList.contains('t-time')){
@@ -789,15 +923,17 @@ document.querySelectorAll('.col-toggle-bar input[type="checkbox"]').forEach(func
   });
 });
 
-/* ---------- perhitungan OEE ---------- */
+/* ---------- perhitungan OEE (Multi-Product Target G) ---------- */
 function recalc(){
-  var B=0,D=0,P=0,tot=0,nShift=0;
+  var B=0,D=0,tot=0,nShift=0;
   var sumGood=0, sumDefect=0;
-  var sh=[{B:0,D:0,P:0},{B:0,D:0,P:0},{B:0,D:0,P:0}];
+  var totalTargetG = 0;
+  var sh=[{B:0,D:0},{B:0,D:0},{B:0,D:0}];
   
   rows().forEach(function(tr){
     var g=function(f){var el=tr.querySelector('[data-f="'+f+'"]');return el?el.value:'';};
     var kode=g('kode').trim(),mulai=parseTime(g('mulai')),selesai=parseTime(g('selesai'));
+    var prodName = g('batch');
     var durEl=tr.querySelector('.dur-v');
     
     var gVal = parseFloat(g('good').replace(',','.')) || 0;
@@ -812,16 +948,20 @@ function recalc(){
     tot+=dur;
     var c=catOf(kode),si=shiftOf(mulai);
     if(si===evalShift)nShift++;
+
     if(c==='planned'){B+=dur;if(si!=null)sh[si].B+=dur;}
     else if(c==='unplanned'){D+=dur;if(si!=null)sh[si].D+=dur;}
-    else if(c==='prod'){P+=dur;if(si!=null)sh[si].P+=dur;}
+    else if(c==='prod'){
+      if(si === evalShift){
+        var rate = getRateForProduct(prodName);
+        totalTargetG += (dur * rate);
+      }
+    }
   });
 
-  // Otomatis masukkan total good ke H (Output Aktual) dan defect ke K
   $('hActual').value = sumGood > 0 ? sumGood : '';
   $('defect').value = sumDefect > 0 ? sumDefect : '';
 
-  // Hitung availability shift terpilih
   var sA=SHIFT_A[evalShift],sB=sh[evalShift].B,sC=Math.max(sA-sB,0),sD=sh[evalShift].D,sE=Math.max(sC-sD,0),sF=sC>0?sE/sC*100:0;
   
   $('rowShiftA').textContent=nf0(sA);
@@ -831,8 +971,8 @@ function recalc(){
   $('rowShiftE').textContent=nf0(sE);
   $('rowShiftF').textContent=nf2(sF);
 
-  var rate=num($('stdRate')),H=num($('hActual')),K=num($('defect'));
-  var G=sh[evalShift].P*rate,I=G>0?H/G*100:0,L=Math.max(H-K,0),M=H>0?L/H*100:0,oee=sF*I*M/10000;
+  var H=num($('hActual')),K=num($('defect'));
+  var G=totalTargetG, I=G>0?H/G*100:0, L=Math.max(H-K,0), M=H>0?L/H*100:0, oee=sF*I*M/10000;
 
   $('pqG').textContent=nf0(G)+' unit';$('pqH').textContent=nf0(H)+' unit';$('pqI').textContent=nf2(I)+' %';$('pqIbar').style.width=Math.min(I,100)+'%';
   $('qqJ').textContent=nf0(H)+' unit';$('qqK').textContent=nf0(K)+' unit';$('qqL').textContent=nf0(L)+' unit';$('qqM').textContent=nf2(M)+' %';$('qqMbar').style.width=Math.min(M,100)+'%';
@@ -850,8 +990,7 @@ function recalc(){
   if(sC<=0)issues.push('Availability 0% — Planned DT (B) ≥ menit shift (A).');
   else if(sE<=0)issues.push('Availability 0% — Unplanned DT (D) ≥ waktu terencana (C).');
   if(I<=0){
-    if(sh[evalShift].P<=0)issues.push('Performance 0% — belum ada durasi kode PRODUKSI pada shift ini.');
-    else if(rate<=0)issues.push('Performance 0% — Kecepatan Standar belum diisi.');
+    if(G<=0)issues.push('Performance 0% — pastikan durasi produksi terisi, produk dipilih pada dropdown, dan kecepatan standar produk terisi di master atas.');
     else if(H<=0)issues.push('Performance 0% — Output Aktual (Good) belum diisi.');
   }
   if(M<=0){
@@ -870,7 +1009,7 @@ function recalc(){
 }
 
 /* ============================================================
-   SISTEM PENYIMPANAN — localStorage (offline-first) + Google Sheets Cloud Sync
+   SISTEM PENYIMPANAN — localStorage + Google Sheets Cloud Sync
    ============================================================ */
 function dbGet(){try{return JSON.parse(localStorage.getItem(DB_KEY))||{};}catch(e){return {};}}
 function dbSet(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch(e){}}
@@ -882,6 +1021,11 @@ function labelFilter(){
 }
 function collect(){
   return {
+    products:{
+      p1Name:$('prodName1').value, p1Rate:$('prodRate1').value,
+      p2Name:$('prodName2').value, p2Rate:$('prodRate2').value,
+      p3Name:$('prodName3').value, p3Rate:$('prodRate3').value
+    },
     rows:rows().map(function(tr){
       var g=function(f){var el=tr.querySelector('[data-f="'+f+'"]');return el?el.value:'';};
       return {
@@ -890,16 +1034,25 @@ function collect(){
         wo:g('wo'), batch:g('batch'), good:g('good'), defect:g('defect')
       };
     }),
-    h:$('hActual').value,k:$('defect').value,rate:$('stdRate').value,
     savedAt:new Date().toISOString()
   };
 }
 function applyRecord(d){
+  if(d && d.products){
+    $('prodName1').value = d.products.p1Name || ''; $('prodRate1').value = d.products.p1Rate || '';
+    $('prodName2').value = d.products.p2Name || ''; $('prodRate2').value = d.products.p2Rate || '';
+    $('prodName3').value = d.products.p3Name || ''; $('prodRate3').value = d.products.p3Rate || '';
+  } else {
+    $('prodName1').value = ''; $('prodRate1').value = '';
+    $('prodName2').value = ''; $('prodRate2').value = '';
+    $('prodName3').value = ''; $('prodRate3').value = '';
+  }
+
   tbody.innerHTML='';
+  updateAllDropdowns();
   if(d&&d.rows&&d.rows.length){d.rows.forEach(function(r){makeRow(r);});}
   else{for(var i=0;i<DEFAULT_ROWS;i++)makeRow();}
   updateRowNumbers();
-  $('hActual').value=(d&&d.h)||'';$('defect').value=(d&&d.k)||'';$('stdRate').value=(d&&d.rate)||'';
   recalc();
   updateEditChip(d);
 }
@@ -1035,10 +1188,6 @@ $('btnAdd').addEventListener('click',function(){
   for(var i=0;i<cells.length;i++){if(cells[i].f==='kode'&&cells[i].ri===rows().length-1){focusCell(cells[i]);break;}}
 });
 window.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveData();}});
-
-['stdRate'].forEach(function(id){
-  $(id).addEventListener('input',function(){var v=this.value.replace(/[^\d.,]/g,'');if(v!==this.value)this.value=v;recalc();});
-});
 
 /* ---------- jam live ---------- */
 function tick(){
