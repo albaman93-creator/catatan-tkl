@@ -537,7 +537,35 @@ textarea.in {
     </div>
   </section>
 
-  <!-- ============ 04 PERFORMANCE & QUALITY ============ -->
+  <!-- ============ 04 RINCIAN PERFORMA PER PRODUK (DIPINDAH KE ATAS) ============ -->
+  <section class="sec">
+    <div class="sec-h">
+      <span class="no">📊</span>
+      <div>
+        <h2>Rincian Performa Per Produk</h2>
+        <div class="sub2">Breakdown target, durasi, dan % performance masing-masing produk pada shift ini</div>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="shift" id="tblProdDetail">
+        <thead>
+          <tr>
+            <th>Nama Produk</th>
+            <th title="Total durasi produk berjalan di log sheet">Durasi (mnt)</th>
+            <th title="Kecepatan standar (unit/menit)">Rate (u/mnt)</th>
+            <th title="Target G = Durasi × Rate">Target (G)</th>
+            <th title="Aktual Good yang diinput pada log ber-produk terkait">Aktual (H)</th>
+            <th title="Performance = Aktual ÷ Target × 100">% Perf</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyProdDetail">
+          <!-- Diisi otomatis oleh JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 05 PERFORMANCE & QUALITY ============ -->
   <section class="sec">
     <div class="sec-h">
       <span class="no">04</span>
@@ -564,7 +592,7 @@ textarea.in {
     </div>
   </section>
 
-  <!-- ============ 05 RINCIAN OEE ============ -->
+  <!-- ============ 06 RINCIAN OEE ============ -->
   <section class="sec">
     <div class="sec-h">
       <span class="no">05</span>
@@ -923,6 +951,62 @@ document.querySelectorAll('.col-toggle-bar input[type="checkbox"]').forEach(func
   });
 });
 
+/* ---------- Fungsi Update Tabel Rincian Per Produk ---------- */
+function updateProductDetailTable() {
+  var tbodyDetail = $('tbodyProdDetail');
+  if(!tbodyDetail) return;
+  tbodyDetail.innerHTML = '';
+
+  var prods = getActiveProducts();
+  if(prods.length === 0){
+    tbodyDetail.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mut);">Belum ada produk terdaftar di Master Produk.</td></tr>';
+    return;
+  }
+
+  var summary = {};
+  prods.forEach(function(p){
+    summary[p] = { durasi: 0, rate: getRateForProduct(p), actual: 0 };
+  });
+
+  rows().forEach(function(tr){
+    var g=function(f){var el=tr.querySelector('[data-f="'+f+'"]');return el?el.value:'';};
+    var mulai=parseTime(g('mulai')), selesai=parseTime(g('selesai'));
+    var prodName = g('batch');
+    var goodVal = parseFloat(g('good').replace(',','.')) || 0;
+
+    if(mulai==null||selesai==null) return;
+    var dur=(selesai-mulai+1440)%1440;
+    var si=shiftOf(mulai);
+
+    if(si === evalShift && prodName && summary[prodName]){
+      summary[prodName].durasi += dur;
+      summary[prodName].actual += goodVal;
+    }
+  });
+
+  var hasData = false;
+  prods.forEach(function(p){
+    var item = summary[p];
+    var targetG = item.durasi * item.rate;
+    var perfP = targetG > 0 ? (item.actual / targetG) * 100 : 0;
+    if(item.durasi > 0 || item.actual > 0) hasData = true;
+
+    var tr = document.createElement('tr');
+    tr.innerHTML = 
+      '<td style="text-align:left;font-weight:600;color:var(--ink);">'+p+'</td>'+
+      '<td>'+nf0(item.durasi)+'</td>'+
+      '<td>'+nf0(item.rate)+'</td>'+
+      '<td>'+nf0(targetG)+'</td>'+
+      '<td>'+nf0(item.actual)+'</td>'+
+      '<td class="fv">'+nf2(perfP)+' %</td>';
+    tbodyDetail.appendChild(tr);
+  });
+
+  if(!hasData){
+    tbodyDetail.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mut);">Belum ada catatan log aktif untuk produk-produk ini pada Shift '+(evalShift+1)+'.</td></tr>';
+  }
+}
+
 /* ---------- perhitungan OEE (Multi-Product Target G) ---------- */
 function recalc(){
   var B=0,D=0,tot=0,nShift=0;
@@ -1005,6 +1089,10 @@ function recalc(){
   $('sumDur').textContent=nf0(tot);
   $('totalDurasi').textContent=nf0(tot);
   $('rowN').textContent=rows().length;
+  
+  // Panggil update tabel rincian produk
+  updateProductDetailTable();
+
   applyTabOrder();
 }
 
