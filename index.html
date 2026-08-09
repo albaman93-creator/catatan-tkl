@@ -72,6 +72,10 @@ kbd{font:600 12px var(--mono);background:#fff;border:1px solid var(--line);borde
 .btn-sync{background:#fff;border:1px solid var(--line);color:var(--navy);padding:11px 14px;font-size:13px;white-space:nowrap}
 .btn-sync:hover{background:#eaf3fb;border-color:var(--blue)}
 .btn-sync.busy{opacity:.6;cursor:wait;pointer-events:none}
+.sync-config-hidden{display:none !important}
+.sync-toggle{background:transparent;border:1px solid var(--line);color:var(--mut);padding:6px 12px;border-radius:99px;font:600 11.5px var(--mono);cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;margin-left:6px}
+.sync-toggle:hover{color:var(--ink);background:#f2f6f8;border-color:#b8c6d0}
+.sync-toggle.active{color:var(--green-d);border-color:rgba(18,161,80,.4);background:var(--green-bg)}
 .btn-install{background:#0d2135;color:#fff;border:1px solid #1a3b5c;padding:8px 14px;font-size:13px;white-space:nowrap;border-radius:8px;cursor:pointer;transition:.2s;display:none}
 .btn-install:hover{background:#1a3b5c;transform:translateY(-1px)}
 .btn-install.show{display:inline-flex}
@@ -291,6 +295,7 @@ td.dur{text-align:center;width:80px}
       </div>
       <span class="spacer"></span>
       <span id="syncStatus" class="edit-info"><i class="sync-dot"></i>sync belum dikonfigurasi</span>
+      <button type="button" id="btn-toggle-sync" class="sync-toggle" title="Pengaturan Sync">⚙ Sync</button>
     </div>
     <div class="filter-grid">
       <div class="field" style="margin-bottom:0">
@@ -317,20 +322,22 @@ td.dur{text-align:center;width:80px}
       </div>
     </div>
 
-    <div class="sync-grid">
-      <div class="field" style="margin-bottom:0">
-        <label>URL Server Sync <span class="unit">Google Apps Script Web App</span></label>
-        <input id="fServer" placeholder="https://script.google.com/macros/s/…/exec">
-      </div>
-      <div class="field" style="margin-bottom:0">
-        <label>Token API</label>
-        <div class="token-wrap">
-          <input id="fToken" type="password" placeholder="oee-fima-2024-secret">
-          <button type="button" class="token-eye" id="btnEye" title="Tampilkan / sembunyikan">👁</button>
+    <div id="sync-config-panel">
+      <div class="sync-grid">
+        <div class="field" style="margin-bottom:0">
+          <label>URL Server Sync <span class="unit">Google Apps Script Web App</span></label>
+          <input id="fServer" placeholder="https://script.google.com/macros/s/…/exec">
         </div>
-      </div>
-      <div class="field" style="margin-bottom:0;display:flex;align-items:flex-end;">
-        <button type="button" class="btn btn-sync" id="btnSync" style="width:100%;">🔄 Sync</button>
+        <div class="field" style="margin-bottom:0">
+          <label>Token API</label>
+          <div class="token-wrap">
+            <input id="fToken" type="password" placeholder="oee-fima-2024-secret">
+            <button type="button" class="token-eye" id="btnEye" title="Tampilkan / sembunyikan">👁</button>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0;display:flex;align-items:flex-end;">
+          <button type="button" class="btn btn-sync" id="btnSync" style="width:100%;">🔄 Sync</button>
+        </div>
       </div>
     </div>
   </section>
@@ -834,29 +841,41 @@ function loadRecord(){
     return;
   }
   setSyncStatus('sync','memuat cloud…');
-  var url=getServer()+'?token='+encodeURIComponent(getToken())+'&key='+encodeURIComponent(k);
-  fetch(url,{method:'GET'})
-    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-    .then(function(j){
-      if(!j || j.ok===false) throw new Error((j&&j.error)||'server error');
-      var cloud = j.data;
-      if(cloud && cloud.savedAt){
-        var local=db[k];
-        if(!local || !local.savedAt || cloud.savedAt>local.savedAt){
-          db[k]=cloud; dbSet(db);
-          applyRecord(cloud);
-          setSyncStatus('ok','✓ cloud terbaru');
-          toast('Data cloud dimuat ✓ '+labelFilter());
-        }else{
-          setSyncStatus('ok','✓ lokal lebih baru');
-        }
+  var url = getServer();
+  var body = {
+    action: 'load',
+    token: getToken(),
+    date: $('fDate').value || todayLocal(),
+    shift: evalShift+1,
+    line: $('fLine').value,
+    stage: $('fStage').value
+  };
+  fetch(url,{
+    method: 'POST',
+    headers: {'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(body)
+  })
+  .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  .then(function(j){
+    if(!j || j.ok===false) throw new Error((j&&j.error)||'server error');
+    var cloud = j.data;
+    if(cloud){
+      var local=db[k];
+      if(!local || !local.savedAt || (cloud.savedAt && cloud.savedAt>local.savedAt)){
+        db[k]=cloud; dbSet(db);
+        applyRecord(cloud);
+        setSyncStatus('ok','✓ cloud terbaru');
+        toast('Data cloud dimuat ✓ '+labelFilter());
       }else{
-        setSyncStatus('ok','✓ cloud kosong');
+        setSyncStatus('ok','✓ lokal lebih baru');
       }
-    })
-    .catch(function(err){
-      setSyncStatus('err','⚠ cloud: '+err.message);
-    });
+    }else{
+      setSyncStatus('ok','✓ cloud kosong');
+    }
+  })
+  .catch(function(err){
+    setSyncStatus('err','⚠ cloud: '+err.message);
+  });
 }
 
 function saveData(opts){
@@ -873,15 +892,29 @@ function saveData(opts){
   }
   var btn=$('btnSync'); if(btn){btn.classList.add('busy');btn.textContent='⏳ Sync…';}
   setSyncStatus('sync','mengunggah…');
-  var payload=JSON.stringify({key:curKey(),data:rec,token:getToken()});
-  fetch(getServer()+'?token='+encodeURIComponent(getToken()),{
+  var bodyObj = {
+    action: 'save',
+    token: getToken(),
+    date: $('fDate').value || todayLocal(),
+    shift: evalShift+1,
+    line: $('fLine').value,
+    stage: $('fStage').value,
+    payload: rec
+  };
+  fetch(getServer(),{
     method:'POST',
-    mode:'no-cors',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:payload
-  }).then(function(){
+    body:JSON.stringify(bodyObj)
+  }).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  .then(function(j){
+    if(!j || j.ok===false) throw new Error((j&&j.error)||'server error');
     if(btn){btn.classList.remove('busy');btn.textContent='🔄 Sync';}
     setSyncStatus('ok','✓ tersinkron cloud');
+    if(j.updatedAt){
+      rec.savedAt = j.updatedAt;
+      db[curKey()] = rec; dbSet(db);
+      updateEditChip(rec);
+    }
     if(!opts.silent) toast('Sync cloud ✓ '+labelFilter());
   }).catch(function(err){
     if(btn){btn.classList.remove('busy');btn.textContent='🔄 Sync';}
@@ -895,8 +928,35 @@ function saveData(opts){
 
 $('fServer').value=getServer();
 $('fToken').value=getToken();
-$('fServer').addEventListener('change',function(){setServer(this.value.trim());loadRecord();});
-$('fToken').addEventListener('change',function(){setToken(this.value.trim());loadRecord();});
+
+/* ---------- sync config toggle (sembunyi jika URL & token sudah terisi) ---------- */
+function updateSyncPanelVisibility(){
+  var panel = $('sync-config-panel');
+  var btn   = $('btn-toggle-sync');
+  if(!panel) return;
+  var server = ($('fServer').value||'').trim();
+  var token  = ($('fToken').value||'').trim();
+  var configured = server.indexOf('https://')===0 && token.length>0;
+  if(configured){
+    panel.classList.add('sync-config-hidden');
+    if(btn) btn.classList.add('active');
+  }else{
+    panel.classList.remove('sync-config-hidden');
+    if(btn) btn.classList.remove('active');
+  }
+}
+updateSyncPanelVisibility();
+var _toggleBtn = $('btn-toggle-sync');
+if(_toggleBtn){
+  _toggleBtn.addEventListener('click',function(){
+    var panel = $('sync-config-panel');
+    if(!panel) return;
+    panel.classList.toggle('sync-config-hidden');
+  });
+}
+
+$('fServer').addEventListener('change',function(){setServer(this.value.trim());updateSyncPanelVisibility();loadRecord();});
+$('fToken').addEventListener('change',function(){setToken(this.value.trim());updateSyncPanelVisibility();loadRecord();});
 $('btnEye').addEventListener('click',function(){
   var i=$('fToken'); i.type=(i.type==='password')?'text':'password';
 });
