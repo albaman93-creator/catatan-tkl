@@ -28,7 +28,7 @@
   --amber:#d97706; --red:#dc2626; --navy:#0d2135;
   --blue:#0c63a8;
   --mono:'IBM Plex Mono',monospace; --disp:'Barlow Condensed',sans-serif; --body:'IBM Plex Sans',sans-serif;
-  --page:880px;
+  --page:1260px;
 }
 html{scroll-behavior:smooth}
 body{
@@ -130,7 +130,7 @@ h1{font:700 clamp(24px,5vw,34px)/1 var(--disp);letter-spacing:.8px;text-transfor
 
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse}
-.log th{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.9px;color:var(--mut);text-align:left;padding:10px 8px;background:#f4f7f9;border-bottom:2px solid var(--line);white-space:nowrap;transition:color .15s,background .15s}
+.log th{font:600 11.5px var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--mut);text-align:left;padding:10px 8px;background:#f4f7f9;border-bottom:2px solid var(--line);white-space:nowrap;transition:color .15s,background .15s;vertical-align:middle}
 .log th.on{color:var(--green-d);background:var(--green-bg)}
 .log td{padding:4px 5px;border-bottom:1px solid var(--line2);vertical-align:middle}
 .log tbody tr{transition:background .15s,opacity .19s,transform .19s;animation:rowin .25s ease both}
@@ -147,8 +147,8 @@ tr[data-cat="prod"] td:first-child::before{background:var(--green)}
 tr[data-cat="planned"] .dot{background:var(--amber);box-shadow:0 0 0 3px rgba(217,119,6,.15)}
 tr[data-cat="unplanned"] .dot{background:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.15)}
 tr[data-cat="prod"] .dot{background:var(--green);box-shadow:0 0 0 3px rgba(18,161,80,.15)}
-td.dur{text-align:center;width:80px}
-.dur-v{font:600 15px var(--mono);color:var(--ink2)}
+td.dur{text-align:center;width:70px}
+.dur-v{font:600 14px var(--mono);color:var(--ink2)}
 .c-aksi{text-align:center;width:46px}
 .del{width:34px;height:34px;border-radius:7px;border:1px solid transparent;background:transparent;color:#a4b4c0;cursor:pointer;font-size:13px;transition:.15s}
 .del:hover{background:rgba(220,38,38,.1);color:var(--red);border-color:rgba(220,38,38,.3);transform:scale(1.08)}
@@ -156,8 +156,8 @@ td.dur{text-align:center;width:80px}
 /* Kelas Sembunyi Kolom */
 .col-hide{display:none !important}
 
-.in{width:100%;border:1px solid transparent;background:transparent;padding:10px 8px;border-radius:7px;font:500 16px var(--body);color:var(--ink);caret-color:var(--green);transition:background .15s,border-color .15s,box-shadow .15s}
-.in.mono{font-family:var(--mono);font-size:15.5px}
+.in{width:100%;border:1px solid transparent;background:transparent;padding:9px 10px;border-radius:7px;font:500 15px var(--body);color:var(--ink);caret-color:var(--green);transition:background .15s,border-color .15s,box-shadow .15s}
+.in.mono{font-family:var(--mono);font-size:14.5px}
 .in.ctr{text-align:center}
 .in::placeholder{color:#b6c4cf}
 .in:hover{background:#f2f6f8}
@@ -211,7 +211,7 @@ td.dur{text-align:center;width:80px}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 #toast.err{border-left-color:var(--red)}
 
-@media(max-width:640px){
+@media(max-width:768px){
   .twrap{gap:8px}
   .pos{flex:1 1 100%;min-width:0;justify-content:center}
   .navmode,.shiftsel{flex:1 1 45%}
@@ -225,9 +225,8 @@ td.dur{text-align:center;width:80px}
   .sec{padding:16px 14px}
   .sec-h h2{font-size:21px}
   .filter-grid{grid-template-columns:1fr}
-  .in{font-size:16px;padding:12px 8px}
-  .in.mono{font-size:16px}
-  .log{min-width:640px}
+  .in{font-size:15px;padding:9px 10px}
+  .log{min-width:1300px}
   .shift{min-width:540px}
   .sheet-f{padding:12px 14px}
 }
@@ -337,9 +336,17 @@ td.dur{text-align:center;width:80px}
       <label><input type="checkbox" data-col="col-num" checked> #</label>
       <label><input type="checkbox" data-col="col-kode" checked> Kode</label>
       <label><input type="checkbox" data-col="col-mulai" checked> Jam Mulai</label>
+      <label><input type="checkbox" data-col="col-panggil" checked> Panggil Teknik</label>
+      <label><input type="checkbox" data-col="col-teknik" checked> Teknik Datang</label>
       <label><input type="checkbox" data-col="col-selesai" checked> Jam Selesai</label>
       <label><input type="checkbox" data-col="col-durasi" checked> Durasi</label>
       <label><input type="checkbox" data-col="col-kegiatan" checked> Kegiatan</label>
+      <label><input type="checkbox" data-col="col-masalah" checked> Masalah / Penyebab</label>
+      <label><input type="checkbox" data-col="col-disposisi" checked> Disposisi / Tindakan</label>
+      <label><input type="checkbox" data-col="col-wo" checked> No. WO</label>
+      <label><input type="checkbox" data-col="col-batch" checked> Kode &amp; Batch</label>
+      <label><input type="checkbox" data-col="col-good" checked> Good</label>
+      <label><input type="checkbox" data-col="col-defect" checked> Defect</label>
       <label><input type="checkbox" data-col="col-aksi" checked> Aksi</label>
     </div>
 
@@ -347,26 +354,37 @@ td.dur{text-align:center;width:80px}
       <table class="log">
         <thead>
           <tr>
-            <th class="col-num" style="width:44px;text-align:center">#</th>
-            <th class="col-kode" style="width:66px">Kode</th>
-            <th class="col-mulai" style="width:96px">Jam Mulai</th>
-            <th class="col-selesai" style="width:96px">Jam Selesai</th>
-            <th class="col-durasi" style="width:80px">Durasi (m)</th>
-            <th class="col-kegiatan">Kegiatan</th>
-            <th class="col-aksi" style="width:46px">Aksi</th>
+            <th class="col-num" style="width:40px;text-align:center" rowspan="2">#</th>
+            <th class="col-kode" style="width:58px" rowspan="2">Kode</th>
+            <th class="col-mulai" style="width:86px" rowspan="2">Jam Mulai</th>
+            <th class="col-panggil" style="width:96px" rowspan="2">Panggil Teknik</th>
+            <th class="col-teknik" style="width:92px" rowspan="2">Teknik Datang</th>
+            <th class="col-selesai" style="width:86px" rowspan="2">Jam Selesai</th>
+            <th class="col-durasi" style="width:70px" rowspan="2">Durasi (m)</th>
+            <th class="col-kegiatan" style="min-width:200px;" rowspan="2">Kegiatan</th>
+            <th class="col-masalah" style="min-width:200px;" rowspan="2">Masalah / Penyebab (Alasan yang terjadi masalah)</th>
+            <th class="col-disposisi" style="min-width:200px;" rowspan="2">Disposisi / Tindakan Sementara (Tindakan pengatasan)</th>
+            <th class="col-wo" style="width:110px" rowspan="2">Nomor WO (Wajib tulis)</th>
+            <th class="col-batch" style="min-width:180px;" rowspan="2">Kode Produk &amp; Batch Number</th>
+            <th colspan="2" style="text-align:center;">Total Output</th>
+            <th class="col-aksi" style="width:42px" rowspan="2">Aksi</th>
+          </tr>
+          <tr>
+            <th class="col-good" style="width:80px;text-align:center;">Good</th>
+            <th class="col-defect" style="width:80px;text-align:center;">Defect</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
         <tfoot>
           <tr style="background:#f4f7f9;border-top:2px solid var(--line);">
-            <td style="text-align:center;padding:10px 6px;" colspan="4">
+            <td style="text-align:center;padding:10px 6px;" colspan="6">
               <span style="font:600 13px var(--mono);color:var(--ink);">TOTAL DURASI TERCATAT</span>
             </td>
             <td style="text-align:center;padding:10px 6px;">
               <b id="totalDurasi" style="font:700 16px var(--mono);color:var(--green-d);">0</b>
               <span style="font:12px var(--mono);color:var(--mut);"> mnt</span>
             </td>
-            <td colspan="2" style="text-align:center;font:11px var(--mono);color:var(--mut);">
+            <td colspan="8" style="text-align:left;font:11px var(--mono);color:var(--mut);padding-left:12px;">
               dari <span id="maxShiftMnt">510</span> mnt
             </td>
           </tr>
@@ -427,12 +445,12 @@ td.dur{text-align:center;width:80px}
       <div><h2>Parameter OEE</h2><div class="sub2">Input output &amp; standar untuk shift terpilih</div></div>
     </div>
     <div class="field">
-      <label>H / J — Total Output Aktual <span class="unit">unit</span></label>
-      <input id="hActual" class="big" data-nav data-plabel="H · OUTPUT AKTUAL" inputmode="decimal" placeholder="0">
+      <label>H / J — Total Output Aktual <span class="unit">unit (Otomatis dari total kolom Good baris log)</span></label>
+      <input id="hActual" class="big" data-nav data-plabel="H · OUTPUT AKTUAL" inputmode="decimal" placeholder="0" readonly style="background:#f2f6f8;cursor:not-allowed;">
     </div>
     <div class="field">
-      <label>K — Total Defect <span class="unit">unit</span></label>
-      <input id="defect" class="big" data-nav data-plabel="K · DEFECT" inputmode="decimal" placeholder="0">
+      <label>K — Total Defect <span class="unit">unit (Otomatis dari total kolom Defect baris log)</span></label>
+      <input id="defect" class="big" data-nav data-plabel="K · DEFECT" inputmode="decimal" placeholder="0" readonly style="background:#f2f6f8;cursor:not-allowed;">
     </div>
     <div class="field">
       <label>Kecepatan Standar <span class="unit">unit/mnt</span></label>
@@ -517,8 +535,8 @@ td.dur{text-align:center;width:80px}
 
 /* ---------- konstanta & hardcoded cloud config ---------- */
 var PLANNED=new Set([5,6,7,8]), UNPLANNED=new Set([1,3,4,9]);
-var NAV_FIELDS=['kode','mulai','selesai','kegiatan'];
-var FLABEL={kode:'KODE',mulai:'JAM MULAI',selesai:'JAM SELESAI',kegiatan:'KEGIATAN'};
+var NAV_FIELDS=['kode','mulai','panggil','teknik','selesai','kegiatan','masalah','disposisi','wo','batch','good','defect'];
+var FLABEL={kode:'KODE',mulai:'JAM MULAI',panggil:'PANGGIL TEKNIK',teknik:'TEKNIK DATANG',selesai:'JAM SELESAI',kegiatan:'KEGIATAN',masalah:'MASALAH',disposisi:'DISPOSISI',wo:'NOMOR WO',batch:'KODE & BATCH',good:'GOOD',defect:'DEFECT'};
 var DB_KEY='fima_oee_db_v2';
 var DEFAULT_ROWS=30;
 var SHIFT_A=[510,480,450];
@@ -595,14 +613,20 @@ function makeRow(data){
    '<td class="col-num" style="text-align:center;font:600 13px var(--mono);color:var(--mut);padding:4px 6px;">'+(rows().length+1)+'</td>'+
    '<td class="col-kode"><div class="c-kode"><span class="dot"></span><input data-f="kode" data-nav class="in mono ctr" inputmode="numeric" maxlength="2" placeholder="•" aria-label="Kode"></div></td>'+
    '<td class="col-mulai"><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>'+
+   '<td class="col-panggil"><input data-f="panggil" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Panggil Teknik"></td>'+
+   '<td class="col-teknik"><input data-f="teknik" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Teknik Datang"></td>'+
    '<td class="col-selesai"><input data-f="selesai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Selesai"></td>'+
    '<td class="col-durasi dur"><b class="dur-v">—</b></td>'+
-   '<td class="col-kegiatan"><input data-f="kegiatan" data-nav class="in" placeholder="Deskripsi kegiatan…" aria-label="Kegiatan"></td>'+
+   '<td class="col-kegiatan"><input data-f="kegiatan" data-nav class="in" placeholder="Kegiatan…" aria-label="Kegiatan"></td>'+
+   '<td class="col-masalah"><input data-f="masalah" data-nav class="in" placeholder="Penyebab…" aria-label="Masalah"></td>'+
+   '<td class="col-disposisi"><input data-f="disposisi" data-nav class="in" placeholder="Tindakan…" aria-label="Disposisi"></td>'+
+   '<td class="col-wo"><input data-f="wo" data-nav class="in mono" placeholder="No WO…" aria-label="Nomor WO"></td>'+
+   '<td class="col-batch"><input data-f="batch" data-nav class="in mono" placeholder="Produk & Batch…" aria-label="Kode & Batch"></td>'+
+   '<td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Good"></td>'+
+   '<td class="col-defect"><input data-f="defect" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Defect"></td>'+
    '<td class="col-aksi c-aksi"><button type="button" class="del" title="Hapus baris">✕</button></td>';
-  if(data){['kode','mulai','selesai','kegiatan'].forEach(function(f){var el=tr.querySelector('[data-f="'+f+'"]');if(el&&data[f]!=null)el.value=data[f];});}
+  if(data){NAV_FIELDS.forEach(function(f){var el=tr.querySelector('[data-f="'+f+'"]');if(el&&data[f]!=null)el.value=data[f];});}
   tbody.appendChild(tr);applyCat(tr);
-  
-  // Terapkan status checkbox sembunyi kolom ke baris baru
   syncColumnVisibility();
   return tr;
 }
@@ -652,7 +676,7 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Tab'){e.preventDefault();var n=e.shiftKey?idx-1:idx+1;if(n>=0&&n<=last)focusCell(cells[n]);return;}
   if(e.key==='Enter'){
     e.preventDefault();
-    if(cur.f==='kegiatan'&&cur.ri===rows().length-1&&t.value.trim()!==''){
+    if(cur.f==='defect'&&cur.ri===rows().length-1&&t.value.trim()!==''){
       var tr=makeRow();updateRowNumbers();recalc();var nc=navCells();
       for(var j=0;j<nc.length;j++){if(nc[j].f==='kode'&&nc[j].ri===rows().length-1){focusCell(nc[j]);break;}}
       tr.scrollIntoView({block:'nearest',behavior:'smooth'});return;
@@ -729,11 +753,19 @@ document.querySelectorAll('.col-toggle-bar input[type="checkbox"]').forEach(func
 /* ---------- perhitungan OEE ---------- */
 function recalc(){
   var B=0,D=0,P=0,tot=0,nShift=0;
+  var sumGood=0, sumDefect=0;
   var sh=[{B:0,D:0,P:0},{B:0,D:0,P:0},{B:0,D:0,P:0}];
+  
   rows().forEach(function(tr){
     var g=function(f){var el=tr.querySelector('[data-f="'+f+'"]');return el?el.value:'';};
     var kode=g('kode').trim(),mulai=parseTime(g('mulai')),selesai=parseTime(g('selesai'));
     var durEl=tr.querySelector('.dur-v');
+    
+    var gVal = parseFloat(g('good').replace(',','.')) || 0;
+    var dVal = parseFloat(g('defect').replace(',','.')) || 0;
+    sumGood += gVal;
+    sumDefect += dVal;
+
     if(mulai==null||selesai==null){durEl.textContent='—';durEl.removeAttribute('title');return;}
     var dur=(selesai-mulai+1440)%1440;
     durEl.textContent=nf0(dur);
@@ -745,6 +777,10 @@ function recalc(){
     else if(c==='unplanned'){D+=dur;if(si!=null)sh[si].D+=dur;}
     else if(c==='prod'){P+=dur;if(si!=null)sh[si].P+=dur;}
   });
+
+  // Otomatis masukkan total good ke H (Output Aktual) dan defect ke K
+  $('hActual').value = sumGood > 0 ? sumGood : '';
+  $('defect').value = sumDefect > 0 ? sumDefect : '';
 
   // Hitung availability shift terpilih
   var sA=SHIFT_A[evalShift],sB=sh[evalShift].B,sC=Math.max(sA-sB,0),sD=sh[evalShift].D,sE=Math.max(sC-sD,0),sF=sC>0?sE/sC*100:0;
@@ -777,11 +813,11 @@ function recalc(){
   if(I<=0){
     if(sh[evalShift].P<=0)issues.push('Performance 0% — belum ada durasi kode PRODUKSI pada shift ini.');
     else if(rate<=0)issues.push('Performance 0% — Kecepatan Standar belum diisi.');
-    else if(H<=0)issues.push('Performance 0% — Output Aktual (H/J) belum diisi.');
+    else if(H<=0)issues.push('Performance 0% — Output Aktual (Good) belum diisi.');
   }
   if(M<=0){
-    if(H<=0)issues.push('Quality 0% — Output Aktual (H/J) belum diisi.');
-    else issues.push('Quality 0% — Defect (K) sama dengan / lebih besar dari Output.');
+    if(H<=0)issues.push('Quality 0% — Output Aktual (Good) belum diisi.');
+    else issues.push('Quality 0% — Defect sama dengan / lebih besar dari Output.');
   }
   var dEl=$('diag');
   if(issues.length===0)dEl.innerHTML='<div class="d-item ok">✓ Semua komponen lengkap — OEE = '+nf2(sF)+'% × '+nf2(I)+'% × '+nf2(M)+'% = '+nf2(oee)+'%</div>';
@@ -809,7 +845,11 @@ function collect(){
   return {
     rows:rows().map(function(tr){
       var g=function(f){var el=tr.querySelector('[data-f="'+f+'"]');return el?el.value:'';};
-      return {kode:g('kode'),mulai:g('mulai'),selesai:g('selesai'),kegiatan:g('kegiatan')};
+      return {
+        kode:g('kode'), mulai:g('mulai'), panggil:g('panggil'), teknik:g('teknik'), selesai:g('selesai'),
+        kegiatan:g('kegiatan'), masalah:g('masalah'), disposisi:g('disposisi'),
+        wo:g('wo'), batch:g('batch'), good:g('good'), defect:g('defect')
+      };
     }),
     h:$('hActual').value,k:$('defect').value,rate:$('stdRate').value,
     savedAt:new Date().toISOString()
@@ -957,7 +997,7 @@ $('btnAdd').addEventListener('click',function(){
 });
 window.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveData();}});
 
-['hActual','defect','stdRate'].forEach(function(id){
+['stdRate'].forEach(function(id){
   $(id).addEventListener('input',function(){var v=this.value.replace(/[^\d.,]/g,'');if(v!==this.value)this.value=v;recalc();});
 });
 
