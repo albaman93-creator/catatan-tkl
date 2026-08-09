@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Log Sheet &amp; OEE — Fima Farma</title>
+<title>Log Sheet &amp; OEE — TKL 2026</title>
 
 <!-- PWA Meta Tags -->
 <link rel="manifest" href="./manifest.webmanifest">
@@ -12,7 +12,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="OEE Fima">
+<meta name="apple-mobile-web-app-title" content="TKL-OEE">
 <link rel="icon" href="./icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
@@ -70,7 +70,6 @@ kbd{font:600 12px var(--mono);background:#fff;border:1px solid var(--line);borde
 .btn-add{background:#fff;border:1.5px dashed #9fc3ad;color:var(--green-d);padding:10px 14px;width:100%;margin-top:12px}
 .btn-add:hover{background:var(--green-bg);border-style:solid}
 .btn-install{background:#0d2135;color:#fff;border:1px solid #1a3b5c;padding:8px 14px;font-size:13px;white-space:nowrap;border-radius:8px;cursor:pointer;transition:.2s;display:none}
-.btn-install:hover{background:#1a3b5c;transform:translateY(-1px)}
 .btn-install.show{display:inline-flex}
 
 .sheet{max-width:var(--page);margin:20px auto 46px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 30px 70px -35px rgba(13,33,53,.45);overflow:hidden;animation:rise .5s cubic-bezier(.22,.8,.3,1) both}
@@ -123,6 +122,12 @@ h1{font:700 clamp(24px,5vw,34px)/1 var(--disp);letter-spacing:.8px;text-transfor
 .sw{width:10px;height:10px;border-radius:2px;flex:none}
 .sw-a{background:var(--amber)}.sw-r{background:var(--red)}.sw-g{background:var(--green)}
 
+/* Toggle Kolom Panel */
+.col-toggle-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;background:#f4f7f9;padding:8px 12px;border-radius:8px;border:1px solid var(--line)}
+.col-toggle-bar span{font:600 11.5px var(--mono);color:var(--mut);letter-spacing:.8px;text-transform:uppercase}
+.col-toggle-bar label{font:500 12px var(--mono);color:var(--ink2);display:inline-flex;align-items:center;gap:4px;cursor:pointer;background:#fff;padding:3px 8px;border:1px solid var(--line);border-radius:6px;user-select:none}
+.col-toggle-bar input[type="checkbox"]{accent-color:var(--green-d);cursor:pointer}
+
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse}
 .log th{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.9px;color:var(--mut);text-align:left;padding:10px 8px;background:#f4f7f9;border-bottom:2px solid var(--line);white-space:nowrap;transition:color .15s,background .15s}
@@ -147,6 +152,9 @@ td.dur{text-align:center;width:80px}
 .c-aksi{text-align:center;width:46px}
 .del{width:34px;height:34px;border-radius:7px;border:1px solid transparent;background:transparent;color:#a4b4c0;cursor:pointer;font-size:13px;transition:.15s}
 .del:hover{background:rgba(220,38,38,.1);color:var(--red);border-color:rgba(220,38,38,.3);transform:scale(1.08)}
+
+/* Kelas Sembunyi Kolom */
+.col-hide{display:none !important}
 
 .in{width:100%;border:1px solid transparent;background:transparent;padding:10px 8px;border-radius:7px;font:500 16px var(--body);color:var(--ink);caret-color:var(--green);transition:background .15s,border-color .15s,box-shadow .15s}
 .in.mono{font-family:var(--mono);font-size:15.5px}
@@ -254,9 +262,9 @@ td.dur{text-align:center;width:80px}
 
   <div class="hwrap">
     <div class="brand">
-      <div class="mark">FF</div>
+      <div class="mark">TK</div>
       <div>
-        <div class="kicker">FIMA FARMA · OEE SYSTEM</div>
+        <div class="kicker">TKL-OEE 2026 · SYSTEM</div>
         <h1>Log Sheet &amp; Perhitungan OEE</h1>
         <div class="sub">Availability · Performance · Quality — Overall Equipment Effectiveness</div>
       </div>
@@ -322,17 +330,30 @@ td.dur{text-align:center;width:80px}
       <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned DT</span>
       <span class="lg"><i class="sw sw-g"></i>Lainnya (misal 2) → Produksi</span>
     </div>
+
+    <!-- Panel Toggle Kolom -->
+    <div class="col-toggle-bar">
+      <span>Tampilkan Kolom:</span>
+      <label><input type="checkbox" data-col="col-num" checked> #</label>
+      <label><input type="checkbox" data-col="col-kode" checked> Kode</label>
+      <label><input type="checkbox" data-col="col-mulai" checked> Jam Mulai</label>
+      <label><input type="checkbox" data-col="col-selesai" checked> Jam Selesai</label>
+      <label><input type="checkbox" data-col="col-durasi" checked> Durasi</label>
+      <label><input type="checkbox" data-col="col-kegiatan" checked> Kegiatan</label>
+      <label><input type="checkbox" data-col="col-aksi" checked> Aksi</label>
+    </div>
+
     <div class="tbl-wrap">
       <table class="log">
         <thead>
           <tr>
-            <th style="width:44px;text-align:center">#</th>
-            <th style="width:66px">Kode</th>
-            <th style="width:96px">Jam Mulai</th>
-            <th style="width:96px">Jam Selesai</th>
-            <th style="width:80px">Durasi (m)</th>
-            <th>Kegiatan</th>
-            <th style="width:46px">Aksi</th>
+            <th class="col-num" style="width:44px;text-align:center">#</th>
+            <th class="col-kode" style="width:66px">Kode</th>
+            <th class="col-mulai" style="width:96px">Jam Mulai</th>
+            <th class="col-selesai" style="width:96px">Jam Selesai</th>
+            <th class="col-durasi" style="width:80px">Durasi (m)</th>
+            <th class="col-kegiatan">Kegiatan</th>
+            <th class="col-aksi" style="width:46px">Aksi</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -346,7 +367,7 @@ td.dur{text-align:center;width:80px}
               <span style="font:12px var(--mono);color:var(--mut);"> mnt</span>
             </td>
             <td colspan="2" style="text-align:center;font:11px var(--mono);color:var(--mut);">
-              dari 1.440 mnt
+              dari <span id="maxShiftMnt">510</span> mnt
             </td>
           </tr>
         </tfoot>
@@ -354,7 +375,7 @@ td.dur{text-align:center;width:80px}
     </div>
     <button class="btn btn-add" id="btnAdd" type="button">+ Tambah Baris</button>
     <div class="sec-f">
-      <span>Σ durasi tercatat: <b id="sumDur">0</b> / 1.440 mnt</span><span>·</span>
+      <span>Σ durasi tercatat: <b id="sumDur">0</b> / <span id="maxShiftMnt2">510</span> mnt</span><span>·</span>
       <span><b id="rowN">0</b> baris</span>
       <span class="spacer"></span>
       <span>Tanda ":" dipasang otomatis saat mengetik jam</span>
@@ -366,8 +387,8 @@ td.dur{text-align:center;width:80px}
     <div class="sec-h">
       <span class="no">02</span>
       <div>
-        <h2>Availability per Shift</h2>
-        <div class="sub2">S1 07.00–15.30 (510 mnt) · S2 15.30–23.30 (480 mnt) · S3 23.30–07.00 (450 mnt)</div>
+        <h2>Availability Shift Terpilih</h2>
+        <div class="sub2" id="availSub">Evaluasi Shift 1 (510 mnt)</div>
       </div>
     </div>
     <div class="tbl-wrap">
@@ -381,13 +402,16 @@ td.dur{text-align:center;width:80px}
           </tr>
         </thead>
         <tbody>
-          <tr><td>1</td><td>510</td><td id="s1B">0</td><td id="s1C">510</td><td id="s1D">0</td><td id="s1E">510</td><td id="s1F" class="fv">0,00</td></tr>
-          <tr><td>2</td><td>480</td><td id="s2B">0</td><td id="s2C">480</td><td id="s2D">0</td><td id="s2E">480</td><td id="s2F" class="fv">0,00</td></tr>
-          <tr><td>3</td><td>450</td><td id="s3B">0</td><td id="s3C">450</td><td id="s3D">0</td><td id="s3E">450</td><td id="s3F" class="fv">0,00</td></tr>
+          <tr>
+            <td id="rowShiftNum">1</td>
+            <td id="rowShiftA">510</td>
+            <td id="rowShiftB">0</td>
+            <td id="rowShiftC">510</td>
+            <td id="rowShiftD">0</td>
+            <td id="rowShiftE">510</td>
+            <td id="rowShiftF" class="fv">0,00</td>
+          </tr>
         </tbody>
-        <tfoot>
-          <tr><td>Total</td><td>1.440</td><td id="tB">0</td><td id="tC">1.440</td><td id="tD">0</td><td id="tE">1.440</td><td id="tF" class="fv">0,00</td></tr>
-        </tfoot>
       </table>
     </div>
     <div class="sec-f">
@@ -480,7 +504,7 @@ td.dur{text-align:center;width:80px}
   <div class="sheet-f">
     <span><kbd>Ctrl</kbd>+<kbd>S</kbd> simpan cepat &amp; sinkron cloud</span>
     <span>Shift: S1 07.00–15.30 · S2 15.30–23.30 · S3 23.30–07.00</span>
-    <span>Fima Farma OEE System</span>
+    <span>TKL-OEE 2026 System</span>
   </div>
 
 </div>
@@ -545,9 +569,14 @@ var evalShift=0;
 try{var _e=parseInt(localStorage.getItem('fima_eval_shift'),10);if(_e>=0&&_e<=2)evalShift=_e;}catch(e){}
 function applyShiftUI(){
   Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),function(b){b.classList.toggle('on',parseInt(b.getAttribute('data-shift'),10)===evalShift);});
-  $('rincSub').textContent='Evaluasi Shift '+(evalShift+1)+' · A = '+SHIFT_A[evalShift]+' mnt';
-  $('pqSub').textContent='Evaluasi Shift '+(evalShift+1)+' ('+SHIFT_A[evalShift]+' mnt)';
+  var maxMnt = SHIFT_A[evalShift];
+  $('rincSub').textContent='Evaluasi Shift '+(evalShift+1)+' · A = '+maxMnt+' mnt';
+  $('pqSub').textContent='Evaluasi Shift '+(evalShift+1)+' ('+maxMnt+' mnt)';
+  $('availSub').textContent='Evaluasi Shift '+(evalShift+1)+' ('+maxMnt+' mnt)';
   $('scoreShift').textContent='SHIFT '+(evalShift+1);
+  $('rowShiftNum').textContent=(evalShift+1);
+  $('maxShiftMnt').textContent=maxMnt;
+  $('maxShiftMnt2').textContent=maxMnt;
 }
 Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),function(b){
   b.addEventListener('click',function(){
@@ -563,22 +592,26 @@ Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),funct
 function makeRow(data){
   var tr=document.createElement('tr');tr.className='log-row';
   tr.innerHTML=
-   '<td class="row-num" style="text-align:center;font:600 13px var(--mono);color:var(--mut);padding:4px 6px;">'+(rows().length+1)+'</td>'+
-   '<td><div class="c-kode"><span class="dot"></span><input data-f="kode" data-nav class="in mono ctr" inputmode="numeric" maxlength="2" placeholder="•" aria-label="Kode"></div></td>'+
-   '<td><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>'+
-   '<td><input data-f="selesai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Selesai"></td>'+
-   '<td class="dur"><b class="dur-v">—</b></td>'+
-   '<td><input data-f="kegiatan" data-nav class="in" placeholder="Deskripsi kegiatan…" aria-label="Kegiatan"></td>'+
-   '<td class="c-aksi"><button type="button" class="del" title="Hapus baris">✕</button></td>';
+   '<td class="col-num" style="text-align:center;font:600 13px var(--mono);color:var(--mut);padding:4px 6px;">'+(rows().length+1)+'</td>'+
+   '<td class="col-kode"><div class="c-kode"><span class="dot"></span><input data-f="kode" data-nav class="in mono ctr" inputmode="numeric" maxlength="2" placeholder="•" aria-label="Kode"></div></td>'+
+   '<td class="col-mulai"><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>'+
+   '<td class="col-selesai"><input data-f="selesai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Selesai"></td>'+
+   '<td class="col-durasi dur"><b class="dur-v">—</b></td>'+
+   '<td class="col-kegiatan"><input data-f="kegiatan" data-nav class="in" placeholder="Deskripsi kegiatan…" aria-label="Kegiatan"></td>'+
+   '<td class="col-aksi c-aksi"><button type="button" class="del" title="Hapus baris">✕</button></td>';
   if(data){['kode','mulai','selesai','kegiatan'].forEach(function(f){var el=tr.querySelector('[data-f="'+f+'"]');if(el&&data[f]!=null)el.value=data[f];});}
-  tbody.appendChild(tr);applyCat(tr);return tr;
+  tbody.appendChild(tr);applyCat(tr);
+  
+  // Terapkan status checkbox sembunyi kolom ke baris baru
+  syncColumnVisibility();
+  return tr;
 }
 function applyCat(tr){var v=tr.querySelector('[data-f="kode"]').value.trim();var c=catOf(v);if(c)tr.dataset.cat=c;else delete tr.dataset.cat;}
 function rows(){return Array.prototype.slice.call(tbody.querySelectorAll('tr.log-row'));}
 function updateRowNumbers(){
   var rs=rows();
   rs.forEach(function(tr,i){
-    var numCell=tr.querySelector('.row-num');
+    var numCell=tr.querySelector('.col-num');
     if(numCell)numCell.textContent=i+1;
   });
 }
@@ -586,8 +619,8 @@ function updateRowNumbers(){
 /* ---------- navigasi cerdas ---------- */
 function navCells(){
   var list=[],rs=rows();
-  if(navMode==='v'){NAV_FIELDS.forEach(function(f,ci){rs.forEach(function(r,ri){var el=r.querySelector('[data-f="'+f+'"]');if(el)list.push({el:el,f:f,ci:ci,ri:ri});});});}
-  else{rs.forEach(function(r,ri){NAV_FIELDS.forEach(function(f,ci){var el=r.querySelector('[data-f="'+f+'"]');if(el)list.push({el:el,f:f,ci:ci,ri:ri});});});}
+  if(navMode==='v'){NAV_FIELDS.forEach(function(f,ci){rs.forEach(function(r,ri){var el=r.querySelector('[data-f="'+f+'"]');if(el&&!el.closest('td').classList.contains('col-hide'))list.push({el:el,f:f,ci:ci,ri:ri});});});}
+  else{rs.forEach(function(r,ri){NAV_FIELDS.forEach(function(f,ci){var el=r.querySelector('[data-f="'+f+'"]');if(el&&!el.closest('td').classList.contains('col-hide'))list.push({el:el,f:f,ci:ci,ri:ri});});});}
   ['hActual','defect','stdRate'].forEach(function(id){var el=$(id);list.push({el:el,f:id,ci:99,ri:-1,param:el.getAttribute('data-plabel')||id});});
   list.push({el:$('btnSave'),f:'save',ci:100,ri:-1,param:'SIMPAN DATA'});
   return list;
@@ -604,7 +637,7 @@ function updatePos(c){posEl.innerHTML='<span class="pos-dot"></span>'+(c.ri>=0?(
 function hlColumn(c){
   var ths=document.querySelectorAll('.log th');
   Array.prototype.forEach.call(ths,function(th){th.classList.remove('on');});
-  if(c.ri>=0){var td=c.el.closest('td'),tr=td&&td.parentElement;if(tr){var i=Array.prototype.indexOf.call(tr.children,td);if(ths[i+1])ths[i+1].classList.add('on');}}
+  if(c.ri>=0){var td=c.el.closest('td'),tr=td&&td.parentElement;if(tr){var i=Array.prototype.indexOf.call(tr.children,td);if(ths[i])ths[i].classList.add('on');}}
 }
 function focusCell(c){c.el.focus();if(c.el.select)c.el.select();flash(c.el);updatePos(c);hlColumn(c);}
 
@@ -669,12 +702,36 @@ document.addEventListener('focusin',function(e){
   for(var i=0;i<cells.length;i++){if(cells[i].el===t){updatePos(cells[i]);hlColumn(cells[i]);break;}}
 });
 
+/* ---------- Fitur Sembunyikan / Tampilkan Kolom ---------- */
+function syncColumnVisibility(){
+  var checkboxes = document.querySelectorAll('.col-toggle-bar input[type="checkbox"]');
+  checkboxes.forEach(function(chk){
+    var className = chk.getAttribute('data-col');
+    var isChecked = chk.checked;
+    var elements = document.querySelectorAll('.' + className);
+    elements.forEach(function(el){
+      if(isChecked){
+        el.classList.remove('col-hide');
+      }else{
+        el.classList.add('col-hide');
+      }
+    });
+  });
+  applyTabOrder();
+}
+
+document.querySelectorAll('.col-toggle-bar input[type="checkbox"]').forEach(function(chk){
+  chk.addEventListener('change', function(){
+    syncColumnVisibility();
+  });
+});
+
 /* ---------- perhitungan OEE ---------- */
 function recalc(){
   var B=0,D=0,P=0,tot=0,nShift=0;
   var sh=[{B:0,D:0,P:0},{B:0,D:0,P:0},{B:0,D:0,P:0}];
   rows().forEach(function(tr){
-    var g=function(f){return tr.querySelector('[data-f="'+f+'"]').value;};
+    var g=function(f){var el=tr.querySelector('[data-f="'+f+'"]');return el?el.value:'';};
     var kode=g('kode').trim(),mulai=parseTime(g('mulai')),selesai=parseTime(g('selesai'));
     var durEl=tr.querySelector('.dur-v');
     if(mulai==null||selesai==null){durEl.textContent='—';durEl.removeAttribute('title');return;}
@@ -688,16 +745,17 @@ function recalc(){
     else if(c==='unplanned'){D+=dur;if(si!=null)sh[si].D+=dur;}
     else if(c==='prod'){P+=dur;if(si!=null)sh[si].P+=dur;}
   });
-  sh.forEach(function(s,i){
-    var a=SHIFT_A[i],c=Math.max(a-s.B,0),e=Math.max(c-s.D,0),f=c>0?e/c*100:0,n=i+1;
-    $('s'+n+'B').textContent=nf0(s.B);$('s'+n+'C').textContent=nf0(c);
-    $('s'+n+'D').textContent=nf0(s.D);$('s'+n+'E').textContent=nf0(e);
-    $('s'+n+'F').textContent=nf2(f);
-  });
-  var A=1440,C=A-B,E=Math.max(C-D,0),F=C>0?E/C*100:0;
-  $('tB').textContent=nf0(B);$('tC').textContent=nf0(C);$('tD').textContent=nf0(D);$('tE').textContent=nf0(E);$('tF').textContent=nf2(F);
 
+  // Hitung availability shift terpilih
   var sA=SHIFT_A[evalShift],sB=sh[evalShift].B,sC=Math.max(sA-sB,0),sD=sh[evalShift].D,sE=Math.max(sC-sD,0),sF=sC>0?sE/sC*100:0;
+  
+  $('rowShiftA').textContent=nf0(sA);
+  $('rowShiftB').textContent=nf0(sB);
+  $('rowShiftC').textContent=nf0(sC);
+  $('rowShiftD').textContent=nf0(sD);
+  $('rowShiftE').textContent=nf0(sE);
+  $('rowShiftF').textContent=nf2(sF);
+
   var rate=num($('stdRate')),H=num($('hActual')),K=num($('defect'));
   var G=sh[evalShift].P*rate,I=G>0?H/G*100:0,L=Math.max(H-K,0),M=H>0?L/H*100:0,oee=sF*I*M/10000;
 
@@ -750,7 +808,7 @@ function labelFilter(){
 function collect(){
   return {
     rows:rows().map(function(tr){
-      var g=function(f){return tr.querySelector('[data-f="'+f+'"]').value;};
+      var g=function(f){var el=tr.querySelector('[data-f="'+f+'"]');return el?el.value:'';};
       return {kode:g('kode'),mulai:g('mulai'),selesai:g('selesai'),kegiatan:g('kegiatan')};
     }),
     h:$('hActual').value,k:$('defect').value,rate:$('stdRate').value,
