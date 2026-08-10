@@ -296,7 +296,8 @@ textarea.in {
 
 .sheet-f{padding:14px 28px;border-top:1px solid var(--line);background:#fafcfd;font:12px var(--mono);color:#8fa2b2;display:flex;gap:16px;flex-wrap:wrap}
 
-#toast{position:fixed;left:50%;bottom:120px;transform:translate(-50%,0);opacity:0;pointer-events:none;background:var(--navy);color:#fff;padding:14px 22px 14px 18px;border-radius:10px;border-left:4px solid var(--green);box-shadow:0 12px 30px -10px rgba(13,33,53,.5);font:500 15px var(--body);transition:.3s cubic-bezier(.22,.8,.3,1);z-index:9999;max-width:calc(100vw - 32px);text-align:center}
+/* DIPERBARUI: Posisi Toast dipindah ke bagian atas layar agar tidak tertutup keyboard ponsel */
+#toast{position:fixed;left:50%;top:20px;bottom:auto;transform:translate(-50%,-10px);opacity:0;pointer-events:none;background:var(--navy);color:#fff;padding:14px 22px 14px 18px;border-radius:10px;border-left:4px solid var(--green);box-shadow:0 12px 30px -10px rgba(13,33,53,.5);font:500 15px var(--body);transition:.3s cubic-bezier(.22,.8,.3,1);z-index:9999;max-width:calc(100vw - 32px);text-align:center}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 #toast.err{border-left-color:var(--red)}
 #toast.warn{border-left-color:var(--amber); background:#713f12; color:#fef08a;}
@@ -847,7 +848,7 @@ function applyShiftUI(){
   $('rincSub').textContent='Evaluasi Shift '+(evalShift+1)+' · A = '+maxMnt+' mnt';
   $('maxShiftMnt').textContent=maxMnt;
   $('maxShiftMnt2').textContent=maxMnt;
-  validateAllTimeInputs(); // Periksa ulang peringatan shift saat tombol shift diubah
+  validateAllTimeInputs();
 }
 Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),function(b){
   b.addEventListener('click',function(){
