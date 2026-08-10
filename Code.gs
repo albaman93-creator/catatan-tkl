@@ -13,7 +13,7 @@ function doPost(e) {
     }
     
     var action = data.action;
-    var date = data.date; // Akan bernilai "08 AUG 2026" dari frontend
+    var date = data.date;
     var shift = data.shift;
     var line = data.line;
     var stage = data.stage;

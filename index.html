@@ -296,7 +296,7 @@ textarea.in {
 
 .sheet-f{padding:14px 28px;border-top:1px solid var(--line);background:#fafcfd;font:12px var(--mono);color:#8fa2b2;display:flex;gap:16px;flex-wrap:wrap}
 
-/* DIPERBARUI: Posisi Toast dipindah ke bagian atas layar agar tidak tertutup keyboard ponsel */
+/* Posisi Toast dipindah ke bagian atas layar agar tidak tertutup keyboard ponsel */
 #toast{position:fixed;left:50%;top:20px;bottom:auto;transform:translate(-50%,-10px);opacity:0;pointer-events:none;background:var(--navy);color:#fff;padding:14px 22px 14px 18px;border-radius:10px;border-left:4px solid var(--green);box-shadow:0 12px 30px -10px rgba(13,33,53,.5);font:500 15px var(--body);transition:.3s cubic-bezier(.22,.8,.3,1);z-index:9999;max-width:calc(100vw - 32px);text-align:center}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 #toast.err{border-left-color:var(--red)}
@@ -750,7 +750,6 @@ var nf2=function(n){return (+n).toLocaleString('id-ID',{minimumFractionDigits:2,
 var num=function(el){var v=parseFloat(String(el.value).replace(',','.'));return isFinite(v)?v:0;};
 function todayLocal(){var n=new Date();return new Date(n.getTime()-n.getTimezoneOffset()*60000).toISOString().slice(0,10);}
 
-// Fungsi format tanggal universal: 08/10/2026 atau lainnya -> "08 AUG 2026"
 function formatDateText(dateStr) {
   if(!dateStr) return '';
   var parts = dateStr.split('-');
@@ -985,7 +984,6 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight'&&t.selectionStart===t.value.length&&t.selectionEnd===t.value.length){var pr=null;for(var d=0;d<cells.length;d++){if(cells[d].ci===cur.ci+1&&cells[d].ri===cur.ri){pr=cells[d];break;}}if(pr){e.preventDefault();focusCell(pr);}}
 });
 
-// Fungsi Validasi Kesesuaian Jam dengan Shift yang Dipilih
 function validateTimeInput(inputEl) {
   var val = inputEl.value.trim();
   var fieldName = inputEl.getAttribute('data-f');
@@ -1377,9 +1375,46 @@ function setSyncStatus(kind,text){
   applyChip();
 }
 
+// Fungsi loadRecord yang langsung mengambil data dari cloud (Google Sheets) secara live
 function loadRecord(){
-  var k=curKey(), db=dbGet();
-  applyRecord(db[k]||null);
+  var k = curKey();
+  setSyncStatus('sync', 'memuat dari cloud…');
+  
+  var rawDate = $('fDate').value || todayLocal();
+  var formattedDateForSheet = formatDateText(rawDate);
+
+  var bodyObj = {
+    action: 'load',
+    token: 'oee-fima-2026-secret',
+    date: formattedDateForSheet,
+    shift: evalShift + 1,
+    line: $('fLine').value,
+    stage: $('fStage').value
+  };
+
+  fetch(HARDCODED_SERVER, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: JSON.stringify(bodyObj)
+  })
+  .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  .then(function(j){
+    if(j && j.ok && j.data){
+      var db = dbGet();
+      db[k] = j.data;
+      dbSet(db);
+      applyRecord(j.data);
+      setSyncStatus('ok', '✓ sinkron dari cloud');
+    } else {
+      applyRecord(null);
+      setSyncStatus('ok', 'data kosong di cloud');
+    }
+  })
+  .catch(function(err){
+    var db = dbGet();
+    applyRecord(db[k] || null);
+    setSyncStatus('err', 'offline · mode lokal');
+  });
 }
 
 function saveData(opts){
@@ -1392,7 +1427,7 @@ function saveData(opts){
 
   setSyncStatus('sync','mengunggah…');
   var rawDate = $('fDate').value || todayLocal();
-  var formattedDateForSheet = formatDateText(rawDate); // Mengubah tanggal menjadi "08 AUG 2026"
+  var formattedDateForSheet = formatDateText(rawDate);
 
   var bodyObj = {
     action: 'save',
