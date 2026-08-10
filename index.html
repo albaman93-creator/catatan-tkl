@@ -48,9 +48,19 @@ kbd{font:600 12px var(--mono);background:#fff;border:1px solid var(--line);borde
 /* ============ HALAMAN LOGIN ============ */
 #loginOverlay {
   position: fixed; inset: 0; z-index: 1000;
-  background: radial-gradient(900px 420px at 50% 20%, rgba(18,161,80,.15), transparent 70%), var(--navy);
+  background: url('./icons/bg-login.jpg') no-repeat center center;
+  background-size: cover;
   display: flex; align-items: center; justify-content: center; padding: 16px;
   transition: opacity .3s ease, visibility .3s ease;
+}
+#loginOverlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 33, 53, 0.25);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: -1;
 }
 #loginOverlay.hide {
   opacity: 0; visibility: hidden; pointer-events: none;
@@ -58,7 +68,7 @@ kbd{font:600 12px var(--mono);background:#fff;border:1px solid var(--line);borde
 .login-card {
   width: 100%; max-width: 420px; background: #fff;
   border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-  padding: 36px 30px; border: 1px solid rgba(255,255,255,0.1);
+  padding: 36px 30px; border: 1px solid rgba(255,255,255,0.4);
   animation: loginPop .4s cubic-bezier(.22,.8,.3,1) both;
 }
 @keyframes loginPop {
