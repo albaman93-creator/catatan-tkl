@@ -1381,6 +1381,7 @@ function saveData(opts){
   setSyncStatus('sync','mengunggah…');
   var bodyObj = {
     action: 'save',
+    token: 'oee-fima-2026-secret',
     date: $('fDate').value || todayLocal(),
     shift: evalShift+1,
     line: $('fLine').value,
