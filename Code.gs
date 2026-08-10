@@ -1,127 +1,118 @@
-/**
- * fima-oee-sync Apps Script backend
- * - doGet: support ping only
- * - doPost: support load and save actions via JSON in e.postData.contents
- */
-
-function jsonResponse(obj){
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
-}
-
-function doGet(e){
-  try{
-    var action = (e && e.parameter && e.parameter.action) ? String(e.parameter.action) : '';
-    if(action === 'ping'){
-      return jsonResponse({ok:true,service:'fima-oee-sync',serverTime: new Date().toISOString()});
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    
+    if (data.token !== 'oee-fima-2026-secret') {
+      return ContentService.createTextOutput(JSON.stringify({ok: false, error: 'Unauthorized'}))
+        .setMimeType(ContentService.MimeType.JSON);
     }
-    return jsonResponse({ok:false,error:'UNKNOWN_ACTION'});
-  }catch(err){
-    return jsonResponse({ok:false,error:'SERVER_ERROR',message: String(err && err.message)});
-  }
-}
-
-function doPost(e){
-  try{
-    var raw = null;
-    if(e && e.postData && e.postData.contents){
-      raw = e.postData.contents;
-    } else if(e && e.parameter && e.parameter.payload){
-      raw = e.parameter.payload;
+    
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Records");
+    if (!sheet) {
+      sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
     }
-    if(!raw){
-      return jsonResponse({ok:false,error:'BAD_REQUEST'});
-    }
-
-    var req = null;
-    try{ req = JSON.parse(raw); } catch(p){ return jsonResponse({ok:false,error:'BAD_REQUEST'}); }
-
-    var serverToken = PropertiesService.getScriptProperties().getProperty('OEE_API_TOKEN');
-    if(!serverToken){
-      return jsonResponse({ok:false,error:'SERVER_TOKEN_MISSING'});
-    }
-
-    var action = req.action || '';
-
-    if(action !== 'load' && action !== 'save'){
-      return jsonResponse({ok:false,error:'UNKNOWN_ACTION'});
-    }
-
-    if(!req.token || String(req.token) !== String(serverToken)){
-      return jsonResponse({ok:false,error:'UNAUTHORIZED'});
-    }
-
-    var date = (req.date || '').toString();
-    var shift = req.shift;
-    var line = (req.line || '').toString();
-    var stage = (req.stage || '').toString();
-
-    if(!date || !shift || !line || !stage){
-      return jsonResponse({ok:false,error:'BAD_REQUEST',message:'missing required fields'});
-    }
-    var sNum = Number(shift);
-    if([1,2,3].indexOf(sNum) === -1){
-      return jsonResponse({ok:false,error:'BAD_REQUEST',message:'invalid shift'});
-    }
-
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    if(!ss){
-      ss = SpreadsheetApp.create('fima-oee-sync-data');
-    }
-    var sheet = ss.getSheetByName('Records');
-    if(!sheet){
-      sheet = ss.insertSheet('Records');
-      var headers = ['key','date','shift','line','tahapan','payload','updatedAt','schemaVersion'];
-      sheet.getRange(1,1,1,headers.length).setValues([headers]);
-    }
-
-    var key = date + '|S' + sNum + '|L' + line + '|' + stage;
-
-    var lastRow = Math.max(sheet.getLastRow(),1);
-    var data = [];
-    if(lastRow >= 2){
-      data = sheet.getRange(2,1,lastRow-1,1).getValues();
-    }
-    var foundRowIndex = -1;
-    for(var i=0;i<data.length;i++){
-      if(data[i] && data[i][0] === key){ foundRowIndex = i+2; break; }
-    }
-
-    if(action === 'load'){
-      if(foundRowIndex !== -1){
-        var payloadStr = sheet.getRange(foundRowIndex,6).getValue() || null;
-        var parsed = null;
-        try{ parsed = payloadStr ? JSON.parse(payloadStr) : null; }catch(e){ parsed = payloadStr; }
-        return jsonResponse({ok:true,data: parsed});
-      } else {
-        return jsonResponse({ok:true,data: null});
+    
+    var action = data.action;
+    var date = data.date; // Akan bernilai "08 AUG 2026" dari frontend
+    var shift = data.shift;
+    var line = data.line;
+    var stage = data.stage;
+    
+    var uniqueKey = date + '|S' + shift + '|L' + line + '|' + stage;
+    
+    var rows = sheet.getDataRange().getValues();
+    var rowIndex = -1;
+    
+    for (var i = 1; i < rows.length; i++) {
+      if (rows[i][0] == uniqueKey) {
+        rowIndex = i + 1;
+        break;
       }
     }
-
-    if(action === 'save'){
-      var lock = LockService.getScriptLock();
-      lock.waitLock(10000);
-      try{
-        var payload = req.payload || null;
-        var payloadStr = (typeof payload === 'string') ? payload : JSON.stringify(payload || {});
-        var updatedAt = new Date().toISOString();
-        var schemaVersion = req.schemaVersion || '1';
-
-        if(foundRowIndex !== -1){
-          sheet.getRange(foundRowIndex,6).setValue(payloadStr);
-          sheet.getRange(foundRowIndex,7).setValue(updatedAt);
-          sheet.getRange(foundRowIndex,8).setValue(schemaVersion);
-        } else {
-          sheet.appendRow([key,date,sNum,line,stage,payloadStr,updatedAt,schemaVersion]);
+    
+    var payloadStr = JSON.stringify(data.payload);
+    var updatedAt = new Date().toISOString();
+    
+    var p = data.payload || {};
+    var rowsList = p.rows || [];
+    var ops = p.operators || {};
+    var sum = p.summary || {};
+    
+    var masalahArr = [];
+    var disposisiArr = [];
+    var batchArr = [];
+    var totalDT = 0;
+    var totalGood = 0;
+    var totalDefect = 0;
+    
+    rowsList.forEach(function(r){
+      if(r.masalah) masalahArr.push(r.masalah);
+      if(r.disposisi) disposisiArr.push(r.disposisi);
+      if(r.batch) batchArr.push(r.batch + (r.wo ? ' (WO:'+r.wo+')' : ''));
+      
+      var gVal = parseFloat(String(r.good || '0').replace(',','.')) || 0;
+      var dVal = parseFloat(String(r.defect || '0').replace(',','.')) || 0;
+      totalGood += gVal;
+      totalDefect += dVal;
+      
+      if(r.mulai && r.selesai) {
+        var mParts = r.mulai.split(':');
+        var sParts = r.selesai.split(':');
+        if(mParts.length === 2 && sParts.length === 2) {
+          var mMin = parseInt(mParts[0])*60 + parseInt(mParts[1]);
+          var sMin = parseInt(sParts[0])*60 + parseInt(sParts[1]);
+          var dur = (sMin - mMin + 1440) % 1440;
+          if(['1','3','4','5','6','7','8','9'].indexOf(String(r.kode)) !== -1) {
+            totalDT += dur;
+          }
         }
-        return jsonResponse({ok:true,updatedAt:updatedAt});
-      }finally{
-        try{ lock.releaseLock(); }catch(e){}
+      }
+    });
+    
+    var ringkasanMasalah = masalahArr.join('; ');
+    var penanggulangan = disposisiArr.join('; ');
+    var produkBatch = Array.from(new Set(batchArr)).join(', ');
+    
+    var inisialList = [];
+    for(var k=1; k<=6; k++){
+      if(ops['op' + k]) inisialList.push(ops['op' + k].toUpperCase());
+    }
+    var inisialOperator = inisialList.join(', ');
+
+    var availability = sum.availability || '0,00 %';
+    var performance = sum.performance || '0,00 %';
+    var quality = sum.quality || '0,00 %';
+    var oee = sum.oee || '0,00%';
+    
+    var rowData = [
+      uniqueKey, date, shift, line, stage, payloadStr, updatedAt, 1,
+      availability, performance, quality, oee, totalDT,
+      totalGood, totalDefect, ringkasanMasalah, penanggulangan, produkBatch, inisialOperator
+    ];
+
+    if (action === 'save') {
+      if (rowIndex > -1) {
+        sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
+      } else {
+        sheet.appendRow(rowData);
+      }
+      
+      return ContentService.createTextOutput(JSON.stringify({ok: true, updatedAt: updatedAt}))
+        .setMimeType(ContentService.MimeType.JSON);
+        
+    } else if (action === 'load') {
+      if (rowIndex > -1) {
+        var savedPayload = rows[rowIndex - 1][5];
+        return ContentService.createTextOutput(JSON.stringify({ok: true, data: JSON.parse(savedPayload)}))
+          .setMimeType(ContentService.MimeType.JSON);
+      } else {
+        return ContentService.createTextOutput(JSON.stringify({ok: true, data: null}))
+          .setMimeType(ContentService.MimeType.JSON);
       }
     }
-
-    return jsonResponse({ok:false,error:'UNKNOWN_ACTION'});
-
-  }catch(err){
-    return jsonResponse({ok:false,error:'SERVER_ERROR',message:String(err && err.message)});
+    
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ok: false, error: err.message}))
+      .setMimeType(ContentService.MimeType.JSON);
   }
 }

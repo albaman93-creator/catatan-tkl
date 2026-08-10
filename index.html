@@ -749,6 +749,18 @@ var nf0=function(n){return Math.round(n).toLocaleString('id-ID');};
 var nf2=function(n){return (+n).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2});};
 var num=function(el){var v=parseFloat(String(el.value).replace(',','.'));return isFinite(v)?v:0;};
 function todayLocal(){var n=new Date();return new Date(n.getTime()-n.getTimezoneOffset()*60000).toISOString().slice(0,10);}
+
+// Fungsi format tanggal universal: 08/10/2026 atau lainnya -> "08 AUG 2026"
+function formatDateText(dateStr) {
+  if(!dateStr) return '';
+  var parts = dateStr.split('-');
+  if(parts.length !== 3) return dateStr;
+  var y = parts[0], m = parseInt(parts[1], 10), d = parts[2];
+  var months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  var mName = months[m - 1] || 'JAN';
+  return d + ' ' + mName + ' ' + y;
+}
+
 function parseTime(s){var m=/^\s*(\d{1,2}):(\d{2})\s*$/.exec(s||'');if(!m)return null;var h=+m[1],mi=+m[2];return (h<24&&mi<60)?h*60+mi:null;}
 function maskTime(raw){
   raw=raw||'';
@@ -1276,8 +1288,8 @@ function dbGet(){try{return JSON.parse(localStorage.getItem(DB_KEY))||{};}catch(
 function dbSet(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch(e){}}
 function curKey(){return ($('fDate').value||todayLocal())+'|S'+(evalShift+1)+'|L'+$('fLine').value+'|'+$('fStage').value;}
 function labelFilter(){
-  var d=new Date(($('fDate').value||todayLocal())+'T00:00:00');
-  return d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
+  var rawDate = $('fDate').value || todayLocal();
+  return formatDateText(rawDate)
     +' · Shift '+(evalShift+1)+' · Line '+$('fLine').value+' · '+$('fStage').value.toUpperCase();
 }
 function collect(){
@@ -1379,10 +1391,13 @@ function saveData(opts){
   if(!opts.silent) toast('Data tersimpan lokal ✓');
 
   setSyncStatus('sync','mengunggah…');
+  var rawDate = $('fDate').value || todayLocal();
+  var formattedDateForSheet = formatDateText(rawDate); // Mengubah tanggal menjadi "08 AUG 2026"
+
   var bodyObj = {
     action: 'save',
     token: 'oee-fima-2026-secret',
-    date: $('fDate').value || todayLocal(),
+    date: formattedDateForSheet,
     shift: evalShift+1,
     line: $('fLine').value,
     stage: $('fStage').value,
