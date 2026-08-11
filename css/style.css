@@ -166,28 +166,32 @@ kbd {
 }
 .preview-btn:hover { background: rgba(13, 33, 53, .8); transform: translateY(-1px); }
 .preview-btn:active { transform: translateY(0); }
+
+/* ====== LOGIN CARD — WHITE THEME (Kembali ke mode awal) ====== */
 .login-card {
   position: relative;
-  z-index: 2;
-  width: 100%; max-width: 420px; background: #fff;
-  border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-  padding: 36px 30px; border: 1px solid rgba(255,255,255,0.1);
+  overflow: hidden;
+  width: 100%; max-width: 420px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+  padding: 36px 30px;
+  border: 1px solid rgba(255,255,255,0.1);
   animation: loginPop .4s cubic-bezier(.22,.8,.3,1) both;
 }
-@keyframes loginPop {
-  from { opacity: 0; transform: translateY(16px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-.login-header { text-align: center; margin-bottom: 28px; }
+
+.login-header { text-align: center; margin-bottom: 28px; position: relative; }
 .login-logo {
   width: 64px; height: 64px; border-radius: 14px;
   background: linear-gradient(160deg,#1cbe68,#0c7c3d);
   display: grid; place-items: center; font: 700 28px var(--disp);
-  color: #fff; margin: 0 auto 16px; box-shadow: 0 8px 20px -6px rgba(12,124,61,0.5);
+  color: #fff; margin: 0 auto 16px;
+  box-shadow: 0 8px 20px -6px rgba(12,124,61,0.5);
 }
 .login-header h2 { font: 700 24px var(--disp); letter-spacing: 1px; color: var(--navy); text-transform: uppercase; }
 .login-header p  { font: 13px var(--mono); color: var(--mut); margin-top: 4px; }
-.login-form .field { margin-bottom: 18px; }
+
+.login-form .field { margin-bottom: 18px; position: relative; }
 .login-form .field label {
   color: var(--mut); font: 600 12px var(--mono);
   text-transform: uppercase; margin-bottom: 6px; display: block;
@@ -196,19 +200,26 @@ kbd {
   background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;
   padding: 12px 14px; font: 600 18px var(--mono);
   width: 100%; text-align: center; letter-spacing: 4px; color: var(--ink);
+  transition: .15s;
 }
-.login-remember {
-  display: flex; align-items: center; gap: 8px; margin: 16px 0 20px;
+.login-form .field input::placeholder { color: #b6c4cf; }
+.login-form .field input:hover { background: #f1f5f9; }
+.login-form .field input:focus {
+  outline: none; border-color: var(--green);
+  background: #fff; box-shadow: 0 0 0 3px rgba(18,161,80,.16);
 }
+
+.login-remember { display: flex; align-items: center; gap: 8px; margin: 16px 0 20px; }
 .login-remember input { width: 16px; height: 16px; accent-color: var(--green-d); cursor: pointer; }
 .login-remember label { font: 500 13px var(--body); color: #475569; cursor: pointer; user-select: none; }
+
 .login-btn {
   width: 100%; background: var(--green-d); color: #fff; border: 0;
   padding: 13px; font: 600 15px var(--body); border-radius: 9px;
   cursor: pointer; transition: .2s; box-shadow: 0 4px 12px rgba(12,124,61,0.3);
-  margin-top: 6px;
 }
 .login-btn:hover { background: var(--green); transform: translateY(-1px); }
+
 .login-error {
   background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3);
   color: var(--red); padding: 10px 14px; border-radius: 8px;
@@ -216,9 +227,11 @@ kbd {
   display: none; text-align: center;
 }
 .login-error.show { display: block; animation: shake .3s; }
-.login-hint {
-  text-align: center; margin-top: 20px;
-  font: 11.5px var(--mono); color: #94a3b8;
+.login-hint { text-align: center; margin-top: 20px; font: 11.5px var(--mono); color: #94a3b8; }
+.login-hint b { color: var(--green-d); }
+@keyframes loginPop {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 #appContainer { display: none; }
@@ -727,3 +740,4 @@ textarea.in {
 @media (prefers-reduced-motion: reduce) {
   .fx-canvas, .fx-flash { display: none !important; }
 }
+
