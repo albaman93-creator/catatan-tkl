@@ -89,21 +89,21 @@ const Rows = (() => {
     tr.innerHTML = `
       <td class="col-num">${rows().length + 1}</td>
       <td class="col-kode"><div class="c-kode"><span class="dot"></span>
-        <input data-f="kode" data-nav class="in mono ctr" type="tel" inputmode="numeric" maxlength="2" placeholder="•" aria-label="Kode">
+        <input data-f="kode" data-nav class="in mono ctr" type="tel" inputmode="numeric" maxlength="2" placeholder=" " aria-label="Kode">
       </div></td>
       <td class="col-mulai"><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>
       <td class="col-panggil"><input data-f="panggil" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Panggil Teknik"></td>
       <td class="col-teknik"><input data-f="teknik" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Teknik Datang"></td>
       <td class="col-selesai"><input data-f="selesai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Selesai"></td>
-      <td class="col-durasi dur"><b class="dur-v">—</b></td>
-      <td class="col-kegiatan"><textarea data-f="kegiatan" data-nav class="in" placeholder="Kegiatan…" aria-label="Kegiatan" rows="1"></textarea></td>
-      <td class="col-masalah"><textarea data-f="masalah" data-nav class="in" placeholder="Penyebab…" aria-label="Masalah" rows="1"></textarea></td>
-      <td class="col-disposisi"><textarea data-f="disposisi" data-nav class="in" placeholder="Tindakan…" aria-label="Disposisi" rows="1"></textarea></td>
-      <td class="col-wo"><input data-f="wo" data-nav class="in mono" placeholder="No WO…" aria-label="Nomor WO"></td>
+      <td class="col-durasi dur"><b class="dur-v"> </b></td>
+      <td class="col-kegiatan"><textarea data-f="kegiatan" data-nav class="in" placeholder="Kegiatan " aria-label="Kegiatan" rows="1"></textarea></td>
+      <td class="col-masalah"><textarea data-f="masalah" data-nav class="in" placeholder="Penyebab " aria-label="Masalah" rows="1"></textarea></td>
+      <td class="col-disposisi"><textarea data-f="disposisi" data-nav class="in" placeholder="Tindakan " aria-label="Disposisi" rows="1"></textarea></td>
+      <td class="col-wo"><input data-f="wo" data-nav class="in mono" placeholder="No WO " aria-label="Nomor WO"></td>
       <td class="col-batch"><select data-f="batch" data-nav class="in mono" aria-label="Produk & Batch">${optionsHtml}</select></td>
       <td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Good"></td>
       <td class="col-defect"><input data-f="defect" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Defect"></td>
-      <td class="col-aksi c-aksi"><button type="button" class="del" title="Hapus baris">✕</button></td>
+      <td class="col-aksi c-aksi"><button type="button" class="del" title="Hapus baris"> </button></td>
     `;
 
     if (data) {
@@ -117,6 +117,7 @@ const Rows = (() => {
         }
       });
     }
+
     State.el.tbody.appendChild(tr);
     applyCat(tr);
     Navigation.syncColumnVisibility();
@@ -128,44 +129,72 @@ const Rows = (() => {
     const tbody = State.el.tbodyProdDetail;
     if (!tbody) return;
     tbody.innerHTML = '';
-
     const prods = getActiveProducts();
+
     if (prods.length === 0) {
       tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mut);">Belum ada produk terdaftar di Master Produk.</td></tr>';
       return;
     }
 
     const summary = {};
-    prods.forEach(p => { summary[p] = { durasi: 0, rate: getRateForProduct(p), actual: 0 }; });
+    prods.forEach(p => { 
+      summary[p] = { 
+        durasiValid: 0,       // Waktu produktif valid (Kode produksi dengan Good >= 1) untuk target
+        durasiTotal: 0,       // Total waktu keseluruhan aktivitas dengan batch ini (kode apapun)
+        durasiProdAll: 0,     // Total waktu seluruh kode produksi (baik ada good maupun kosong)
+        durasiPlannedDT: 0,   // Total waktu Planned Down Time (Kode 5, 6, 7, 8)
+        durasiUnplannedDT: 0, // Total waktu Unplanned Down Time (Kode 1, 3, 4, 9)
+        rate: getRateForProduct(p), 
+        actual: 0 
+      }; 
+    });
 
     rows().forEach(tr => {
       const g = (f) => {
         const el = tr.querySelector(`[data-f="${f}"]`);
         return el ? el.value : '';
       };
+      const kodeStr = g('kode').trim();
+      const kodeNum = parseInt(kodeStr, 10);
       const mulai = Utils.parseTime(g('mulai'));
       const selesai = Utils.parseTime(g('selesai'));
       const prodName = g('batch');
-      const good = parseFloat(g('good').replace(',', '.')) || 0;
-      const defect = parseFloat(g('defect').replace(',', '.')) || 0;
-      const rowActual = good + defect;
+      const goodVal = parseFloat(String(g('good') || '0').replace(',', '.')) || 0;
+      const defectVal = parseFloat(String(g('defect') || '0').replace(',', '.')) || 0;
+      const rowActual = goodVal + defectVal;
 
-      if (mulai == null || selesai == null) return;
+      if (mulai == null || selesai == null || !prodName || !summary[prodName]) return;
       const dur = (selesai - mulai + 1440) % 1440;
       const si = Utils.shiftOf(mulai);
 
-      if (si === State.evalShift && prodName && summary[prodName]) {
-        summary[prodName].durasi += dur;
-        summary[prodName].actual += rowActual;
+      if (si === State.evalShift) {
+        // 1. Total waktu keseluruhan aktivitas (kode apapun)
+        summary[prodName].durasiTotal += dur;
+
+        // Kategori Down Time & Produksi
+        if (CONFIG.PLANNED_CODES.has(kodeNum)) {
+          summary[prodName].durasiPlannedDT += dur;
+        } else if (CONFIG.UNPLANNED_CODES.has(kodeNum)) {
+          summary[prodName].durasiUnplannedDT += dur;
+        } else if (Utils.catOf(kodeStr) === 'prod') {
+          summary[prodName].durasiProdAll += dur; // Total waktu kategori produksi
+
+          // Syarat valid untuk target: Kode produksi DAN kolom Good terisi >= 1
+          if (goodVal >= 1) {
+            summary[prodName].durasiValid += dur;
+            summary[prodName].actual += rowActual;
+          }
+        }
       }
     });
 
     let hasData = false;
     prods.forEach(p => {
       const item = summary[p];
-      const targetG = item.durasi * item.rate;
+      const targetG = item.durasiValid * item.rate;
       const perfP = targetG > 0 ? (item.actual / targetG) * 100 : 0;
-      if (item.durasi > 0 || item.actual > 0) hasData = true;
+
+      if (item.durasiTotal > 0 || item.actual > 0) hasData = true;
 
       const perfColor = perfP >= CONFIG.TARGET.PERFORMANCE
         ? 'color:var(--green-d);font-weight:700;'
@@ -173,12 +202,21 @@ const Rows = (() => {
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="text-align:left;font-weight:600;color:var(--ink);">${p}</td>
-        <td>${Utils.nf0(item.durasi)}</td>
-        <td>${Utils.nf0(item.rate)}</td>
-        <td>${Utils.nf0(targetG)}</td>
-        <td>${Utils.nf0(item.actual)}</td>
-        <td style="${perfColor}">${Utils.nf2(perfP)} %</td>
+        <td style="text-align:left; padding: 10px 12px;">
+          <div style="font-weight:700; color:var(--ink); font-size: 14px;">📦 ${p}</div>
+          <div style="font-size: 11.5px; color: var(--mut); margin-top: 6px; line-height: 1.5; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line2);">
+            <div>⏱️ Total Waktu Keseluruhan: <b>${Utils.nf0(item.durasiTotal)} mnt</b></div>
+            <div>⚙️ Waktu Produktif (Semua Kode 2): <b>${Utils.nf0(item.durasiProdAll)} mnt</b></div>
+            <div>✅ Waktu Produktif Valid (Good ≥ 1): <b style="color:var(--green-d);">${Utils.nf0(item.durasiValid)} mnt</b></div>
+            <div>🟨 Planned Down Time (Kode 5,6,7,8): <b style="color:var(--amber);">${Utils.nf0(item.durasiPlannedDT)} mnt</b></div>
+            <div>🟥 Unplanned Down Time (Kode 1,3,4,9): <b style="color:var(--red);">${Utils.nf0(item.durasiUnplannedDT)} mnt</b></div>
+          </div>
+        </td>
+        <td style="text-align:center;"><b>${Utils.nf0(item.durasiValid)}</b></td>
+        <td style="text-align:center;">${Utils.nf0(item.rate)}</td>
+        <td style="text-align:center;">${Utils.nf0(targetG)}</td>
+        <td style="text-align:center;">${Utils.nf0(item.actual)}</td>
+        <td style="text-align:center; ${perfColor}">${Utils.nf2(perfP)} %</td>
       `;
       tbody.appendChild(tr);
     });

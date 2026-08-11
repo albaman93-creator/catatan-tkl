@@ -125,7 +125,8 @@ const Calculation = (() => {
       const hAct = prodStats[i].actual;
       const perfI = gTarget > 0 ? (hAct / gTarget) * 100 : 0;
 
-      if (pNames[i]) { activeCount++; totalPerfSum += perfI; }
+      // Hanya hitung produk sebagai "aktif" untuk rata-rata jika nama ada DAN rate > 0
+      if (pNames[i] && prodStats[i].rate > 0) { activeCount++; totalPerfSum += perfI; }
 
       State.el['oG' + (i+1)].textContent = Utils.nf0(gTarget);
       State.el['oH' + (i+1)].textContent = Utils.nf0(hAct);
