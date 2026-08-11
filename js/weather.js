@@ -11,14 +11,30 @@
  *    - 1 Jan / 17 Ags / 31 Des → kembang api
  *    - hujan + matahari (sunrise/siang) → pelangi otomatis
  * 4. Dengar event 'scenechange' dari Scene module agar pelangi responsif.
+ *
+ * 5. **Manual Preview Mode**: tombol 🌤 auto di pojok kanan bawah
+ *    memungkinkan user menguji semua efek tanpa menunggu API.
+ *    Siklus: auto → ☀️ cerah → 🌧 hujan → ⛈ badai → ❄️ salju → 🎆 kembang api → auto
  */
 const Weather = (() => {
   'use strict';
 
-  const LS_KEY  = 'tkl_weather_cache_v1';
+  const LS_KEY   = 'tkl_weather_cache_v1';
   const RAIN_KEY = 'tkl_last_rain';
-  let lastKind = 'clear';
+  let lastKind     = 'clear';
   let currentScene = 'day';
+  let manualWx     = null;  // null = auto (ikuti API), string = override
+
+  // Mode-mode yang tersedia untuk tombol preview
+  const WX_MODES = ['auto', 'clear', 'rain', 'storm', 'snow', 'fireworks'];
+  const WX_LABELS = {
+    auto:      '🌤 auto',
+    clear:     '☀️ cerah',
+    rain:      '🌧 hujan',
+    storm:     '⛈ badai',
+    snow:      '❄️ salju',
+    fireworks: '🎆 kembang api',
+  };
 
   // ====== API ======
   async function fetchFromApi() {
@@ -94,6 +110,11 @@ const Weather = (() => {
     el.classList.add('show');
   }
 
+  function updateBtn() {
+    const btn = document.getElementById('weatherToggle');
+    if (btn) btn.textContent = WX_LABELS[manualWx || 'auto'];
+  }
+
   function applyRainbow() {
     const wrap = document.getElementById('bgScene');
     if (!wrap) return;
@@ -108,7 +129,7 @@ const Weather = (() => {
     if (wrap) wrap.classList.toggle('is-rain', on);
   }
 
-  // ====== KOORDINASI EFEK ======
+  // ====== KOORDINASI EFEK (dari API) ======
   function applyEffects(kind, sceneName) {
     lastKind = kind;
     currentScene = sceneName;
@@ -141,8 +162,80 @@ const Weather = (() => {
     updateChip(labels[kind] || '');
   }
 
-  // ====== REFRESH ======
+  // ====== MANUAL OVERRIDE ======
+  /**
+   * Terapkan efek berdasarkan manualWx (mode preview dari user).
+   * Kalau manualWx null → kembali ke state auto (dari API).
+   */
+  function applyManual() {
+    const wrap = document.getElementById('bgScene');
+
+    // Reset semua efek
+    FX.stopAll();
+    if (wrap) wrap.classList.remove('is-rain', 'has-rainbow');
+
+    if (!manualWx) {
+      // Mode auto: terapkan dari cache API terakhir
+      const cached = getCached();
+      const kind = cached ? classify(cached.code) : 'clear';
+      applyEffects(kind, currentScene);
+      updateChip('');  // chip auto tidak ditampilkan
+      return;
+    }
+
+    // Manual: apply efek sesuai pilihan user
+    switch (manualWx) {
+      case 'clear':
+        updateChip('☀️ cerah (preview)');
+        break;
+
+      case 'rain':
+        FX.setRain(true);
+        lastKind = 'rain';
+        markRainNow();
+        if (wrap) wrap.classList.add('is-rain');
+        applyRainbow();
+        updateChip('🌧 hujan (preview)');
+        break;
+
+      case 'storm':
+        FX.setStorm(true);
+        FX.setRain(true);
+        lastKind = 'storm';
+        markRainNow();
+        if (wrap) wrap.classList.add('is-rain');
+        applyRainbow();
+        updateChip('⛈ badai (preview)');
+        break;
+
+      case 'snow':
+        FX.setSnow(true);
+        updateChip('❄️ salju (preview)');
+        break;
+
+      case 'fireworks':
+        FX.setFireworks(true);
+        updateChip('🎆 kembang api (preview)');
+        break;
+    }
+  }
+
+  /**
+   * Siklus mode preview cuaca: auto → clear → rain → storm → snow → fireworks → auto.
+   */
+  function cycle() {
+    const idx = WX_MODES.indexOf(manualWx || 'auto');
+    const next = WX_MODES[(idx + 1) % WX_MODES.length];
+    manualWx = next === 'auto' ? null : next;
+    applyManual();
+    updateBtn();
+  }
+
+  // ====== REFRESH (dari API) ======
   async function refresh() {
+    // Skip refresh kalau sedang di mode manual
+    if (manualWx) return;
+
     let data = getCached();
     if (!data) {
       try {
@@ -159,23 +252,41 @@ const Weather = (() => {
     applyEffects(kind, sceneName);
   }
 
-  // ====== LISTENER: Scene change ======
+  // ====== LISTENER: Scene change (untuk pelangi responsif) ======
   function onSceneChange(e) {
     const sceneName = e.detail && e.detail.name;
     if (!sceneName) return;
     currentScene = sceneName;
-    applyRainbow();
+    // Re-apply efek agar pelangi & logic scene-aware tetap konsisten
+    if (manualWx) applyManual();
+    else applyRainbow();
   }
 
   // ====== INIT ======
   function init() {
     FX.mount('loginOverlay');
     window.addEventListener('scenechange', onSceneChange);
+
+    const btn = document.getElementById('weatherToggle');
+    if (btn) btn.addEventListener('click', cycle);
+
+    updateBtn();
     refresh();
     setInterval(refresh, CONFIG.WEATHER_REFRESH_MIN * 60 * 1000);
   }
 
-  return { init, refresh };
+  // Public API (untuk console debugging)
+  return {
+    init,
+    refresh,
+    cycle,
+    setManual: (mode) => {
+      manualWx = mode === 'auto' ? null : mode;
+      applyManual();
+      updateBtn();
+    },
+    isManual: () => !!manualWx,
+  };
 })();
 
 document.addEventListener('DOMContentLoaded', Weather.init);

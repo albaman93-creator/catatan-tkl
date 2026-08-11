@@ -140,12 +140,16 @@ kbd {
 .flower-white  { fill: #fff;    transition: fill 2s ease; }
 .scene--night .flower-yellow, .scene--night .flower-pink, .scene--night .flower-white { opacity: .4; transition: opacity 2s ease; }
 
-/* Preview toggle button (bottom-right of login overlay) */
-.scene-toggle {
+/* Preview bar (bottom-right of login overlay): cuaca + tema */
+.preview-bar {
   position: absolute;
   right: 16px;
   bottom: 16px;
   z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+.preview-btn {
   font: 600 11px var(--mono);
   letter-spacing: .5px;
   color: #eaf2fa;
@@ -158,8 +162,10 @@ kbd {
   -webkit-backdrop-filter: blur(6px);
   transition: .2s;
   box-shadow: 0 4px 14px rgba(0,0,0,.25);
+  white-space: nowrap;
 }
-.scene-toggle:hover { background: rgba(13, 33, 53, .8); transform: translateY(-1px); }
+.preview-btn:hover { background: rgba(13, 33, 53, .8); transform: translateY(-1px); }
+.preview-btn:active { transform: translateY(0); }
 .login-card {
   position: relative;
   z-index: 2;
@@ -647,6 +653,10 @@ textarea.in {
   .in { font-size: 15px; padding: 9px 10px; }
   .log { min-width: 1450px; }
   .sheet-f { padding: 12px 14px; }
+
+  /* Preview bar di layar kecil: lebih kecil font & padding, tetap horizontal */
+  .preview-bar { right: 10px; bottom: 10px; gap: 6px; }
+  .preview-btn { font-size: 10px; padding: 6px 10px; }
 }
 
 /* ====== FX (Weather Effects) ====== */

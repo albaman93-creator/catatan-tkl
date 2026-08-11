@@ -28,24 +28,28 @@ const Scene = (() => {
   };
 
   /**
-   * Posisi matahari di busur langit (06:00 → 18:00).
+   * Posisi matahari di busur langit (05:30 → 18:30).
    * Bergerak dari timur (kiri) ke barat (kanan) dengan tinggi maksimum di tengah hari.
+   * Puncak diatur cukup tinggi (y=110) agar tidak terhalang login card di tengah layar.
    */
   const sunPosition = (mins) => {
-    const p = Math.max(0, Math.min(1, (mins - 360) / 720));
-    const x = 150 + p * 1620;
-    const y = 780 - Math.sin(p * Math.PI) * 540;
+    // 05:30 (330) = terbit timur, 18:30 (1110) = terbenam barat
+    const p = Math.max(0, Math.min(1, (mins - 330) / 780));
+    const x = 100 + p * 1720;                     // kiri → kanan
+    const y = 680 - Math.sin(p * Math.PI) * 570;  // puncak y=110 (tinggi di atas login card)
     return { x, y };
   };
 
   /**
-   * Posisi bulan di busur langit (18:00 → 06:00).
+   * Posisi bulan di busur langit (18:00 → 06:00 berikutnya).
+   * Puncak di tengah malam pada posisi atas tengah layar.
    */
   const moonPosition = (mins) => {
-    let m = mins >= 1080 ? mins - 1080 : mins + 360;
-    const p = Math.max(0, Math.min(1, m / 720));
-    const x = 150 + p * 1620;
-    const y = 780 - Math.sin(p * Math.PI) * 540;
+    // Normalize: 18:00 (1080) → 06:00 berikutnya (360 + 1440)
+    const normalized = mins >= 1080 ? mins - 1080 : mins + 360;
+    const p = Math.max(0, Math.min(1, normalized / 720));
+    const x = 100 + p * 1720;
+    const y = 680 - Math.sin(p * Math.PI) * 570;
     return { x, y };
   };
 
