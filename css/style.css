@@ -648,3 +648,72 @@ textarea.in {
   .log { min-width: 1450px; }
   .sheet-f { padding: 12px 14px; }
 }
+
+/* ====== FX (Weather Effects) ====== */
+/* Canvas untuk hujan, salju, kembang api */
+.fx-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Lightning flash overlay (muncul saat badai) */
+.fx-flash {
+  position: absolute; inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.fx-flash.flash-once {
+  animation: flashBlink 0.5s ease-out;
+}
+@keyframes flashBlink {
+  0%   { opacity: 0; }
+  10%  { opacity: 0.85; }
+  20%  { opacity: 0.1; }
+  30%  { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+/* Weather chip (pojos kanan atas login) */
+.wx-chip {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font: 500 12px var(--mono);
+  color: #fff;
+  background: rgba(13,33,53,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 5px 10px;
+  border-radius: 99px;
+  opacity: 0;
+  transition: opacity .3s ease;
+  pointer-events: none;
+  z-index: 3;
+}
+.wx-chip.show { opacity: 1; }
+
+/* Rainbow (SVG group) */
+.rainbow-group {
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+#bgScene.has-rainbow .rainbow-group { opacity: 0.85; }
+
+/* Rain dimming (latar agak gelap saat hujan) */
+#bgScene.is-rain .bg-scene {
+  filter: saturate(0.7) brightness(0.85);
+  transition: filter 1.2s ease;
+}
+#bgScene.is-rain .sky-stop-top  { stop-color: #4a5d6e !important; }
+#bgScene.is-rain .sky-stop-mid  { stop-color: #6b7d8f !important; }
+#bgScene.is-rain .sky-stop-bot  { stop-color: #8fa0b1 !important; }
+#bgScene.is-rain .cloud-puff    { fill: #5c6b7a !important; }
+
+/* Reduce motion support */
+@media (prefers-reduced-motion: reduce) {
+  .fx-canvas, .fx-flash { display: none !important; }
+}

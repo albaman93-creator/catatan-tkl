@@ -8,18 +8,18 @@
  *
  * Matahari/bulan bergerak sepanjang busur langit mengikuti waktu.
  * Tombol preview di pojok kanan bawah memungkinkan cycle manual untuk testing.
+ *
+ * Dispatch event 'scenechange' saat nama scene berubah, agar modul lain
+ * (misalnya weather.js) bisa merespon untuk efek visual (pelangi, dll).
  */
 const Scene = (() => {
   'use strict';
 
-  // null = otomatis ikut waktu sistem; string = manual override untuk preview
   let manualMode = null;
+  let lastName   = null;
   const MODES = ['auto', 'day', 'sunset', 'night', 'sunrise'];
+  const SCENE_CLASSES = ['scene--night', 'scene--day', 'scene--sunrise', 'scene--sunset'];
 
-  /**
-   * Tentukan scene dari menit (0–1439).
-   * Jadwal bisa diubah di CONFIG.SCENE_SCHEDULE (js/config.js).
-   */
   const sceneOf = (mins) => {
     for (const slot of CONFIG.SCENE_SCHEDULE) {
       if (mins >= slot.from && mins < slot.to) return slot.name;
@@ -40,7 +40,6 @@ const Scene = (() => {
 
   /**
    * Posisi bulan di busur langit (18:00 → 06:00).
-   * Sama seperti matahari, lintas malam.
    */
   const moonPosition = (mins) => {
     let m = mins >= 1080 ? mins - 1080 : mins + 360;
@@ -66,7 +65,10 @@ const Scene = (() => {
     const mins = now.getHours() * 60 + now.getMinutes();
     const name = manualMode || sceneOf(mins);
 
-    wrap.className = 'scene scene--' + name;
+    // Hanya ganti class scene--*, pertahankan class lain (is-rain, has-rainbow)
+    SCENE_CLASSES.forEach(c => wrap.classList.remove(c));
+    wrap.classList.add('scene--' + name);
+    wrap.classList.add('scene');
 
     const sun  = document.getElementById('sun');
     const moon = document.getElementById('moon');
@@ -77,17 +79,32 @@ const Scene = (() => {
 
     const btn = document.getElementById('sceneToggle');
     if (btn) btn.textContent = labels[manualMode || 'auto'];
+
+    // Dispatch event saat scene berubah, supaya modul lain (weather) tahu
+    if (name !== lastName) {
+      lastName = name;
+      window.dispatchEvent(new CustomEvent('scenechange', { detail: { name } }));
+    }
   };
 
   /**
    * Siklus mode preview: auto → day → sunset → night → sunrise → auto.
-   * Mode manual tidak mempengaruhi auto-resume (akan tetap manual sampai diklik lagi).
    */
   const cycle = () => {
     const idx = MODES.indexOf(manualMode || 'auto');
     const next = MODES[(idx + 1) % MODES.length];
     manualMode = next === 'auto' ? null : next;
     apply();
+  };
+
+  /**
+   * Nama scene saat ini (auto atau manual override).
+   */
+  const current = () => {
+    if (lastName) return lastName;
+    const now = new Date();
+    const mins = now.getHours() * 60 + now.getMinutes();
+    return manualMode || sceneOf(mins);
   };
 
   const init = () => {
@@ -98,7 +115,7 @@ const Scene = (() => {
     if (btn) btn.addEventListener('click', cycle);
   };
 
-  return { init, cycle, apply };
+  return { init, cycle, apply, current };
 })();
 
 document.addEventListener('DOMContentLoaded', Scene.init);

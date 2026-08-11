@@ -135,6 +135,16 @@
           </g>
         </g>
 
+        <!-- Rainbow (muncul di fajar/siang setelah hujan) -->
+        <g id="rainbow" class="rainbow-group">
+          <path d="M 300,900 A 660,660 0 0 1 1620,900" stroke="#ff3b3b" stroke-width="8" fill="none" opacity="0.75"/>
+          <path d="M 340,900 A 620,620 0 0 1 1580,900" stroke="#ff9a3c" stroke-width="8" fill="none" opacity="0.75"/>
+          <path d="M 380,900 A 580,580 0 0 1 1540,900" stroke="#ffd93d" stroke-width="8" fill="none" opacity="0.75"/>
+          <path d="M 420,900 A 540,540 0 0 1 1500,900" stroke="#6bcb77" stroke-width="8" fill="none" opacity="0.75"/>
+          <path d="M 460,900 A 500,500 0 0 1 1460,900" stroke="#4d96ff" stroke-width="8" fill="none" opacity="0.75"/>
+          <path d="M 500,900 A 460,460 0 0 1 1420,900" stroke="#b26dff" stroke-width="8" fill="none" opacity="0.75"/>
+        </g>
+
         <!-- Hills -->
         <path class="hill-far"  d="M0,680 C200,560 380,610 560,640 C780,675 950,590 1180,620 C1380,645 1580,580 1920,650 L1920,1080 L0,1080 Z"/>
         <path class="hill-mid"  d="M0,780 C220,660 420,720 640,730 C860,740 1020,670 1280,710 C1500,745 1700,680 1920,740 L1920,1080 L0,1080 Z"/>
@@ -239,6 +249,7 @@
       <div class="bg-dim"></div>
     </div>
     <button type="button" id="sceneToggle" class="scene-toggle" title="Ganti tema langit (preview)">🕐 auto</button>
+    <span id="wxChip" class="wx-chip"></span>
     <div class="login-card">
       <div class="login-header">
         <div class="login-logo">TKL</div>
@@ -566,6 +577,8 @@
   <script src="./js/calculation.js"></script>
   <script src="./js/storage.js"></script>
   <script src="./js/scene.js"></script>
+  <script src="./js/fx.js"></script>
+  <script src="./js/weather.js"></script>
   <script src="./js/app.js"></script>
 </body>
 </html>

@@ -69,6 +69,25 @@ const CONFIG = Object.freeze({
   // ====== BULAN (untuk format tanggal) ======
   MONTHS: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'],
 
+  // ====== CUACA & EFEK VISUAL ======
+  // Koordinat pabrik untuk fetch cuaca dari Open-Meteo (gratis, tanpa API key)
+  // ⚠ Ubah ke koordinat pabrik Anda sendiri untuk akurasi maksimal.
+  LOCATION: {
+    lat: -6.9147,       // contoh: Bandung
+    lon: 107.6098,
+    label: 'Bandung'
+  },
+  WEATHER_REFRESH_MIN: 30,      // refresh API tiap N menit
+  SNOW_MONTHS: [12],            // bulan dengan efek salju dekoratif (1=Jan..12=Des)
+  RAINBOW_RECENT_MIN: 90,       // menit setelah hujan → pelangi muncul
+
+  // Tanggal khusus yang memicu kembang api di background login
+  SPECIAL_DATES: [
+    { month: 1,  day: 1,  name: 'Tahun Baru' },
+    { month: 8,  day: 17, name: 'HUT RI' },
+    { month: 12, day: 31, name: 'Malam Tahun Baru' }
+  ],
+
   // ====== SCENE SCHEDULE (tema background login berdasarkan waktu) ======
   // Jam dalam menit dari 00:00. Edit rentang ini untuk mengubah kapan tema berganti.
   SCENE_SCHEDULE: [
