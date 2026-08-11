@@ -1,147 +1,99 @@
-const CACHE_NAME = 'fima-oee-v1';
-const PRECACHE_URLS = [
+/**
+ * SW.JS — Service Worker TKL OEE (Modular Version)
+ * Cache semua aset aplikasi untuk mode offline.
+ * Versi ditingkatkan untuk mencantumkan semua file JS modular.
+ */
+const CACHE_NAME = 'tkl-oee-v2';
+
+const PRECACHE = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './css/style.css',
+  './js/config.js',
+  './js/utils.js',
+  './js/state.js',
+  './js/auth.js',
+  './js/ui.js',
+  './js/rows.js',
+  './js/navigation.js',
+  './js/calculation.js',
+  './js/storage.js',
+  './js/app.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png'
 ];
 
-self.addEventListener('install', function(event) {
+self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(function(cache) {
-        return cache.addAll(PRECACHE_URLS);
-      })
-      .then(function() {
-        return self.skipWaiting();
-      })
+      .then((cache) => cache.addAll(PRECACHE))
+      .then(() => self.skipWaiting())
   );
 });
 
-self.addEventListener('activate', function(event) {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then(function(cacheNames) {
-        return Promise.all(
-          cacheNames.map(function(cacheName) {
-            if (cacheName !== CACHE_NAME) {
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
-      .then(function() {
-        return self.clients.claim();
-      })
+      .then((keys) => Promise.all(
+        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
-function isSyncRequest(url) {
-  return url.includes('script.google.com') || 
-         url.includes('macros/s/') ||
-         url.includes('/exec');
-}
-
-function isNavigationRequest(request) {
-  return request.mode === 'navigate' || 
-         (request.destination === 'document' && request.method === 'GET');
-}
-
-function isStaticAsset(url) {
-  const sameOrigin = url.origin === self.location.origin;
-  if (!sameOrigin) return false;
-  const path = url.pathname;
-  if (path.match(/\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot|otf|json)$/i)) return true;
-  return false;
-}
-
-self.addEventListener('fetch', function(event) {
+self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
 
-  if (request.method !== 'GET') {
+  // Skip non-GET requests
+  if (request.method !== 'GET') return;
+
+  // JANGAN cache request ke Google (Apps Script / Sheets / Fonts)
+  if (url.hostname.includes('google.com') || url.hostname.includes('gstatic.com') || url.href.includes('script.google.com')) {
     return;
   }
 
-  if (isSyncRequest(url.href)) {
-    return;
-  }
-
-  if (isNavigationRequest(request)) {
+  // Navigation requests (HTML) — network first, fallback ke cache
+  if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
-        .then(function(response) {
+        .then((response) => {
           if (response && response.status === 200) {
             const clone = response.clone();
-            caches.open(CACHE_NAME).then(function(cache) {
-              cache.put(request, clone);
-            });
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
           }
           return response;
         })
-        .catch(function() {
-          return caches.match('./index.html');
-        })
+        .catch(() => caches.match('./index.html'))
     );
     return;
   }
 
-  if (isStaticAsset(url)) {
+  // Static assets — cache first, lalu network, lalu update cache
+  if (url.origin === self.location.origin) {
     event.respondWith(
       caches.match(request)
-        .then(function(cachedResponse) {
-          if (cachedResponse) {
-            fetch(request).then(function(networkResponse) {
-              if (networkResponse && networkResponse.status === 200) {
-                caches.open(CACHE_NAME).then(function(cache) {
-                  cache.put(request, networkResponse);
-                });
+        .then((cached) => {
+          if (cached) {
+            // Stale-while-revalidate: return cache dulu, update di background
+            fetch(request).then((netRes) => {
+              if (netRes && netRes.status === 200) {
+                caches.open(CACHE_NAME).then((c) => c.put(request, netRes));
               }
-            }).catch(function() {});
-            return cachedResponse;
+            }).catch(() => {});
+            return cached;
           }
-          return fetch(request).then(function(networkResponse) {
-            if (networkResponse && networkResponse.status === 200) {
-              caches.open(CACHE_NAME).then(function(cache) {
-                cache.put(request, networkResponse.clone());
-              });
+          return fetch(request).then((netRes) => {
+            if (netRes && netRes.status === 200) {
+              const copy = netRes.clone();
+              caches.open(CACHE_NAME).then((c) => c.put(request, copy));
             }
-            return networkResponse;
+            return netRes;
           });
         })
     );
     return;
   }
-
-  if (url.origin === self.location.origin) {
-    event.respondWith(
-      fetch(request)
-        .then(function(response) {
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(function(cache) {
-              cache.put(request, clone);
-            });
-          }
-          return response;
-        })
-        .catch(function() {
-          return caches.match(request);
-        })
-    );
-    return;
-  }
-
-  event.respondWith(
-    fetch(request).catch(function() {
-      return caches.match(request).then(function(cached) {
-        if (cached && cached.type !== 'opaque') {
-          return cached;
-        }
-        return new Response('', { status: 404, statusText: 'Not Found' });
-      });
-    })
-  );
 });

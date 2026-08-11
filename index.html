@@ -1,1548 +1,531 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Log Sheet &amp; OEE — TKL-Produksi-OEE 2026</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log Sheet &amp; OEE — TKL-Produksi-OEE 2026</title>
 
-<!-- PWA Meta Tags -->
-<link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#0d2135">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="TKL-OEE">
-<link rel="icon" href="./icons/icon-192.png" type="image/png">
-<link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0d2135">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TKL-OEE">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --ink:#0f2437; --ink2:#41586c; --mut:#6b8093;
-  --paper:#e8edf1; --card:#fff; --line:#d6dee5; --line2:#e8eef2;
-  --green:#12a150; --green-d:#0c7c3d; --green-bg:rgba(18,161,80,.12);
-  --amber:#d97706; --red:#dc2626; --navy:#0d2135;
-  --blue:#0c63a8;
-  --mono:'IBM Plex Mono',monospace; --disp:'Barlow Condensed',sans-serif; --body:'IBM Plex Sans',sans-serif;
-  --page:1360px;
-}
-html{scroll-behavior:smooth}
-body{
-  font-family:var(--body);font-size:16px;color:var(--ink);min-height:100vh;
-  background:
-    radial-gradient(900px 420px at 50% -10%, rgba(18,161,80,.10), transparent 60%),
-    linear-gradient(rgba(15,36,55,.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15,36,55,.05) 1px, transparent 1px),
-    var(--paper);
-  background-size:auto,26px 26px,26px 26px,auto;
-  overflow-x:hidden;
-}
-::selection{background:rgba(18,161,80,.25)}
-button,input,select{touch-action:manipulation}
-.spacer{flex:1}
-kbd{font:600 12px var(--mono);background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 6px;color:var(--ink2)}
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-/* ============ HALAMAN LOGIN ============ */
-#loginOverlay {
-  position: fixed; inset: 0; z-index: 1000;
-  background: url('./icons/bg-login.jpg') no-repeat center center;
-  background-size: cover;
-  display: flex; align-items: center; justify-content: center; padding: 16px;
-  transition: opacity .3s ease, visibility .3s ease;
-}
-#loginOverlay::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(13, 33, 53, 0.25);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  z-index: -1;
-}
-#loginOverlay.hide {
-  opacity: 0; visibility: hidden; pointer-events: none;
-}
-.login-card {
-  width: 100%; max-width: 420px; background: #fff;
-  border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-  padding: 36px 30px; border: 1px solid rgba(255,255,255,0.4);
-  animation: loginPop .4s cubic-bezier(.22,.8,.3,1) both;
-}
-@keyframes loginPop {
-  from { opacity: 0; transform: translateY(16px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-.login-header { text-align: center; margin-bottom: 28px; }
-.login-logo {
-  width: 64px; height: 64px; border-radius: 14px;
-  background: linear-gradient(160deg,#1cbe68,#0c7c3d);
-  display: grid; place-items: center; font: 700 28px var(--disp);
-  color: #fff; margin: 0 auto 16px; box-shadow: 0 8px 20px -6px rgba(12,124,61,0.5);
-}
-.login-header h2 { font: 700 24px var(--disp); letter-spacing: 1px; color: var(--navy); text-transform: uppercase; }
-.login-header p { font: 13px var(--mono); color: var(--mut); margin-top: 4px; }
-.login-form .field { margin-bottom: 18px; }
-.login-btn {
-  width: 100%; background: var(--green-d); color: #fff; border: 0;
-  padding: 13px; font: 600 15px var(--body); border-radius: 9px;
-  cursor: pointer; transition: .2s; box-shadow: 0 4px 12px rgba(12,124,61,0.3);
-  margin-top: 6px;
-}
-.login-btn:hover { background: var(--green); transform: translateY(-1px); }
-.login-error {
-  background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3);
-  color: var(--red); padding: 10px 14px; border-radius: 8px;
-  font: 500 12.5px var(--mono); margin-bottom: 16px; display: none; text-align: center;
-}
-.login-error.show { display: block; animation: shake .3s; }
-
-#appContainer { display: none; }
-#appContainer.show { display: block; }
-
-.toolbar{position:sticky;top:0;z-index:50;background:rgba(238,242,245,.95);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:10px 14px}
-.twrap{max-width:var(--page);margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.pos{display:inline-flex;align-items:center;gap:9px;font:600 13px var(--mono);color:var(--ink);background:#fff;border:1px solid var(--line);padding:10px 14px;border-radius:7px;min-width:200px}
-.pos-dot{width:9px;height:9px;background:var(--green);border-radius:2px;animation:blink 1.2s steps(2) infinite;flex:none}
-@keyframes blink{50%{opacity:.25}}
-.navmode,.shiftsel{display:inline-flex;align-items:center;background:#fff;border:1px solid var(--line);border-radius:9px;padding:3px;gap:3px}
-.nm-cap{font:600 10px var(--mono);letter-spacing:1.5px;color:var(--mut);padding:0 5px 0 9px}
-.navmode button,.shiftsel button{border:0;background:transparent;font:600 12.5px var(--mono);letter-spacing:.6px;padding:9px 12px;border-radius:7px;color:var(--mut);cursor:pointer;transition:.2s;display:inline-flex;gap:6px;align-items:center}
-.navmode button.on{background:var(--navy);color:#fff;box-shadow:0 2px 6px -2px rgba(13,33,53,.55)}
-.shiftsel button.on{background:var(--green-d);color:#fff;box-shadow:0 2px 6px -2px rgba(12,124,61,.6)}
-.navmode button:not(.on):hover,.shiftsel button:not(.on):hover{color:var(--ink);background:#f2f6f8}
-.hint{font-size:12px;font-family:var(--mono);color:var(--mut);flex-basis:100%}
-#lastSaved{font:12px var(--mono);color:var(--green-d)}
-
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 14px var(--body);letter-spacing:.3px;padding:11px 18px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:transform .12s,box-shadow .12s,background .15s,border-color .15s;text-decoration:none;user-select:none}
-.btn-primary{background:var(--green-d);color:#fff;box-shadow:0 2px 0 #085c2d}
-.btn-primary:hover{background:var(--green);transform:translateY(-1px);box-shadow:0 3px 0 #085c2d}
-.btn-primary:active{transform:translateY(1px);box-shadow:none}
-.btn-ghost{background:#fff;border-color:var(--line);color:var(--ink2);box-shadow:0 2px 0 #e2e9ee}
-.btn-ghost:hover{border-color:#b8c6d0;color:var(--ink);transform:translateY(-1px)}
-.btn-ghost:active{transform:translateY(1px);box-shadow:none}
-.btn-logout{background:#fff;border-color:rgba(220,38,38,0.3);color:var(--red)}
-.btn-logout:hover{background:rgba(220,38,38,0.08);border-color:var(--red)}
-.btn-add{background:#fff;border:1.5px dashed #9fc3ad;color:var(--green-d);padding:10px 14px;width:100%;margin-top:12px}
-.btn-add:hover{background:var(--green-bg);border-style:solid}
-.btn-install{background:#0d2135;color:#fff;border:1px solid #1a3b5c;padding:8px 14px;font-size:13px;white-space:nowrap;border-radius:8px;cursor:pointer;transition:.2s;display:none}
-.btn-install.show{display:inline-flex}
-
-.sheet{max-width:var(--page);margin:20px auto 46px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 30px 70px -35px rgba(13,33,53,.45);overflow:hidden;animation:rise .5s cubic-bezier(.22,.8,.3,1) both}
-@keyframes rise{from{opacity:0;transform:translateY(14px)}}
-.hwrap{background:linear-gradient(180deg,#16324c 0%,#0d2135 100%);color:#fff;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;position:relative}
-.hwrap::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 26px);pointer-events:none}
-.brand{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
-.mark{width:50px;height:50px;border-radius:10px;background:linear-gradient(160deg,#1cbe68,#0c7c3d);display:grid;place-items:center;font:700 23px var(--disp);letter-spacing:1px;color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);flex:none}
-.kicker{font:600 10.5px var(--mono);letter-spacing:2.5px;color:#6fd39c;margin-bottom:3px}
-h1{font:700 clamp(24px,5vw,34px)/1 var(--disp);letter-spacing:.8px;text-transform:uppercase}
-.sub{font-size:12.5px;color:#93a9bc;margin-top:4px}
-.hud{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
-.clock{font:600 26px var(--mono);letter-spacing:1px;font-variant-numeric:tabular-nums}
-.date{font:11.5px var(--mono);color:#93a9bc}
-.led{display:inline-flex;align-items:center;gap:7px;font:600 10.5px var(--mono);letter-spacing:1.5px;color:#7fd7a8;border:1px solid rgba(127,215,168,.4);padding:6px 11px;border-radius:99px}
-.led i{width:8px;height:8px;border-radius:50%;background:#2ee27e;animation:pulse 1.6s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,226,126,.5)}70%{box-shadow:0 0 0 7px rgba(46,226,126,0)}100%{box-shadow:0 0 0 0 rgba(46,226,126,0)}}
-.stripe{height:6px;background:repeating-linear-gradient(-45deg,var(--green) 0 14px,var(--navy) 14px 28px)}
-
-.sec{padding:20px 28px}
-.sec + .sec{border-top:2px dashed var(--line)}
-.sec-h{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.sec-h .no{font:700 17px var(--disp);color:#fff;background:var(--navy);padding:4px 9px;border-radius:6px;letter-spacing:1px;flex:none}
-.sec-h h2{font:600 23px/1.05 var(--disp);letter-spacing:1.2px;text-transform:uppercase}
-.sec-h .sub2{font:12px var(--mono);color:var(--mut);margin-top:2px}
-.sec-f{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;font:12.5px var(--mono);color:var(--mut)}
-.sec-f b{color:var(--ink)}
-
-.filter-grid{display:grid;grid-template-columns:1.2fr 1fr 1.2fr;gap:12px}
-.edit-info{font:600 11.5px var(--mono);color:var(--mut);background:#f4f7f9;border:1px dashed var(--line);border-radius:99px;padding:6px 12px;display:inline-flex;align-items:center;gap:6px;cursor:default}
-.edit-info.ok{color:var(--green-d);border-color:rgba(18,161,80,.4);background:var(--green-bg)}
-.edit-info.sync{color:var(--blue);border-color:rgba(12,99,168,.3);background:rgba(12,99,168,.08)}
-.edit-info.err{color:var(--red);border-color:rgba(220,38,38,.3);background:rgba(220,38,38,.08)}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:#b8c6d0;flex:none}
-.edit-info.ok   .sync-dot{background:var(--green-d)}
-.edit-info.sync .sync-dot{background:var(--blue);animation:blink 1s steps(2) infinite}
-.edit-info.err  .sync-dot{background:var(--red)}
-
-.field{margin-bottom:14px}
-.field:last-child{margin-bottom:0}
-.field label{display:flex;justify-content:space-between;align-items:baseline;font:600 12.5px var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
-.unit{font-size:11.5px;color:var(--mut);text-transform:none}
-.field input,.field select{width:100%;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font:600 16px var(--mono);color:var(--ink);background:#fbfcfd;transition:.15s;caret-color:var(--green)}
-.field input:hover,.field select:hover{background:#f4f8fa}
-.field input:focus,.field select:focus{outline:none;border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(18,161,80,.16)}
-.field .big{font-size:18px}
-
-.legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.lg{display:inline-flex;align-items:center;gap:7px;font:500 12.5px var(--mono);color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 12px}
-.sw{width:10px;height:10px;border-radius:2px;flex:none}
-.sw-a{background:var(--amber)}.sw-r{background:var(--red)}.sw-g{background:var(--green)}
-
-.col-toggle-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;background:#f4f7f9;padding:8px 12px;border-radius:8px;border:1px solid var(--line)}
-.col-toggle-bar span{font:600 11.5px var(--mono);color:var(--mut);letter-spacing:.8px;text-transform:uppercase}
-.col-toggle-bar label{font:500 12px var(--mono);color:var(--ink2);display:inline-flex;align-items:center;gap:4px;cursor:pointer;background:#fff;padding:3px 8px;border:1px solid var(--line);border-radius:6px;user-select:none}
-.col-toggle-bar input[type="checkbox"]{accent-color:var(--green-d);cursor:pointer}
-
-.col-kode {
-  min-width: 90px !important;
-  width: 90px !important;
-}
-
-.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse}
-.log th{font:600 11.5px var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--mut);text-align:left;padding:10px 8px;background:#f4f7f9;border-bottom:2px solid var(--line);white-space:nowrap;transition:color .15s,background .15s;vertical-align:middle}
-.log th.on{color:var(--green-d);background:var(--green-bg)}
-.log td{padding:4px 5px;border-bottom:1px solid var(--line2);vertical-align:middle}
-.log tbody tr{transition:background .2s,opacity .19s,transform .19s;animation:rowin .25s ease both}
-@keyframes rowin{from{opacity:0;transform:translateY(-4px)}}
-.log tbody tr:hover{background:#f6faf8}
-
-tr.log-row[data-cat="planned"] { background-color: #ffffff; }
-tr.log-row[data-cat="planned"]:hover { background-color: #fafcfd; }
-tr.log-row[data-cat="unplanned"] { background-color: rgba(220, 38, 38, 0.25); }
-tr.log-row[data-cat="unplanned"]:hover { background-color: rgba(220, 38, 38, 0.33); }
-tr.log-row[data-cat="prod"] { background-color: rgba(18, 161, 80, 0.25); }
-tr.log-row[data-cat="prod"]:hover { background-color: rgba(18, 161, 80, 0.35); }
-
-tr.out{opacity:0;transform:translateX(12px)}
-tr.log-row td:first-child{position:relative}
-tr.log-row td:first-child::before{content:'';position:absolute;left:0;top:18%;bottom:18%;width:3px;border-radius:3px;background:transparent;transition:background .2s}
-tr[data-cat="planned"] td:first-child::before{background:var(--amber)}
-tr[data-cat="unplanned"] td:first-child::before{background:var(--red)}
-tr[data-cat="prod"] td:first-child::before{background:var(--green)}
-.c-kode{display:flex;align-items:center;gap:8px}
-.dot{width:9px;height:9px;border-radius:50%;background:#d7e0e7;flex:none;transition:background .2s,box-shadow .2s}
-tr[data-cat="planned"] .dot{background:var(--amber);box-shadow:0 0 0 3px rgba(217,119,6,.15)}
-tr[data-cat="unplanned"] .dot{background:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.15)}
-tr[data-cat="prod"] .dot{background:var(--green);box-shadow:0 0 0 3px rgba(18,161,80,.15)}
-td.dur{text-align:center;width:70px}
-.dur-v{font:600 14px var(--mono);color:var(--ink2)}
-.c-aksi{text-align:center;width:46px}
-.del{width:34px;height:34px;border-radius:7px;border:1px solid transparent;background:transparent;color:#a4b4c0;cursor:pointer;font-size:13px;transition:.15s}
-.del:hover{background:rgba(220,38,38,.1);color:var(--red);border-color:rgba(220,38,38,.3);transform:scale(1.08)}
-
-.col-hide{display:none !important}
-.col-kegiatan, .col-masalah, .col-disposisi, .col-batch {
-  min-width: 200px; max-width: 280px; width: 220px; white-space: normal !important;
-}
-.col-good, .col-defect {
-  min-width: 110px !important; width: 120px !important;
-}
-
-.in, select.in{width:100%;border:1px solid transparent;background:transparent;padding:9px 10px;border-radius:7px;font:500 15px var(--body);color:var(--ink);caret-color:var(--green);transition:background .15s,border-color .15s,box-shadow .15s}
-.in.mono{font-family:var(--mono);font-size:14.5px}
-.in.ctr{text-align:center}
-textarea.in {
-  resize: none; overflow: hidden; line-height: 1.4; height: 38px; min-height: 38px; display: block;
-}
-.in::placeholder{color:#b6c4cf}
-.in:hover{background:rgba(255,255,255,0.6)}
-.in:focus{outline:none;background:#fff;border-color:var(--green);box-shadow:0 0 0 3px rgba(18,161,80,.16)}
-.in.invalid{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.14);animation:shake .3s}
-@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
-.in.flash{animation:flashbg .6s}
-@keyframes flashbg{0%{background:rgba(18,161,80,.3)}100%{background:transparent}}
-
-/* Kelas khusus untuk Peringatan Jam di luar shift (Kuning) */
-.in.warn-shift {
-  background-color: #fef08a !important;
-  border-color: #eab308 !important;
-  color: #713f12 !important;
-}
-
-.oee-matrix-tbl {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--mono);
-  font-size: 13px;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.oee-matrix-tbl th, .oee-matrix-tbl td {
-  border: 1px solid var(--line);
-  padding: 8px 10px;
-  vertical-align: middle;
-}
-.oee-matrix-tbl th {
-  background: #16324c;
-  color: #fff;
-  text-align: center;
-  font-family: var(--disp);
-  letter-spacing: 1px;
-  font-size: 15px;
-}
-.oee-matrix-tbl tr.sec-header td {
-  background: #f0f4f8;
-  font-weight: 700;
-  color: var(--navy);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-}
-.oee-matrix-tbl td.code-col {
-  width: 40px;
-  text-align: center;
-  font-weight: 700;
-  background: #fbfcfd;
-}
-.oee-matrix-tbl td.desc-col {
-  color: var(--ink2);
-}
-.oee-matrix-tbl td.val-col {
-  text-align: right;
-  font-weight: 600;
-  color: var(--ink);
-  width: 130px;
-}
-.oee-matrix-tbl tr.highlight-res td {
-  background: linear-gradient(180deg,#123049,#0d2135);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.sheet-f{padding:14px 28px;border-top:1px solid var(--line);background:#fafcfd;font:12px var(--mono);color:#8fa2b2;display:flex;gap:16px;flex-wrap:wrap}
-
-/* Posisi Toast dipindah ke bagian atas layar agar tidak tertutup keyboard ponsel */
-#toast{position:fixed;left:50%;top:20px;bottom:auto;transform:translate(-50%,-10px);opacity:0;pointer-events:none;background:var(--navy);color:#fff;padding:14px 22px 14px 18px;border-radius:10px;border-left:4px solid var(--green);box-shadow:0 12px 30px -10px rgba(13,33,53,.5);font:500 15px var(--body);transition:.3s cubic-bezier(.22,.8,.3,1);z-index:9999;max-width:calc(100vw - 32px);text-align:center}
-#toast.show{opacity:1;transform:translate(-50%,0)}
-#toast.err{border-left-color:var(--red)}
-#toast.warn{border-left-color:var(--amber); background:#713f12; color:#fef08a;}
-
-@media print {
-  @page { size: A4 landscape; margin: 8mm; }
-  body { background: #fff !important; }
-  #loginOverlay, .toolbar, .btn, .col-toggle-bar, #toast { display: none !important; }
-  #appContainer { display: block !important; }
-  .sheet { box-shadow: none !important; border: none !important; margin: 0 !important; max-width: 100% !important; width: 100% !important; }
-}
-
-@media(max-width:768px){
-  .twrap{gap:8px}
-  .pos{flex:1 1 100%;min-width:0;justify-content:center}
-  .navmode,.shiftsel{flex:1 1 45%}
-  .navmode button,.shiftsel button{flex:1;justify-content:center;padding:11px 4px;font-size:12px}
-  .nm-cap{display:none}
-  .hint{display:none}
-  #lastSaved{flex:1 1 100%;text-align:center}
-  #btnReset,#btnSave{flex:1 1 40%;padding:13px 10px}
-  .sheet{margin:12px 10px 30px}
-  .hwrap{padding:16px 16px}
-  .sec{padding:16px 14px}
-  .sec-h h2{font-size:21px}
-  .filter-grid{grid-template-columns:1fr}
-  .in{font-size:15px;padding:9px 10px}
-  .log{min-width:1450px}
-  .sheet-f{padding:12px 14px}
-}
-</style>
+  <!-- CSS (urutan penting) -->
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 
-<div id="loginOverlay">
-  <div class="login-card">
-    <div class="login-header">
-      <div class="login-logo">TKL</div>
-      <h2>OEE System Login</h2>
-      <p>Masukkan PIN Akses Operator / Admin</p>
-    </div>
-    <div id="loginError" class="login-error">PIN Akses Salah! Silakan coba lagi.</div>
-    <form id="loginForm" class="login-form" onsubmit="handleLogin(event)">
-      <div class="field">
-        <label for="loginPin" style="color:var(--mut); font:600 12px var(--mono); text-transform:uppercase; margin-bottom:6px; display:block;">PIN Akses</label>
-        <input type="password" id="loginPin" placeholder="••••" maxlength="10" required autofocus autocomplete="current-password" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:12px 14px; font:600 18px var(--mono); width:100%; text-align:center; letter-spacing:4px; color:#0f2437;">
+  <!-- ============ LOGIN OVERLAY ============ -->
+  <div id="loginOverlay">
+    <!-- 🎨 Cartoon landscape background (SVG inline - offline friendly) -->
+    <svg class="bg-scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7cc9ec"/>
+          <stop offset="70%" stop-color="#bde4f4"/>
+          <stop offset="100%" stop-color="#e8f5f9"/>
+        </linearGradient>
+        <radialGradient id="sunGlow" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stop-color="#fff2a8" stop-opacity="1"/>
+          <stop offset="40%" stop-color="#ffd97a" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#ffd97a" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="hillFar" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#a8dda6"/>
+          <stop offset="100%" stop-color="#7fc47d"/>
+        </linearGradient>
+        <linearGradient id="hillMid" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#6fc46f"/>
+          <stop offset="100%" stop-color="#4ca64c"/>
+        </linearGradient>
+        <linearGradient id="hillNear" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3d9440"/>
+          <stop offset="100%" stop-color="#26732a"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Sky -->
+      <rect width="1920" height="1080" fill="url(#skyGrad)"/>
+
+      <!-- Sun glow + disc -->
+      <circle cx="1550" cy="220" r="280" fill="url(#sunGlow)"/>
+      <circle cx="1550" cy="220" r="80" fill="#ffe56b"/>
+      <circle cx="1550" cy="220" r="60" fill="#fff3a8"/>
+
+      <!-- Birds (distant) -->
+      <g fill="none" stroke="#2c5f7c" stroke-width="2.5" stroke-linecap="round" opacity="0.45">
+        <path d="M900,260 Q905,252 912,258 Q917,252 924,260"/>
+        <path d="M950,240 Q954,234 960,238 Q964,234 970,240"/>
+        <path d="M980,270 Q985,264 991,268"/>
+      </g>
+
+      <!-- Clouds (animated drift) -->
+      <g class="clouds-slow" fill="#ffffff" opacity="0.92">
+        <g>
+          <ellipse cx="280" cy="180" rx="85" ry="28"/>
+          <ellipse cx="320" cy="160" rx="65" ry="32"/>
+          <ellipse cx="240" cy="175" rx="55" ry="24"/>
+          <ellipse cx="360" cy="185" rx="45" ry="20"/>
+        </g>
+        <g transform="translate(700, 240)">
+          <ellipse cx="0" cy="0" rx="95" ry="30"/>
+          <ellipse cx="45" cy="-18" rx="70" ry="34"/>
+          <ellipse cx="-40" cy="-10" rx="55" ry="25"/>
+          <ellipse cx="85" cy="5" rx="40" ry="18"/>
+        </g>
+        <g transform="translate(1100, 130)">
+          <ellipse cx="0" cy="0" rx="75" ry="26"/>
+          <ellipse cx="40" cy="-15" rx="55" ry="28"/>
+          <ellipse cx="-35" cy="-8" rx="50" ry="22"/>
+        </g>
+        <g transform="translate(1650, 330)">
+          <ellipse cx="0" cy="0" rx="70" ry="24"/>
+          <ellipse cx="38" cy="-14" rx="50" ry="26"/>
+          <ellipse cx="-32" cy="-8" rx="45" ry="20"/>
+        </g>
+      </g>
+
+      <!-- Far hills (light) -->
+      <path d="M0,680 C200,560 380,610 560,640 C780,675 950,590 1180,620 C1380,645 1580,580 1920,650 L1920,1080 L0,1080 Z" fill="url(#hillFar)"/>
+
+      <!-- Mid hills -->
+      <path d="M0,780 C220,660 420,720 640,730 C860,740 1020,670 1280,710 C1500,745 1700,680 1920,740 L1920,1080 L0,1080 Z" fill="url(#hillMid)"/>
+
+      <!-- Near hills -->
+      <path d="M0,900 C260,820 520,870 760,860 C1000,850 1220,790 1480,840 C1700,880 1850,840 1920,860 L1920,1080 L0,1080 Z" fill="url(#hillNear)"/>
+
+      <!-- Pine trees (back layer, smaller) -->
+      <g fill="#2a6d2e" opacity="0.85">
+        <g transform="translate(120, 700)">
+          <polygon points="0,0 -28,90 28,90"/>
+          <polygon points="0,-30 -24,60 24,60"/>
+          <polygon points="0,-55 -18,30 18,30"/>
+          <rect x="-5" y="90" width="10" height="25" fill="#5a3a1f"/>
+        </g>
+        <g transform="translate(200, 710)">
+          <polygon points="0,0 -24,80 24,80"/>
+          <polygon points="0,-26 -20,55 20,55"/>
+          <polygon points="0,-48 -15,26 15,26"/>
+          <rect x="-4" y="80" width="8" height="22" fill="#5a3a1f"/>
+        </g>
+        <g transform="translate(880, 690)">
+          <polygon points="0,0 -30,95 30,95"/>
+          <polygon points="0,-32 -25,63 25,63"/>
+          <polygon points="0,-60 -18,32 18,32"/>
+          <rect x="-5" y="95" width="10" height="26" fill="#5a3a1f"/>
+        </g>
+        <g transform="translate(1380, 695)">
+          <polygon points="0,0 -26,88 26,88"/>
+          <polygon points="0,-28 -22,58 22,58"/>
+          <polygon points="0,-52 -16,28 16,28"/>
+          <rect x="-4" y="88" width="8" height="24" fill="#5a3a1f"/>
+        </g>
+        <g transform="translate(1720, 705)">
+          <polygon points="0,0 -22,78 22,78"/>
+          <polygon points="0,-24 -18,52 18,52"/>
+          <polygon points="0,-45 -13,24 13,24"/>
+          <rect x="-4" y="78" width="8" height="22" fill="#5a3a1f"/>
+        </g>
+      </g>
+
+      <!-- Pine trees (front layer, larger) -->
+      <g fill="#1c5520">
+        <g transform="translate(80, 820)">
+          <polygon points="0,0 -50,160 50,160"/>
+          <polygon points="0,-50 -42,100 42,100"/>
+          <polygon points="0,-95 -32,50 32,50"/>
+          <rect x="-8" y="160" width="16" height="45" fill="#4a2d14"/>
+        </g>
+        <g transform="translate(260, 835)">
+          <polygon points="0,0 -42,140 42,140"/>
+          <polygon points="0,-42 -35,88 35,88"/>
+          <polygon points="0,-80 -26,44 26,44"/>
+          <rect x="-7" y="140" width="14" height="40" fill="#4a2d14"/>
+        </g>
+        <g transform="translate(480, 825)">
+          <polygon points="0,0 -48,155 48,155"/>
+          <polygon points="0,-48 -40,96 40,96"/>
+          <polygon points="0,-90 -30,48 30,48"/>
+          <rect x="-7" y="155" width="14" height="42" fill="#4a2d14"/>
+        </g>
+        <g transform="translate(1200, 820)">
+          <polygon points="0,0 -52,170 52,170"/>
+          <polygon points="0,-52 -44,106 44,106"/>
+          <polygon points="0,-98 -34,54 34,54"/>
+          <rect x="-8" y="170" width="16" height="48" fill="#4a2d14"/>
+        </g>
+        <g transform="translate(1500, 830)">
+          <polygon points="0,0 -44,145 44,145"/>
+          <polygon points="0,-44 -36,90 36,90"/>
+          <polygon points="0,-82 -27,46 27,46"/>
+          <rect x="-7" y="145" width="14" height="42" fill="#4a2d14"/>
+        </g>
+        <g transform="translate(1820, 815)">
+          <polygon points="0,0 -50,165 50,165"/>
+          <polygon points="0,-50 -42,104 42,104"/>
+          <polygon points="0,-94 -32,52 32,52"/>
+          <rect x="-8" y="165" width="16" height="46" fill="#4a2d14"/>
+        </g>
+      </g>
+
+      <!-- Grass blades -->
+      <g fill="#26732a">
+        <path d="M340,1030 L336,1005 L342,1030 Z"/>
+        <path d="M360,1040 L356,1018 L362,1040 Z"/>
+        <path d="M700,1035 L696,1012 L702,1035 Z"/>
+        <path d="M720,1040 L716,1020 L722,1040 Z"/>
+        <path d="M1080,1030 L1076,1008 L1082,1030 Z"/>
+        <path d="M1440,1040 L1436,1018 L1442,1040 Z"/>
+        <path d="M1780,1035 L1776,1012 L1782,1035 Z"/>
+      </g>
+
+      <!-- Small flowers -->
+      <g>
+        <circle cx="400" cy="1045" r="3" fill="#ffd84d"/>
+        <circle cx="820" cy="1050" r="3" fill="#ff7eb3"/>
+        <circle cx="1300" cy="1048" r="3" fill="#ffd84d"/>
+        <circle cx="1680" cy="1045" r="3" fill="#ff7eb3"/>
+        <circle cx="1100" cy="1055" r="2.5" fill="#fff"/>
+      </g>
+    </svg>
+    <!-- Dim layer for card contrast -->
+    <div class="bg-dim"></div>
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">TKL</div>
+        <h2>OEE System Login</h2>
+        <p>Masukkan PIN Akses Operator / Admin</p>
       </div>
-      <div style="display:flex; align-items:center; gap:8px; margin: 16px 0 20px;">
-        <input type="checkbox" id="rememberMe" style="width:16px; height:16px; accent-color:var(--green-d); cursor:pointer;">
-        <label for="rememberMe" style="font:500 13px var(--body); color:#475569; cursor:pointer; user-select:none;">Ingat saya di perangkat ini</label>
-      </div>
-      <button type="submit" class="login-btn">Masuk Aplikasi</button>
-    </form>
-    <div style="text-align:center; margin-top:20px; font:11.5px var(--mono); color:#94a3b8;">
-      Default PIN: <b>2026</b>
+      <div id="loginError" class="login-error">PIN Akses Salah! Silakan coba lagi.</div>
+      <form id="loginForm" class="login-form">
+        <div class="field">
+          <label for="loginPin">PIN Akses</label>
+          <input type="password" id="loginPin" placeholder="••••" maxlength="10" required autofocus autocomplete="current-password">
+        </div>
+        <div class="login-remember">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe">Ingat saya di perangkat ini</label>
+        </div>
+        <button type="submit" class="login-btn">Masuk Aplikasi</button>
+      </form>
+      <div class="login-hint">Default PIN: <b id="defaultPinHint">2026</b></div>
     </div>
   </div>
-</div>
 
-<div id="appContainer">
-  <div class="toolbar">
-    <div class="twrap">
-      <span class="pos" id="pos"><span class="pos-dot"></span>SIAP · KLIK SEL / MULAI KETIK</span>
-      <div class="navmode" title="Pilih mode navigasi Tab / Enter">
-        <span class="nm-cap">MODE TAB</span>
-        <button type="button" data-mode="v" class="on">⇅ VERTIKAL</button>
-        <button type="button" data-mode="h">⇄ HORIZONTAL</button>
-      </div>
-      <div class="shiftsel" title="Shift evaluasi & komponen kunci simpan">
-        <span class="nm-cap">SHIFT</span>
-        <button type="button" data-shift="0" class="on">S1·510</button>
-        <button type="button" data-shift="1">S2·480</button>
-        <button type="button" data-shift="2">S3·450</button>
-      </div>
-      <span class="hint" id="hint"></span>
-      <span class="spacer"></span>
-      <span id="lastSaved"></span>
-      <button class="btn btn-install" id="pwa-install-btn">📱 Install Aplikasi</button>
-      <a href="https://docs.google.com/spreadsheets/d/16N5vCzssLshBb3_eKqOq9wRdAtr9NkM4E_CXHC3yFTI/edit?gid=1800639959#gid=1800639959" target="_blank" class="btn btn-ghost" title="Buka Database Spreadsheet">📂 Lihat Database</a>
-      <button class="btn btn-ghost btn-logout" id="btnLogout" type="button" onclick="handleLogout()" title="Keluar sesi">🔒 Keluar</button>
-      <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
-      <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
-    </div>
-  </div>
+  <!-- ============ MAIN APP ============ -->
+  <div id="appContainer">
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="twrap">
+        <span class="pos" id="pos"><span class="pos-dot"></span>SIAP · KLIK SEL / MULAI KETIK</span>
 
-  <div class="sheet">
-    <div class="hwrap">
-      <div class="brand">
-        <div class="mark">TKL</div>
-        <div>
-          <div class="kicker">TKL-Produksi-OEE 2026 · SYSTEM</div>
-          <h1>Log Sheet &amp; Perhitungan OEE</h1>
-          <div class="sub">Availability · Performance · Quality — Overall Equipment Effectiveness</div>
+        <div class="navmode" title="Mode navigasi Tab">
+          <span class="nm-cap">MODE TAB</span>
+          <button type="button" data-mode="v" class="on">⇅ VERTIKAL</button>
+          <button type="button" data-mode="h">⇄ HORIZONTAL</button>
         </div>
-      </div>
-      <div class="hud">
-        <div>
-          <div class="clock" id="clock">--:--:--</div>
-          <div class="date" id="dateEl">—</div>
-        </div>
-        <div class="led"><i></i>LIVE</div>
-      </div>
-    </div>
-    <div class="stripe"></div>
 
-    <section class="sec">
-      <div class="sec-h">
-        <span class="no">📊</span>
-        <div>
-          <h2>Data &amp; Penyimpanan</h2>
-          <div class="sub2">Satu slot per Tanggal · Shift · Line · Tahapan — sinkron otomatis via Google Sheets</div>
+        <div class="shiftsel" title="Shift evaluasi">
+          <span class="nm-cap">SHIFT</span>
+          <button type="button" data-shift="0" class="on">S1·510</button>
+          <button type="button" data-shift="1">S2·480</button>
+          <button type="button" data-shift="2">S3·450</button>
         </div>
+
+        <span class="hint" id="hint"></span>
         <span class="spacer"></span>
-        <span id="syncStatus" class="edit-info"><i class="sync-dot"></i>tersambung otomatis</span>
-      </div>
-      <div class="filter-grid">
-        <div class="field" style="margin-bottom:0">
-          <label>Tanggal <span class="unit">log sheet</span></label>
-          <input type="date" id="fDate">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Line <span class="unit">produksi</span></label>
-          <select id="fLine">
-            <option value="1">Line 1</option>
-            <option value="2">Line 2</option>
-            <option value="4">Line 4</option>
-          </select>
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Tahapan Proses</label>
-          <select id="fStage">
-            <option value="mixing">Mixing</option>
-            <option value="filling">Filling</option>
-            <option value="steril">Steril</option>
-            <option value="visual">Visual</option>
-            <option value="kemas">Kemas</option>
-          </select>
-        </div>
-      </div>
-    </section>
+        <span id="lastSaved"></span>
 
-    <section class="sec">
-      <div class="sec-h">
-        <span class="no">👤</span>
-        <div>
-          <h2>Inisial Operator</h2>
-          <div class="sub2">Masukkan inisial operator yang bertugas pada shift ini (maksimal 3 huruf per kolom)</div>
-        </div>
+        <button class="btn btn-install" id="pwa-install-btn" type="button">📱 Install Aplikasi</button>
+        <a href="#" id="dbLink" target="_blank" class="btn btn-ghost" title="Buka Database">📂 Lihat Database</a>
+        <button class="btn btn-ghost btn-logout" id="btnLogout" type="button" title="Keluar sesi">🔒 Keluar</button>
+        <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
+        <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
       </div>
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px;">
-        <div class="field" style="margin-bottom:0"><label>Operator 1</label><input type="text" id="op1" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
-        <div class="field" style="margin-bottom:0"><label>Operator 2</label><input type="text" id="op2" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
-        <div class="field" style="margin-bottom:0"><label>Operator 3</label><input type="text" id="op3" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
-        <div class="field" style="margin-bottom:0"><label>Operator 4</label><input type="text" id="op4" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
-        <div class="field" style="margin-bottom:0"><label>Operator 5</label><input type="text" id="op5" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
-        <div class="field" style="margin-bottom:0"><label>Operator 6</label><input type="text" id="op6" maxlength="3" placeholder="---" style="text-align:center; text-transform:uppercase;" class="mono"></div>
-      </div>
-    </section>
-
-    <section class="sec">
-      <div class="sec-h">
-        <span class="no">⚙️</span>
-        <div>
-          <h2>Master Produk &amp; Kecepatan Standar</h2>
-          <div class="sub2">Daftarkan produk yang berjalan pada shift ini beserta kecepatan standarnya (unit/menit)</div>
-        </div>
-      </div>
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
-        <div class="field" style="margin-bottom:0">
-          <label>Produk 1 (Nama &amp; Kecepatan)</label>
-          <div style="display:flex; gap:6px;">
-            <input type="text" id="prodName1" placeholder="Misal: VTTS1 L030001" style="flex:2;">
-            <input type="number" id="prodRate1" placeholder="Rate/mnt" style="flex:1;" inputmode="decimal">
-          </div>
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Produk 2 (Cadangan)</label>
-          <div style="display:flex; gap:6px;">
-            <input type="text" id="prodName2" placeholder="Misal: VPEL1 L027001" style="flex:2;">
-            <input type="number" id="prodRate2" placeholder="Rate/mnt" style="flex:1;" inputmode="decimal">
-          </div>
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Produk 3 (Cadangan)</label>
-          <div style="display:flex; gap:6px;">
-            <input type="text" id="prodName3" placeholder="Misal: PROD-C" style="flex:2;">
-            <input type="number" id="prodRate3" placeholder="Rate/mnt" style="flex:1;" inputmode="decimal">
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="sec">
-      <div class="sec-h">
-        <span class="no">01</span>
-        <div>
-          <h2>Log Sheet Harian</h2>
-          <div class="sub2">Jam Selesai otomatis = Jam Mulai baris berikutnya · ketik 0740 → 07:40 · default 30 baris</div>
-        </div>
-      </div>
-      <div class="legend">
-        <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned Down Time (Putih)</span>
-        <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned Down Time (Merah)</span>
-        <span class="lg"><i class="sw sw-g"></i>Kode 2 / Lainnya → Produksi terencana (Hijau)</span>
-      </div>
-
-      <div class="col-toggle-bar">
-        <span>Tampilkan Kolom:</span>
-        <label><input type="checkbox" data-col="col-num" checked> #</label>
-        <label><input type="checkbox" data-col="col-kode" checked> Kode</label>
-        <label><input type="checkbox" data-col="col-mulai" checked> Jam Mulai</label>
-        <label><input type="checkbox" data-col="col-panggil" checked> Panggil Teknik</label>
-        <label><input type="checkbox" data-col="col-teknik" checked> Teknik Datang</label>
-        <label><input type="checkbox" data-col="col-selesai" checked> Jam Selesai</label>
-        <label><input type="checkbox" data-col="col-durasi" checked> Durasi</label>
-        <label><input type="checkbox" data-col="col-kegiatan" checked> Kegiatan</label>
-        <label><input type="checkbox" data-col="col-masalah" checked> Masalah / Penyebab</label>
-        <label><input type="checkbox" data-col="col-disposisi" checked> Disposisi / Tindakan</label>
-        <label><input type="checkbox" data-col="col-wo" checked> No. WO</label>
-        <label><input type="checkbox" data-col="col-batch" checked> Produk &amp; Batch</label>
-        <label><input type="checkbox" data-col="col-good" checked> Good</label>
-        <label><input type="checkbox" data-col="col-defect" checked> Defect</label>
-        <label><input type="checkbox" data-col="col-aksi" checked> Aksi</label>
-      </div>
-
-      <div class="tbl-wrap">
-        <table class="log">
-          <thead>
-            <tr>
-              <th class="col-num" style="width:40px;text-align:center" rowspan="2">#</th>
-              <th class="col-kode" style="width:58px" rowspan="2">Kode</th>
-              <th class="col-mulai" style="width:86px" rowspan="2">Jam Mulai</th>
-              <th class="col-panggil" style="width:96px" rowspan="2">Panggil Teknik</th>
-              <th class="col-teknik" style="width:92px" rowspan="2">Teknik Datang</th>
-              <th class="col-selesai" style="width:86px" rowspan="2">Jam Selesai</th>
-              <th class="col-durasi" style="width:70px" rowspan="2">Durasi (m)</th>
-              <th class="col-kegiatan" rowspan="2">Kegiatan</th>
-              <th class="col-masalah" rowspan="2">Masalah / Penyebab (Alasan yang terjadi masalah)</th>
-              <th class="col-disposisi" rowspan="2">Disposisi / Tindakan Sementara (Tindakan pengatasan)</th>
-              <th class="col-wo" style="width:110px" rowspan="2">Nomor WO (Wajib tulis)</th>
-              <th class="col-batch" rowspan="2">Kode Produk &amp; Batch Number</th>
-              <th colspan="2" style="text-align:center;">Total Output</th>
-              <th class="col-aksi" style="width:42px" rowspan="2">Aksi</th>
-            </tr>
-            <tr>
-              <th class="col-good" style="width:110px;text-align:center;">Good</th>
-              <th class="col-defect" style="width:110px;text-align:center;">Defect</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-          <tfoot>
-            <tr style="background:#f4f7f9;border-top:2px solid var(--line);">
-              <td style="text-align:center;padding:10px 6px;" colspan="6">
-                <span style="font:600 13px var(--mono);color:var(--ink);">TOTAL DURASI TERCATAT</span>
-              </td>
-              <td style="text-align:center;padding:10px 6px;">
-                <b id="totalDurasi" style="font:700 16px var(--mono);color:var(--green-d);">0</b>
-                <span style="font:12px var(--mono);color:var(--mut);"> mnt</span>
-              </td>
-              <td colspan="8" style="text-align:left;font:11px var(--mono);color:var(--mut);padding-left:12px;">
-                dari <span id="maxShiftMnt">510</span> mnt
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-      <button class="btn btn-add" id="btnAdd" type="button">+ Tambah Baris</button>
-      <div class="sec-f">
-        <span>Σ durasi tercatat: <b id="sumDur">0</b> / <span id="maxShiftMnt2">510</span> mnt</span><span>·</span>
-        <span><b id="rowN">0</b> baris</span>
-        <span class="spacer"></span>
-        <span>Tanda ":" dipasang otomatis saat mengetik jam</span>
-      </div>
-    </section>
-
-    <section class="sec">
-      <div class="sec-h">
-        <span class="no">📊</span>
-        <div>
-          <h2>Rincian Performa Per Produk</h2>
-          <div class="sub2">Breakdown target, durasi, dan % performance masing-masing produk pada shift ini</div>
-        </div>
-      </div>
-      <div class="tbl-wrap">
-        <table class="shift" id="tblProdDetail">
-          <thead>
-            <tr>
-              <th>Nama Produk</th>
-              <th title="Total durasi produk berjalan di log sheet">Durasi (mnt)</th>
-              <th title="Kecepatan standar (unit/menit)">Rate (u/mnt)</th>
-              <th title="Target G = Durasi × Rate">Target (G)</th>
-              <th title="Aktual (Good + Defect) yang diinput pada log ber-produk terkait">Aktual (H)</th>
-              <th title="Performance = Aktual ÷ Target × 100">% Perf</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyProdDetail"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="sec">
-      <div class="sec-h">
-        <span class="no">02</span>
-        <div>
-          <h2>Perhitungan Pencapaian OEE</h2>
-          <div class="sub2" id="rincSub">Evaluasi Shift 1 · A = 510 mnt</div>
-        </div>
-      </div>
-      
-      <div class="tbl-wrap">
-        <table class="oee-matrix-tbl">
-          <thead>
-            <tr>
-              <th colspan="2" style="text-align:left; padding-left:14px;">% Availability, Performance, &amp; Quality</th>
-              <th id="thProd1" style="width:130px; text-align:right;">Produk 1</th>
-              <th id="thProd2" style="width:130px; text-align:right;">Produk 2</th>
-              <th id="thProd3" style="width:130px; text-align:right;">Produk 3</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="sec-header"><td colspan="5">% Availability</td></tr>
-            <tr><td class="code-col">A</td><td class="desc-col">Waktu Operasional Pabrik (menit) → Sh1=510, Sh2=510, Sh3=495</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oA">510</span> mnt</td></tr>
-            <tr><td class="code-col">B</td><td class="desc-col">Waktu Berhenti Terencana (menit) → (Total keg. kode 5,6,7,8)</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oB">0</span> mnt</td></tr>
-            <tr><td class="code-col">C</td><td class="desc-col">Waktu Produksi Terencana (menit) → ( A − B )</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oC">510</span> mnt</td></tr>
-            <tr><td class="code-col">D</td><td class="desc-col">Waktu Berhenti Tidak Terencana (menit) → (Total keg. kode 1,3,4,9)</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oD">0</span> mnt</td></tr>
-            <tr><td class="code-col">E</td><td class="desc-col">Waktu Operasional (menit) → ( C − D )</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oE">510</span> mnt</td></tr>
-            <tr><td class="code-col">F</td><td class="desc-col"><b>% A</b> → ( E ÷ C )<br><span style="font-size:11px;color:var(--mut)">Target %A = 90%</span></td><td class="val-col" style="text-align:center;font-size:15px;" colspan="3"><span id="oF">0,00</span> %</td></tr>
-
-            <tr class="sec-header"><td colspan="5">% Performance (Breakdown per Produk)</td></tr>
-            <tr><td class="code-col">G</td><td class="desc-col">Target output produksi → (Kec. Standar × Durasi produk)</td><td class="val-col"><span id="oG1">0</span> unit</td><td class="val-col"><span id="oG2">0</span> unit</td><td class="val-col"><span id="oG3">0</span> unit</td></tr>
-            <tr><td class="code-col">H</td><td class="desc-col">Total output produksi aktual (Good + Defect)</td><td class="val-col"><span id="oH1">0</span> unit</td><td class="val-col"><span id="oH2">0</span> unit</td><td class="val-col"><span id="oH3">0</span> unit</td></tr>
-            <tr>
-              <td class="code-col">I</td>
-              <td class="desc-col">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span><b>% P</b> → ( H ÷ G ) per produk &amp; Rata-rata</span>
-                  <span id="badgeAvgP" style="background:var(--green-bg); color:var(--green-d); padding:2px 8px; border-radius:6px; font-weight:700; font-size:13px; border:1px solid rgba(18,161,80,0.3);">Average: <span id="oITotal">0,00</span> %</span>
-                </div>
-                <span style="font-size:11px;color:var(--mut)">Target %P = 98%</span>
-              </td>
-              <td class="val-col" id="colI1"><span id="oI1">0,00</span> %</td>
-              <td class="val-col" id="colI2"><span id="oI2">0,00</span> %</td>
-              <td class="val-col" id="colI3"><span id="oI3">0,00</span> %</td>
-            </tr>
-
-            <tr class="sec-header"><td colspan="5">% Quality</td></tr>
-            <tr><td class="code-col">J</td><td class="desc-col">Total output produksi (actual total = Good + Defect)</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oJ">0</span> unit</td></tr>
-            <tr><td class="code-col">K</td><td class="desc-col">Total Defect / produk cacat (actual)</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oK">0</span> unit</td></tr>
-            <tr><td class="code-col">L</td><td class="desc-col">Total Produksi Bagus (Good Quality) → ( J − K )</td><td class="val-col" style="text-align:center;" colspan="3"><span id="oL">0</span> unit</td></tr>
-            <tr><td class="code-col">M</td><td class="desc-col"><b>% Q</b> → ( L ÷ J )<br><span style="font-size:11px;color:var(--mut)">Target %Q = 99,50%</span></td><td class="val-col" style="text-align:center;" colspan="3"><span id="oM">0,00</span> %</td></tr>
-
-            <tr class="highlight-res">
-              <td colspan="2" style="text-align:right;letter-spacing:1px;font-family:var(--disp);font-size:16px;">
-                % OVERALL EQUIPMENT EFFECTIVENESS (OEE) &nbsp;·&nbsp; <span style="font-size:11px;color:#7fd7a8">Target %OEE = 88%</span><br>
-                <span style="font-size:10px;color:#94a3b8;font-weight:400;">OEE = %Availability × %Performance (Average) × %Quality</span>
-              </td>
-              <td style="text-align:right;font-size:22px;font-family:var(--disp);" colspan="3" id="oee">0,00%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="diag" id="diag" style="margin-top:14px;"></div>
-    </section>
-
-    <div style="display:none;">
-      <input id="hActual" value="0">
-      <input id="defect" value="0">
-      <input id="stdRate" value="0">
     </div>
 
-    <div class="sheet-f">
-      <span><kbd>Ctrl</kbd>+<kbd>S</kbd> simpan cepat &amp; sinkron cloud</span>
-      <span>Shift: S1 07.00–15.30 · S2 15.30–23.30 · S3 23.30–07.00</span>
-      <span>TKL-Produksi-OEE 2026 System</span>
+    <!-- Sheet -->
+    <div class="sheet">
+      <!-- Header -->
+      <div class="hwrap">
+        <div class="brand">
+          <div class="mark">TKL</div>
+          <div>
+            <div class="kicker">TKL-Produksi-OEE 2026 · SYSTEM</div>
+            <h1>Log Sheet &amp; Perhitungan OEE</h1>
+            <div class="sub">Availability · Performance · Quality — Overall Equipment Effectiveness</div>
+          </div>
+        </div>
+        <div class="hud">
+          <div>
+            <div class="clock" id="clock">--:--:--</div>
+            <div class="date" id="dateEl">—</div>
+          </div>
+          <div class="led"><i></i>LIVE</div>
+        </div>
+      </div>
+      <div class="stripe"></div>
+
+      <!-- Section: Filter Data -->
+      <section class="sec">
+        <div class="sec-h">
+          <span class="no">📊</span>
+          <div>
+            <h2>Data &amp; Penyimpanan</h2>
+            <div class="sub2">Satu slot per Tanggal · Shift · Line · Tahapan — sinkron otomatis via Google Sheets</div>
+          </div>
+          <span class="spacer"></span>
+          <span id="syncStatus" class="edit-info"><i class="sync-dot"></i>tersambung otomatis</span>
+        </div>
+        <div class="filter-grid">
+          <div class="field"><label>Tanggal <span class="unit">log sheet</span></label><input type="date" id="fDate"></div>
+          <div class="field"><label>Line <span class="unit">produksi</span></label>
+            <select id="fLine">
+              <option value="1">Line 1</option><option value="2">Line 2</option><option value="4">Line 4</option>
+            </select>
+          </div>
+          <div class="field"><label>Tahapan Proses</label>
+            <select id="fStage">
+              <option value="mixing">Mixing</option><option value="filling">Filling</option>
+              <option value="steril">Steril</option><option value="visual">Visual</option><option value="kemas">Kemas</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Operator -->
+      <section class="sec">
+        <div class="sec-h">
+          <span class="no">👤</span>
+          <div><h2>Inisial Operator</h2><div class="sub2">Masukkan inisial operator (maks. 3 huruf per kolom)</div></div>
+        </div>
+        <div class="operator-grid">
+          <div class="field"><label>Operator 1</label><input type="text" id="op1" maxlength="3" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 2</label><input type="text" id="op2" maxlength="3" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 3</label><input type="text" id="op3" maxlength="3" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 4</label><input type="text" id="op4" maxlength="3" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 5</label><input type="text" id="op5" maxlength="3" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 6</label><input type="text" id="op6" maxlength="3" placeholder="---" class="mono"></div>
+        </div>
+      </section>
+
+      <!-- Section: Master Produk -->
+      <section class="sec">
+        <div class="sec-h">
+          <span class="no">⚙️</span>
+          <div><h2>Master Produk &amp; Kecepatan Standar</h2><div class="sub2">Daftarkan produk &amp; kecepatan standarnya (unit/menit)</div></div>
+        </div>
+        <div class="product-grid">
+          <div class="field">
+            <label>Produk 1 (Nama &amp; Kecepatan)</label>
+            <div class="split-input">
+              <input type="text" id="prodName1" placeholder="Misal: VTTS1 L030001">
+              <input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal">
+            </div>
+          </div>
+          <div class="field">
+            <label>Produk 2 (Cadangan)</label>
+            <div class="split-input">
+              <input type="text" id="prodName2" placeholder="Misal: VPEL1 L027001">
+              <input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal">
+            </div>
+          </div>
+          <div class="field">
+            <label>Produk 3 (Cadangan)</label>
+            <div class="split-input">
+              <input type="text" id="prodName3" placeholder="Misal: PROD-C">
+              <input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Log Sheet Harian -->
+      <section class="sec">
+        <div class="sec-h">
+          <span class="no">01</span>
+          <div><h2>Log Sheet Harian</h2><div class="sub2">Jam Selesai otomatis = Jam Mulai baris berikutnya · ketik 0740 → 07:40</div></div>
+        </div>
+
+        <div class="legend">
+          <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned Down Time (Putih)</span>
+          <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned Down Time (Merah)</span>
+          <span class="lg"><i class="sw sw-g"></i>Kode 2 / Lainnya → Produksi (Hijau)</span>
+        </div>
+
+        <div class="col-toggle-bar">
+          <span>Tampilkan Kolom:</span>
+          <label><input type="checkbox" data-col="col-num" checked> #</label>
+          <label><input type="checkbox" data-col="col-kode" checked> Kode</label>
+          <label><input type="checkbox" data-col="col-mulai" checked> Jam Mulai</label>
+          <label><input type="checkbox" data-col="col-panggil" checked> Panggil Teknik</label>
+          <label><input type="checkbox" data-col="col-teknik" checked> Teknik Datang</label>
+          <label><input type="checkbox" data-col="col-selesai" checked> Jam Selesai</label>
+          <label><input type="checkbox" data-col="col-durasi" checked> Durasi</label>
+          <label><input type="checkbox" data-col="col-kegiatan" checked> Kegiatan</label>
+          <label><input type="checkbox" data-col="col-masalah" checked> Masalah</label>
+          <label><input type="checkbox" data-col="col-disposisi" checked> Disposisi</label>
+          <label><input type="checkbox" data-col="col-wo" checked> No. WO</label>
+          <label><input type="checkbox" data-col="col-batch" checked> Batch</label>
+          <label><input type="checkbox" data-col="col-good" checked> Good</label>
+          <label><input type="checkbox" data-col="col-defect" checked> Defect</label>
+          <label><input type="checkbox" data-col="col-aksi" checked> Aksi</label>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="log">
+            <thead>
+              <tr>
+                <th class="col-num" rowspan="2">#</th>
+                <th class="col-kode" rowspan="2">Kode</th>
+                <th class="col-mulai" rowspan="2">Jam Mulai</th>
+                <th class="col-panggil" rowspan="2">Panggil Teknik</th>
+                <th class="col-teknik" rowspan="2">Teknik Datang</th>
+                <th class="col-selesai" rowspan="2">Jam Selesai</th>
+                <th class="col-durasi" rowspan="2">Durasi (m)</th>
+                <th class="col-kegiatan" rowspan="2">Kegiatan</th>
+                <th class="col-masalah" rowspan="2">Masalah / Penyebab</th>
+                <th class="col-disposisi" rowspan="2">Disposisi / Tindakan</th>
+                <th class="col-wo" rowspan="2">Nomor WO</th>
+                <th class="col-batch" rowspan="2">Kode Produk &amp; Batch</th>
+                <th colspan="2">Total Output</th>
+                <th class="col-aksi" rowspan="2">Aksi</th>
+              </tr>
+              <tr>
+                <th class="col-good">Good</th>
+                <th class="col-defect">Defect</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+            <tfoot>
+              <tr>
+                <td colspan="6"><span>TOTAL DURASI TERCATAT</span></td>
+                <td><b id="totalDurasi">0</b> <span>mnt</span></td>
+                <td colspan="8">dari <span id="maxShiftMnt">510</span> mnt</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <button class="btn btn-add" id="btnAdd" type="button">+ Tambah Baris</button>
+        <div class="sec-f">
+          <span>Σ durasi: <b id="sumDur">0</b> / <span id="maxShiftMnt2">510</span> mnt</span>
+          <span>·</span>
+          <span><b id="rowN">0</b> baris</span>
+          <span class="spacer"></span>
+          <span>Tanda ":" otomatis saat mengetik jam</span>
+        </div>
+      </section>
+
+      <!-- Section: Rincian Performa Produk -->
+      <section class="sec">
+        <div class="sec-h">
+          <span class="no">📊</span>
+          <div><h2>Rincian Performa Per Produk</h2><div class="sub2">Breakdown target &amp; % performance masing-masing produk</div></div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="shift" id="tblProdDetail">
+            <thead>
+              <tr>
+                <th>Nama Produk</th><th>Durasi (mnt)</th><th>Rate (u/mnt)</th>
+                <th>Target (G)</th><th>Aktual (H)</th><th>% Perf</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyProdDetail"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section: OEE Matrix -->
+      <section class="sec">
+        <div class="sec-h">
+          <span class="no">02</span>
+          <div><h2>Perhitungan Pencapaian OEE</h2><div class="sub2" id="rincSub">Evaluasi Shift 1 · A = 510 mnt</div></div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="oee-matrix-tbl">
+            <thead>
+              <tr>
+                <th colspan="2">% Availability, Performance, &amp; Quality</th>
+                <th id="thProd1">Produk 1</th>
+                <th id="thProd2">Produk 2</th>
+                <th id="thProd3">Produk 3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="sec-header"><td colspan="5">% Availability</td></tr>
+              <tr><td class="code-col">A</td><td class="desc-col">Waktu Operasional Pabrik (menit)</td><td class="val-col" colspan="3"><span id="oA">510</span> mnt</td></tr>
+              <tr><td class="code-col">B</td><td class="desc-col">Waktu Berhenti Terencana (kode 5,6,7,8)</td><td class="val-col" colspan="3"><span id="oB">0</span> mnt</td></tr>
+              <tr><td class="code-col">C</td><td class="desc-col">Waktu Produksi Terencana (A − B)</td><td class="val-col" colspan="3"><span id="oC">510</span> mnt</td></tr>
+              <tr><td class="code-col">D</td><td class="desc-col">Waktu Berhenti Tidak Terencana (kode 1,3,4,9)</td><td class="val-col" colspan="3"><span id="oD">0</span> mnt</td></tr>
+              <tr><td class="code-col">E</td><td class="desc-col">Waktu Operasional (C − D)</td><td class="val-col" colspan="3"><span id="oE">510</span> mnt</td></tr>
+              <tr><td class="code-col">F</td><td class="desc-col"><b>% A</b> → (E ÷ C)<br><small>Target 90%</small></td><td class="val-col" colspan="3"><span id="oF">0,00</span> %</td></tr>
+
+              <tr class="sec-header"><td colspan="5">% Performance</td></tr>
+              <tr><td class="code-col">G</td><td class="desc-col">Target output (Rate × Durasi)</td><td class="val-col"><span id="oG1">0</span> unit</td><td class="val-col"><span id="oG2">0</span> unit</td><td class="val-col"><span id="oG3">0</span> unit</td></tr>
+              <tr><td class="code-col">H</td><td class="desc-col">Output aktual (Good + Defect)</td><td class="val-col"><span id="oH1">0</span> unit</td><td class="val-col"><span id="oH2">0</span> unit</td><td class="val-col"><span id="oH3">0</span> unit</td></tr>
+              <tr>
+                <td class="code-col">I</td>
+                <td class="desc-col">
+                  <div class="perf-head">
+                    <span><b>% P</b> → (H ÷ G) per produk &amp; Rata-rata</span>
+                    <span id="badgeAvgP" class="badge-avg">Average: <span id="oITotal">0,00</span> %</span>
+                  </div>
+                  <small>Target %P = 98%</small>
+                </td>
+                <td class="val-col" id="colI1"><span id="oI1">0,00</span> %</td>
+                <td class="val-col" id="colI2"><span id="oI2">0,00</span> %</td>
+                <td class="val-col" id="colI3"><span id="oI3">0,00</span> %</td>
+              </tr>
+
+              <tr class="sec-header"><td colspan="5">% Quality</td></tr>
+              <tr><td class="code-col">J</td><td class="desc-col">Total output (Good + Defect)</td><td class="val-col" colspan="3"><span id="oJ">0</span> unit</td></tr>
+              <tr><td class="code-col">K</td><td class="desc-col">Total Defect</td><td class="val-col" colspan="3"><span id="oK">0</span> unit</td></tr>
+              <tr><td class="code-col">L</td><td class="desc-col">Good Quality (J − K)</td><td class="val-col" colspan="3"><span id="oL">0</span> unit</td></tr>
+              <tr><td class="code-col">M</td><td class="desc-col"><b>% Q</b> → (L ÷ J)<br><small>Target 99,50%</small></td><td class="val-col" colspan="3"><span id="oM">0,00</span> %</td></tr>
+
+              <tr class="highlight-res">
+                <td colspan="2"><span class="oee-title">% OVERALL EQUIPMENT EFFECTIVENESS (OEE)</span><br><small>Target 88% · A × P × Q</small></td>
+                <td colspan="3" id="oee">0,00%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="diag" id="diag"></div>
+      </section>
+
+      <!-- Footer sheet -->
+      <div class="sheet-f">
+        <span><kbd>Ctrl</kbd>+<kbd>S</kbd> simpan cepat &amp; sinkron cloud</span>
+        <span>Shift: S1 07.00–15.30 · S2 15.30–23.30 · S3 23.30–07.00</span>
+        <span>TKL-Produksi-OEE 2026 System</span>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="toast"></div>
-
-<script>
-var CORRECT_PIN = '2026';
-var AUTH_KEY = 'fima_oee_logged_in';
-
-function handleLogin(e){
-  e.preventDefault();
-  var pinInput = document.getElementById('loginPin').value.trim();
-  var remember = document.getElementById('rememberMe').checked;
-  var errEl = document.getElementById('loginError');
-
-  if(pinInput === CORRECT_PIN){
-    errEl.classList.remove('show');
-    if(remember){
-      localStorage.setItem(AUTH_KEY, 'true');
-    } else {
-      sessionStorage.setItem(AUTH_KEY, 'true');
-    }
-    initAppSession();
-  } else {
-    errEl.classList.add('show');
-    document.getElementById('loginPin').value = '';
-    document.getElementById('loginPin').focus();
-  }
-}
-
-function handleLogout(){
-  localStorage.removeItem(AUTH_KEY);
-  sessionStorage.removeItem(AUTH_KEY);
-  document.getElementById('appContainer').classList.remove('show');
-  document.getElementById('loginOverlay').classList.remove('hide');
-  document.getElementById('loginPin').value = '';
-  document.getElementById('loginPin').focus();
-  toast('Sesi diakhiri, Anda telah keluar 🔒');
-}
-
-function initAppSession(){
-  var isLogged = localStorage.getItem(AUTH_KEY) === 'true' || sessionStorage.getItem(AUTH_KEY) === 'true';
-  if(isLogged){
-    document.getElementById('loginOverlay').classList.add('hide');
-    document.getElementById('appContainer').classList.add('show');
-    startMainApp();
-  } else {
-    document.getElementById('loginOverlay').classList.remove('hide');
-    document.getElementById('appContainer').classList.remove('show');
-  }
-}
-
-window.addEventListener('DOMContentLoaded', function(){
-  initAppSession();
-});
-
-function startMainApp(){
-'use strict';
-
-var PLANNED=new Set([5,6,7,8]), UNPLANNED=new Set([1,3,4,9]);
-var NAV_FIELDS=['kode','mulai','panggil','teknik','selesai','kegiatan','masalah','disposisi','wo','batch','good','defect'];
-var FLABEL={kode:'KODE',mulai:'JAM MULAI',panggil:'PANGGIL TEKNIK',teknik:'TEKNIK DATANG',selesai:'JAM SELESAI',kegiatan:'KEGIATAN',masalah:'MASALAH',disposisi:'DISPOSISI',wo:'NOMOR WO',batch:'PRODUK & BATCH',good:'GOOD',defect:'DEFECT'};
-var DB_KEY='fima_oee_db_v3';
-var DEFAULT_ROWS=30;
-var SHIFT_A=[510,480,450];
-
-var HARDCODED_SERVER = 'https://script.google.com/macros/s/AKfycbzO3LR5QZNxIUTLC6Htpm1z-T7oszjo1PS7s6j54g2CtfPDWCsrjH1nmDz84vkpc-32pw/exec';
-
-function shiftOf(m){ if(m==null)return null; if(m>=420&&m<930)return 0; if(m>=930&&m<1410)return 1; return 2; }
-function $(id){return document.getElementById(id);}
-var tbody=$('tbody'),posEl=$('pos'),hintEl=$('hint'),syncEl=$('syncStatus');
-var nf0=function(n){return Math.round(n).toLocaleString('id-ID');};
-var nf2=function(n){return (+n).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2});};
-var num=function(el){var v=parseFloat(String(el.value).replace(',','.'));return isFinite(v)?v:0;};
-function todayLocal(){var n=new Date();return new Date(n.getTime()-n.getTimezoneOffset()*60000).toISOString().slice(0,10);}
-
-function formatDateText(dateStr) {
-  if(!dateStr) return '';
-  var parts = dateStr.split('-');
-  if(parts.length !== 3) return dateStr;
-  var y = parts[0], m = parseInt(parts[1], 10), d = parts[2];
-  var months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  var mName = months[m - 1] || 'JAN';
-  return d + ' ' + mName + ' ' + y;
-}
-
-function parseTime(s){var m=/^\s*(\d{1,2}):(\d{2})\s*$/.exec(s||'');if(!m)return null;var h=+m[1],mi=+m[2];return (h<24&&mi<60)?h*60+mi:null;}
-function maskTime(raw){
-  raw=raw||'';
-  if(raw.indexOf(':')>=0){var p=raw.split(':');var h=p[0].replace(/\D/g,'').slice(0,2);var m=(p[1]||'').replace(/\D/g,'').slice(0,2);return (raw.slice(-1)===':'||m)?h+':'+m:h;}
-  var d=raw.replace(/\D/g,'').slice(0,4);
-  if(d.length>=3)return d.slice(0,2)+':'+d.slice(2);
-  return d;
-}
-function normTime(v){v=(v||'').trim();if(!v)return '';if(/^\d{1,2}$/.test(v))v=v.padStart(2,'0')+':00';else if(/^\d{3,4}$/.test(v)){v=v.padStart(4,'0');v=v.slice(0,2)+':'+v.slice(2);}return parseTime(v)!=null?v:null;}
-function catOf(k){
-  if(k===''||k==null)return null;
-  var n=parseInt(k,10);
-  if(isNaN(n))return null;
-  if(PLANNED.has(n))return 'planned';
-  if(UNPLANNED.has(n))return 'unplanned';
-  return 'prod';
-}
-
-function getActiveProducts(){
-  var p1 = $('prodName1').value.trim();
-  var p2 = $('prodName2').value.trim();
-  var p3 = $('prodName3').value.trim();
-  var list = [];
-  if(p1) list.push(p1);
-  if(p2) list.push(p2);
-  if(p3) list.push(p3);
-  return list;
-}
-
-function updateAllDropdowns(){
-  var prods = getActiveProducts();
-  var selects = tbody.querySelectorAll('select[data-f="batch"]');
-  selects.forEach(function(sel){
-    var currentVal = sel.value;
-    sel.innerHTML = '<option value="">-- Pilih Produk --</option>';
-    prods.forEach(function(p){
-      var opt = document.createElement('option');
-      opt.value = p;
-      opt.textContent = p;
-      if(p === currentVal) opt.selected = true;
-      sel.appendChild(opt);
-    });
-  });
-}
-
-['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3'].forEach(function(id){
-  $(id).addEventListener('input',function(){
-    updateAllDropdowns();
-    updateMatrixProductHeaders();
-    recalc();
-  });
-});
-
-function updateMatrixProductHeaders(){
-  var p1 = $('prodName1').value.trim() || 'Produk 1';
-  var p2 = $('prodName2').value.trim() || 'Produk 2';
-  var p3 = $('prodName3').value.trim() || 'Produk 3';
-  $('thProd1').textContent = p1;
-  $('thProd2').textContent = p2;
-  $('thProd3').textContent = p3;
-}
-
-function getRateForProduct(prodName){
-  if(!prodName) return 0;
-  var p1 = $('prodName1').value.trim();
-  var p2 = $('prodName2').value.trim();
-  var p3 = $('prodName3').value.trim();
-  if(prodName === p1) return parseFloat($('prodRate1').value) || 0;
-  if(prodName === p2) return parseFloat($('prodRate2').value) || 0;
-  if(prodName === p3) return parseFloat($('prodRate3').value) || 0;
-  return 0;
-}
-
-var navMode='v';
-try{navMode=localStorage.getItem('fima_nav_mode')==='h'?'h':'v';}catch(e){}
-function applyModeUI(){
-  Array.prototype.forEach.call(document.querySelectorAll('.navmode button'),function(b){b.classList.toggle('on',b.getAttribute('data-mode')===navMode);});
-  hintEl.innerHTML=navMode==='v'
-   ?'<kbd>Tab</kbd>/<kbd>Enter</kbd> ↓ kolom · <kbd>Shift+Tab</kbd> ↑ · <kbd>⌫</kbd> mundur saat kosong · <kbd>←</kbd><kbd>→</kbd> pindah kolom'
-   :'<kbd>Tab</kbd>/<kbd>Enter</kbd> → baris · <kbd>Shift+Tab</kbd> ← · <kbd>⌫</kbd> mundur saat kosong · <kbd>↑</kbd><kbd>↓</kbd> pindah baris';
-  applyTabOrder();
-}
-Array.prototype.forEach.call(document.querySelectorAll('.navmode button'),function(b){
-  b.addEventListener('click',function(){
-    navMode=b.getAttribute('data-mode');
-    try{localStorage.setItem('fima_nav_mode',navMode);}catch(e){}
-    applyModeUI();
-    toast(navMode==='v'?'Mode navigasi: ⇅ VERTIKAL':'Mode navigasi: ⇄ HORIZONTAL');
-  });
-});
-
-var evalShift=0;
-try{var _e=parseInt(localStorage.getItem('fima_eval_shift'),10);if(_e>=0&&_e<=2)evalShift=_e;}catch(e){}
-function applyShiftUI(){
-  Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),function(b){b.classList.toggle('on',parseInt(b.getAttribute('data-shift'),10)===evalShift);});
-  var maxMnt = SHIFT_A[evalShift];
-  $('rincSub').textContent='Evaluasi Shift '+(evalShift+1)+' · A = '+maxMnt+' mnt';
-  $('maxShiftMnt').textContent=maxMnt;
-  $('maxShiftMnt2').textContent=maxMnt;
-  validateAllTimeInputs();
-}
-Array.prototype.forEach.call(document.querySelectorAll('.shiftsel button'),function(b){
-  b.addEventListener('click',function(){
-    evalShift=parseInt(b.getAttribute('data-shift'),10)||0;
-    try{localStorage.setItem('fima_eval_shift',String(evalShift));}catch(e){}
-    applyShiftUI();
-    loadRecord();
-    toast('Shift '+(evalShift+1)+' · A = '+SHIFT_A[evalShift]+' mnt');
-  });
-});
-
-function autoResizeTextarea(ta){
-  if(!ta)return;
-  ta.style.height='auto';
-  ta.style.height=(ta.scrollHeight)+'px';
-}
-
-function makeRow(data){
-  var tr=document.createElement('tr');tr.className='log-row';
-  
-  var prods = getActiveProducts();
-  var optionsHtml = '<option value="">-- Pilih Produk --</option>';
-  prods.forEach(function(p){
-    optionsHtml += '<option value="'+p+'">'+p+'</option>';
-  });
-
-  tr.innerHTML=
-   '<td class="col-num" style="text-align:center;font:600 13px var(--mono);color:var(--mut);padding:4px 6px;">'+(rows().length+1)+'</td>'+
-   '<td class="col-kode"><div class="c-kode"><span class="dot"></span><input data-f="kode" data-nav class="in mono ctr" type="tel" inputmode="numeric" maxlength="2" placeholder="•" aria-label="Kode"></div></td>'+
-   '<td class="col-mulai"><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>'+
-   '<td class="col-panggil"><input data-f="panggil" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Panggil Teknik"></td>'+
-   '<td class="col-teknik"><input data-f="teknik" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Teknik Datang"></td>'+
-   '<td class="col-selesai"><input data-f="selesai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Selesai"></td>'+
-   '<td class="col-durasi dur"><b class="dur-v">—</b></td>'+
-   '<td class="col-kegiatan"><textarea data-f="kegiatan" data-nav class="in" placeholder="Kegiatan…" aria-label="Kegiatan" rows="1"></textarea></td>'+
-   '<td class="col-masalah"><textarea data-f="masalah" data-nav class="in" placeholder="Penyebab…" aria-label="Masalah" rows="1"></textarea></td>'+
-   '<td class="col-disposisi"><textarea data-f="disposisi" data-nav class="in" placeholder="Tindakan…" aria-label="Disposisi" rows="1"></textarea></td>'+
-   '<td class="col-wo"><input data-f="wo" data-nav class="in mono" placeholder="No WO…" aria-label="Nomor WO"></td>'+
-   '<td class="col-batch"><select data-f="batch" data-nav class="in mono" aria-label="Produk & Batch">'+optionsHtml+'</select></td>'+
-   '<td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Good"></td>'+
-   '<td class="col-defect"><input data-f="defect" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Defect"></td>'+
-   '<td class="col-aksi c-aksi"><button type="button" class="del" title="Hapus baris">✕</button></td>';
-   
-  if(data){
-    NAV_FIELDS.forEach(function(f){
-      var el=tr.querySelector('[data-f="'+f+'"]');
-      if(el&&data[f]!=null){
-        el.value=data[f];
-        if(f==='kegiatan'||f==='masalah'||f==='disposisi') {
-          setTimeout(function(){ autoResizeTextarea(el); }, 10);
-        }
-      }
-    });
-  }
-  tbody.appendChild(tr);applyCat(tr);
-  syncColumnVisibility();
-  return tr;
-}
-function applyCat(tr){
-  var kodeInput = tr.querySelector('[data-f="kode"]');
-  if(!kodeInput) return;
-  var v = kodeInput.value.trim();
-  var c = catOf(v);
-  if(c) tr.dataset.cat = c;
-  else delete tr.dataset.cat;
-}
-function rows(){return Array.prototype.slice.call(tbody.querySelectorAll('tr.log-row'));}
-function updateRowNumbers(){
-  var rs=rows();
-  rs.forEach(function(tr,i){
-    var numCell=tr.querySelector('.col-num');
-    if(numCell)numCell.textContent=i+1;
-  });
-}
-
-function navCells(){
-  var list=[],rs=rows();
-  if(navMode==='v'){NAV_FIELDS.forEach(function(f,ci){rs.forEach(function(r,ri){var el=r.querySelector('[data-f="'+f+'"]');if(el&&!el.closest('td').classList.contains('col-hide'))list.push({el:el,f:f,ci:ci,ri:ri});});});}
-  else{rs.forEach(function(r,ri){NAV_FIELDS.forEach(function(f,ci){var el=r.querySelector('[data-f="'+f+'"]');if(el&&!el.closest('td').classList.contains('col-hide'))list.push({el:el,f:f,ci:ci,ri:ri});});});}
-  ['hActual','defect','stdRate'].forEach(function(id){var el=$(id);if(el){list.push({el:el,f:id,ci:99,ri:-1,param:el.getAttribute('data-plabel')||id});}});
-  list.push({el:$('btnSave'),f:'save',ci:100,ri:-1,param:'SIMPAN DATA'});
-  return list;
-}
-function applyTabOrder(){
-  var cells=navCells();
-  for(var i=0;i<cells.length;i++){
-    var el=cells[i].el;
-    if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'))el.tabIndex=i+1;
-  }
-}
-function flash(el){if(!el.classList||!el.classList.contains('in'))return;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');}
-function updatePos(c){posEl.innerHTML='<span class="pos-dot"></span>'+(c.ri>=0?('BARIS '+(c.ri+1)+' · '+FLABEL[c.f]):(c.param||''));}
-function hlColumn(c){
-  var ths=document.querySelectorAll('.log th');
-  Array.prototype.forEach.call(ths,function(th){th.classList.remove('on');});
-  if(c.ri>=0){var td=c.el.closest('td'),tr=td&&td.parentElement;if(tr){var i=Array.prototype.indexOf.call(tr.children,td);if(ths[i])ths[i].classList.add('on');}}
-}
-function focusCell(c){c.el.focus();if(c.el.select)c.el.select();flash(c.el);updatePos(c);hlColumn(c);}
-
-document.addEventListener('keydown',function(e){
-  if(e.ctrlKey||e.metaKey||e.altKey)return;
-  var t=e.target;
-  if(!(t instanceof HTMLInputElement || t instanceof HTMLTextArea || t instanceof HTMLSelectElement) || !t.hasAttribute('data-nav'))return;
-  var cells=navCells(),idx=-1;
-  for(var i=0;i<cells.length;i++){if(cells[i].el===t){idx=i;break;}}
-  if(idx<0)return;
-  var cur=cells[idx],last=cells.length-1;
-  if(e.key==='Tab'){e.preventDefault();var n=e.shiftKey?idx-1:idx+1;if(n>=0&&n<=last)focusCell(cells[n]);return;}
-  if(e.key==='Enter' && t.tagName==='INPUT'){
-    e.preventDefault();
-    if(cur.f==='defect'&&cur.ri===rows().length-1&&t.value.trim()!==''){
-      var tr=makeRow();updateRowNumbers();recalc();var nc=navCells();
-      for(var j=0;j<nc.length;j++){if(nc[j].f==='kode'&&nc[j].ri===rows().length-1){focusCell(nc[j]);break;}}
-      tr.scrollIntoView({block:'nearest',behavior:'smooth'});return;
-    }
-    if(idx<last)focusCell(cells[idx+1]);return;
-  }
-  if(e.key==='ArrowDown'&&(t.tagName==='INPUT'||t.tagName==='SELECT')){e.preventDefault();var dn=null;for(var a=0;a<cells.length;a++){if(cells[a].ci===cur.ci&&cells[a].ri===cur.ri+1){dn=cells[a];break;}}focusCell(dn||(idx<last?cells[idx+1]:cur));return;}
-  if(e.key==='ArrowUp'&&(t.tagName==='INPUT'||t.tagName==='SELECT')){e.preventDefault();var up=null;for(var b=0;b<cells.length;b++){if(cells[b].ci===cur.ci&&cells[b].ri===cur.ri-1){up=cells[b];break;}}focusCell(up||(idx>0?cells[idx-1]:cur));return;}
-  if(e.key==='Backspace'&&t.value===''&&t.tagName==='INPUT'){e.preventDefault();if(idx>0)focusCell(cells[idx-1]);return;}
-  if(e.key==='ArrowLeft'&&t.selectionStart===0&&t.selectionEnd===0){var pl=null;for(var c=0;c<cells.length;c++){if(cells[c].ci===cur.ci-1&&cells[c].ri===cur.ri){pl=cells[c];break;}}if(pl){e.preventDefault();focusCell(pl);}return;}
-  if(e.key==='ArrowRight'&&t.selectionStart===t.value.length&&t.selectionEnd===t.value.length){var pr=null;for(var d=0;d<cells.length;d++){if(cells[d].ci===cur.ci+1&&cells[d].ri===cur.ri){pr=cells[d];break;}}if(pr){e.preventDefault();focusCell(pr);}}
-});
-
-function validateTimeInput(inputEl) {
-  var val = inputEl.value.trim();
-  var fieldName = inputEl.getAttribute('data-f');
-  if((fieldName !== 'mulai' && fieldName !== 'selesai') || !val || val.length < 5) {
-    inputEl.classList.remove('warn-shift');
-    return;
-  }
-  var mins = parseTime(val);
-  if(mins === null) return;
-  var actualShift = shiftOf(mins);
-  
-  if(actualShift !== evalShift) {
-    inputEl.classList.add('warn-shift');
-    toast('Pastikan shift yang anda pilih benar ⚠', true, 'warn');
-  } else {
-    inputEl.classList.remove('warn-shift');
-  }
-}
-
-function validateAllTimeInputs(){
-  rows().forEach(function(tr){
-    var mEl = tr.querySelector('[data-f="mulai"]');
-    var sEl = tr.querySelector('[data-f="selesai"]');
-    if(mEl) validateTimeInput(mEl);
-    if(sEl) validateTimeInput(sEl);
-  });
-}
-
-tbody.addEventListener('input',function(e){
-  var t=e.target;
-  if(t.tagName==='TEXTAREA' && (t.getAttribute('data-f')==='kegiatan'||t.getAttribute('data-f')==='masalah'||t.getAttribute('data-f')==='disposisi')){
-    autoResizeTextarea(t);
-  }
-  if(t.getAttribute('data-f')==='kode'){
-    t.value = t.value.replace(/\D/g,'');
-    applyCat(t.closest('tr'));
-  }
-  if(t.getAttribute('data-f')==='mulai'){
-    var tr=t.closest('tr'),prev=tr?tr.previousElementSibling:null;
-    while(prev&&!prev.classList.contains('log-row'))prev=prev.previousElementSibling;
-    if(prev){
-      var sv=prev.querySelector('[data-f="selesai"]');
-      if(sv){sv.value=t.value;sv.classList.remove('invalid');flash(sv);validateTimeInput(sv);}
-    }
-  }
-  if(t.classList.contains('t-time')){
-    var v=maskTime(t.value);
-    if(v!==t.value)t.value=v;
-    t.classList.remove('invalid');
-    validateTimeInput(t);
-  }
-  recalc();
-});
-
-tbody.addEventListener('change',function(e){
-  if(e.target.getAttribute('data-f')==='batch') recalc();
-  if(e.target.getAttribute('data-f')==='kode') applyCat(e.target.closest('tr'));
-});
-
-tbody.addEventListener('focusout',function(e){
-  var t=e.target;
-  if(t.classList&&t.classList.contains('t-time')){
-    var n=normTime(t.value);
-    if(t.value.trim()!==''&&n===null)t.classList.add('invalid');
-    else{t.value=n;t.classList.remove('invalid');}
-    validateTimeInput(t);
-    recalc();
-  }
-});
-tbody.addEventListener('click',function(e){
-  var btn=e.target.closest('.del');if(!btn)return;
-  var tr=btn.closest('tr');tr.classList.add('out');
-  setTimeout(function(){tr.remove();updateRowNumbers();if(!rows().length)makeRow();recalc();},190);
-});
-document.addEventListener('focusin',function(e){
-  var t=e.target;
-  if(!(t instanceof HTMLElement)||!t.hasAttribute('data-nav'))return;
-  var cells=navCells();
-  for(var i=0;i<cells.length;i++){if(cells[i].el===t){updatePos(cells[i]);hlColumn(cells[i]);break;}}
-});
-
-function syncColumnVisibility(){
-  var checkboxes = document.querySelectorAll('.col-toggle-bar input[type="checkbox"]');
-  checkboxes.forEach(function(chk){
-    var className = chk.getAttribute('data-col');
-    var isChecked = chk.checked;
-    var elements = document.querySelectorAll('.' + className);
-    elements.forEach(function(el){
-      if(isChecked){
-        el.classList.remove('col-hide');
-      }else{
-        el.classList.add('col-hide');
-      }
-    });
-  });
-  applyTabOrder();
-}
-
-document.querySelectorAll('.col-toggle-bar input[type="checkbox"]').forEach(function(chk){
-  chk.addEventListener('change', function(){
-    syncColumnVisibility();
-  });
-});
-
-function updateProductDetailTable() {
-  var tbodyDetail = $('tbodyProdDetail');
-  if(!tbodyDetail) return;
-  tbodyDetail.innerHTML = '';
-
-  var prods = getActiveProducts();
-  if(prods.length === 0){
-    tbodyDetail.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mut);">Belum ada produk terdaftar di Master Produk.</td></tr>';
-    return;
-  }
-
-  var summary = {};
-  prods.forEach(function(p){
-    summary[p] = { durasi: 0, rate: getRateForProduct(p), actual: 0 };
-  });
-
-  rows().forEach(function(tr){
-    var g=function(f){var el=tr.querySelector('[data-f="'+f+'"]');return el?el.value:'';};
-    var mulai=parseTime(g('mulai')), selesai=parseTime(g('selesai'));
-    var prodName = g('batch');
-    var goodVal = parseFloat(g('good').replace(',','.')) || 0;
-    var defectVal = parseFloat(g('defect').replace(',','.')) || 0;
-    var rowActual = goodVal + defectVal;
-
-    if(mulai==null||selesai==null) return;
-    var dur=(selesai-mulai+1440)%1440;
-    var si=shiftOf(mulai);
-
-    if(si === evalShift && prodName && summary[prodName]){
-      summary[prodName].durasi += dur;
-      summary[prodName].actual += rowActual;
-    }
-  });
-
-  var hasData = false;
-  prods.forEach(function(p){
-    var item = summary[p];
-    var targetG = item.durasi * item.rate;
-    var perfP = targetG > 0 ? (item.actual / targetG) * 100 : 0;
-    if(item.durasi > 0 || item.actual > 0) hasData = true;
-
-    var perfColorClass = (perfP >= 98) ? 'color:var(--green-d);font-weight:700;' : 'color:var(--red);font-weight:700;';
-
-    var tr = document.createElement('tr');
-    tr.innerHTML = 
-      '<td style="text-align:left;font-weight:600;color:var(--ink);">'+p+'</td>'+
-      '<td>'+nf0(item.durasi)+'</td>'+
-      '<td>'+nf0(item.rate)+'</td>'+
-      '<td>'+nf0(targetG)+'</td>'+
-      '<td>'+nf0(item.actual)+'</td>'+
-      '<td class="fv" style="'+perfColorClass+'">'+nf2(perfP)+' %</td>';
-    tbodyDetail.appendChild(tr);
-  });
-
-  if(!hasData){
-    tbodyDetail.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mut);">Belum ada catatan log aktif untuk produk-produk ini pada Shift '+(evalShift+1)+'.</td></tr>';
-  }
-}
-
-function recalc(){
-  var B=0,D=0,tot=0,nShift=0;
-  var sumGood=0, sumDefect=0;
-  var sh=[{B:0,D:0},{B:0,D:0},{B:0,D:0}];
-
-  var prods = getActiveProducts();
-  var pNames = [
-    $('prodName1').value.trim(),
-    $('prodName2').value.trim(),
-    $('prodName3').value.trim()
-  ];
-  var prodStats = [
-    {dur:0, rate:parseFloat($('prodRate1').value)||0, actual:0},
-    {dur:0, rate:parseFloat($('prodRate2').value)||0, actual:0},
-    {dur:0, rate:parseFloat($('prodRate3').value)||0, actual:0}
-  ];
-  
-  rows().forEach(function(tr){
-    var g=function(f){var el=tr.querySelector('[data-f="'+f+'"]');return el?el.value:'';};
-    var kode=g('kode').trim(),mulai=parseTime(g('mulai')),selesai=parseTime(g('selesai'));
-    var prodName = g('batch');
-    var durEl=tr.querySelector('.dur-v');
-    
-    var gVal = parseFloat(g('good').replace(',','.')) || 0;
-    var dVal = parseFloat(g('defect').replace(',','.')) || 0;
-    var rowActual = gVal + dVal;
-
-    sumGood += gVal;
-    sumDefect += dVal;
-
-    if(mulai==null||selesai==null){durEl.textContent='—';durEl.removeAttribute('title');return;}
-    var dur=(selesai-mulai+1440)%1440;
-    durEl.textContent=nf0(dur);
-    if(selesai<mulai)durEl.title='Lintas tengah malam (+24 jam)';else durEl.removeAttribute('title');
-    tot+=dur;
-    var c=catOf(kode),si=shiftOf(mulai);
-    if(si===evalShift)nShift++;
-
-    if(c==='planned'){B+=dur;if(si!=null)sh[si].B+=dur;}
-    else if(c==='unplanned'){D+=dur;if(si!=null)sh[si].D+=dur;}
-    else if(c==='prod'){
-      if(si === evalShift && prodName){
-        for(var i=0; i<3; i++){
-          if(pNames[i] && pNames[i] === prodName){
-            prodStats[i].dur += dur;
-            prodStats[i].actual += rowActual;
-          }
-        }
-      }
-    }
-  });
-
-  var totalOutputJ = sumGood + sumDefect;
-  $('hActual').value = totalOutputJ > 0 ? totalOutputJ : '';
-  $('defect').value = sumDefect > 0 ? sumDefect : '';
-
-  var sA=SHIFT_A[evalShift],sB=sh[evalShift].B,sC=Math.max(sA-sB,0),sD=sh[evalShift].D,sE=Math.max(sC-sD,0),sF=sC>0?sE/sC*100:0;
-  
-  $('oA').textContent=nf0(sA);
-  $('oB').textContent=nf0(sB);
-  $('oC').textContent=nf0(sC);
-  $('oD').textContent=nf0(sD);
-  $('oE').textContent=nf0(sE);
-  
-  var oFEl = $('oF');
-  oFEl.textContent = nf2(sF);
-  oFEl.style.color = (sF >= 90) ? 'var(--green-d)' : 'var(--red)';
-  oFEl.style.fontWeight = '700';
-
-  var totalPerfSum = 0;
-  var activeCount = 0;
-
-  for(var i=0; i<3; i++){
-    var gTarget = prodStats[i].dur * prodStats[i].rate;
-    var hAct = prodStats[i].actual;
-    var perfI = gTarget > 0 ? (hAct / gTarget) * 100 : 0;
-
-    if(pNames[i]) {
-      activeCount++;
-      totalPerfSum += perfI;
-    }
-
-    $('oG' + (i+1)).textContent = nf0(gTarget);
-    $('oH' + (i+1)).textContent = nf0(hAct);
-    
-    var elI = $('oI' + (i+1));
-    elI.textContent = nf2(perfI);
-    elI.style.color = (perfI >= 98) ? 'var(--green-d)' : 'var(--red)';
-    elI.style.fontWeight = '700';
-  }
-
-  var avgPerfI = activeCount > 0 ? (totalPerfSum / activeCount) : 0;
-  $('oITotal').textContent = nf2(avgPerfI);
-  var badgeAvgP = $('badgeAvgP');
-  badgeAvgP.style.color = (avgPerfI >= 98) ? 'var(--green-d)' : 'var(--red)';
-  badgeAvgP.style.borderColor = (avgPerfI >= 98) ? 'rgba(18,161,80,0.3)' : 'rgba(220,38,38,0.3)';
-
-  var K=num($('defect'));
-  var J=totalOutputJ;
-  var L=Math.max(sumGood,0);
-  var M=J>0?L/J*100:0;
-  var oee=sF*(avgPerfI)*M/10000;
-
-  $('oJ').textContent=nf0(J);
-  $('oK').textContent=nf0(K);
-  $('oL').textContent=nf0(L);
-  
-  var oMEl = $('oM');
-  oMEl.textContent=nf2(M);
-  oMEl.style.color = (M >= 99.50) ? 'var(--green-d)' : 'var(--red)';
-  oMEl.style.fontWeight = '700';
-
-  var oeeEl = $('oee');
-  oeeEl.textContent=nf2(oee)+'%';
-  oeeEl.style.color = (oee >= 88) ? '#2ee27e' : '#f87171';
-
-  var issues=[];
-  if(nShift===0)issues.push('Tidak ada baris log pada jam Shift '+(evalShift+1)+' — cek tombol SHIFT atau jam mulai.');
-  if(sC<=0)issues.push('Availability 0% — Planned DT (B) ≥ menit shift (A).');
-  else if(sE<=0)issues.push('Availability 0% — Unplanned DT (D) ≥ waktu terencana (C).');
-  if(J<=0)issues.push('Quality / Performance 0% — Output Aktual belum diisi.');
-  
-  var dEl=$('diag');
-  if(issues.length===0)dEl.innerHTML='<div class="d-item ok" style="padding:10px 14px;border-radius:8px;font-family:var(--mono);font-size:13px;background:rgba(46,226,126,0.12);border:1px solid rgba(46,226,126,0.35);color:#0c7c3d;">✓ Semua komponen lengkap — OEE = '+nf2(sF)+'% × '+nf2(avgPerfI)+'% × '+nf2(M)+'% = '+nf2(oee)+'%</div>';
-  else dEl.innerHTML=issues.map(function(s){return '<div class="d-item" style="padding:10px 14px;border-radius:8px;font-family:var(--mono);font-size:13px;background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.3);color:var(--red);">⚠ '+s+'</div>';}).join('');
-
-  updateRowNumbers();
-  $('sumDur').textContent=nf0(tot);
-  $('totalDurasi').textContent=nf0(tot);
-  $('rowN').textContent=rows().length;
-  
-  updateProductDetailTable();
-  applyTabOrder();
-}
-
-function dbGet(){try{return JSON.parse(localStorage.getItem(DB_KEY))||{};}catch(e){return {};}}
-function dbSet(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch(e){}}
-function curKey(){return ($('fDate').value||todayLocal())+'|S'+(evalShift+1)+'|L'+$('fLine').value+'|'+$('fStage').value;}
-function labelFilter(){
-  var rawDate = $('fDate').value || todayLocal();
-  return formatDateText(rawDate)
-    +' · Shift '+(evalShift+1)+' · Line '+$('fLine').value+' · '+$('fStage').value.toUpperCase();
-}
-function collect(){
-  return {
-    products:{
-      p1Name:$('prodName1').value, p1Rate:$('prodRate1').value,
-      p2Name:$('prodName2').value, p2Rate:$('prodRate2').value,
-      p3Name:$('prodName3').value, p3Rate:$('prodRate3').value
-    },
-    operators:{
-      op1:$('op1').value, op2:$('op2').value, op3:$('op3').value,
-      op4:$('op4').value, op5:$('op5').value, op6:$('op6').value
-    },
-    summary:{
-      availability: $('oF').textContent,
-      performance: $('oITotal').textContent,
-      quality: $('oM').textContent,
-      oee: $('oee').textContent
-    },
-    rows:rows().map(function(tr){
-      var g=function(f){var el=tr.querySelector('[data-f="'+f+'"]');return el?el.value:'';};
-      return {
-        kode:g('kode'), mulai:g('mulai'), panggil:g('panggil'), teknik:g('teknik'), selesai:g('selesai'),
-        kegiatan:g('kegiatan'), masalah:g('masalah'), disposisi:g('disposisi'),
-        wo:g('wo'), batch:g('batch'), good:g('good'), defect:g('defect')
-      };
-    }),
-    savedAt:new Date().toISOString()
-  };
-}
-function applyRecord(d){
-  if(d && d.products){
-    $('prodName1').value = d.products.p1Name || ''; $('prodRate1').value = d.products.p1Rate || '';
-    $('prodName2').value = d.products.p2Name || ''; $('prodRate2').value = d.products.p2Rate || '';
-    $('prodName3').value = d.products.p3Name || ''; $('prodRate3').value = d.products.p3Rate || '';
-  } else {
-    $('prodName1').value = ''; $('prodRate1').value = '';
-    $('prodName2').value = ''; $('prodRate2').value = '';
-    $('prodName3').value = ''; $('prodRate3').value = '';
-  }
-
-  if(d && d.operators){
-    $('op1').value = d.operators.op1 || ''; $('op2').value = d.operators.op2 || '';
-    $('op3').value = d.operators.op3 || ''; $('op4').value = d.operators.op4 || '';
-    $('op5').value = d.operators.op5 || ''; $('op6').value = d.operators.op6 || '';
-  } else {
-    $('op1').value = ''; $('op2').value = ''; $('op3').value = '';
-    $('op4').value = ''; $('op5').value = ''; $('op6').value = '';
-  }
-
-  tbody.innerHTML='';
-  updateAllDropdowns();
-  updateMatrixProductHeaders();
-  if(d&&d.rows&&d.rows.length){d.rows.forEach(function(r){makeRow(r);});}
-  else{for(var i=0;i<DEFAULT_ROWS;i++)makeRow();}
-  updateRowNumbers();
-  recalc();
-  validateAllTimeInputs();
-  updateEditChip(d);
-}
-
-function updateEditChip(d){
-  var base='';
-  if(d&&d.savedAt){
-    var dt=new Date(d.savedAt);
-    base='✓ diedit '+dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short'})
-      +' '+dt.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
-  }else{
-    base='belum ada data tersimpan untuk filter ini';
-  }
-  syncEl.dataset.edit = base;
-  applyChip();
-}
-function applyChip(){
-  var kind  = syncEl.dataset.kind  || '';
-  var sText = syncEl.dataset.sync  || '';
-  var eText = syncEl.dataset.edit  || '';
-  var full  = sText ? (sText + ' · ' + eText) : eText;
-  syncEl.className='edit-info'+(kind?(' '+kind):'');
-  syncEl.innerHTML='<i class="sync-dot"></i>'+full;
-}
-function setSyncStatus(kind,text){
-  syncEl.dataset.kind = kind||'';
-  syncEl.dataset.sync = text||'';
-  applyChip();
-}
-
-// Fungsi loadRecord yang langsung mengambil data dari cloud (Google Sheets) secara live
-function loadRecord(){
-  var k = curKey();
-  setSyncStatus('sync', 'memuat dari cloud…');
-  
-  var rawDate = $('fDate').value || todayLocal();
-  var formattedDateForSheet = formatDateText(rawDate);
-
-  var bodyObj = {
-    action: 'load',
-    token: 'oee-fima-2026-secret',
-    date: formattedDateForSheet,
-    shift: evalShift + 1,
-    line: $('fLine').value,
-    stage: $('fStage').value
-  };
-
-  fetch(HARDCODED_SERVER, {
-    method: 'POST',
-    headers: {'Content-Type': 'text/plain;charset=utf-8'},
-    body: JSON.stringify(bodyObj)
-  })
-  .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-  .then(function(j){
-    if(j && j.ok && j.data){
-      var db = dbGet();
-      db[k] = j.data;
-      dbSet(db);
-      applyRecord(j.data);
-      setSyncStatus('ok', '✓ sinkron dari cloud');
-    } else {
-      applyRecord(null);
-      setSyncStatus('ok', 'data kosong di cloud');
-    }
-  })
-  .catch(function(err){
-    var db = dbGet();
-    applyRecord(db[k] || null);
-    setSyncStatus('err', 'offline · mode lokal');
-  });
-}
-
-function saveData(opts){
-  opts=opts||{};
-  var rec=collect(),db=dbGet();
-  db[curKey()]=rec; dbSet(db);
-  $('lastSaved').textContent='✓ tersimpan '+new Date().toLocaleTimeString('id-ID');
-  updateEditChip(rec);
-  if(!opts.silent) toast('Data tersimpan lokal ✓');
-
-  setSyncStatus('sync','mengunggah…');
-  var rawDate = $('fDate').value || todayLocal();
-  var formattedDateForSheet = formatDateText(rawDate);
-
-  var bodyObj = {
-    action: 'save',
-    token: 'oee-fima-2026-secret',
-    date: formattedDateForSheet,
-    shift: evalShift+1,
-    line: $('fLine').value,
-    stage: $('fStage').value,
-    payload: rec
-  };
-  fetch(HARDCODED_SERVER,{
-    method:'POST',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify(bodyObj)
-  }).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-  .then(function(j){
-    if(!j || j.ok===false) throw new Error((j&&j.error)||'server error');
-    setSyncStatus('ok','✓ tersinkron cloud');
-    if(j.updatedAt){
-      rec.savedAt = j.updatedAt;
-      db[curKey()] = rec; dbSet(db);
-      updateEditChip(rec);
-    }
-    if(!opts.silent) toast('Sync cloud ✓ '+labelFilter());
-  }).catch(function(err){
-    setSyncStatus('err','⚠ sync gagal: '+err.message);
-    if(!opts.silent) toast('Tersimpan LOKAL — sync gagal ⚠',true);
-  });
-}
-
-['fDate','fLine','fStage'].forEach(function(id){$(id).addEventListener('change',loadRecord);});
-
-var toastTimer=null;
-function toast(msg,isErr,type){
-  var el=$('toast');el.textContent=msg;
-  el.className = '';
-  if(type === 'warn') el.classList.add('warn');
-  else if(isErr) el.classList.add('err');
-  
-  el.classList.add('show');clearTimeout(toastTimer);
-  toastTimer=setTimeout(function(){el.classList.remove('show','err','warn');},3000);
-}
-
-$('btnSave').addEventListener('click',function(){saveData();});
-$('btnReset').addEventListener('click',function(){
-  if(!confirm('Reset seluruh form? Data yang belum disimpan akan hilang.'))return;
-  applyRecord(null);
-  toast('Form dikosongkan ↺');
-});
-$('btnAdd').addEventListener('click',function(){
-  var tr=makeRow();updateRowNumbers();recalc();
-  tr.scrollIntoView({block:'nearest',behavior:'smooth'});
-  var cells=navCells();
-  for(var i=0;i<cells.length;i++){if(cells[i].f==='kode'&&cells[i].ri===rows().length-1){focusCell(cells[i]);break;}}
-});
-window.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveData();}});
-
-function tick(){
-  var n=new Date();
-  $('clock').textContent=n.toLocaleTimeString('id-ID',{hour12:false});
-  $('dateEl').textContent=n.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-}
-setInterval(tick,1000);tick();
-
-var installBtn = document.getElementById('pwa-install-btn');
-var deferredPrompt = null;
-
-window.addEventListener('beforeinstallprompt', function(e){
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.classList.add('show');
-});
-
-installBtn.addEventListener('click', function(){
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(function(result){
-        if(result.outcome === 'accepted'){
-          toast('Aplikasi berhasil diinstall ✓');
-        } else {
-          toast('Installasi dibatalkan');
-        }
-        deferredPrompt = null;
-        installBtn.classList.remove('show');
-    });
-  }
-});
-
-window.addEventListener('appinstalled', function(){
-  installBtn.classList.remove('show');
-  toast('Aplikasi terinstall ✓');
-});
-
-$('fDate').value=todayLocal();
-applyModeUI();
-applyShiftUI();
-updateMatrixProductHeaders();
-loadRecord();
-
-if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js', { scope: './' })
-    .then(function(reg){ console.log('✅ Service Worker registered:', reg); })
-    .catch(function(err){ console.warn('⚠️ Service Worker registration failed:', err); });
-}
-}
-</script>
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <!-- JS (urutan PENTING: dari dependen paling dasar ke paling atas) -->
+  <script src="./js/config.js"></script>
+  <script src="./js/utils.js"></script>
+  <script src="./js/state.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/rows.js"></script>
+  <script src="./js/navigation.js"></script>
+  <script src="./js/calculation.js"></script>
+  <script src="./js/storage.js"></script>
+  <script src="./js/app.js"></script>
 </body>
 </html>

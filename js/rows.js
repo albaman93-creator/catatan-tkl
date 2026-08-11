@@ -1,0 +1,197 @@
+/**
+ * ROWS.JS
+ * Menangani pembuatan, penghapusan, dan pengelolaan baris log sheet.
+ * Juga dropdown produk dan tabel rincian performa produk.
+ */
+const Rows = (() => {
+  'use strict';
+
+  // ====== HELPER ======
+  const getActiveProducts = () => {
+    const p1 = State.el.prodName1.value.trim();
+    const p2 = State.el.prodName2.value.trim();
+    const p3 = State.el.prodName3.value.trim();
+    return [p1, p2, p3].filter(Boolean);
+  };
+
+  const getRateForProduct = (prodName) => {
+    if (!prodName) return 0;
+    const names = [
+      State.el.prodName1.value.trim(),
+      State.el.prodName2.value.trim(),
+      State.el.prodName3.value.trim()
+    ];
+    const rates = [
+      parseFloat(State.el.prodRate1.value) || 0,
+      parseFloat(State.el.prodRate2.value) || 0,
+      parseFloat(State.el.prodRate3.value) || 0,
+    ];
+    const idx = names.indexOf(prodName);
+    return idx >= 0 ? rates[idx] : 0;
+  };
+
+  // ====== DROPDOWN PRODUK ======
+  const updateAllDropdowns = () => {
+    const prods = getActiveProducts();
+    const selects = State.el.tbody.querySelectorAll('select[data-f="batch"]');
+    selects.forEach(sel => {
+      const currentVal = sel.value;
+      sel.innerHTML = '<option value="">-- Pilih Produk --</option>';
+      prods.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = p;
+        if (p === currentVal) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    });
+  };
+
+  const updateMatrixProductHeaders = () => {
+    State.el.thProd1.textContent = State.el.prodName1.value.trim() || 'Produk 1';
+    State.el.thProd2.textContent = State.el.prodName2.value.trim() || 'Produk 2';
+    State.el.thProd3.textContent = State.el.prodName3.value.trim() || 'Produk 3';
+  };
+
+  // ====== MANIPULASI BARIS ======
+  const rows = () => Array.from(State.el.tbody.querySelectorAll('tr.log-row'));
+
+  const updateRowNumbers = () => {
+    rows().forEach((tr, i) => {
+      const numCell = tr.querySelector('.col-num');
+      if (numCell) numCell.textContent = i + 1;
+    });
+  };
+
+  /**
+   * Apply kategori (warna) ke baris berdasarkan kode.
+   */
+  const applyCat = (tr) => {
+    const kodeInput = tr.querySelector('[data-f="kode"]');
+    if (!kodeInput) return;
+    const c = Utils.catOf(kodeInput.value.trim());
+    if (c) tr.dataset.cat = c;
+    else delete tr.dataset.cat;
+  };
+
+  /**
+   * Buat satu baris log sheet baru.
+   * @param {Object} data - Data untuk diisi ke input (optional, untuk load).
+   */
+  const makeRow = (data) => {
+    const tr = document.createElement('tr');
+    tr.className = 'log-row';
+
+    const prods = getActiveProducts();
+    const optionsHtml = '<option value="">-- Pilih Produk --</option>' +
+      prods.map(p => `<option value="${p}">${p}</option>`).join('');
+
+    tr.innerHTML = `
+      <td class="col-num">${rows().length + 1}</td>
+      <td class="col-kode"><div class="c-kode"><span class="dot"></span>
+        <input data-f="kode" data-nav class="in mono ctr" type="tel" inputmode="numeric" maxlength="2" placeholder="•" aria-label="Kode">
+      </div></td>
+      <td class="col-mulai"><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>
+      <td class="col-panggil"><input data-f="panggil" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Panggil Teknik"></td>
+      <td class="col-teknik"><input data-f="teknik" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Teknik Datang"></td>
+      <td class="col-selesai"><input data-f="selesai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Selesai"></td>
+      <td class="col-durasi dur"><b class="dur-v">—</b></td>
+      <td class="col-kegiatan"><textarea data-f="kegiatan" data-nav class="in" placeholder="Kegiatan…" aria-label="Kegiatan" rows="1"></textarea></td>
+      <td class="col-masalah"><textarea data-f="masalah" data-nav class="in" placeholder="Penyebab…" aria-label="Masalah" rows="1"></textarea></td>
+      <td class="col-disposisi"><textarea data-f="disposisi" data-nav class="in" placeholder="Tindakan…" aria-label="Disposisi" rows="1"></textarea></td>
+      <td class="col-wo"><input data-f="wo" data-nav class="in mono" placeholder="No WO…" aria-label="Nomor WO"></td>
+      <td class="col-batch"><select data-f="batch" data-nav class="in mono" aria-label="Produk & Batch">${optionsHtml}</select></td>
+      <td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Good"></td>
+      <td class="col-defect"><input data-f="defect" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Defect"></td>
+      <td class="col-aksi c-aksi"><button type="button" class="del" title="Hapus baris">✕</button></td>
+    `;
+
+    if (data) {
+      CONFIG.NAV_FIELDS.forEach(f => {
+        const el = tr.querySelector(`[data-f="${f}"]`);
+        if (el && data[f] != null) {
+          el.value = data[f];
+          if (['kegiatan','masalah','disposisi'].includes(f)) {
+            setTimeout(() => UI.autoResizeTextarea(el), 10);
+          }
+        }
+      });
+    }
+    State.el.tbody.appendChild(tr);
+    applyCat(tr);
+    Navigation.syncColumnVisibility();
+    return tr;
+  };
+
+  // ====== TABEL RINCIAN PRODUK ======
+  const updateProductDetailTable = () => {
+    const tbody = State.el.tbodyProdDetail;
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const prods = getActiveProducts();
+    if (prods.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mut);">Belum ada produk terdaftar di Master Produk.</td></tr>';
+      return;
+    }
+
+    const summary = {};
+    prods.forEach(p => { summary[p] = { durasi: 0, rate: getRateForProduct(p), actual: 0 }; });
+
+    rows().forEach(tr => {
+      const g = (f) => {
+        const el = tr.querySelector(`[data-f="${f}"]`);
+        return el ? el.value : '';
+      };
+      const mulai = Utils.parseTime(g('mulai'));
+      const selesai = Utils.parseTime(g('selesai'));
+      const prodName = g('batch');
+      const good = parseFloat(g('good').replace(',', '.')) || 0;
+      const defect = parseFloat(g('defect').replace(',', '.')) || 0;
+      const rowActual = good + defect;
+
+      if (mulai == null || selesai == null) return;
+      const dur = (selesai - mulai + 1440) % 1440;
+      const si = Utils.shiftOf(mulai);
+
+      if (si === State.evalShift && prodName && summary[prodName]) {
+        summary[prodName].durasi += dur;
+        summary[prodName].actual += rowActual;
+      }
+    });
+
+    let hasData = false;
+    prods.forEach(p => {
+      const item = summary[p];
+      const targetG = item.durasi * item.rate;
+      const perfP = targetG > 0 ? (item.actual / targetG) * 100 : 0;
+      if (item.durasi > 0 || item.actual > 0) hasData = true;
+
+      const perfColor = perfP >= CONFIG.TARGET.PERFORMANCE
+        ? 'color:var(--green-d);font-weight:700;'
+        : 'color:var(--red);font-weight:700;';
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="text-align:left;font-weight:600;color:var(--ink);">${p}</td>
+        <td>${Utils.nf0(item.durasi)}</td>
+        <td>${Utils.nf0(item.rate)}</td>
+        <td>${Utils.nf0(targetG)}</td>
+        <td>${Utils.nf0(item.actual)}</td>
+        <td style="${perfColor}">${Utils.nf2(perfP)} %</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    if (!hasData) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--mut);">Belum ada catatan log aktif untuk produk-produk ini pada Shift ${State.evalShift + 1}.</td></tr>`;
+    }
+  };
+
+  return {
+    getActiveProducts, getRateForProduct,
+    rows, updateRowNumbers, applyCat, makeRow,
+    updateAllDropdowns, updateMatrixProductHeaders,
+    updateProductDetailTable,
+  };
+})();
