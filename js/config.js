@@ -68,4 +68,14 @@ const CONFIG = Object.freeze({
 
   // ====== BULAN (untuk format tanggal) ======
   MONTHS: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'],
+
+  // ====== SCENE SCHEDULE (tema background login berdasarkan waktu) ======
+  // Jam dalam menit dari 00:00. Edit rentang ini untuk mengubah kapan tema berganti.
+  SCENE_SCHEDULE: [
+    { from: 0,    to: 240,  name: 'night'   }, // 00:00 - 04:00
+    { from: 240,  to: 420,  name: 'sunrise' }, // 04:00 - 07:00  (fajar)
+    { from: 420,  to: 960,  name: 'day'     }, // 07:00 - 16:00  (siang)
+    { from: 960,  to: 1080, name: 'sunset'  }, // 16:00 - 18:00  (senja)
+    { from: 1080, to: 1440, name: 'night'   }, // 18:00 - 24:00  (malam)
+  ],
 });

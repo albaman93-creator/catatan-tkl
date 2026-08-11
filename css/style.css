@@ -48,7 +48,15 @@ kbd {
 }
 #loginOverlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
 
-/* ====== CARTOON LANDSCAPE BACKGROUND ====== */
+/* ====== CARTOON LANDSCAPE BACKGROUND (auto day/night) ====== */
+#bgScene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  /* ⬇️ KECEPATAN AWAN: ubah angka ini untuk mempercepat/memperlambat awan (s/detik) */
+  --cloud-speed: 160s;
+}
 .bg-scene {
   position: absolute;
   inset: 0;
@@ -56,23 +64,102 @@ kbd {
   height: 100%;
   display: block;
   pointer-events: none;
-  z-index: 0;
-}
-.clouds-slow {
-  animation: cloudDrift 160s linear infinite;
-  transform-origin: center;
-}
-@keyframes cloudDrift {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-180px); }
 }
 .bg-dim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(13,33,53,.08) 0%, rgba(13,33,53,.42) 100%);
+  background: linear-gradient(180deg, rgba(13,33,53,.10) 0%, rgba(13,33,53,.42) 100%);
   pointer-events: none;
-  z-index: 1;
+  opacity: var(--dim, .3);
+  transition: opacity 2s ease;
 }
+
+/* --- Palettes per time-of-day (CSS variables yang di-refer oleh SVG) --- */
+.scene { transition: background-color 2s ease; }
+.scene--day     { --sky-top:#68c1f5; --sky-mid:#b3e1f9; --sky-bot:#e9f8ff; --hill-far:#a8dda6; --hill-mid:#6fc46f; --hill-near:#3d9440; --tree-leaf:#2a6d2e; --tree-leaf-front:#1c5520; --tree-trunk:#5a3a1f; --cloud:#ffffff; --grass:#26732a; --bird-stroke:#2c5f7c; --dim:.3; }
+.scene--sunrise { --sky-top:#7e96e8; --sky-mid:#f7b878; --sky-bot:#ffe3b5; --hill-far:#b8cf9a; --hill-mid:#82ab5e; --hill-near:#56824a; --tree-leaf:#3e7045; --tree-leaf-front:#2f5d35; --tree-trunk:#5a3a1f; --cloud:#fff1e0; --grass:#4a7e3a; --bird-stroke:#4a4a6a; --dim:.28; }
+.scene--sunset  { --sky-top:#4a3e86; --sky-mid:#e5714b; --sky-bot:#ffc872; --hill-far:#6a5c7a; --hill-mid:#4e4254; --hill-near:#2d2430; --tree-leaf:#2a2736; --tree-leaf-front:#1c1a26; --tree-trunk:#3a2818; --cloud:#f8c48a; --grass:#2e2630; --bird-stroke:#2a1f38; --dim:.45; }
+.scene--night   { --sky-top:#091830; --sky-mid:#0f2c50; --sky-bot:#184066; --hill-far:#153a30; --hill-mid:#102e25; --hill-near:#0b241c; --tree-leaf:#0d2c22; --tree-leaf-front:#0a2419; --tree-trunk:#3a2818; --cloud:#2c4a70; --grass:#0a241c; --bird-stroke:#2c4a70; --dim:.52; }
+
+/* Stop gradients (SVG fill transition) */
+.sky-stop-top { stop-color: var(--sky-top); transition: stop-color 2s ease; }
+.sky-stop-mid { stop-color: var(--sky-mid); transition: stop-color 2s ease; }
+.sky-stop-bot { stop-color: var(--sky-bot); transition: stop-color 2s ease; }
+
+/* Hills / Trees / Grass (fill driven by CSS var) */
+.hill-far, .hill-mid, .hill-near { transition: fill 2s ease; }
+.hill-far  { fill: var(--hill-far); }
+.hill-mid  { fill: var(--hill-mid); }
+.hill-near { fill: var(--hill-near); }
+.tree-leaf        { fill: var(--tree-leaf);       transition: fill 2s ease; }
+.tree-leaf-front  { fill: var(--tree-leaf-front); transition: fill 2s ease; }
+.trees-front .tree-leaf { fill: var(--tree-leaf-front); }
+.tree-trunk { fill: var(--tree-trunk); transition: fill 2s ease; }
+.grass path { fill: var(--grass); transition: fill 2s ease; }
+
+/* Clouds — speed controlled by --cloud-speed variable */
+.cloud { animation: cloudDrift var(--cloud-speed, 160s) linear infinite; }
+.cloud-puff { fill: var(--cloud); transition: fill 2s ease; opacity: .94; }
+.scene--night .cloud-puff { opacity: .45; }
+/* Spread clouds out with negative delays so they start at different positions */
+.c1 { animation-delay: 0s; }
+.c2 { animation-delay: -40s; }
+.c3 { animation-delay: -90s; }
+.c4 { animation-delay: -130s; }
+@keyframes cloudDrift {
+  from { transform: translateX(-350px); }
+  to   { transform: translateX(2250px); }
+}
+/* Optional: per-scene cloud speed overrides */
+.scene--night   { --cloud-speed: 240s; } /* malam: awan lebih pelan */
+.scene--sunrise { --cloud-speed: 180s; }
+.scene--sunset  { --cloud-speed: 200s; }
+
+/* Sun (hidden at night, visible elsewhere) */
+#sun { transition: opacity 1.6s ease; opacity: 1; }
+.scene--night #sun { opacity: 0; }
+
+/* Moon (visible only at night) */
+#moon { opacity: 0; transition: opacity 1.6s ease; }
+.scene--night #moon { opacity: 1; }
+
+/* Stars (twinkle, only at night) */
+#stars { opacity: 0; transition: opacity 2s ease; }
+.scene--night #stars { opacity: 1; }
+.star { fill: #fff; animation: twinkle 2.8s ease-in-out infinite; }
+@keyframes twinkle { 50% { opacity: .2; } }
+
+/* Birds (hidden at night) */
+#birds { transition: opacity 1.6s ease; opacity: .55; }
+.scene--night #birds { opacity: 0; }
+.scene--sunset #birds { opacity: .3; }
+
+/* Flowers */
+.flower-yellow { fill: #ffd84d; transition: fill 2s ease; }
+.flower-pink   { fill: #ff7eb3; transition: fill 2s ease; }
+.flower-white  { fill: #fff;    transition: fill 2s ease; }
+.scene--night .flower-yellow, .scene--night .flower-pink, .scene--night .flower-white { opacity: .4; transition: opacity 2s ease; }
+
+/* Preview toggle button (bottom-right of login overlay) */
+.scene-toggle {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 3;
+  font: 600 11px var(--mono);
+  letter-spacing: .5px;
+  color: #eaf2fa;
+  background: rgba(13, 33, 53, .55);
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 99px;
+  padding: 7px 14px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: .2s;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25);
+}
+.scene-toggle:hover { background: rgba(13, 33, 53, .8); transform: translateY(-1px); }
 .login-card {
   position: relative;
   z-index: 2;
