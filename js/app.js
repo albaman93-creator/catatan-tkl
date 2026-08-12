@@ -21,12 +21,6 @@ const App = (() => {
     // Set default tanggal = hari ini
     State.el.fDate.value = Utils.todayLocal();
 
-    // Link database (Supabase Table Editor, diturunkan dari SUPABASE_URL)
-    const projectRef = (CONFIG.SUPABASE_URL.match(/https:\/\/([^.]+)\.supabase\.co/) || [])[1];
-    State.el.dbLink.href = projectRef
-      ? `https://supabase.com/dashboard/project/${projectRef}/editor`
-      : '#';
-
     // Load record pertama
     Storage.loadRecord();
 
@@ -39,6 +33,9 @@ const App = (() => {
     // Setup PWA & Service Worker
     UI.setupPWA();
     UI.registerServiceWorker();
+
+    // Dashboard (rekap data & grafik) — bind sekali saat app utama siap
+    if (typeof Dashboard !== 'undefined') Dashboard.init();
   };
 
   /**

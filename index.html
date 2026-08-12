@@ -269,7 +269,7 @@
       <form id="loginForm" class="login-form">
         <div class="field">
           <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" placeholder="" required autofocus autocomplete="username">
+          <input type="email" id="loginEmail" placeholder="nama@pabrik.com" required autofocus autocomplete="username">
         </div>
         <div class="field">
           <label for="loginPassword">Password</label>
@@ -277,7 +277,7 @@
         </div>
         <button type="submit" class="login-btn" id="loginBtn">Masuk Aplikasi</button>
       </form>
-      <div class="login-hint">masukan email dan password</div>
+      <div class="login-hint">Akun dibuat oleh admin melalui Supabase Dashboard</div>
     </div>
   </div>
 
@@ -299,7 +299,7 @@
         <span id="lastSaved"></span>
 
         <button class="btn btn-install" id="pwa-install-btn" type="button">📱 Install Aplikasi</button>
-        <a href="#" id="dbLink" target="_blank" class="btn btn-ghost" title="Buka Database">📂 Lihat Database</a>
+        <button class="btn btn-ghost" id="btnDashboard" type="button" title="Rekap data & grafik OEE">📊 Dashboard</button>
         <button class="btn btn-ghost btn-logout" id="btnLogout" type="button" title="Keluar sesi">🔒 Keluar</button>
         <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
         <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
@@ -575,6 +575,66 @@
   <!-- Toast -->
   <div id="toast"></div>
 
+  <!-- Dashboard Overlay -->
+  <div class="dash-overlay hide" id="dashOverlay">
+    <div class="dash-panel">
+      <div class="dash-head">
+        <div>
+          <h2>📊 Dashboard OEE</h2>
+          <div class="dash-sub">Rekap data &amp; grafik OEE dari Supabase — semua user yang login bisa akses</div>
+        </div>
+        <span class="spacer"></span>
+        <button type="button" id="dashClose" class="btn btn-ghost">✕ Tutup</button>
+      </div>
+
+      <div class="dash-filters">
+        <div class="field"><label>Dari Tanggal</label><input type="date" id="dashFrom"></div>
+        <div class="field"><label>Sampai Tanggal</label><input type="date" id="dashTo"></div>
+        <div class="field"><label>Line</label>
+          <select id="dashLine">
+            <option value="">Semua Line</option>
+            <option value="1">Line 1</option><option value="2">Line 2</option><option value="4">Line 4</option>
+          </select>
+        </div>
+        <div class="field"><label>Shift</label>
+          <select id="dashShift">
+            <option value="">Semua Shift</option>
+            <option value="1">Shift 1</option><option value="2">Shift 2</option><option value="3">Shift 3</option>
+          </select>
+        </div>
+        <div class="field"><label>Tahapan</label>
+          <select id="dashStage">
+            <option value="">Semua Tahapan</option>
+            <option value="mixing">Mixing</option><option value="filling">Filling</option>
+            <option value="steril">Steril</option><option value="visual">Visual</option><option value="kemas">Kemas</option>
+          </select>
+        </div>
+        <button type="button" id="dashApply" class="btn btn-primary">🔍 Terapkan Filter</button>
+      </div>
+
+      <div id="dashStatus" class="dash-status"></div>
+
+      <div class="dash-chart-wrap">
+        <div class="dash-chart-title">Grafik OEE per Record <span class="dash-legend"><i class="dot ok"></i>≥85% <i class="dot warn"></i>60–85% <i class="dot bad"></i>&lt;60%</span></div>
+        <div id="dashChart" class="dash-chart"></div>
+      </div>
+
+      <div class="dash-table-wrap">
+        <table class="dash-table" id="dashTable">
+          <thead>
+            <tr>
+              <th>Tanggal</th><th>Shift</th><th>Line</th><th>Tahapan</th>
+              <th>Avail%</th><th>Perf%</th><th>Qual%</th><th>OEE%</th>
+              <th>DT(m)</th><th>Good</th><th>Defect</th>
+              <th>Produk / Batch</th><th>Operator</th><th>Update Terakhir</th>
+            </tr>
+          </thead>
+          <tbody id="dashTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- JS (urutan PENTING: dari dependen paling dasar ke paling atas) -->
   <script src="./js/config.js"></script>
   <script src="./js/utils.js"></script>
@@ -587,6 +647,7 @@
   <script src="./js/calculation.js"></script>
   <script src="./js/sync.js"></script>
   <script src="./js/storage.js"></script>
+  <script src="./js/dashboard.js"></script>
   <script src="./js/scene.js"></script>
   <script src="./js/fx.js"></script>
   <script src="./js/weather.js"></script>

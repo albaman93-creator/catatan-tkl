@@ -18,10 +18,11 @@ const Calculation = (() => {
     }
     const mins = Utils.parseTime(val);
     if (mins === null) return;
+
     const actualShift = Utils.shiftOf(mins);
     if (actualShift !== State.evalShift) {
       inputEl.classList.add('warn-shift');
-      UI.toast('Pastikan shift yang Anda pilih benar ⚠️', true, 'warn');
+      UI.toast('Pastikan shift yang Anda pilih benar ⚠', true, 'warn');
     } else {
       inputEl.classList.remove('warn-shift');
     }
@@ -49,7 +50,6 @@ const Calculation = (() => {
       State.el.prodName2.value.trim(),
       State.el.prodName3.value.trim()
     ];
-
     const prodStats = [
       { dur:0, rate:parseFloat(State.el.prodRate1.value)||0, actual:0 },
       { dur:0, rate:parseFloat(State.el.prodRate2.value)||0, actual:0 },
@@ -64,19 +64,18 @@ const Calculation = (() => {
       const prodName = g('batch');
       const durEl = tr.querySelector('.dur-v');
 
-      const gVal = parseFloat(String(g('good') || '0').replace(',', '.')) || 0;
-      const dVal = parseFloat(String(g('defect') || '0').replace(',', '.')) || 0;
+      const gVal = parseFloat(g('good').replace(',', '.')) || 0;
+      const dVal = parseFloat(g('defect').replace(',', '.')) || 0;
       const rowActual = gVal + dVal;
 
       sumGood += gVal;
       sumDefect += dVal;
 
       if (mulai == null || selesai == null) {
-        durEl.textContent = '';
+        durEl.textContent = '—';
         durEl.removeAttribute('title');
         return;
       }
-
       const dur = (selesai - mulai + 1440) % 1440;
       durEl.textContent = Utils.nf0(dur);
       durEl.title = selesai < mulai ? 'Lintas tengah malam (+24 jam)' : '';
@@ -84,24 +83,16 @@ const Calculation = (() => {
 
       const c = Utils.catOf(kode);
       const si = Utils.shiftOf(mulai);
-
       if (si === State.evalShift) nShift++;
 
-      if (c === 'planned') {
-        B += dur;
-        if (si != null) sh[si].B += dur;
-      } else if (c === 'unplanned') {
-        D += dur;
-        if (si != null) sh[si].D += dur;
-      } else if (c === 'prod') {
+      if (c === 'planned')       { B += dur; if (si != null) sh[si].B += dur; }
+      else if (c === 'unplanned'){ D += dur; if (si != null) sh[si].D += dur; }
+      else if (c === 'prod') {
         if (si === State.evalShift && prodName) {
           for (let i = 0; i < 3; i++) {
             if (pNames[i] && pNames[i] === prodName) {
-              // ATURAN: Durasi & Aktual hanya masuk hitungan target matriks jika Good >= 1
-              if (gVal >= 1) {
-                prodStats[i].dur += dur;
-                prodStats[i].actual += rowActual;
-              }
+              prodStats[i].dur += dur;
+              prodStats[i].actual += rowActual;
             }
           }
         }
@@ -127,18 +118,15 @@ const Calculation = (() => {
     oFEl.style.color = sF >= CONFIG.TARGET.AVAILABILITY ? 'var(--green-d)' : 'var(--red)';
     oFEl.style.fontWeight = '700';
 
-    // === PERFORMANCE PER PRODUK (Matriks OEE) ===
+    // === PERFORMANCE PER PRODUK ===
     let totalPerfSum = 0, activeCount = 0;
     for (let i = 0; i < 3; i++) {
       const gTarget = prodStats[i].dur * prodStats[i].rate;
       const hAct = prodStats[i].actual;
       const perfI = gTarget > 0 ? (hAct / gTarget) * 100 : 0;
 
-      // Hanya hitung ke rata-rata jika produk terdaftar namanya DAN memiliki target aktif (gTarget > 0)
-      if (pNames[i] && gTarget > 0) {
-        activeCount++;
-        totalPerfSum += perfI;
-      }
+      // Hanya hitung produk sebagai "aktif" untuk rata-rata jika nama ada DAN rate > 0
+      if (pNames[i] && prodStats[i].rate > 0) { activeCount++; totalPerfSum += perfI; }
 
       State.el['oG' + (i+1)].textContent = Utils.nf0(gTarget);
       State.el['oH' + (i+1)].textContent = Utils.nf0(hAct);
@@ -163,7 +151,6 @@ const Calculation = (() => {
     State.el.oJ.textContent = Utils.nf0(J);
     State.el.oK.textContent = Utils.nf0(K);
     State.el.oL.textContent = Utils.nf0(L);
-
     const oMEl = State.el.oM;
     oMEl.textContent = Utils.nf2(M);
     oMEl.style.color = M >= CONFIG.TARGET.QUALITY ? 'var(--green-d)' : 'var(--red)';
@@ -186,13 +173,14 @@ const Calculation = (() => {
     if (issues.length === 0) {
       dEl.innerHTML = `<div class="d-item ok">✓ Semua komponen lengkap — OEE = ${Utils.nf2(sF)}% × ${Utils.nf2(avgPerfI)}% × ${Utils.nf2(M)}% = ${Utils.nf2(oee)}%</div>`;
     } else {
-      dEl.innerHTML = issues.map(s => `<div class="d-item err">⚠️ ${s}</div>`).join('');
+      dEl.innerHTML = issues.map(s => `<div class="d-item err">⚠ ${s}</div>`).join('');
     }
 
     Rows.updateRowNumbers();
     State.el.sumDur.textContent = Utils.nf0(tot);
     State.el.totalDurasi.textContent = Utils.nf0(tot);
     State.el.rowN.textContent = Rows.rows().length;
+
     Rows.updateProductDetailTable();
     Navigation.applyTabOrder();
   };

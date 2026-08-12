@@ -98,8 +98,17 @@ const Utils = (() => {
     return 'prod';
   };
 
+  // ====== KEAMANAN TAMPILAN ======
+  /**
+   * Escape karakter HTML berbahaya sebelum dirender via innerHTML
+   * (dipakai untuk teks bebas dari user: masalah, operator, dsb).
+   */
+  const escapeHtml = (str) => String(str ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+
   return {
     nf0, nf2, parseNumber, parseTime, maskTime, normTime,
-    todayLocal, formatDateText, shiftOf, catOf
+    todayLocal, formatDateText, shiftOf, catOf, escapeHtml
   };
 })();
