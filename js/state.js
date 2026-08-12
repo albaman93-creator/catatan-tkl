@@ -17,7 +17,7 @@ const State = (() => {
 
   const initElements = () => {
     const ids = [
-      'loginOverlay', 'loginForm', 'loginPin', 'rememberMe', 'loginError',
+      'loginOverlay', 'loginForm', 'loginEmail', 'loginPassword', 'loginBtn', 'loginError', 'loginOfflineNote',
       'appContainer', 'pos', 'hint', 'lastSaved', 'syncStatus',
       'fDate', 'fLine', 'fStage',
       'op1','op2','op3','op4','op5','op6',

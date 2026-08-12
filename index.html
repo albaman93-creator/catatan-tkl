@@ -22,6 +22,9 @@
 
   <!-- CSS (urutan penting) -->
   <link rel="stylesheet" href="./css/style.css">
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -257,21 +260,24 @@
       <div class="login-header">
         <div class="login-logo">TKL</div>
         <h2>OEE System Login</h2>
-        <p>Masukkan PIN Akses Operator / Admin</p>
+        <p>Masuk dengan Email &amp; Password Supabase</p>
       </div>
-      <div id="loginError" class="login-error">PIN Akses Salah! Silakan coba lagi.</div>
+      <div id="loginError" class="login-error">Email atau password salah. Silakan coba lagi.</div>
+      <div id="loginOfflineNote" class="login-error" style="display:none;background:#5a4b00;">
+        ⚠ Tidak ada koneksi internet. Login pertama kali wajib online.
+      </div>
       <form id="loginForm" class="login-form">
         <div class="field">
-          <label for="loginPin">PIN Akses</label>
-          <input type="password" id="loginPin" placeholder="••••" maxlength="10" required autofocus autocomplete="current-password">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="" required autofocus autocomplete="username">
         </div>
-        <div class="login-remember">
-          <input type="checkbox" id="rememberMe">
-          <label for="rememberMe">Ingat saya di perangkat ini</label>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
         </div>
-        <button type="submit" class="login-btn">Masuk Aplikasi</button>
+        <button type="submit" class="login-btn" id="loginBtn">Masuk Aplikasi</button>
       </form>
-      <div class="login-hint">Default PIN: <b id="defaultPinHint">2026</b></div>
+      <div class="login-hint">masukan email dan password</div>
     </div>
   </div>
 
@@ -286,13 +292,6 @@
           <span class="nm-cap">MODE TAB</span>
           <button type="button" data-mode="v" class="on">⇅ VERTIKAL</button>
           <button type="button" data-mode="h">⇄ HORIZONTAL</button>
-        </div>
-
-        <div class="shiftsel" title="Shift evaluasi">
-          <span class="nm-cap">SHIFT</span>
-          <button type="button" data-shift="0" class="on">S1·510</button>
-          <button type="button" data-shift="1">S2·480</button>
-          <button type="button" data-shift="2">S3·450</button>
         </div>
 
         <span class="hint" id="hint"></span>
@@ -335,13 +334,20 @@
           <span class="no">📊</span>
           <div>
             <h2>Data &amp; Penyimpanan</h2>
-            <div class="sub2">Satu slot per Tanggal · Shift · Line · Tahapan — sinkron otomatis via Google Sheets</div>
+            <div class="sub2">Satu slot per Tanggal · Shift · Line · Tahapan — sinkron otomatis via Supabase</div>
           </div>
           <span class="spacer"></span>
           <span id="syncStatus" class="edit-info"><i class="sync-dot"></i>tersambung otomatis</span>
         </div>
         <div class="filter-grid">
           <div class="field"><label>Tanggal <span class="unit">log sheet</span></label><input type="date" id="fDate"></div>
+          <div class="field"><label>Shift <span class="unit">evaluasi</span></label>
+            <div class="shiftsel" id="fShift" title="Shift evaluasi">
+              <button type="button" data-shift="0" class="on">S1·510</button>
+              <button type="button" data-shift="1">S2·480</button>
+              <button type="button" data-shift="2">S3·450</button>
+            </div>
+          </div>
           <div class="field"><label>Line <span class="unit">produksi</span></label>
             <select id="fLine">
               <option value="1">Line 1</option><option value="2">Line 2</option><option value="4">Line 4</option>
@@ -573,11 +579,13 @@
   <script src="./js/config.js"></script>
   <script src="./js/utils.js"></script>
   <script src="./js/state.js"></script>
+  <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/ui.js"></script>
   <script src="./js/rows.js"></script>
   <script src="./js/navigation.js"></script>
   <script src="./js/calculation.js"></script>
+  <script src="./js/sync.js"></script>
   <script src="./js/storage.js"></script>
   <script src="./js/scene.js"></script>
   <script src="./js/fx.js"></script>

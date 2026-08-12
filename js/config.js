@@ -4,7 +4,19 @@
  * Untuk ubah nilai (PIN, target OEE, URL server), cukup edit file ini.
  */
 const CONFIG = Object.freeze({
+  // ====== SUPABASE ======
+  // Project: rximlgklzghbtgyqvmux
+  SUPABASE_URL:      'https://rximlgklzghbtgyqvmux.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4aW1sZ2tsemdoYnRneXF2bXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MjYyMDcsImV4cCI6MjEwMjAwMjIwN30.igM5-0JRWQSb6zAlN9qN2MvuG4A5UGuIL3OpVX1nFMo',
+
+  // Nama tabel Supabase tempat data OEE disimpan (lihat supabase-setup.sql)
+  DB_TABLE: 'oee_data',
+  SCHEMA_VERSION: 1,
+
   // ====== AUTENTIKASI ======
+  // 'supabase' = login email/password via Supabase Auth (rekomendasi)
+  // 'pin'      = login PIN lama (fallback, tidak butuh internet/Supabase)
+  AUTH_MODE:   'supabase',
   CORRECT_PIN: '2026',
   AUTH_KEY:    'fima_oee_logged_in',
 
@@ -12,6 +24,10 @@ const CONFIG = Object.freeze({
   DB_KEY:      'fima_oee_db_v3',
   NAV_MODE_KEY: 'fima_nav_mode',
   EVAL_SHIFT_KEY: 'fima_eval_shift',
+
+  // Auto-save LOKAL (localStorage) setiap N ms. Tidak menyentuh Supabase —
+  // hanya menjaga-jaga data tidak hilang kalau browser/tab tertutup tiba-tiba.
+  AUTO_SAVE_INTERVAL_MS: 60000, // 1 menit
 
   // ====== DEFAULTS ======
   DEFAULT_ROWS: 30,
@@ -59,12 +75,6 @@ const CONFIG = Object.freeze({
     masalah: 'MASALAH', disposisi: 'DISPOSISI', wo: 'NOMOR WO',
     batch: 'PRODUK & BATCH', good: 'GOOD', defect: 'DEFECT'
   },
-
-  // ====== GOOGLE SHEETS SYNC ======
-  // ⚠ GANTI URL INI dengan endpoint Apps Script kamu
-  SHEETS_ENDPOINT: 'https://script.google.com/macros/s/AKfycbzO3LR5QZNxIUTLC6Htpm1z-T7oszjo1PS7s6j54g2CtfPDWCsrjH1nmDz84vkpc-32pw/exec',
-  SHEETS_TOKEN:    'oee-fima-2026-secret',
-  SHEETS_DB_URL:   'https://docs.google.com/spreadsheets/d/16N5vCzssLshBb3_eKqOq9wRdAtr9NkM4E_CXHC3yFTI/edit?gid=1800639959#gid=1800639959',
 
   // ====== BULAN (untuk format tanggal) ======
   MONTHS: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'],

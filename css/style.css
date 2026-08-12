@@ -356,7 +356,7 @@ h1 { font: 700 clamp(24px,5vw,34px)/1 var(--disp); letter-spacing: .8px; text-tr
 }
 .sec-f b { color: var(--ink); }
 
-.filter-grid { display: grid; grid-template-columns: 1.2fr 1fr 1.2fr; gap: 12px; }
+.filter-grid { display: grid; grid-template-columns: 1.1fr 1.1fr .9fr 1fr; gap: 12px; }
 .operator-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
 .product-grid  { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
 .split-input   { display: flex; gap: 6px; }
@@ -398,6 +398,12 @@ h1 { font: 700 clamp(24px,5vw,34px)/1 var(--disp); letter-spacing: .8px; text-tr
   outline: none; border-color: var(--green); background: #fff;
   box-shadow: 0 0 0 3px rgba(18,161,80,.16);
 }
+/* Shift selector saat dipakai di dalam .field (Data & Penyimpanan) */
+.field .shiftsel {
+  width: 100%; box-sizing: border-box;
+  background: #fbfcfd; border: 1px solid var(--line); border-radius: 8px; padding: 4px;
+}
+.field .shiftsel button { flex: 1; justify-content: center; padding: 9px 4px; }
 
 /* ====== LEGEND ====== */
 .legend { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }

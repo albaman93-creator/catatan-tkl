@@ -21,11 +21,17 @@ const App = (() => {
     // Set default tanggal = hari ini
     State.el.fDate.value = Utils.todayLocal();
 
-    // Link database
-    State.el.dbLink.href = CONFIG.SHEETS_DB_URL;
+    // Link database (Supabase Table Editor, diturunkan dari SUPABASE_URL)
+    const projectRef = (CONFIG.SUPABASE_URL.match(/https:\/\/([^.]+)\.supabase\.co/) || [])[1];
+    State.el.dbLink.href = projectRef
+      ? `https://supabase.com/dashboard/project/${projectRef}/editor`
+      : '#';
 
     // Load record pertama
     Storage.loadRecord();
+
+    // Auto-save LOKAL tiap N ms (default 1 menit) — tidak menyentuh Supabase
+    setInterval(Storage.autoSaveLocal, CONFIG.AUTO_SAVE_INTERVAL_MS || 60000);
 
     // Start clock
     UI.startClock();
@@ -164,12 +170,14 @@ const App = (() => {
   const init = () => {
     State.initElements();
 
-    // Tampilkan PIN default di UI
-    const hintEl = document.getElementById('defaultPinHint');
-    if (hintEl) hintEl.textContent = CONFIG.CORRECT_PIN;
+    // Inisialisasi client Supabase (butuh CONFIG.SUPABASE_URL/ANON_KEY terisi benar)
+    if (typeof SupabaseClient !== 'undefined') SupabaseClient.init();
 
     bindEvents();
     Auth.initSession();
+
+    // Coba kirim antrean offline yang tertunda (jika ada) begitu app siap
+    if (typeof Sync !== 'undefined') Sync.flushQueue();
   };
 
   return { startMain, init };
