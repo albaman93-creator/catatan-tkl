@@ -139,11 +139,11 @@ const Rows = (() => {
     const summary = {};
     prods.forEach(p => { 
       summary[p] = { 
-        durasiValid: 0,       // Waktu produktif valid (Kode produksi dengan Good >= 1) untuk target
-        durasiTotal: 0,       // Total waktu keseluruhan aktivitas dengan batch ini (kode apapun)
-        durasiProdAll: 0,     // Total waktu seluruh kode produksi (baik ada good maupun kosong)
-        durasiPlannedDT: 0,   // Total waktu Planned Down Time (Kode 5, 6, 7, 8)
-        durasiUnplannedDT: 0, // Total waktu Unplanned Down Time (Kode 1, 3, 4, 9)
+        durasiValid: 0,       
+        durasiTotal: 0,       
+        durasiProdAll: 0,     
+        durasiPlannedDT: 0,   
+        durasiUnplannedDT: 0, 
         rate: getRateForProduct(p), 
         actual: 0 
       }; 
@@ -168,18 +168,14 @@ const Rows = (() => {
       const si = Utils.shiftOf(mulai);
 
       if (si === State.evalShift) {
-        // 1. Total waktu keseluruhan aktivitas (kode apapun)
         summary[prodName].durasiTotal += dur;
 
-        // Kategori Down Time & Produksi
         if (CONFIG.PLANNED_CODES.has(kodeNum)) {
           summary[prodName].durasiPlannedDT += dur;
         } else if (CONFIG.UNPLANNED_CODES.has(kodeNum)) {
           summary[prodName].durasiUnplannedDT += dur;
         } else if (Utils.catOf(kodeStr) === 'prod') {
-          summary[prodName].durasiProdAll += dur; // Total waktu kategori produksi
-
-          // Syarat valid untuk target: Kode produksi DAN kolom Good terisi >= 1
+          summary[prodName].durasiProdAll += dur; 
           if (goodVal >= 1) {
             summary[prodName].durasiValid += dur;
             summary[prodName].actual += rowActual;
@@ -200,25 +196,32 @@ const Rows = (() => {
         ? 'color:var(--green-d);font-weight:700;'
         : 'color:var(--red);font-weight:700;';
 
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="text-align:left; padding: 10px 12px;">
-          <div style="font-weight:700; color:var(--ink); font-size: 14px;">📦 ${p}</div>
-          <div style="font-size: 11.5px; color: var(--mut); margin-top: 6px; line-height: 1.5; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line2);">
-            <div>⏱️ Total Waktu Keseluruhan: <b>${Utils.nf0(item.durasiTotal)} mnt</b></div>
-            <div>⚙️ Waktu Produktif (Semua Kode 2): <b>${Utils.nf0(item.durasiProdAll)} mnt</b></div>
-            <div>✅ Waktu Produktif Valid (Good ≥ 1): <b style="color:var(--green-d);">${Utils.nf0(item.durasiValid)} mnt</b></div>
-            <div>🟨 Planned Down Time (Kode 5,6,7,8): <b style="color:var(--amber);">${Utils.nf0(item.durasiPlannedDT)} mnt</b></div>
-            <div>🟥 Unplanned Down Time (Kode 1,3,4,9): <b style="color:var(--red);">${Utils.nf0(item.durasiUnplannedDT)} mnt</b></div>
-          </div>
-        </td>
+      // Baris Utama: Nama Produk dan Nilai Angka Utama
+      const trMain = document.createElement('tr');
+      trMain.innerHTML = `
+        <td style="text-align:left; font-weight:700; color:var(--ink); padding: 10px 8px;">📦 ${p}</td>
         <td style="text-align:center;"><b>${Utils.nf0(item.durasiValid)}</b></td>
         <td style="text-align:center;">${Utils.nf0(item.rate)}</td>
         <td style="text-align:center;">${Utils.nf0(targetG)}</td>
         <td style="text-align:center;">${Utils.nf0(item.actual)}</td>
         <td style="text-align:center; ${perfColor}">${Utils.nf2(perfP)} %</td>
       `;
-      tbody.appendChild(tr);
+      tbody.appendChild(trMain);
+
+      // Baris Kedua (Sub-row): Kartu Rincian Waktu melebar ke bawah (Full Width)
+      const trSub = document.createElement('tr');
+      trSub.innerHTML = `
+        <td colspan="6" style="padding: 0 8px 12px 8px; background: #fafbfc; border-bottom: 2px solid var(--line);">
+          <div style="font-size: 11.5px; color: var(--mut); line-height: 1.6; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--line2); display: flex; flex-wrap: wrap; gap: 12px;">
+            <div>⏱️ Total Keseluruhan: <b>${Utils.nf0(item.durasiTotal)} mnt</b></div>
+            <div>⚙️ Prod (Semua): <b>${Utils.nf0(item.durasiProdAll)} mnt</b></div>
+            <div>✅ Prod (Valid Good≥1): <b style="color:var(--green-d);">${Utils.nf0(item.durasiValid)} mnt</b></div>
+            <div>🟨 Planned DT: <b style="color:var(--amber);">${Utils.nf0(item.durasiPlannedDT)} mnt</b></div>
+            <div>🟥 Unplanned DT: <b style="color:var(--red);">${Utils.nf0(item.durasiUnplannedDT)} mnt</b></div>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(trSub);
     });
 
     if (!hasData) {
