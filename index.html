@@ -219,12 +219,6 @@
             <polygon class="tree-leaf" points="0,-98 -34,54 34,54"/>
             <rect class="tree-trunk" x="-8" y="170" width="16" height="48"/>
           </g>
-          <g class="tree" transform="translate(1500, 830)">
-            <polygon class="tree-leaf" points="0,0 -44,145 44,145"/>
-            <polygon class="tree-leaf" points="0,-44 -36,90 36,90"/>
-            <polygon class="tree-leaf" points="0,-82 -27,46 27,46"/>
-            <rect class="tree-trunk" x="-7" y="145" width="14" height="42"/>
-          </g>
           <g class="tree" transform="translate(1820, 815)">
             <polygon class="tree-leaf" points="0,0 -50,165 50,165"/>
             <polygon class="tree-leaf" points="0,-50 -42,104 42,104"/>
@@ -280,6 +274,38 @@
                 <ellipse class="wm-blade" cx="0" cy="-36" rx="8.5" ry="36" transform="rotate(270)"/>
               </g>
               <circle class="wm-hub" r="6.5"/>
+            </g>
+          </g>
+
+          <!-- Pohon rimbun bulat (gaya kartun) — pengganti area dekat gubuk yang tadinya pinus -->
+          <g id="roundTree" class="round-tree" transform="translate(1710, 828)">
+            <ellipse class="rt-shadow" cx="0" cy="20" rx="66" ry="13"/>
+
+            <!-- Batang -->
+            <path class="rt-trunk" d="M-9,16 C-11,-14 -8,-44 -6,-76 L6,-76 C8,-44 11,-14 9,16 Z"/>
+            <path class="rt-trunk-line" d="M0,-8 C-3,-28 2,-48 -1,-68"/>
+            <path class="rt-branch" d="M-6,-58 C-22,-62 -30,-74 -26,-88"/>
+            <path class="rt-branch" d="M7,-53 C20,-58 26,-70 22,-82"/>
+
+            <!-- Kanopi rimbun setengah-bulat (multi-blob, gaya sama dengan cloud-puff) -->
+            <g class="rt-canopy">
+              <circle class="rt-leaf rt-leaf-back" cx="-34" cy="-90" r="33"/>
+              <circle class="rt-leaf rt-leaf-back" cx="34"  cy="-90" r="33"/>
+              <circle class="rt-leaf rt-leaf-back" cx="0"   cy="-116" r="39"/>
+              <circle class="rt-leaf" cx="-40" cy="-68" r="29"/>
+              <circle class="rt-leaf" cx="40"  cy="-68" r="29"/>
+              <circle class="rt-leaf" cx="-14" cy="-54" r="29"/>
+              <circle class="rt-leaf" cx="14"  cy="-54" r="29"/>
+              <circle class="rt-leaf" cx="0"   cy="-96" r="37"/>
+              <circle class="rt-leaf-hi" cx="-16" cy="-106" r="15"/>
+              <circle class="rt-leaf-hi" cx="18"  cy="-88"  r="11"/>
+            </g>
+
+            <!-- Semak kecil di dasar -->
+            <g class="rt-bush">
+              <circle class="rt-leaf-back" cx="0"   cy="16" r="23"/>
+              <circle class="rt-leaf"      cx="-29" cy="10" r="19"/>
+              <circle class="rt-leaf"      cx="29"  cy="12" r="21"/>
             </g>
           </g>
 
@@ -346,6 +372,8 @@
             <g class="wg-clump" transform="translate(1500,1000)"  style="--wg-d:1.0s"> <path class="wg-blade" d="M10,40 C8,26 13,15 9,0"/><path class="wg-blade" d="M5,40 C4,29 9,19 6,6"/><path class="wg-blade" d="M15,40 C16,28 11,18 13,4"/></g>
             <g class="wg-clump" transform="translate(1690,1030) scale(.9)"  style="--wg-d:.5s">  <path class="wg-blade" d="M10,40 C8,26 13,15 9,0"/><path class="wg-blade" d="M5,40 C4,29 9,19 6,6"/><path class="wg-blade" d="M15,40 C16,28 11,18 13,4"/></g>
             <g class="wg-clump" transform="translate(1800,1045) scale(.8)"  style="--wg-d:.9s">  <path class="wg-blade" d="M10,40 C8,26 13,15 9,0"/><path class="wg-blade" d="M5,40 C4,29 9,19 6,6"/><path class="wg-blade" d="M15,40 C16,28 11,18 13,4"/></g>
+            <g class="wg-clump" transform="translate(1660,1005)"  style="--wg-d:.3s">  <path class="wg-blade" d="M10,40 C8,26 13,15 9,0"/><path class="wg-blade" d="M5,40 C4,29 9,19 6,6"/><path class="wg-blade" d="M15,40 C16,28 11,18 13,4"/></g>
+            <g class="wg-clump" transform="translate(1755,1000) scale(.9)" style="--wg-d:.7s">  <path class="wg-blade" d="M10,40 C8,26 13,15 9,0"/><path class="wg-blade" d="M5,40 C4,29 9,19 6,6"/><path class="wg-blade" d="M15,40 C16,28 11,18 13,4"/></g>
           </g>
 
           <!-- Kupu-kupu (hanya tampil pagi hari — diatur nature.js) -->
@@ -411,6 +439,7 @@
     <div class="preview-bar">
       <button type="button" id="weatherToggle" class="preview-btn" title="Preview efek cuaca (manual)">🌤 auto</button>
       <button type="button" id="sceneToggle" class="preview-btn" title="Ganti tema langit (preview)">🕐 auto</button>
+      <button type="button" id="natureToggle" class="preview-btn" title="Preview kupu-kupu (paksa tampil, untuk cek tanpa menunggu pagi)">🦋 auto</button>
     </div>
     <span id="wxChip" class="wx-chip"></span>
     <div class="login-card">

@@ -17,6 +17,7 @@ const Nature = (() => {
   'use strict';
 
   const REFRESH_MS = 30000; // selaras dengan interval update Scene (30 detik)
+  let manualButterflies = null; // null = auto (ikut jam), true/false = override manual (tombol preview)
 
   /**
    * Baca posisi X matahari saat ini dari elemen #sun (di-set oleh scene.js).
@@ -61,7 +62,23 @@ const Nature = (() => {
   const updateButterflies = () => {
     const wrap = document.getElementById('butterflies');
     if (!wrap) return;
-    wrap.classList.toggle('is-morning', isMorningNow());
+    const show = manualButterflies === null ? isMorningNow() : manualButterflies;
+    wrap.classList.toggle('is-morning', show);
+  };
+
+  /**
+   * Tombol preview "🦋" di pojok kanan bawah: paksa tampil / paksa sembunyi /
+   * kembali ke otomatis — supaya bisa dicek tanpa menunggu jam 06.00–10.00.
+   * Murni untuk keperluan pratinjau manual, tidak mengubah logika jam asli.
+   */
+  const cycleButterflyPreview = () => {
+    // null(auto) → true(paksa tampil) → false(paksa sembunyi) → null(auto) ...
+    manualButterflies = manualButterflies === null ? true : (manualButterflies === true ? false : null);
+    updateButterflies();
+    const btn = document.getElementById('natureToggle');
+    if (btn) {
+      btn.textContent = manualButterflies === null ? '🦋 auto' : (manualButterflies ? '🦋 tampil' : '🦋 sembunyi');
+    }
   };
 
   /**
@@ -96,6 +113,9 @@ const Nature = (() => {
     // Ikut update instan saat scene berganti (event ini sudah di-dispatch
     // oleh scene.js sebelumnya — di sini kita hanya MENDENGARKAN, additive).
     window.addEventListener('scenechange', refreshAll);
+
+    const toggleBtn = document.getElementById('natureToggle');
+    if (toggleBtn) toggleBtn.addEventListener('click', cycleButterflyPreview);
   };
 
   return { init, refreshAll };

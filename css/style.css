@@ -878,6 +878,21 @@ textarea.in {
 #bgScene.scene--night .wm-pole  { fill: #5c5848; }
 #bgScene.scene--night .wm-pole-shade { fill: #46433a; }
 
+/* ------- Pohon rimbun bulat (gaya kartun, kanopi dari blob bulat) ------- */
+.rt-shadow { fill: rgba(15, 35, 20, .18); }
+.rt-trunk       { fill: #7c4a26; stroke: #5a3417; stroke-width: 1.5; transition: fill 2s ease; }
+.rt-trunk-line  { fill: none; stroke: #5a3417; stroke-width: 2; opacity: .5; }
+.rt-branch      { fill: none; stroke: #7c4a26; stroke-width: 5; stroke-linecap: round; transition: stroke 2s ease; }
+.rt-leaf        { fill: #63b24a; transition: fill 2s ease; }
+.rt-leaf-back   { fill: #4f9a3c; transition: fill 2s ease; }
+.rt-leaf-hi     { fill: #8fd66a; opacity: .85; transition: fill 2s ease; }
+#bgScene.scene--sunrise .round-tree .rt-leaf,
+#bgScene.scene--sunset  .round-tree .rt-leaf { filter: saturate(.85) brightness(.92); }
+#bgScene.scene--night .round-tree {
+  filter: brightness(.45) saturate(.7);
+  transition: filter 2s ease;
+}
+
 /* ------- Gubuk kayu ------- */
 .hut-wall       { fill: #ab7d51; stroke: #7c5837; stroke-width: 2; transition: fill 2s ease; }
 .hut-plank      { stroke: #8b6541; stroke-width: 1.2; opacity: .55; }
