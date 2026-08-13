@@ -89,6 +89,7 @@ const CONFIG = Object.freeze({
   },
   WEATHER_REFRESH_MIN: 30,      // refresh API tiap N menit
   SNOW_MONTHS: [12],            // bulan dengan efek salju dekoratif (1=Jan..12=Des)
+  AUTUMN_MONTHS: [9, 10, 11],   // bulan dengan efek daun berguguran (state musim gugur dekoratif)
   RAINBOW_RECENT_MIN: 90,       // menit setelah hujan → pelangi muncul
 
   // Tanggal khusus yang memicu kembang api di background login

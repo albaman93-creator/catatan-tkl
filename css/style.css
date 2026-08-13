@@ -837,3 +837,153 @@ textarea.in {
   .dash-filters { grid-template-columns: 1fr 1fr; }
   .dash-panel { padding: 16px; }
 }
+
+/* =====================================================
+   NATURE EXTRAS — Layer tambahan pada background login
+   (sungai, kincir, gubuk, bunga matahari, rumput liar,
+   kupu-kupu, kunang-kunang, daun musim gugur)
+
+   Prinsip: SEMUA rule di bawah ini murni ADDITIVE.
+   Tidak ada rule lama (.scene--*, .hill-*, .tree-*, dst di atas)
+   yang diubah — variasi day/night untuk elemen baru dicapai lewat
+   selector gabungan baru, mis. "#bgScene.scene--night .river-body".
+   ===================================================== */
+
+#natureExtra { pointer-events: none; } /* elemen dekoratif, tidak pernah blok interaksi */
+
+/* ------- Sungai ------- */
+.river-body { fill: url(#riverGrad); opacity: .9; transition: opacity 1.5s ease, filter 1.5s ease; }
+.river-shine {
+  stroke: #f2fbff; stroke-width: 5; stroke-linecap: round;
+  stroke-dasharray: 16 22; opacity: .5; filter: blur(.4px);
+  animation: riverShineFlow 3.2s linear infinite;
+}
+@keyframes riverShineFlow { to { stroke-dashoffset: -76; } }
+#bgScene.scene--sunrise .river-body,
+#bgScene.scene--sunset  .river-body { filter: hue-rotate(-8deg) brightness(.92); }
+#bgScene.scene--night   .river-body { opacity: .82; filter: brightness(.5) saturate(.75); }
+#bgScene.scene--night   .river-shine { opacity: .28; }
+
+/* ------- Kincir angin ------- */
+.wm-pole       { fill: #d9d2c2; }
+.wm-pole-shade { fill: #b7ad98; }
+.wm-blade      { fill: #f6f1e3; stroke: #cfc6ac; stroke-width: 1.4; }
+.wm-hub        { fill: #7c7158; }
+#windmillBlades {
+  transform-origin: 0px 0px;
+  animation: windmillSpin 7s linear infinite;
+}
+@keyframes windmillSpin { to { transform: rotate(360deg); } }
+#bgScene.scene--night .wm-blade { fill: #8f8a77; }
+#bgScene.scene--night .wm-pole  { fill: #5c5848; }
+#bgScene.scene--night .wm-pole-shade { fill: #46433a; }
+
+/* ------- Gubuk kayu ------- */
+.hut-wall       { fill: #ab7d51; stroke: #7c5837; stroke-width: 2; transition: fill 2s ease; }
+.hut-plank      { stroke: #8b6541; stroke-width: 1.2; opacity: .55; }
+.hut-roof       { fill: #7c3c29; stroke: #5c2c1d; stroke-width: 2; transition: fill 2s ease; }
+.hut-chimney    { fill: #8d8d8d; }
+.hut-door       { fill: #5c3b22; stroke: #3c2513; stroke-width: 1.5; }
+.hut-knob       { fill: #d9b04c; }
+.hut-window     { fill: #bfe4f1; stroke: #5c3b22; stroke-width: 2; transition: fill 1.5s ease, filter 1.5s ease; }
+.hut-window-x   { stroke: #5c3b22; stroke-width: 1.4; }
+#bgScene.scene--night .hut-wall   { fill: #5b4230; }
+#bgScene.scene--night .hut-roof   { fill: #452019; }
+#bgScene.scene--night .hut-window {
+  fill: #ffe08c;
+  filter: drop-shadow(0 0 7px rgba(255, 224, 140, .85));
+}
+
+/* ------- Bunga matahari (arah kepala diatur oleh nature.js via inline transform) ------- */
+.sf-stem   { fill: none; stroke: #3f7d34; stroke-width: 5; stroke-linecap: round; }
+.sf-leaf   { fill: #4c9440; }
+.sf-petal  { fill: #ffd23f; stroke: #e0a800; stroke-width: .6; }
+.sf-center { fill: #7a5230; }
+.sf-head   { transform-origin: 0px 0px; transition: transform 3s ease; }
+#bgScene.scene--sunset .sf-petal, #bgScene.scene--sunrise .sf-petal { fill: #ffcf5c; }
+#bgScene.scene--night .sunflower { opacity: .55; transition: opacity 2s ease; }
+
+/* ------- Rumput liar (halus, bergoyang tertiup angin) ------- */
+.wg-clump  { transform-origin: 50% 100%; }
+.wg-blade {
+  fill: none; stroke: var(--grass, #2f8f3a); stroke-width: 3; stroke-linecap: round;
+  transform-origin: 50% 100%;
+  animation: wgSway 3.6s ease-in-out infinite;
+  animation-delay: var(--wg-d, 0s);
+  transition: stroke 2s ease;
+}
+.wg-clump .wg-blade:nth-child(2) { animation-delay: calc(var(--wg-d, 0s) + .15s); }
+.wg-clump .wg-blade:nth-child(3) { animation-delay: calc(var(--wg-d, 0s) + .3s); }
+@keyframes wgSway {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(5deg); }
+}
+
+/* ------- Kupu-kupu (hanya tampil pagi — di-toggle class .is-morning oleh nature.js) ------- */
+.butterflies .butterfly {
+  opacity: 0;
+  transform: translate(var(--bf-x), var(--bf-y));
+  transition: opacity 1.8s ease;
+}
+.butterflies.is-morning .butterfly {
+  opacity: 1;
+  animation: bfWander 11s ease-in-out infinite, bfBob 2.6s ease-in-out infinite;
+}
+.bf-wingL, .bf-wingR { transform-origin: 0px -4px; animation: bfFlap .5s ease-in-out infinite alternate; }
+.bf-wingR { animation-direction: alternate-reverse; }
+.bf-body  { stroke: #3a2b1a; stroke-width: 1.6; stroke-linecap: round; }
+.bf-yellow .bf-wingL ellipse, .bf-yellow .bf-wingR ellipse { fill: #ffd23f; stroke: #e0a800; stroke-width: .6; }
+.bf-purple .bf-wingL ellipse, .bf-purple .bf-wingR ellipse { fill: #b57bff; stroke: #8a4fd6; stroke-width: .6; }
+.bf-blue   .bf-wingL ellipse, .bf-blue   .bf-wingR ellipse { fill: #5aa9ff; stroke: #2f7fd6; stroke-width: .6; }
+@keyframes bfFlap { from { transform: scaleX(1); } to { transform: scaleX(.35); } }
+@keyframes bfBob  { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes bfWander {
+  0%   { translate: 0px 0px; rotate: 0deg; }
+  25%  { translate: 18px -14px; rotate: 8deg; }
+  50%  { translate: -6px -26px; rotate: -6deg; }
+  75%  { translate: -22px -10px; rotate: 6deg; }
+  100% { translate: 0px 0px; rotate: 0deg; }
+}
+
+/* ------- Kunang-kunang (hanya malam — otomatis via class scene--night yang SUDAH ADA) ------- */
+.fireflies { opacity: 0; transition: opacity 2s ease; }
+#bgScene.scene--night .fireflies { opacity: 1; }
+.firefly {
+  fill: #eaff8a;
+  filter: drop-shadow(0 0 4px #eaff8a);
+  animation: ffGlow 2.4s ease-in-out infinite, ffDrift 7s ease-in-out infinite;
+  animation-delay: var(--ff-d, 0s), var(--ff-d, 0s);
+}
+@keyframes ffGlow  { 0%, 100% { opacity: .15; } 50% { opacity: 1; } }
+@keyframes ffDrift { 0% { transform: translate(0,0); } 50% { transform: translate(10px,-14px); } 100% { transform: translate(-6px,4px); } }
+
+/* ------- Daun musim gugur (opsional — hanya tampil bila .is-autumn aktif, di-toggle nature.js) ------- */
+.af-wrap { transform: translate(var(--af-x), -40px); }
+.autumn-leaf {
+  opacity: 0;
+  transform-origin: 0px 0px;
+  animation: none;
+}
+.autumn-leaves.is-autumn .autumn-leaf {
+  opacity: .85;
+  animation: leafFall var(--af-dur, 10s) linear infinite;
+  animation-delay: var(--af-d, 0s);
+}
+.leaf-a { fill: #d9772e; }
+.leaf-b { fill: #c0392b; }
+.leaf-c { fill: #e0a63e; }
+@keyframes leafFall {
+  0%   { transform: translate(0,0) rotate(0deg);       opacity: 0; }
+  10%  { opacity: .85; }
+  50%  { transform: translate(36px, 560px) rotate(150deg); }
+  90%  { opacity: .85; }
+  100% { transform: translate(-18px, 1150px) rotate(300deg); opacity: 0; }
+}
+
+/* Hormati preferensi reduced-motion untuk semua efek nature baru */
+@media (prefers-reduced-motion: reduce) {
+  #windmillBlades, .river-shine, .wg-blade, .butterflies .butterfly,
+  .bf-wingL, .bf-wingR, .firefly, .autumn-leaf {
+    animation: none !important;
+  }
+}
