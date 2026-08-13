@@ -20,6 +20,7 @@ const App = (() => {
 
     // Set default tanggal = hari ini
     State.el.fDate.value = Utils.todayLocal();
+    UI.updateShiftIndicator();
 
     // Load record pertama
     Storage.loadRecord();
@@ -134,6 +135,8 @@ const App = (() => {
     ['fDate','fLine','fStage'].forEach(id => {
       State.el[id].addEventListener('change', Storage.loadRecord);
     });
+    // Indikator Shift & Tanggal di toolbar atas ikut update tiap tanggal diganti
+    State.el.fDate.addEventListener('input', UI.updateShiftIndicator);
 
     // Buttons
     State.el.btnSave.addEventListener('click', () => Storage.saveData());

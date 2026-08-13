@@ -26,6 +26,7 @@ const State = (() => {
     const ids = [
       'loginOverlay', 'loginForm', 'loginEmail', 'loginPassword', 'loginBtn', 'loginError', 'loginOfflineNote',
       'appContainer', 'pos', 'hint', 'lastSaved', 'syncStatus',
+      'shiftIndicator', 'shiftIndicatorText',
       'fDate', 'fLine', 'fStage',
       'op1','op2','op3','op4','op5','op6',
       'prodName1','prodRate1','prodName2','prodRate2','prodName3','prodRate3',

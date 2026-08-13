@@ -78,6 +78,15 @@ const UI = (() => {
     State.el.rincSub.textContent = `Evaluasi Shift ${State.evalShift + 1} · A = ${maxMnt} mnt`;
     State.el.maxShiftMnt.textContent = maxMnt;
     State.el.maxShiftMnt2.textContent = maxMnt;
+    updateShiftIndicator();
+  };
+
+  // ====== INDIKATOR SHIFT & TANGGAL AKTIF (di toolbar atas, tidak perlu scroll) ======
+  const updateShiftIndicator = () => {
+    if (!State.el.shiftIndicatorText) return;
+    const dateVal = State.el.fDate ? State.el.fDate.value : '';
+    const dateText = dateVal ? Utils.formatDateText(dateVal) : '— pilih tanggal —';
+    State.el.shiftIndicatorText.textContent = `SHIFT ${State.evalShift + 1} · ${dateText}`;
   };
 
   const bindShiftButtons = () => {
@@ -174,6 +183,7 @@ const UI = (() => {
     tick, startClock, toast, autoResizeTextarea,
     applyModeUI, bindModeButtons, loadNavMode,
     applyShiftUI, bindShiftButtons, loadEvalShift,
+    updateShiftIndicator,
     updateEditChip, setSyncStatus,
     setupPWA, registerServiceWorker,
   };
