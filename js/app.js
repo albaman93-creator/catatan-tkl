@@ -171,6 +171,11 @@ const App = (() => {
     if (typeof SupabaseClient !== 'undefined') SupabaseClient.init();
 
     bindEvents();
+
+    // Mode Input Cepat (Normal / Cepat 1 / Cepat 2) — additive, tidak
+    // mengubah alur Mode Normal yang sudah ada.
+    if (typeof QuickMode !== 'undefined') QuickMode.init();
+
     Auth.initSession();
 
     // Coba kirim antrean offline yang tertunda (jika ada) begitu app siap

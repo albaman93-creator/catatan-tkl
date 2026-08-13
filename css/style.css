@@ -267,6 +267,18 @@ kbd {
 .navmode button.on  { background: var(--navy); color: #fff; box-shadow: 0 2px 6px -2px rgba(13,33,53,.55); }
 .shiftsel button.on { background: var(--green-d); color: #fff; box-shadow: 0 2px 6px -2px rgba(12,124,61,.6); }
 .navmode button:not(.on):hover, .shiftsel button:not(.on):hover { color: var(--ink); background: #f2f6f8; }
+.inputmode {
+  display: flex; align-items: center; gap: 2px;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 8px; padding: 3px;
+}
+.inputmode button {
+  border: 0; background: transparent; border-radius: 6px; padding: 6px 10px;
+  font: 600 12px var(--mono); color: var(--mut); cursor: pointer; transition: .2s;
+}
+.inputmode button.on { background: var(--amber); color: #fff; box-shadow: 0 2px 6px -2px rgba(217,119,6,.6); }
+.inputmode button:not(.on):hover { color: var(--ink); background: #f2f6f8; }
+
 .hint { font-size: 12px; font-family: var(--mono); color: var(--mut); flex-basis: 100%; }
 #lastSaved { font: 12px var(--mono); color: var(--green-d); }
 
@@ -460,8 +472,8 @@ table { width: 100%; border-collapse: collapse; }
 @keyframes rowin { from { opacity: 0; transform: translateY(-4px); } }
 .log tbody tr:hover { background: #f6faf8; }
 
-tr.log-row[data-cat="planned"]    { background-color: #ffffff; }
-tr.log-row[data-cat="planned"]:hover   { background-color: #fafcfd; }
+tr.log-row[data-cat="planned"]    { background-color: rgba(217, 119, 6, 0.18); }
+tr.log-row[data-cat="planned"]:hover   { background-color: rgba(217, 119, 6, 0.26); }
 tr.log-row[data-cat="unplanned"]  { background-color: rgba(220, 38, 38, 0.25); }
 tr.log-row[data-cat="unplanned"]:hover { background-color: rgba(220, 38, 38, 0.33); }
 tr.log-row[data-cat="prod"]       { background-color: rgba(18, 161, 80, 0.25); }
@@ -506,6 +518,89 @@ td.dur { text-align: center; width: 70px; }
 }
 
 .col-hide { display: none !important; }
+
+/* =====================================================
+   MODE INPUT CEPAT — kolom ringkas & field khusus
+   ===================================================== */
+/* Mode Cepat 1: fokus Kode, Jam Mulai, Durasi, Kegiatan, Batch, Good, Defect
+   (kolom Kegiatan dibuka — sama seperti Mode Normal) */
+table.log.qm-cepat1 .col-panggil,
+table.log.qm-cepat1 .col-teknik,
+table.log.qm-cepat1 .col-selesai,
+table.log.qm-cepat1 .col-masalah,
+table.log.qm-cepat1 .col-disposisi,
+table.log.qm-cepat1 .col-wo { display: none !important; }
+
+/* Mode Cepat 2 / Super Cepat: tambahkan Jam Selesai */
+table.log.qm-cepat2 .col-panggil,
+table.log.qm-cepat2 .col-teknik,
+table.log.qm-cepat2 .col-kegiatan,
+table.log.qm-cepat2 .col-masalah,
+table.log.qm-cepat2 .col-disposisi,
+table.log.qm-cepat2 .col-wo { display: none !important; }
+
+/* Input Durasi menggantikan tampilan durasi otomatis pada Mode Cepat */
+table.log.qm-cepat1 .dur-v, table.log.qm-cepat2 .dur-v { display: none !important; }
+table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
+  display: inline-block !important; max-width: 62px;
+}
+.col-durasi { white-space: nowrap; }
+
+/* Style umum untuk input readonly (tidak dipakai lagi di Jam Mulai Mode Cepat,
+   semua kolom kini bebas diisi — disisakan untuk kebutuhan lain di masa depan) */
+.in[readonly] { background: #f1f5f9; color: var(--mut); cursor: not-allowed; }
+
+/* =====================================================
+   MODE CEPAT — Overlay konfirmasi & setup
+   ===================================================== */
+.qm-overlay {
+  position: fixed; inset: 0; z-index: 950;
+  background: rgba(15, 36, 55, .6);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 1; visibility: visible;
+  transition: opacity .18s ease, visibility .18s ease;
+}
+.qm-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+.qm-modal {
+  width: 100%; max-width: 440px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: 0 20px 60px -18px rgba(0,0,0,.45);
+  padding: 22px 22px 18px;
+}
+.qm-title { font: 800 18px var(--disp); color: var(--ink); margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
+.qm-title .bolt { font-size: 20px; }
+.qm-sub { font: 12.5px var(--mono); color: var(--mut); margin-bottom: 16px; line-height: 1.5; }
+.qm-row { margin-bottom: 12px; }
+.qm-label { display: block; font: 600 11.5px var(--mono); letter-spacing: .5px; text-transform: uppercase; color: var(--mut); margin-bottom: 6px; }
+.qm-choices { display: flex; gap: 8px; flex-wrap: wrap; }
+.qm-choices button {
+  flex: 1; min-width: 70px; padding: 12px 10px; border-radius: 10px;
+  border: 1.5px solid var(--line); background: #fbfcfd; color: var(--ink2);
+  font: 700 14px var(--mono); cursor: pointer; transition: .15s;
+}
+.qm-choices button:hover { border-color: var(--amber); color: var(--ink); }
+.qm-choices button.on { border-color: var(--amber); background: rgba(217,119,6,.1); color: var(--amber); }
+.qm-slot { border: 1px solid var(--line2); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; background: #fbfcfd; }
+.qm-slot .qm-label { margin-bottom: 4px; }
+.qm-slot select, .qm-slot input {
+  width: 100%; border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px 10px; font: 500 14px var(--body); color: var(--ink); background: #fff;
+}
+.qm-slot select { margin-bottom: 8px; }
+.qm-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.qm-actions .btn { padding: 10px 18px; }
+
+/* Dropdown pilihan jam mulai (per shift) pada baris pertama Mode Cepat */
+.qm-time-dropdown {
+  position: absolute; z-index: 60; min-width: 150px;
+  background: #fff; border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,.35); padding: 6px; margin-top: 4px;
+}
+.qm-time-dropdown button {
+  display: block; width: 100%; text-align: left; border: 0; background: transparent;
+  padding: 8px 10px; border-radius: 6px; font: 600 13px var(--mono); color: var(--ink2); cursor: pointer;
+}
+.qm-time-dropdown button:hover { background: var(--green-bg); color: var(--green-d); }
 .col-kegiatan, .col-masalah, .col-disposisi, .col-batch {
   min-width: 200px; max-width: 280px; width: 220px; white-space: normal !important;
 }

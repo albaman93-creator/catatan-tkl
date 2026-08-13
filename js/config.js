@@ -62,8 +62,11 @@ const CONFIG = Object.freeze({
   },
 
   // ====== URUTAN KOLOM NAVIGASI (tab order) ======
+  // 'durasi' hanya terlihat/terpakai pada Mode Cepat 1 & Mode Cepat 2
+  // (disembunyikan otomatis di Mode Normal, tidak ikut tab order berkat
+  // filter offsetParent di Navigation.navCells).
   NAV_FIELDS: [
-    'kode', 'mulai', 'panggil', 'teknik', 'selesai',
+    'kode', 'mulai', 'panggil', 'teknik', 'selesai', 'durasi',
     'kegiatan', 'masalah', 'disposisi', 'wo', 'batch',
     'good', 'defect'
   ],
@@ -71,10 +74,18 @@ const CONFIG = Object.freeze({
   // ====== LABEL KOLOM (untuk indikator posisi) ======
   FIELD_LABELS: {
     kode: 'KODE', mulai: 'JAM MULAI', panggil: 'PANGGIL TEKNIK',
-    teknik: 'TEKNIK DATANG', selesai: 'JAM SELESAI', kegiatan: 'KEGIATAN',
+    teknik: 'TEKNIK DATANG', selesai: 'JAM SELESAI', durasi: 'DURASI (MENIT)',
+    kegiatan: 'KEGIATAN',
     masalah: 'MASALAH', disposisi: 'DISPOSISI', wo: 'NOMOR WO',
     batch: 'PRODUK & BATCH', good: 'GOOD', defect: 'DEFECT'
   },
+
+  // ====== MODE INPUT (Normal / Cepat 1 / Cepat 2) ======
+  INPUT_MODE_KEY: 'fima_input_mode',
+
+  // Jam mulai standar per shift, dipakai untuk dropdown cepat pada baris pertama
+  // di Mode Cepat 1 & Mode Cepat 2 (lihat js/quickmode.js).
+  SHIFT_START_TIMES: ['07:00', '15:30', '23:30'],
 
   // ====== BULAN (untuk format tanggal) ======
   MONTHS: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'],

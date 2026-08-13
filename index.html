@@ -480,6 +480,13 @@
           <button type="button" data-mode="h">⇄ HORIZONTAL</button>
         </div>
 
+        <div class="inputmode" id="qmModeSel" title="Mode pengisian data">
+          <span class="nm-cap">MODE INPUT</span>
+          <button type="button" data-imode="normal" class="on">📝 Normal</button>
+          <button type="button" data-imode="cepat1">⚡ Cepat 1</button>
+          <button type="button" data-imode="cepat2">⚡⚡ Super Cepat</button>
+        </div>
+
         <span class="hint" id="hint"></span>
         <span class="spacer"></span>
         <span id="lastSaved"></span>
@@ -628,7 +635,7 @@
         </div>
 
         <div class="tbl-wrap">
-          <table class="log">
+          <table class="log" id="logTable">
             <thead>
               <tr>
                 <th class="col-num" rowspan="2">#</th>
@@ -821,6 +828,11 @@
     </div>
   </div>
 
+  <!-- ============ MODE CEPAT — Overlay Konfirmasi & Setup ============ -->
+  <div id="qmOverlay" class="qm-overlay hide">
+    <div class="qm-modal" id="qmModal"></div>
+  </div>
+
   <!-- JS (urutan PENTING: dari dependen paling dasar ke paling atas) -->
   <script src="./js/config.js"></script>
   <script src="./js/utils.js"></script>
@@ -834,6 +846,7 @@
   <script src="./js/sync.js"></script>
   <script src="./js/storage.js"></script>
   <script src="./js/dashboard.js"></script>
+  <script src="./js/quickmode.js"></script>
   <script src="./js/scene.js"></script>
   <script src="./js/nature.js"></script>
   <script src="./js/fx.js"></script>

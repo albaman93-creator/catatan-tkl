@@ -57,6 +57,17 @@ const Utils = (() => {
     return parseTime(v) != null ? v : null;
   };
 
+  /**
+   * Format total menit (0-1439, boleh > 1439 lalu di-mod otomatis) → "HH:MM".
+   */
+  const minutesToHHMM = (mins) => {
+    if (mins == null || isNaN(mins)) return '';
+    const m = ((Math.round(mins) % 1440) + 1440) % 1440;
+    const h = Math.floor(m / 60);
+    const mi = m % 60;
+    return String(h).padStart(2, '0') + ':' + String(mi).padStart(2, '0');
+  };
+
   // ====== TANGGAL ======
   const todayLocal = () => {
     const n = new Date();
@@ -108,7 +119,7 @@ const Utils = (() => {
   }[c]));
 
   return {
-    nf0, nf2, parseNumber, parseTime, maskTime, normTime,
+    nf0, nf2, parseNumber, parseTime, maskTime, normTime, minutesToHHMM,
     todayLocal, formatDateText, shiftOf, catOf, escapeHtml
   };
 })();

@@ -12,6 +12,13 @@ const State = (() => {
   let deferredPrompt = null;   // PWA install prompt
   let toastTimer = null;       // timer untuk auto-hide toast
 
+  // Mode Input Cepat (lihat js/quickmode.js)
+  // inputMode: 'normal' | 'cepat1' | 'cepat2'
+  // activeProducts: array nama produk aktif (dari Master Produk) yang dipakai
+  //                 sebagai fokus pengisian pada Mode Cepat 1 / Mode Cepat 2.
+  let inputMode = 'normal';
+  let quickActiveProducts = [];
+
   // Cache elemen DOM (akan di-inisialisasi setelah DOMContentLoaded)
   const el = {};
 
@@ -34,6 +41,7 @@ const State = (() => {
       'oG1','oG2','oG3','oH1','oH2','oH3',
       'oI1','oI2','oI3','oITotal','badgeAvgP',
       'oJ','oK','oL','oM','oee','diag','toast',
+      'qmOverlay', 'qmModal',
     ];
     ids.forEach(id => { el[id] = document.getElementById(id); });
   };
@@ -48,6 +56,10 @@ const State = (() => {
     set deferredPrompt(v){ deferredPrompt = v; },
     get toastTimer()     { return toastTimer; },
     set toastTimer(v)    { toastTimer = v; },
+    get inputMode()          { return inputMode; },
+    set inputMode(v)         { inputMode = v; },
+    get quickActiveProducts(){ return quickActiveProducts; },
+    set quickActiveProducts(v){ quickActiveProducts = v; },
 
     // DOM cache
     el,

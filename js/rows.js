@@ -7,11 +7,24 @@ const Rows = (() => {
   'use strict';
 
   // ====== HELPER ======
-  const getActiveProducts = () => {
+  const getAllProducts = () => {
     const p1 = State.el.prodName1.value.trim();
     const p2 = State.el.prodName2.value.trim();
     const p3 = State.el.prodName3.value.trim();
     return [p1, p2, p3].filter(Boolean);
+  };
+
+  /**
+   * Produk yang aktif untuk dropdown Batch pada baris log.
+   * Di Mode Normal: semua produk Master Produk yang terisi.
+   * Di Mode Cepat 1 / Mode Cepat 2: hanya produk yang dipilih user
+   * saat setup mode cepat (lihat QuickMode), agar user fokus mengisi.
+   */
+  const getActiveProducts = () => {
+    if (State.inputMode !== 'normal' && State.quickActiveProducts.length > 0) {
+      return State.quickActiveProducts.filter(Boolean);
+    }
+    return getAllProducts();
   };
 
   const getRateForProduct = (prodName) => {
@@ -89,13 +102,13 @@ const Rows = (() => {
     tr.innerHTML = `
       <td class="col-num">${rows().length + 1}</td>
       <td class="col-kode"><div class="c-kode"><span class="dot"></span>
-        <input data-f="kode" data-nav class="in mono ctr" type="tel" inputmode="numeric" maxlength="2" placeholder=" " aria-label="Kode">
+        <input data-f="kode" data-nav class="in mono ctr" type="tel" inputmode="numeric" maxlength="1" placeholder=" " aria-label="Kode">
       </div></td>
       <td class="col-mulai"><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>
       <td class="col-panggil"><input data-f="panggil" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Panggil Teknik"></td>
       <td class="col-teknik"><input data-f="teknik" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Teknik Datang"></td>
       <td class="col-selesai"><input data-f="selesai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Selesai"></td>
-      <td class="col-durasi dur"><b class="dur-v"> </b></td>
+      <td class="col-durasi dur"><b class="dur-v"> </b><input data-f="durasi" data-nav class="in mono ctr durasi-input" type="text" inputmode="decimal" maxlength="4" placeholder="0" aria-label="Durasi (menit)" style="display:none"></td>
       <td class="col-kegiatan"><textarea data-f="kegiatan" data-nav class="in" placeholder="Kegiatan " aria-label="Kegiatan" rows="1"></textarea></td>
       <td class="col-masalah"><textarea data-f="masalah" data-nav class="in" placeholder="Penyebab " aria-label="Masalah" rows="1"></textarea></td>
       <td class="col-disposisi"><textarea data-f="disposisi" data-nav class="in" placeholder="Tindakan " aria-label="Disposisi" rows="1"></textarea></td>

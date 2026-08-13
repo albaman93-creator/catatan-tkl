@@ -14,11 +14,22 @@ const Navigation = (() => {
     const list = [];
     const rs = Rows.rows();
 
+    // Sebuah field ikut tab order hanya kalau benar-benar terlihat:
+    // tidak ada di kolom yang disembunyikan lewat toggle kolom (.col-hide),
+    // dan tidak disembunyikan lewat CSS mode input (mis. kolom Durasi di
+    // Mode Normal, atau kolom yang disembunyikan di Mode Cepat 1/2).
+    // offsetParent null → elemen (atau leluhurnya) sedang display:none.
+    const isVisible = (el) => {
+      const td = el.closest('td');
+      if (td && td.classList.contains('col-hide')) return false;
+      return el.offsetParent !== null;
+    };
+
     if (State.navMode === 'v') {
       CONFIG.NAV_FIELDS.forEach((f, ci) => {
         rs.forEach((r, ri) => {
           const el = r.querySelector(`[data-f="${f}"]`);
-          if (el && !el.closest('td').classList.contains('col-hide')) {
+          if (el && isVisible(el)) {
             list.push({ el, f, ci, ri });
           }
         });
@@ -27,7 +38,7 @@ const Navigation = (() => {
       rs.forEach((r, ri) => {
         CONFIG.NAV_FIELDS.forEach((f, ci) => {
           const el = r.querySelector(`[data-f="${f}"]`);
-          if (el && !el.closest('td').classList.contains('col-hide')) {
+          if (el && isVisible(el)) {
             list.push({ el, f, ci, ri });
           }
         });
