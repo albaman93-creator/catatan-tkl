@@ -124,6 +124,15 @@ const Storage = (() => {
     Calculation.recalc();
     Calculation.validateAllTimeInputs();
     UI.updateEditChip(d);
+
+    // Kalau Mode Form sedang aktif, sinkronkan kartu form ke baris pertama
+    // dari data yang baru saja dimuat (data tabel baru saja diganti total).
+    if (typeof FormMode !== 'undefined' && State.el.formPanel && !State.el.formPanel.hidden) {
+      FormMode.resetAndRender();
+    }
+    if (typeof FormModeFull !== 'undefined' && State.el.formFullPanel && !State.el.formFullPanel.hidden) {
+      FormModeFull.resetAndRender();
+    }
   };
 
   // ====== HELPER: derivasi kolom ringkasan untuk Supabase ======

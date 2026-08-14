@@ -343,27 +343,28 @@ kbd {
   pointer-events: none;
 }
 
-/* ====== SCREEN NAV — pindah antar section tanpa scroll ====== */
+/* ====== SCREEN NAV — kini menyatu di Toolbar (persingkat: Data, Produk,
+   Sheet, Inisial, Perform/Produk, Hasil OEE) supaya tidak makan tempat ====== */
 .screen-nav {
-  display: flex; flex-wrap: wrap; gap: 8px;
-  padding: 14px 28px; background: #eef2f5;
-  border-bottom: 1px solid var(--line);
+  display: inline-flex; flex-wrap: wrap; gap: 4px;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 9px; padding: 3px;
 }
 .screen-tab {
-  display: inline-flex; align-items: center; gap: 7px;
-  border: 1px solid var(--line); background: #fff; color: var(--ink2);
-  font: 700 12.5px var(--mono); letter-spacing: .3px;
-  padding: 10px 14px; border-radius: 9px; cursor: pointer; transition: .15s;
+  display: inline-flex; align-items: center; gap: 5px;
+  border: 0; background: transparent; color: var(--mut);
+  font: 700 12px var(--mono); letter-spacing: .3px;
+  padding: 9px 11px; border-radius: 7px; cursor: pointer; transition: .15s;
   white-space: nowrap;
 }
-.screen-tab:hover { border-color: #b8c6d0; color: var(--ink); transform: translateY(-1px); }
+.screen-tab:hover { color: var(--ink); background: #f2f6f8; }
 .screen-tab.on {
-  background: var(--navy); border-color: var(--navy); color: #fff;
-  box-shadow: 0 2px 8px -2px rgba(13,33,53,.5);
+  background: var(--navy); color: #fff;
+  box-shadow: 0 2px 6px -2px rgba(13,33,53,.55);
 }
 @media (max-width: 768px) {
-  .screen-nav { padding: 10px 12px; gap: 6px; }
-  .screen-tab { flex: 1 1 calc(50% - 6px); justify-content: center; padding: 11px 8px; font-size: 11.5px; }
+  .screen-nav { flex: 1 1 100%; justify-content: center; }
+  .screen-tab { flex: 1 1 calc(33.333% - 4px); justify-content: center; padding: 9px 4px; font-size: 10.5px; }
 }
 
 /* Section disembunyikan kecuali yang sedang aktif (dipilih lewat Screen Nav) */
@@ -456,12 +457,59 @@ h1 { font: 700 clamp(24px,5vw,34px)/1 var(--disp); letter-spacing: .8px; text-tr
   outline: none; border-color: var(--green); background: #fff;
   box-shadow: 0 0 0 3px rgba(18,161,80,.16);
 }
+/* Peringatan kolom wajib isi (form-panel / form-panel-full) belum terisi */
+.field input.invalid, .field select.invalid, .field textarea.invalid {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 0 3px rgba(220,38,38,.14);
+  animation: shake .3s;
+}
 /* Shift selector saat dipakai di dalam .field (Data & Penyimpanan) */
 .field .shiftsel {
   width: 100%; box-sizing: border-box;
   background: #fbfcfd; border: 1px solid var(--line); border-radius: 8px; padding: 4px;
 }
 .field .shiftsel button { flex: 1; justify-content: center; padding: 9px 4px; }
+
+/* ====== HELP / PANDUAN (disembunyikan default, buka lewat tombol ⓘ) ====== */
+.help-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  font: 600 12px var(--mono); color: var(--mut);
+  background: #fff; border: 1px solid var(--line); border-radius: 8px;
+  padding: 7px 12px; cursor: pointer; transition: .15s; white-space: nowrap;
+}
+.help-btn:hover { color: var(--ink); border-color: #b8c6d0; }
+.help-btn[aria-expanded="true"] { color: var(--green-d); border-color: rgba(18,161,80,.4); background: var(--green-bg); }
+.help-panel {
+  background: #f4f7f9; border: 1px solid var(--line); border-radius: 8px;
+  padding: 10px 14px; margin-bottom: 12px;
+}
+.help-panel p { font: 12px var(--mono); color: var(--mut); margin: 0 0 8px; }
+.help-panel .legend { margin-bottom: 0; }
+
+/* ====== VIEW TOGGLE: Tabel / Form / Form Lengkap ====== */
+.view-toggle {
+  display: inline-flex; align-items: center; gap: 2px;
+  background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 3px;
+}
+.view-toggle button {
+  border: 0; background: transparent; border-radius: 6px; padding: 7px 12px;
+  font: 600 12px var(--mono); color: var(--mut); cursor: pointer; transition: .2s;
+  white-space: nowrap;
+}
+.view-toggle button.on { background: var(--navy); color: #fff; box-shadow: 0 2px 6px -2px rgba(13,33,53,.5); }
+.view-toggle button:not(.on):hover { color: var(--ink); background: #f2f6f8; }
+
+/* Saat Mode Form / Form Lengkap aktif: sembunyikan ceklis "Tampilkan Kolom"
+   & panel Panduan — tidak relevan waktu fokus isi satu baris, dan bikin
+   scroll tambahan yang mengganggu (pengalaman jadi lebih "native"). */
+.sec[data-screen="logsheet"][data-view="form"] .col-toggle-wrap,
+.sec[data-screen="logsheet"][data-view="form-full"] .col-toggle-wrap,
+.sec[data-screen="logsheet"][data-view="form"] .help-btn,
+.sec[data-screen="logsheet"][data-view="form-full"] .help-btn,
+.sec[data-screen="logsheet"][data-view="form"] .help-panel,
+.sec[data-screen="logsheet"][data-view="form-full"] .help-panel {
+  display: none !important;
+}
 
 /* ====== LEGEND ====== */
 .legend { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
@@ -476,14 +524,24 @@ h1 { font: 700 clamp(24px,5vw,34px)/1 var(--disp); letter-spacing: .8px; text-tr
 .sw-r { background: var(--red); }
 .sw-g { background: var(--green); }
 
-/* ====== COLUMN TOGGLE BAR ====== */
+/* ====== COLUMN TOGGLE (bisa digulung, ringkas secara default) ====== */
+.col-toggle-wrap { margin-bottom: 10px; }
+.col-toggle-head {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 600 11.5px var(--mono); letter-spacing: .8px; text-transform: uppercase;
+  color: var(--mut); background: #f4f7f9; border: 1px solid var(--line);
+  border-radius: 8px; padding: 7px 12px; cursor: pointer; transition: .15s;
+}
+.col-toggle-head:hover { color: var(--ink); border-color: #b8c6d0; }
+.col-toggle-head[aria-expanded="true"] { color: var(--green-d); border-color: rgba(18,161,80,.4); background: var(--green-bg); }
 .col-toggle-bar {
   display: flex; align-items: center; gap: 8px;
   flex-wrap: wrap; background: #f4f7f9;
   padding: 8px 12px; border-radius: 8px;
-  border: 1px solid var(--line); margin-bottom: 10px;
+  border: 1px solid var(--line); border-top: none;
+  border-top-left-radius: 0; border-top-right-radius: 0;
+  margin-top: -1px;
 }
-.col-toggle-bar span { font: 600 11.5px var(--mono); color: var(--mut); letter-spacing: .8px; text-transform: uppercase; }
 .col-toggle-bar label {
   font: 500 12px var(--mono); color: var(--ink2);
   display: inline-flex; align-items: center; gap: 4px;
@@ -495,8 +553,100 @@ h1 { font: 700 clamp(24px,5vw,34px)/1 var(--disp); letter-spacing: .8px; text-tr
 
 .col-kode { min-width: 90px !important; width: 90px !important; }
 
+/* ====== MODE FORM INPUT — satu baris per kartu, dengan navigator ====== */
+.form-panel {
+  background: #fbfcfd; border: 1px solid var(--line); border-radius: 12px;
+  padding: 16px; margin-bottom: 4px;
+  border-left: 4px solid var(--line);
+}
+.form-panel[data-cat="planned"]   { border-left-color: var(--amber); background: rgba(217,119,6,.06); }
+.form-panel[data-cat="unplanned"] { border-left-color: var(--red);   background: rgba(220,38,38,.06); }
+.form-panel[data-cat="prod"]      { border-left-color: var(--green); background: var(--green-bg); }
+
+.fp-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-bottom: 14px;
+}
+.fp-nav-btn {
+  font: 700 13px var(--mono); color: var(--ink2);
+  background: #fff; border: 1px solid var(--line); border-radius: 8px;
+  padding: 10px 16px; cursor: pointer; transition: .15s;
+}
+.fp-nav-btn:hover { border-color: #b8c6d0; color: var(--ink); }
+.fp-nav-btn:disabled { opacity: .4; cursor: not-allowed; }
+.fp-nav-label {
+  font: 700 13px var(--mono); color: var(--ink); letter-spacing: .4px;
+  background: #fff; border: 1px solid var(--line); border-radius: 99px;
+  padding: 8px 16px;
+}
+.fp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.fp-span2 { grid-column: 1 / -1; }
+.form-panel .field textarea {
+  width: 100%; border: 1px solid var(--line); border-radius: 8px;
+  padding: 12px 14px; font: 600 15px var(--mono); color: var(--ink);
+  background: #fbfcfd; resize: vertical; min-height: 46px;
+}
+.form-panel .field textarea:focus {
+  outline: none; border-color: var(--green); background: #fff;
+  box-shadow: 0 0 0 3px rgba(18,161,80,.16);
+}
+.fp-save { width: 100%; margin-top: 14px; padding: 14px; font-size: 15px; }
+@media (max-width: 640px) {
+  .fp-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ====== MODE FORM LENGKAP — semua kolom, nav & simpan tetap di tempat
+   (tidak ikut ke-scroll), cuma area field yang scroll di dalam kartu ====== */
+.form-panel-full { padding: 0; overflow: hidden; }
+.form-panel-full .fp-nav {
+  margin: 0; padding: 14px 16px;
+  background: #fff; border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 2;
+}
+.form-panel-full .ff-scroll {
+  max-height: 52vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 16px; overscroll-behavior: contain;
+}
+.ff-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.ff-span2 { grid-column: span 2; }
+.form-panel-full .field textarea {
+  width: 100%; border: 1px solid var(--line); border-radius: 8px;
+  padding: 10px 12px; font: 600 14px var(--mono); color: var(--ink);
+  background: #fbfcfd; resize: vertical; min-height: 42px;
+}
+.form-panel-full .field textarea:focus {
+  outline: none; border-color: var(--green); background: #fff;
+  box-shadow: 0 0 0 3px rgba(18,161,80,.16);
+}
+.form-panel-full .field select {
+  width: 100%; border: 1px solid var(--line); border-radius: 8px;
+  padding: 12px 14px; font: 600 14px var(--mono); color: var(--ink); background: #fbfcfd;
+}
+.ff-actions {
+  display: flex; gap: 10px; padding: 14px 16px;
+  background: #fff; border-top: 1px solid var(--line);
+  position: sticky; bottom: 0; z-index: 2;
+}
+.ff-actions .fp-save { margin-top: 0; flex: 3; }
+.ff-actions .btn-logout { flex: 1; white-space: nowrap; }
+@media (max-width: 900px) {
+  .ff-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .ff-grid { grid-template-columns: 1fr; }
+  .ff-span2 { grid-column: 1; }
+  .ff-actions { flex-direction: column; }
+  .form-panel-full .ff-scroll { max-height: 46vh; }
+}
+
 /* ====== LOG TABLE ====== */
-.tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+/* Wrapper punya scroll-context sendiri (vertikal & horizontal) supaya header
+   kolom & nomor baris bisa "dikunci" (position: sticky) — tetap kelihatan
+   sedang mengisi baris/kolom mana walau daftar baris panjang. */
+.tbl-wrap {
+  overflow: auto; -webkit-overflow-scrolling: touch;
+  max-height: 66vh; border: 1px solid var(--line); border-radius: 8px;
+}
 table { width: 100%; border-collapse: collapse; }
 
 /* Tabel Log Sheet: lebar tiap kolom TETAP (colgroup) — dirampingkan agar
@@ -535,6 +685,28 @@ col.col-hide { display: none; }
 .log th.on { color: var(--green-d); background: var(--green-bg); }
 
 .log td { padding: 3px 4px; border-bottom: 1px solid var(--line2); vertical-align: middle; }
+
+/* --- LOCK HEADER: baris judul kolom tetap kelihatan saat scroll ke bawah --- */
+.log thead th {
+  position: sticky; top: 0; z-index: 15;
+  background: #f4f7f9; /* solid, biar konten baris tidak tembus di belakangnya */
+}
+.log thead tr:first-child th { top: 0; }
+/* Baris ke-2 header (Good/Defect) menempel tepat di bawah baris pertama */
+.log thead tr:nth-child(2) th { top: 33px; }
+
+/* --- LOCK KOLOM NOMOR: kolom "#" tetap kelihatan saat scroll ke samping --- */
+.log td.col-num, .log th.col-num {
+  position: sticky; left: 0; z-index: 6;
+  background: #fff;
+}
+.log thead th.col-num { z-index: 25; background: #f4f7f9; } /* pojok kiri-atas: prioritas tertinggi */
+tr.log-row[data-cat="planned"]   td.col-num { background: #fdf3e4; }
+tr.log-row[data-cat="unplanned"] td.col-num { background: #fce8e8; }
+tr.log-row[data-cat="prod"]      td.col-num { background: #e6f7ed; }
+/* Highlight baris yang sedang diisi/difokuskan, agar makin jelas posisinya */
+.log tbody tr:focus-within { outline: 2px solid var(--green); outline-offset: -2px; }
+.log tbody tr:focus-within td.col-num { box-shadow: inset 3px 0 0 var(--green-d); }
 
 /* Input/textarea di dalam tabel Log Sheet dibuat lebih ringkas supaya muat
    di kolom yang sudah dirampingkan */
@@ -830,9 +1002,12 @@ textarea.in {
 @media print {
   @page { size: A4 landscape; margin: 8mm; }
   body { background: #fff !important; }
-  #loginOverlay, .toolbar, .btn, .col-toggle-bar, #toast { display: none !important; }
+  #loginOverlay, .toolbar, .btn, .col-toggle-wrap, .help-btn, .help-panel,
+  .view-toggle, .form-panel, #toast { display: none !important; }
   #appContainer { display: block !important; }
   .sheet { box-shadow: none !important; border: none !important; margin: 0 !important; max-width: 100% !important; width: 100% !important; }
+  .tbl-wrap { max-height: none !important; overflow: visible !important; border: none !important; }
+  .log thead th, .log td.col-num, .log th.col-num { position: static !important; }
 }
 
 /* ====== MOBILE ====== */
@@ -858,6 +1033,13 @@ textarea.in {
   /* Preview bar di layar kecil: lebih kecil font & padding, tetap horizontal */
   .preview-bar { right: 10px; bottom: 10px; gap: 6px; }
   .preview-btn { font-size: 10px; padding: 6px 10px; }
+
+  /* Mode Form & toggle tampilan lebih ringkas di layar kecil */
+  .sec-h { position: relative; }
+  .view-toggle, .help-btn { flex: 1 1 auto; }
+  .fp-grid { grid-template-columns: 1fr 1fr; }
+  .fp-nav-btn { padding: 10px 12px; font-size: 12px; }
+  .tbl-wrap { max-height: 56vh; }
 }
 
 /* ====== FX (Weather Effects) ====== */

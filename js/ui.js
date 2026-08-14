@@ -165,6 +165,84 @@ const UI = (() => {
     showScreen(screenId, true);
   };
 
+  // ====== PANDUAN LOG SHEET (help panel, disembunyikan default) ======
+  const bindLogsheetHelp = () => {
+    if (!State.el.logsheetHelpBtn || !State.el.logsheetHelpPanel) return;
+    State.el.logsheetHelpBtn.addEventListener('click', () => {
+      const isHidden = State.el.logsheetHelpPanel.hasAttribute('hidden');
+      if (isHidden) State.el.logsheetHelpPanel.removeAttribute('hidden');
+      else State.el.logsheetHelpPanel.setAttribute('hidden', '');
+      State.el.logsheetHelpBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    });
+  };
+
+  // ====== CEKLIS TAMPILKAN KOLOM (bisa digulung, ringkas) ======
+  const setColToggleOpen = (open) => {
+    if (!State.el.colToggleBar || !State.el.colToggleHead) return;
+    if (open) State.el.colToggleBar.removeAttribute('hidden');
+    else State.el.colToggleBar.setAttribute('hidden', '');
+    State.el.colToggleHead.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (State.el.colToggleIcon) State.el.colToggleIcon.textContent = open ? '▾' : '▸';
+    try { localStorage.setItem(CONFIG.COL_TOGGLE_OPEN_KEY, open ? '1' : '0'); } catch(e){}
+  };
+
+  const bindColToggleCollapse = () => {
+    if (!State.el.colToggleHead) return;
+    State.el.colToggleHead.addEventListener('click', () => {
+      const isOpen = !State.el.colToggleBar.hasAttribute('hidden');
+      setColToggleOpen(!isOpen);
+    });
+  };
+
+  const loadColToggleState = () => {
+    let open = false; // ringkas/gulung secara default
+    try { open = localStorage.getItem(CONFIG.COL_TOGGLE_OPEN_KEY) === '1'; } catch(e){}
+    setColToggleOpen(open);
+  };
+
+  // ====== MODE TAMPILAN: TABEL vs FORM vs FORM LENGKAP ======
+  const setViewMode = (mode) => {
+    if (!State.el.tblWrap || !State.el.formPanel) return;
+    if (mode !== 'table' && mode !== 'form' && mode !== 'form-full') mode = 'table';
+
+    State.el.tblWrap.hidden = mode !== 'table';
+    State.el.formPanel.hidden = mode !== 'form';
+    if (State.el.formFullPanel) State.el.formFullPanel.hidden = mode !== 'form-full';
+
+    if (State.el.viewModeToggle) {
+      State.el.viewModeToggle.querySelectorAll('button[data-view]').forEach(b => {
+        b.classList.toggle('on', b.getAttribute('data-view') === mode);
+      });
+    }
+
+    // Saat mode Form / Form Lengkap aktif, sembunyikan ceklis "Tampilkan Kolom"
+    // & panel Panduan — tidak relevan dan cuma bikin scroll tambahan saat
+    // sedang fokus mengisi satu baris (mirip pengalaman native di ponsel).
+    const logsheetSec = document.querySelector('.sec[data-screen="logsheet"]');
+    if (logsheetSec) logsheetSec.dataset.view = mode;
+
+    try { localStorage.setItem(CONFIG.VIEW_MODE_KEY, mode); } catch(e){}
+
+    if (mode === 'form' && typeof FormMode !== 'undefined') FormMode.render();
+    if (mode === 'form-full' && typeof FormModeFull !== 'undefined') FormModeFull.render();
+  };
+
+  const bindViewModeToggle = () => {
+    if (!State.el.viewModeToggle) return;
+    State.el.viewModeToggle.querySelectorAll('button[data-view]').forEach(b => {
+      b.addEventListener('click', () => setViewMode(b.getAttribute('data-view')));
+    });
+  };
+
+  const loadViewMode = () => {
+    let mode = 'table';
+    try {
+      const saved = localStorage.getItem(CONFIG.VIEW_MODE_KEY);
+      if (saved === 'form' || saved === 'form-full') mode = saved;
+    } catch(e){}
+    setViewMode(mode);
+  };
+
   // ====== SYNC STATUS CHIP ======
   const applyChip = () => {
     const kind  = State.el.syncStatus.dataset.kind || '';
@@ -243,6 +321,9 @@ const UI = (() => {
     updateShiftIndicator,
     bindToolbarToggle, loadToolbarCollapsed,
     bindScreenNav, loadActiveScreen, showScreen,
+    bindLogsheetHelp,
+    setColToggleOpen, bindColToggleCollapse, loadColToggleState,
+    setViewMode, bindViewModeToggle, loadViewMode,
     updateEditChip, setSyncStatus,
     setupPWA, registerServiceWorker,
   };

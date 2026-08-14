@@ -463,7 +463,7 @@
         </div>
         <button type="submit" class="login-btn" id="loginBtn">Masuk Aplikasi</button>
       </form>
-      <div class="login-hint">Produksi-2026</div>
+      <div class="login-hint">Akun dibuat oleh admin melalui Supabase Dashboard</div>
     </div>
   </div>
 
@@ -494,6 +494,15 @@
           <button type="button" data-imode="normal" class="on">📝 Normal</button>
           <button type="button" data-imode="cepat1">⚡ Cepat 1</button>
           <button type="button" data-imode="cepat2">⚡⚡ Super Cepat</button>
+        </div>
+
+        <div class="screen-nav" id="screenNav" title="Pindah antar bagian formulir">
+          <button type="button" class="screen-tab on" data-screen="filter">Data</button>
+          <button type="button" class="screen-tab" data-screen="master-produk">Produk</button>
+          <button type="button" class="screen-tab" data-screen="logsheet">Sheet</button>
+          <button type="button" class="screen-tab" data-screen="operator">Inisial</button>
+          <button type="button" class="screen-tab" data-screen="perf-produk">Perform/Produk</button>
+          <button type="button" class="screen-tab" data-screen="oee">Hasil OEE</button>
         </div>
 
         <span class="hint" id="hint"></span>
@@ -530,16 +539,6 @@
         </div>
       </div>
       <div class="stripe"></div>
-
-      <!-- Navigasi Screen: klik untuk pindah tampilan tanpa perlu scroll -->
-      <div class="screen-nav" id="screenNav">
-        <button type="button" class="screen-tab on" data-screen="filter">📊 Data &amp; Penyimpanan</button>
-        <button type="button" class="screen-tab" data-screen="master-produk">⚙️ Master Produk &amp; Kecepatan</button>
-        <button type="button" class="screen-tab" data-screen="logsheet">📋 Log Sheet Harian</button>
-        <button type="button" class="screen-tab" data-screen="operator">👤 Inisial Operator</button>
-        <button type="button" class="screen-tab" data-screen="perf-produk">📈 Rincian Performa Produk</button>
-        <button type="button" class="screen-tab" data-screen="oee">🎯 Perhitungan OEE</button>
-      </div>
 
       <!-- Section: Filter Data -->
       <section class="sec" data-screen="filter">
@@ -626,35 +625,125 @@
       <section class="sec" data-screen="logsheet">
         <div class="sec-h">
           <span class="no">01</span>
-          <div><h2>Log Sheet Harian</h2><div class="sub2">Jam Selesai otomatis = Jam Mulai baris berikutnya · ketik 0740 → 07:40</div></div>
+          <div><h2>Log Sheet Harian</h2></div>
+          <span class="spacer"></span>
+          <button type="button" class="help-btn" id="logsheetHelpBtn" title="Panduan pengisian" aria-expanded="false">ⓘ Panduan</button>
+          <div class="view-toggle" id="viewModeToggle" title="Ganti tampilan pengisian">
+            <button type="button" data-view="table" class="on">📋 Tabel</button>
+            <button type="button" data-view="form">🧾 Form</button>
+            <button type="button" data-view="form-full">🗂️ Form Lengkap</button>
+          </div>
         </div>
 
-        <div class="legend">
-          <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned Down Time (Putih)</span>
-          <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned Down Time (Merah)</span>
-          <span class="lg"><i class="sw sw-g"></i>Kode 2 / Lainnya → Produksi (Hijau)</span>
+        <div class="help-panel" id="logsheetHelpPanel" hidden>
+          <p>Jam Selesai otomatis = Jam Mulai baris berikutnya · ketik 0740 → 07:40</p>
+          <div class="legend">
+            <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned Down Time (Putih)</span>
+            <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned Down Time (Merah)</span>
+            <span class="lg"><i class="sw sw-g"></i>Kode 2 / Lainnya → Produksi (Hijau)</span>
+          </div>
         </div>
 
-        <div class="col-toggle-bar">
-          <span>Tampilkan Kolom:</span>
-          <label><input type="checkbox" data-col="col-num" checked> #</label>
-          <label><input type="checkbox" data-col="col-kode" checked> Kode</label>
-          <label><input type="checkbox" data-col="col-mulai" checked> Jam Mulai</label>
-          <label><input type="checkbox" data-col="col-panggil" checked> Panggil Teknik</label>
-          <label><input type="checkbox" data-col="col-teknik" checked> Teknik Datang</label>
-          <label><input type="checkbox" data-col="col-selesai" checked> Jam Selesai</label>
-          <label><input type="checkbox" data-col="col-durasi" checked> Durasi</label>
-          <label><input type="checkbox" data-col="col-kegiatan" checked> Kegiatan</label>
-          <label><input type="checkbox" data-col="col-masalah" checked> Masalah</label>
-          <label><input type="checkbox" data-col="col-disposisi" checked> Disposisi</label>
-          <label><input type="checkbox" data-col="col-wo" checked> No. WO</label>
-          <label><input type="checkbox" data-col="col-batch" checked> Batch</label>
-          <label><input type="checkbox" data-col="col-good" checked> Good</label>
-          <label><input type="checkbox" data-col="col-defect" checked> Defect</label>
-          <label><input type="checkbox" data-col="col-aksi" checked> Aksi</label>
+        <div class="col-toggle-wrap">
+          <button type="button" class="col-toggle-head" id="colToggleHead" aria-expanded="false">
+            <span id="colToggleIcon">▸</span> Tampilkan Kolom
+          </button>
+          <div class="col-toggle-bar" id="colToggleBar" hidden>
+            <label><input type="checkbox" data-col="col-num" checked> #</label>
+            <label><input type="checkbox" data-col="col-kode" checked> Kode</label>
+            <label><input type="checkbox" data-col="col-mulai" checked> Jam Mulai</label>
+            <label><input type="checkbox" data-col="col-panggil" checked> Panggil Teknik</label>
+            <label><input type="checkbox" data-col="col-teknik" checked> Teknik Datang</label>
+            <label><input type="checkbox" data-col="col-selesai" checked> Jam Selesai</label>
+            <label><input type="checkbox" data-col="col-durasi" checked> Durasi</label>
+            <label><input type="checkbox" data-col="col-kegiatan" checked> Kegiatan</label>
+            <label><input type="checkbox" data-col="col-masalah" checked> Masalah</label>
+            <label><input type="checkbox" data-col="col-disposisi" checked> Disposisi</label>
+            <label><input type="checkbox" data-col="col-wo" checked> No. WO</label>
+            <label><input type="checkbox" data-col="col-batch" checked> Batch</label>
+            <label><input type="checkbox" data-col="col-good" checked> Good</label>
+            <label><input type="checkbox" data-col="col-defect" checked> Defect</label>
+            <label><input type="checkbox" data-col="col-aksi" checked> Aksi</label>
+          </div>
         </div>
 
-        <div class="tbl-wrap">
+        <!-- Mode Form Input: satu baris difokuskan lewat navigator, tanpa perlu geser tabel -->
+        <div class="form-panel" id="formPanel" hidden>
+          <div class="fp-nav">
+            <button type="button" class="fp-nav-btn" id="fpPrev" title="Baris sebelumnya">‹ Prev</button>
+            <span class="fp-nav-label" id="fpNavLabel">Baris 1 dari 1</span>
+            <button type="button" class="fp-nav-btn" id="fpNext" title="Baris berikutnya">Next ›</button>
+          </div>
+          <div class="fp-grid">
+            <div class="field">
+              <label>Kode</label>
+              <input type="tel" inputmode="numeric" maxlength="1" id="fpKode" class="mono ctr" placeholder=" ">
+            </div>
+            <div class="field">
+              <label>Jam Mulai</label>
+              <input type="text" inputmode="numeric" maxlength="5" id="fpMulai" class="mono ctr" placeholder="--:--">
+            </div>
+            <div class="field fp-span2">
+              <label>Kegiatan</label>
+              <textarea id="fpKegiatan" rows="2" placeholder="Kegiatan"></textarea>
+            </div>
+            <div class="field">
+              <label>Good</label>
+              <input type="text" inputmode="decimal" id="fpGood" class="mono ctr" placeholder="0">
+            </div>
+            <div class="field">
+              <label>Defect</label>
+              <input type="text" inputmode="decimal" id="fpDefect" class="mono ctr" placeholder="0">
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary fp-save" id="fpSave">💾 Simpan &amp; Lanjut Baris Berikutnya</button>
+        </div>
+
+        <!-- Mode Form Lengkap: semua kolom tabel dalam satu kartu, header/navigator
+             tetap di tempat (sticky), hanya area field yang scroll -->
+        <div class="form-panel form-panel-full" id="formFullPanel" hidden>
+          <div class="fp-nav">
+            <button type="button" class="fp-nav-btn" id="ffPrev" title="Baris sebelumnya">‹ Prev</button>
+            <span class="fp-nav-label" id="ffNavLabel">Baris 1 dari 1</span>
+            <button type="button" class="fp-nav-btn" id="ffNext" title="Baris berikutnya">Next ›</button>
+          </div>
+          <div class="ff-scroll">
+            <div class="ff-grid">
+              <div class="field"><label>Kode</label>
+                <input type="tel" inputmode="numeric" maxlength="1" id="ffKode" class="mono ctr" placeholder=" "></div>
+              <div class="field"><label>Jam Mulai</label>
+                <input type="text" inputmode="numeric" maxlength="5" id="ffMulai" class="mono ctr" placeholder="--:--"></div>
+              <div class="field"><label>Panggil Teknik</label>
+                <input type="text" inputmode="numeric" maxlength="5" id="ffPanggil" class="mono ctr" placeholder="--:--"></div>
+              <div class="field"><label>Teknik Datang</label>
+                <input type="text" inputmode="numeric" maxlength="5" id="ffTeknik" class="mono ctr" placeholder="--:--"></div>
+              <div class="field"><label>Jam Selesai</label>
+                <input type="text" inputmode="numeric" maxlength="5" id="ffSelesai" class="mono ctr" placeholder="--:--"></div>
+              <div class="field"><label>Durasi (m)</label>
+                <input type="text" inputmode="decimal" maxlength="4" id="ffDurasi" class="mono ctr" placeholder="0"></div>
+              <div class="field ff-span2"><label>Kegiatan</label>
+                <textarea id="ffKegiatan" rows="2" placeholder="Kegiatan"></textarea></div>
+              <div class="field ff-span2"><label>Masalah / Penyebab</label>
+                <textarea id="ffMasalah" rows="2" placeholder="Penyebab"></textarea></div>
+              <div class="field ff-span2"><label>Disposisi / Tindakan</label>
+                <textarea id="ffDisposisi" rows="2" placeholder="Tindakan"></textarea></div>
+              <div class="field"><label>Nomor WO</label>
+                <input type="text" id="ffWo" class="mono" placeholder="No WO"></div>
+              <div class="field"><label>Kode Produk &amp; Batch</label>
+                <select id="ffBatch" class="mono"><option value="">-- Pilih Produk --</option></select></div>
+              <div class="field"><label>Good</label>
+                <input type="text" inputmode="decimal" id="ffGood" class="mono ctr" placeholder="0"></div>
+              <div class="field"><label>Defect</label>
+                <input type="text" inputmode="decimal" id="ffDefect" class="mono ctr" placeholder="0"></div>
+            </div>
+          </div>
+          <div class="ff-actions">
+            <button type="button" class="btn btn-ghost btn-logout" id="ffDelete" title="Hapus baris ini">🗑 Hapus Baris</button>
+            <button type="button" class="btn btn-primary fp-save" id="ffSave">💾 Simpan &amp; Lanjut Baris Berikutnya</button>
+          </div>
+        </div>
+
+        <div class="tbl-wrap" id="tblWrap">
           <table class="log" id="logTable">
             <colgroup>
               <col class="col-num">
@@ -884,6 +973,8 @@
   <script src="./js/storage.js"></script>
   <script src="./js/dashboard.js"></script>
   <script src="./js/quickmode.js"></script>
+  <script src="./js/formmode.js"></script>
+  <script src="./js/formfull.js"></script>
   <script src="./js/scene.js"></script>
   <script src="./js/nature.js"></script>
   <script src="./js/fx.js"></script>

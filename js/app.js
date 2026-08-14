@@ -18,6 +18,8 @@ const App = (() => {
     UI.applyShiftUI();
     UI.loadToolbarCollapsed();
     UI.loadActiveScreen();
+    UI.loadColToggleState();
+    UI.loadViewMode();
     Rows.updateMatrixProductHeaders();
 
     // Set default tanggal = hari ini
@@ -54,6 +56,9 @@ const App = (() => {
     UI.bindShiftButtons();
     UI.bindToolbarToggle();
     UI.bindScreenNav();
+    UI.bindLogsheetHelp();
+    UI.bindColToggleCollapse();
+    UI.bindViewModeToggle();
 
     // Keyboard navigation
     Navigation.bindKeyboard();
@@ -183,6 +188,10 @@ const App = (() => {
     // Mode Input Cepat (Normal / Cepat 1 / Cepat 2) — additive, tidak
     // mengubah alur Mode Normal yang sudah ada.
     if (typeof QuickMode !== 'undefined') QuickMode.init();
+
+    // Mode Form Input (kartu per-baris, additive — tabel tetap source of truth)
+    if (typeof FormMode !== 'undefined') FormMode.init();
+    if (typeof FormModeFull !== 'undefined') FormModeFull.init();
 
     Auth.initSession();
 
