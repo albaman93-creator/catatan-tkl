@@ -108,6 +108,61 @@ const UI = (() => {
     } catch(e) {}
   };
 
+  // ====== TOOLBAR COLLAPSE (ringkas di ponsel) ======
+  const setToolbarCollapsed = (collapsed) => {
+    const toolbar = document.querySelector('.toolbar');
+    if (!toolbar) return;
+    toolbar.classList.toggle('collapsed', collapsed);
+    if (State.el.toolbarToggleIcon) State.el.toolbarToggleIcon.textContent = collapsed ? '▸' : '▾';
+    try { localStorage.setItem(CONFIG.TOOLBAR_COLLAPSED_KEY, collapsed ? '1' : '0'); } catch(e){}
+  };
+
+  const bindToolbarToggle = () => {
+    if (!State.el.toolbarToggle) return;
+    State.el.toolbarToggle.addEventListener('click', () => {
+      const toolbar = document.querySelector('.toolbar');
+      const isCollapsed = toolbar && toolbar.classList.contains('collapsed');
+      setToolbarCollapsed(!isCollapsed);
+    });
+  };
+
+  const loadToolbarCollapsed = () => {
+    let collapsed = false;
+    try { collapsed = localStorage.getItem(CONFIG.TOOLBAR_COLLAPSED_KEY) === '1'; } catch(e){}
+    setToolbarCollapsed(collapsed);
+  };
+
+  // ====== SCREEN NAV (pindah antar section tanpa perlu scroll) ======
+  const showScreen = (screenId, silent) => {
+    if (!screenId) return;
+    document.querySelectorAll('.sheet > .sec[data-screen]').forEach(sec => {
+      sec.classList.toggle('active', sec.getAttribute('data-screen') === screenId);
+    });
+    document.querySelectorAll('.screen-tab').forEach(tab => {
+      tab.classList.toggle('on', tab.getAttribute('data-screen') === screenId);
+    });
+    try { localStorage.setItem(CONFIG.ACTIVE_SCREEN_KEY, screenId); } catch(e){}
+    if (!silent) {
+      const sheet = document.querySelector('.sheet');
+      if (sheet) sheet.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const bindScreenNav = () => {
+    document.querySelectorAll('.screen-tab').forEach(tab => {
+      tab.addEventListener('click', () => showScreen(tab.getAttribute('data-screen')));
+    });
+  };
+
+  const loadActiveScreen = () => {
+    let screenId = 'filter';
+    try {
+      const saved = localStorage.getItem(CONFIG.ACTIVE_SCREEN_KEY);
+      if (saved && document.querySelector(`.screen-tab[data-screen="${saved}"]`)) screenId = saved;
+    } catch(e){}
+    showScreen(screenId, true);
+  };
+
   // ====== SYNC STATUS CHIP ======
   const applyChip = () => {
     const kind  = State.el.syncStatus.dataset.kind || '';
@@ -184,6 +239,8 @@ const UI = (() => {
     applyModeUI, bindModeButtons, loadNavMode,
     applyShiftUI, bindShiftButtons, loadEvalShift,
     updateShiftIndicator,
+    bindToolbarToggle, loadToolbarCollapsed,
+    bindScreenNav, loadActiveScreen, showScreen,
     updateEditChip, setSyncStatus,
     setupPWA, registerServiceWorker,
   };

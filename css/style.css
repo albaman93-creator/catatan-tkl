@@ -244,6 +244,16 @@ kbd {
   border-bottom: 1px solid var(--line); padding: 10px 14px;
 }
 .twrap { max-width: var(--page); margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.toolbar-body { display: contents; }
+.toolbar.collapsed .toolbar-body { display: none; }
+.toolbar-toggle {
+  display: none; align-items: center; gap: 5px;
+  background: #fff; border: 1px solid var(--line); border-radius: 8px;
+  padding: 9px 12px; font: 700 12px var(--mono); color: var(--ink2);
+  cursor: pointer; transition: .15s;
+}
+.toolbar-toggle:hover { border-color: #b8c6d0; color: var(--ink); }
+.toolbar.collapsed .toolbar-toggle #toolbarToggleIcon { transform: rotate(-90deg); display: inline-block; }
 .shift-indicator {
   display: inline-flex; align-items: center; gap: 9px;
   font: 800 13.5px var(--mono); letter-spacing: .4px; color: #fff;
@@ -332,6 +342,33 @@ kbd {
   background: repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 26px);
   pointer-events: none;
 }
+
+/* ====== SCREEN NAV — pindah antar section tanpa scroll ====== */
+.screen-nav {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 14px 28px; background: #eef2f5;
+  border-bottom: 1px solid var(--line);
+}
+.screen-tab {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid var(--line); background: #fff; color: var(--ink2);
+  font: 700 12.5px var(--mono); letter-spacing: .3px;
+  padding: 10px 14px; border-radius: 9px; cursor: pointer; transition: .15s;
+  white-space: nowrap;
+}
+.screen-tab:hover { border-color: #b8c6d0; color: var(--ink); transform: translateY(-1px); }
+.screen-tab.on {
+  background: var(--navy); border-color: var(--navy); color: #fff;
+  box-shadow: 0 2px 8px -2px rgba(13,33,53,.5);
+}
+@media (max-width: 768px) {
+  .screen-nav { padding: 10px 12px; gap: 6px; }
+  .screen-tab { flex: 1 1 calc(50% - 6px); justify-content: center; padding: 11px 8px; font-size: 11.5px; }
+}
+
+/* Section disembunyikan kecuali yang sedang aktif (dipilih lewat Screen Nav) */
+.sheet > .sec[data-screen] { display: none; }
+.sheet > .sec[data-screen].active { display: block; animation: rise .3s cubic-bezier(.22,.8,.3,1) both; }
 .brand { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
 .mark {
   width: 50px; height: 50px; border-radius: 10px;
@@ -462,17 +499,47 @@ h1 { font: 700 clamp(24px,5vw,34px)/1 var(--disp); letter-spacing: .8px; text-tr
 .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table { width: 100%; border-collapse: collapse; }
 
+/* Tabel Log Sheet: lebar tiap kolom TETAP (colgroup) — dirampingkan agar
+   mendekati lebar kertas A4 Landscape & supaya tidak perlu scroll jauh ke
+   samping. Kolom yang di-hide lewat toggle TIDAK membuat kolom lain melebar
+   (table-layout:fixed + width:auto, bukan 100%). */
+table.log { table-layout: fixed; width: auto; max-width: none; }
+col.col-num      { width: 34px;  }
+col.col-kode     { width: 56px;  }
+col.col-mulai    { width: 66px;  }
+col.col-panggil  { width: 76px;  }
+col.col-teknik   { width: 76px;  }
+col.col-selesai  { width: 66px;  }
+col.col-durasi   { width: 60px;  }
+col.col-kegiatan { width: 150px; }
+col.col-masalah  { width: 150px; }
+col.col-disposisi{ width: 150px; }
+col.col-wo       { width: 90px;  }
+col.col-batch    { width: 120px; }
+col.col-good     { width: 58px;  }
+col.col-defect   { width: 58px;  }
+col.col-aksi     { width: 40px;  }
+/* Kolom yang di-hide (lewat checkbox Tampilkan Kolom) dihapus total dari
+   perhitungan lebar tabel — bukan disembunyikan doang, sehingga kolom lain
+   TIDAK ikut melebar mengisi ruang yang kosong. */
+col.col-hide { display: none; }
+
 .log th {
-  font: 600 11.5px var(--mono); text-transform: uppercase;
-  letter-spacing: .8px; color: var(--mut); text-align: left;
-  padding: 10px 8px; background: #f4f7f9;
+  font: 600 10.5px var(--mono); text-transform: uppercase;
+  letter-spacing: .5px; color: var(--mut); text-align: left;
+  padding: 8px 6px; background: #f4f7f9;
   border-bottom: 2px solid var(--line);
   white-space: nowrap; transition: color .15s, background .15s;
-  vertical-align: middle;
+  vertical-align: middle; overflow: hidden; text-overflow: ellipsis;
 }
 .log th.on { color: var(--green-d); background: var(--green-bg); }
 
-.log td { padding: 4px 5px; border-bottom: 1px solid var(--line2); vertical-align: middle; }
+.log td { padding: 3px 4px; border-bottom: 1px solid var(--line2); vertical-align: middle; }
+
+/* Input/textarea di dalam tabel Log Sheet dibuat lebih ringkas supaya muat
+   di kolom yang sudah dirampingkan */
+.log .in, .log select.in { font-size: 12.5px; padding: 7px 6px; }
+.log textarea.in { min-height: 32px; }
 
 .log tbody tr {
   transition: background .2s, opacity .19s, transform .19s;
@@ -511,7 +578,7 @@ tr[data-cat="planned"]   .dot { background: var(--amber); box-shadow: 0 0 0 3px 
 tr[data-cat="unplanned"] .dot { background: var(--red);   box-shadow: 0 0 0 3px rgba(220,38,38,.15); }
 tr[data-cat="prod"]      .dot { background: var(--green); box-shadow: 0 0 0 3px rgba(18,161,80,.15); }
 
-td.dur { text-align: center; width: 70px; }
+td.dur { text-align: center; }
 .dur-v { font: 600 14px var(--mono); color: var(--ink2); }
 
 .c-aksi { text-align: center; width: 46px; }
@@ -611,9 +678,8 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
 }
 .qm-time-dropdown button:hover { background: var(--green-bg); color: var(--green-d); }
 .col-kegiatan, .col-masalah, .col-disposisi, .col-batch {
-  min-width: 200px; max-width: 280px; width: 220px; white-space: normal !important;
+  white-space: normal !important;
 }
-.col-good, .col-defect { min-width: 110px !important; width: 120px !important; }
 
 /* ====== INPUTS DI TABEL ====== */
 .in, select.in {
@@ -719,6 +785,17 @@ textarea.in {
 
 /* ====== DIAGNOSTIK ====== */
 .diag { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+
+/* Kotak ringkasan waktu per-produk (Rincian Performa Per Produk) —
+   dipaksa selalu bertumpuk 1 baris per keterangan, tidak menyamping,
+   di layar berapapun lebarnya. */
+.perf-detail-box {
+  display: flex; flex-direction: column; gap: 3px;
+  width: 100%; box-sizing: border-box;
+}
+.perf-detail-box > div {
+  display: block; white-space: normal; word-break: break-word;
+}
 .d-item {
   padding: 10px 14px; border-radius: 8px;
   font-family: var(--mono); font-size: 13px;
@@ -760,6 +837,8 @@ textarea.in {
 
 /* ====== MOBILE ====== */
 @media (max-width: 768px) {
+  .toolbar-toggle { display: inline-flex; }
+  .toolbar.collapsed { padding-bottom: 10px; }
   .twrap { gap: 8px; }
   .pos { flex: 1 1 100%; min-width: 0; justify-content: center; }
   .navmode, .shiftsel { flex: 1 1 45%; }
@@ -774,7 +853,6 @@ textarea.in {
   .sec-h h2 { font-size: 21px; }
   .filter-grid { grid-template-columns: 1fr; }
   .in { font-size: 15px; padding: 9px 10px; }
-  .log { min-width: 1450px; }
   .sheet-f { padding: 12px 14px; }
 
   /* Preview bar di layar kecil: lebih kecil font & padding, tetap horizontal */

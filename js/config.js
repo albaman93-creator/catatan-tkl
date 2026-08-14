@@ -24,6 +24,8 @@ const CONFIG = Object.freeze({
   DB_KEY:      'fima_oee_db_v3',
   NAV_MODE_KEY: 'fima_nav_mode',
   EVAL_SHIFT_KEY: 'fima_eval_shift',
+  TOOLBAR_COLLAPSED_KEY: 'fima_toolbar_collapsed',
+  ACTIVE_SCREEN_KEY: 'fima_active_screen',
 
   // Auto-save LOKAL (localStorage) setiap N ms. Tidak menyentuh Supabase —
   // hanya menjaga-jaga data tidak hilang kalau browser/tab tertutup tiba-tiba.

@@ -16,6 +16,8 @@ const App = (() => {
     // Apply UI awal
     UI.applyModeUI();
     UI.applyShiftUI();
+    UI.loadToolbarCollapsed();
+    UI.loadActiveScreen();
     Rows.updateMatrixProductHeaders();
 
     // Set default tanggal = hari ini
@@ -50,6 +52,8 @@ const App = (() => {
     // Shift & Mode
     UI.bindModeButtons();
     UI.bindShiftButtons();
+    UI.bindToolbarToggle();
+    UI.bindScreenNav();
 
     // Keyboard navigation
     Navigation.bindKeyboard();

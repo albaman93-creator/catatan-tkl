@@ -217,7 +217,7 @@ const Rows = (() => {
       tr.innerHTML = `
         <td style="text-align:left; padding: 10px 12px;">
           <div style="font-weight:700; color:var(--ink); font-size: 14px;">📦 ${p}</div>
-          <div style="font-size: 11.5px; color: var(--mut); margin-top: 6px; line-height: 1.5; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line2);">
+          <div style="font-size: 11.5px; color: var(--mut); margin-top: 6px; line-height: 1.5; background: #f8fafc; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--line2);" class="perf-detail-box">
             <div>⏱️ Total Waktu Keseluruhan: <b>${Utils.nf0(item.durasiTotal)} mnt</b></div>
             <div>⚙️ Waktu Produktif (Semua Kode 2): <b>${Utils.nf0(item.durasiProdAll)} mnt</b></div>
             <div>✅ Waktu Produktif Valid (Good ≥ 1): <b style="color:var(--green-d);">${Utils.nf0(item.durasiValid)} mnt</b></div>

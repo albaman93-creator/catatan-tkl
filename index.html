@@ -463,7 +463,7 @@
         </div>
         <button type="submit" class="login-btn" id="loginBtn">Masuk Aplikasi</button>
       </form>
-      <div class="login-hint">Akun dibuat oleh admin melalui Supabase Dashboard</div>
+      <div class="login-hint">produksi-2026</div>
     </div>
   </div>
 
@@ -476,7 +476,11 @@
           <span class="si-dot"></span>
           <span id="shiftIndicatorText">SHIFT 1 · 12 AUG 2026</span>
         </span>
+        <button type="button" class="toolbar-toggle" id="toolbarToggle" title="Sembunyikan/tampilkan toolbar">
+          <span id="toolbarToggleIcon">▾</span> <span class="tt-label">Toolbar</span>
+        </button>
 
+        <div class="toolbar-body" id="toolbarBody">
         <span class="pos" id="pos"><span class="pos-dot"></span>SIAP · KLIK SEL / MULAI KETIK</span>
 
         <div class="navmode" title="Mode navigasi Tab">
@@ -501,6 +505,7 @@
         <button class="btn btn-ghost btn-logout" id="btnLogout" type="button" title="Keluar sesi">🔒 Keluar</button>
         <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
         <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
+        </div>
       </div>
     </div>
 
@@ -526,8 +531,18 @@
       </div>
       <div class="stripe"></div>
 
+      <!-- Navigasi Screen: klik untuk pindah tampilan tanpa perlu scroll -->
+      <div class="screen-nav" id="screenNav">
+        <button type="button" class="screen-tab on" data-screen="filter">📊 Data &amp; Penyimpanan</button>
+        <button type="button" class="screen-tab" data-screen="master-produk">⚙️ Master Produk &amp; Kecepatan</button>
+        <button type="button" class="screen-tab" data-screen="logsheet">📋 Log Sheet Harian</button>
+        <button type="button" class="screen-tab" data-screen="operator">👤 Inisial Operator</button>
+        <button type="button" class="screen-tab" data-screen="perf-produk">📈 Rincian Performa Produk</button>
+        <button type="button" class="screen-tab" data-screen="oee">🎯 Perhitungan OEE</button>
+      </div>
+
       <!-- Section: Filter Data -->
-      <section class="sec">
+      <section class="sec" data-screen="filter">
         <div class="sec-h">
           <span class="no">📊</span>
           <div>
@@ -561,7 +576,7 @@
       </section>
 
       <!-- Section: Operator -->
-      <section class="sec">
+      <section class="sec" data-screen="operator">
         <div class="sec-h">
           <span class="no">👤</span>
           <div><h2>Inisial Operator</h2><div class="sub2">Masukkan inisial operator (maks. 3 huruf per kolom)</div></div>
@@ -577,7 +592,7 @@
       </section>
 
       <!-- Section: Master Produk -->
-      <section class="sec">
+      <section class="sec" data-screen="master-produk">
         <div class="sec-h">
           <span class="no">⚙️</span>
           <div><h2>Master Produk &amp; Kecepatan Standar</h2><div class="sub2">Daftarkan produk &amp; kecepatan standarnya (unit/menit)</div></div>
@@ -608,7 +623,7 @@
       </section>
 
       <!-- Section: Log Sheet Harian -->
-      <section class="sec">
+      <section class="sec" data-screen="logsheet">
         <div class="sec-h">
           <span class="no">01</span>
           <div><h2>Log Sheet Harian</h2><div class="sub2">Jam Selesai otomatis = Jam Mulai baris berikutnya · ketik 0740 → 07:40</div></div>
@@ -641,6 +656,23 @@
 
         <div class="tbl-wrap">
           <table class="log" id="logTable">
+            <colgroup>
+              <col class="col-num">
+              <col class="col-kode">
+              <col class="col-mulai">
+              <col class="col-panggil">
+              <col class="col-teknik">
+              <col class="col-selesai">
+              <col class="col-durasi">
+              <col class="col-kegiatan">
+              <col class="col-masalah">
+              <col class="col-disposisi">
+              <col class="col-wo">
+              <col class="col-batch">
+              <col class="col-good">
+              <col class="col-defect">
+              <col class="col-aksi">
+            </colgroup>
             <thead>
               <tr>
                 <th class="col-num" rowspan="2">#</th>
@@ -684,7 +716,7 @@
       </section>
 
       <!-- Section: Rincian Performa Produk -->
-      <section class="sec">
+      <section class="sec" data-screen="perf-produk">
         <div class="sec-h">
           <span class="no">📊</span>
           <div><h2>Rincian Performa Per Produk</h2><div class="sub2">Breakdown target &amp; % performance masing-masing produk</div></div>
@@ -703,7 +735,7 @@
       </section>
 
       <!-- Section: OEE Matrix -->
-      <section class="sec">
+      <section class="sec" data-screen="oee">
         <div class="sec-h">
           <span class="no">02</span>
           <div><h2>Perhitungan Pencapaian OEE</h2><div class="sub2" id="rincSub">Evaluasi Shift 1 · A = 510 mnt</div></div>
