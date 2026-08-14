@@ -41,6 +41,7 @@ const State = (() => {
       'prodName1','prodRate1','prodName2','prodRate2','prodName3','prodRate3',
       'thProd1','thProd2','thProd3',
       'tbody', 'tbodyProdDetail', 'btnAdd', 'btnSave', 'btnReset', 'btnLogout',
+      'btnPrint', 'printArea',
       'btnDashboard', 'dashOverlay', 'dashClose', 'dashFrom', 'dashTo', 'dashLine',
       'dashShift', 'dashStage', 'dashApply', 'dashStatus', 'dashChart', 'dashTbody',
       'pwa-install-btn',

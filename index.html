@@ -514,6 +514,7 @@
         <button class="btn btn-ghost btn-logout" id="btnLogout" type="button" title="Keluar sesi">🔒 Keluar</button>
         <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
         <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
+        <button class="btn" id="btnPrint" type="button">🖨️ Print</button>
         </div>
       </div>
     </div>
@@ -985,6 +986,9 @@
     <div class="qm-modal bulk-modal" id="bulkModal"></div>
   </div>
 
+  <!-- ============ AREA CETAK (hanya tampil saat Print, lihat @media print) ============ -->
+  <div id="printArea" class="print-only"></div>
+
   <!-- JS (urutan PENTING: dari dependen paling dasar ke paling atas) -->
   <script src="./js/config.js"></script>
   <script src="./js/utils.js"></script>
@@ -1003,6 +1007,7 @@
   <script src="./js/formmode.js"></script>
   <script src="./js/formfull.js"></script>
   <script src="./js/bulkfill.js"></script>
+  <script src="./js/printsheet.js"></script>
   <script src="./js/scene.js"></script>
   <script src="./js/nature.js"></script>
   <script src="./js/fx.js"></script>
