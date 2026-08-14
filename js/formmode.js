@@ -207,6 +207,7 @@ const FormMode = (() => {
     if (!State.el.formPanel) return;
     bindNav();
     bindFields();
+    if (State.el.fpKegiatan && typeof Suggest !== 'undefined') Suggest.attachGhost(State.el.fpKegiatan);
   };
 
   /** Dipanggil saat data tabel diganti total (ganti tanggal/shift/dsb). */

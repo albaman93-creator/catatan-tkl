@@ -84,6 +84,35 @@ const CONFIG = Object.freeze({
     batch: 'PRODUK & BATCH', good: 'GOOD', defect: 'DEFECT'
   },
 
+  // ====== SUGESTI KEGIATAN (ghost-text) ======
+  // Muncul otomatis saat mengetik di kolom Kegiatan (sel tabel, Isi Massal,
+  // maupun Form Input), disesuaikan dengan Tahapan Proses yang aktif
+  // (dropdown "Tahapan" di Data & Penyimpanan). Silakan tambah/ubah daftar
+  // di bawah ini sesuka hati — tidak perlu ubah kode JS lain.
+  // 'common' = selalu ikut disertakan di tahapan manapun.
+  KEGIATAN_SUGGESTIONS: {
+    mixing: [
+      'Loading Lot A', 'Loading Lot B', 'Loading Lot C', 'Loading Lot D',
+      'Mixing', 'Persiapan', 'Ganti Lot', 'Ganti Baju',
+    ],
+    filling: [
+      'Filling Lot A', 'Filling Lot B', 'Filling Lot C', 'Filling Lot D',
+      'Persiapan',
+    ],
+    steril: [
+      'Sterilisasi', 'Persiapan', 'Loading Chamber', 'Unloading Chamber',
+    ],
+    visual: [
+      'Inspeksi Visual', 'Persiapan', 'Sortir Reject',
+    ],
+    kemas: [
+      'Pengemasan Sekunder', 'Persiapan', 'Ganti Batch', 'Labeling',
+    ],
+    common: [
+      'Cleaning', 'Istirahat', 'Menunggu Instruksi',
+    ],
+  },
+
   // ====== MODE INPUT (Normal / Cepat 1 / Cepat 2) ======
   INPUT_MODE_KEY: 'fima_input_mode',
 

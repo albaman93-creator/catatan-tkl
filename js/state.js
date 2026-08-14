@@ -52,6 +52,7 @@ const State = (() => {
       'oI1','oI2','oI3','oITotal','badgeAvgP',
       'oJ','oK','oL','oM','oee','diag','toast',
       'qmOverlay', 'qmModal',
+      'bulkOverlay', 'bulkModal',
     ];
     ids.forEach(id => { el[id] = document.getElementById(id); });
   };

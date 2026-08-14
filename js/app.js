@@ -193,6 +193,9 @@ const App = (() => {
     if (typeof FormMode !== 'undefined') FormMode.init();
     if (typeof FormModeFull !== 'undefined') FormModeFull.init();
 
+    // Isi Massal (kotak input daftar bernomor untuk kolom Kode / Jam Mulai)
+    if (typeof BulkFill !== 'undefined') BulkFill.init();
+
     Auth.initSession();
 
     // Coba kirim antrean offline yang tertunda (jika ada) begitu app siap

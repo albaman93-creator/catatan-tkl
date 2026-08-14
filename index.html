@@ -765,13 +765,28 @@
             <thead>
               <tr>
                 <th class="col-num" rowspan="2">#</th>
-                <th class="col-kode" rowspan="2">Kode</th>
-                <th class="col-mulai" rowspan="2">Jam Mulai</th>
+                <th class="col-kode" rowspan="2">
+                  Kode
+                  <button type="button" class="th-bulk-btn" data-bulk-col="kode" title="Isi massal Kode dari daftar">📥</button>
+                </th>
+                <th class="col-mulai" rowspan="2">
+                  Jam Mulai
+                  <button type="button" class="th-bulk-btn" data-bulk-col="mulai" title="Isi massal Jam Mulai dari daftar">📥</button>
+                </th>
                 <th class="col-panggil" rowspan="2">Panggil Teknik</th>
                 <th class="col-teknik" rowspan="2">Teknik Datang</th>
-                <th class="col-selesai" rowspan="2">Jam Selesai</th>
-                <th class="col-durasi" rowspan="2">Durasi (m)</th>
-                <th class="col-kegiatan" rowspan="2">Kegiatan</th>
+                <th class="col-selesai" rowspan="2">
+                  Jam Selesai
+                  <button type="button" class="th-bulk-btn" data-bulk-col="selesai" title="Isi massal Jam Selesai dari daftar">📥</button>
+                </th>
+                <th class="col-durasi" rowspan="2">
+                  Durasi (m)
+                  <button type="button" class="th-bulk-btn" data-bulk-col="durasi" title="Isi massal Durasi dari daftar">📥</button>
+                </th>
+                <th class="col-kegiatan" rowspan="2">
+                  Kegiatan
+                  <button type="button" class="th-bulk-btn" data-bulk-col="kegiatan" title="Isi massal Kegiatan dari daftar">📥</button>
+                </th>
                 <th class="col-masalah" rowspan="2">Masalah / Penyebab</th>
                 <th class="col-disposisi" rowspan="2">Disposisi / Tindakan</th>
                 <th class="col-wo" rowspan="2">Nomor WO</th>
@@ -780,8 +795,14 @@
                 <th class="col-aksi" rowspan="2">Aksi</th>
               </tr>
               <tr>
-                <th class="col-good">Good</th>
-                <th class="col-defect">Defect</th>
+                <th class="col-good">
+                  Good
+                  <button type="button" class="th-bulk-btn" data-bulk-col="good" title="Isi massal Good (khusus baris Kode 2) dari daftar">📥</button>
+                </th>
+                <th class="col-defect">
+                  Defect
+                  <button type="button" class="th-bulk-btn" data-bulk-col="defect" title="Isi massal Defect (khusus baris Kode 2) dari daftar">📥</button>
+                </th>
               </tr>
             </thead>
             <tbody id="tbody"></tbody>
@@ -959,10 +980,16 @@
     <div class="qm-modal" id="qmModal"></div>
   </div>
 
+  <!-- ============ ISI MASSAL — Overlay input list per-baris (Kode / Jam Mulai) ============ -->
+  <div id="bulkOverlay" class="qm-overlay hide">
+    <div class="qm-modal bulk-modal" id="bulkModal"></div>
+  </div>
+
   <!-- JS (urutan PENTING: dari dependen paling dasar ke paling atas) -->
   <script src="./js/config.js"></script>
   <script src="./js/utils.js"></script>
   <script src="./js/state.js"></script>
+  <script src="./js/suggest.js"></script>
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/ui.js"></script>
@@ -975,6 +1002,7 @@
   <script src="./js/quickmode.js"></script>
   <script src="./js/formmode.js"></script>
   <script src="./js/formfull.js"></script>
+  <script src="./js/bulkfill.js"></script>
   <script src="./js/scene.js"></script>
   <script src="./js/nature.js"></script>
   <script src="./js/fx.js"></script>

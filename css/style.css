@@ -247,7 +247,7 @@ kbd {
 .toolbar-body { display: contents; }
 .toolbar.collapsed .toolbar-body { display: none; }
 .toolbar-toggle {
-  display: none; align-items: center; gap: 5px;
+  display: inline-flex; align-items: center; gap: 5px;
   background: #fff; border: 1px solid var(--line); border-radius: 8px;
   padding: 9px 12px; font: 700 12px var(--mono); color: var(--ink2);
   cursor: pointer; transition: .15s;
@@ -853,6 +853,47 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
   white-space: normal !important;
 }
 
+/* Tombol kecil "Isi Massal" di header kolom Kode / Jam Mulai */
+.th-bulk-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; margin-left: 4px; padding: 0;
+  border: 1px solid var(--line); border-radius: 6px; background: #fff;
+  font-size: 11px; line-height: 1; cursor: pointer; vertical-align: middle;
+  opacity: .7; transition: .15s;
+}
+.th-bulk-btn:hover { opacity: 1; border-color: var(--amber); background: rgba(217,119,6,.1); }
+
+/* ====== ISI MASSAL — daftar baris bernomor (Kode / Jam Mulai) ====== */
+.bulk-modal { max-width: 360px; }
+.bulk-list {
+  max-height: 46vh; overflow-y: auto; margin-bottom: 4px;
+  border: 1px solid var(--line2); border-radius: 10px; padding: 8px;
+  background: #fbfcfd;
+}
+.bulk-line { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.bulk-line:last-child { margin-bottom: 0; }
+.bulk-line .ghost-wrap { flex: 1; }
+.bulk-num {
+  flex: 0 0 26px; text-align: right; font: 700 13px var(--mono); color: var(--mut);
+}
+.bulk-input {
+  flex: 1; border: 1px solid var(--line); border-radius: 8px;
+  padding: 9px 10px; font: 700 15px var(--mono); text-align: center;
+  color: var(--ink); background: #fff; transition: .15s;
+}
+.bulk-input:focus {
+  outline: none; border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(18,161,80,.16);
+}
+.bulk-count { font: 600 11.5px var(--mono); color: var(--mut); margin-top: 8px; }
+.bulk-startrow {
+  width: 90px; border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px 10px; font: 700 14px var(--mono); text-align: center;
+  color: var(--ink); background: #fff;
+}
+.bulk-modal-wide { max-width: 460px; }
+.bulk-input-text { text-align: left; font: 500 14px var(--body); }
+
 /* ====== INPUTS DI TABEL ====== */
 .in, select.in {
   width: 100%; border: 1px solid transparent; background: transparent;
@@ -887,6 +928,18 @@ textarea.in {
   border-color: #eab308 !important;
   color: #713f12 !important;
 }
+
+/* ====== GHOST-TEXT SUGESTI (Kolom Kegiatan) ====== */
+.ghost-wrap { position: relative; display: block; width: 100%; }
+.ghost-layer {
+  position: absolute; top: 0; left: 0; z-index: 3;
+  pointer-events: none; overflow: hidden;
+  white-space: pre-wrap; word-wrap: break-word; word-break: break-word;
+  background: transparent;
+}
+.ghost-layer .ghost-typed { color: transparent; }
+.ghost-layer .ghost-suggest { color: #a3aeb6; }
+.log .ghost-wrap { height: 100%; }
 
 /* ====== OEE MATRIX ====== */
 .oee-matrix-tbl {

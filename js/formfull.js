@@ -262,6 +262,7 @@ const FormModeFull = (() => {
     if (!State.el.formFullPanel) return;
     bindNav();
     bindFields();
+    if (State.el.ffKegiatan && typeof Suggest !== 'undefined') Suggest.attachGhost(State.el.ffKegiatan);
   };
 
   const resetAndRender = () => {

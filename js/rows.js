@@ -134,6 +134,8 @@ const Rows = (() => {
     State.el.tbody.appendChild(tr);
     applyCat(tr);
     Navigation.syncColumnVisibility();
+    const kegiatanEl = tr.querySelector('[data-f="kegiatan"]');
+    if (kegiatanEl && typeof Suggest !== 'undefined') Suggest.attachGhost(kegiatanEl);
     return tr;
   };
 
