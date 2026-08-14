@@ -86,7 +86,9 @@ const UI = (() => {
     if (!State.el.shiftIndicatorText) return;
     const dateVal = State.el.fDate ? State.el.fDate.value : '';
     const dateText = dateVal ? Utils.formatDateText(dateVal) : '— pilih tanggal —';
-    State.el.shiftIndicatorText.textContent = `SHIFT ${State.evalShift + 1} · ${dateText}`;
+    const stageVal = State.el.fStage ? State.el.fStage.value : '';
+    const stageText = stageVal ? '_' + stageVal.charAt(0).toUpperCase() + stageVal.slice(1) : '';
+    State.el.shiftIndicatorText.textContent = `SHIFT ${State.evalShift + 1} · ${dateText}${stageText}`;
   };
 
   const bindShiftButtons = () => {

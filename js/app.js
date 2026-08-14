@@ -139,8 +139,9 @@ const App = (() => {
     ['fDate','fLine','fStage'].forEach(id => {
       State.el[id].addEventListener('change', Storage.loadRecord);
     });
-    // Indikator Shift & Tanggal di toolbar atas ikut update tiap tanggal diganti
+    // Indikator Shift & Tanggal di toolbar atas ikut update tiap tanggal/tahapan diganti
     State.el.fDate.addEventListener('input', UI.updateShiftIndicator);
+    State.el.fStage.addEventListener('change', UI.updateShiftIndicator);
 
     // Buttons
     State.el.btnSave.addEventListener('click', () => Storage.saveData());
