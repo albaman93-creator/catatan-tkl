@@ -18,6 +18,7 @@ const State = (() => {
   //                 sebagai fokus pengisian pada Mode Cepat 1 / Mode Cepat 2.
   let inputMode = 'normal';
   let quickActiveProducts = [];
+  let defaultWO = '';          // "WO default" dari Wizard Setup — auto-isi ke baris baru
 
   // Cache elemen DOM (akan di-inisialisasi setelah DOMContentLoaded)
   const el = {};
@@ -26,7 +27,7 @@ const State = (() => {
     const ids = [
       'loginOverlay', 'loginForm', 'loginEmail', 'loginPassword', 'loginBtn', 'loginError', 'loginOfflineNote',
       'appContainer', 'pos', 'hint', 'lastSaved', 'syncStatus',
-      'shiftIndicator', 'shiftIndicatorText',
+      'shiftIndicator', 'shiftIndicatorText', 'oeeIndicator', 'oeeIndicatorValue',
       'toolbarToggle', 'toolbarToggleIcon', 'toolbarBody', 'screenNav',
       'logsheetHelpBtn', 'logsheetHelpPanel',
       'viewModeToggle', 'tblWrap',
@@ -38,10 +39,11 @@ const State = (() => {
       'ffKegiatan', 'ffMasalah', 'ffDisposisi', 'ffWo', 'ffBatch', 'ffGood', 'ffDefect',
       'fDate', 'fLine', 'fStage',
       'op1','op2','op3','op4','op5','op6',
-      'prodName1','prodRate1','prodName2','prodRate2','prodName3','prodRate3',
+      'prodName1','prodRate1','prodWo1','prodName2','prodRate2','prodWo2','prodName3','prodRate3','prodWo3',
       'thProd1','thProd2','thProd3',
       'tbody', 'tbodyProdDetail', 'btnAdd', 'btnSave', 'btnReset', 'btnLogout',
-      'btnPrint', 'printArea',
+      'btnPrint', 'printArea', 'presetQuick', 'presetFull',
+      'btnWizard', 'wizardOverlay', 'wizardModal',
       'btnDashboard', 'dashOverlay', 'dashClose', 'dashFrom', 'dashTo', 'dashLine',
       'dashShift', 'dashStage', 'dashApply', 'dashStatus', 'dashChart', 'dashTbody',
       'pwa-install-btn',
@@ -72,6 +74,8 @@ const State = (() => {
     set inputMode(v)         { inputMode = v; },
     get quickActiveProducts(){ return quickActiveProducts; },
     set quickActiveProducts(v){ quickActiveProducts = v; },
+    get defaultWO()       { return defaultWO; },
+    set defaultWO(v)      { defaultWO = v; },
 
     // DOM cache
     el,

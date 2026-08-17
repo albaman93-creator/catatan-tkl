@@ -463,7 +463,7 @@
         </div>
         <button type="submit" class="login-btn" id="loginBtn">Masuk Aplikasi</button>
       </form>
-      <div class="login-hint">Produksi-2026</div>
+      <div class="login-hint">Akun dibuat oleh admin melalui Supabase Dashboard</div>
     </div>
   </div>
 
@@ -476,6 +476,13 @@
           <span class="si-dot"></span>
           <span id="shiftIndicatorText">SHIFT 1 · 12 AUG 2026</span>
         </span>
+        <span class="oee-indicator" id="oeeIndicator" title="%OEE saat ini, update otomatis — klik untuk lihat rinciannya">
+          <span class="oi-label">OEE</span>
+          <span id="oeeIndicatorValue">0,00%</span>
+        </span>
+        <button type="button" class="toolbar-toggle" id="btnWizard" title="Setup Awal (Shift, Tahapan, Tanggal, Operator, WO, Produk)">
+          🧭 <span class="tt-label">Setup Awal</span>
+        </button>
         <button type="button" class="toolbar-toggle" id="toolbarToggle" title="Sembunyikan/tampilkan toolbar">
           <span id="toolbarToggleIcon">▾</span> <span class="tt-label">Toolbar</span>
         </button>
@@ -487,13 +494,6 @@
           <span class="nm-cap">MODE TAB</span>
           <button type="button" data-mode="v" class="on">⇅ VERTIKAL</button>
           <button type="button" data-mode="h">⇄ HORIZONTAL</button>
-        </div>
-
-        <div class="inputmode" id="qmModeSel" title="Mode pengisian data">
-          <span class="nm-cap">MODE INPUT</span>
-          <button type="button" data-imode="normal" class="on">📝 Normal</button>
-          <button type="button" data-imode="cepat1">⚡ Cepat 1</button>
-          <button type="button" data-imode="cepat2">⚡⚡ Super Cepat</button>
         </div>
 
         <div class="screen-nav" id="screenNav" title="Pindah antar bagian formulir">
@@ -599,27 +599,31 @@
         </div>
         <div class="product-grid">
           <div class="field">
-            <label>Produk 1 (Nama &amp; Kecepatan)</label>
-            <div class="split-input">
+            <label>Produk 1 (Nama, Kecepatan &amp; No. WO)</label>
+            <div class="split-input split-input-3">
               <input type="text" id="prodName1" placeholder="Misal: VTTS1 L030001">
               <input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal">
+              <input type="text" id="prodWo1" placeholder="No. WO" class="mono">
             </div>
           </div>
           <div class="field">
             <label>Produk 2 (Cadangan)</label>
-            <div class="split-input">
+            <div class="split-input split-input-3">
               <input type="text" id="prodName2" placeholder="Misal: VPEL1 L027001">
               <input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal">
+              <input type="text" id="prodWo2" placeholder="No. WO" class="mono">
             </div>
           </div>
           <div class="field">
             <label>Produk 3 (Cadangan)</label>
-            <div class="split-input">
+            <div class="split-input split-input-3">
               <input type="text" id="prodName3" placeholder="Misal: PROD-C">
               <input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal">
+              <input type="text" id="prodWo3" placeholder="No. WO" class="mono">
             </div>
           </div>
         </div>
+        <p class="sub2" style="margin-top:10px;">💡 Isi No. WO per produk di sini (atau lewat 🧭 Setup Awal) — saat operator memilih produk pada kolom <b>Produk &amp; Batch</b> di Log Sheet, kolom <b>Nomor WO</b> baris tersebut otomatis terisi sendiri mengikuti produk yang dipilih, begitu kolom Kode baris itu sudah diisi.</p>
       </section>
 
       <!-- Section: Log Sheet Harian -->
@@ -643,6 +647,11 @@
             <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned Down Time (Merah)</span>
             <span class="lg"><i class="sw sw-g"></i>Kode 2 / Lainnya → Produksi (Hijau)</span>
           </div>
+        </div>
+
+        <div class="col-preset-bar">
+          <button type="button" class="col-preset-btn" id="presetQuick" title="Sembunyikan kolom detail, sisakan Kode/Jam/Durasi/Good/Defect saja">⚡ Mode Hitung Cepat</button>
+          <button type="button" class="col-preset-btn" id="presetFull" title="Tampilkan semua kolom">📋 Mode Lengkap</button>
         </div>
 
         <div class="col-toggle-wrap">
@@ -986,6 +995,11 @@
     <div class="qm-modal bulk-modal" id="bulkModal"></div>
   </div>
 
+  <!-- ============ WIZARD SETUP AWAL — Shift/Tahapan/Tanggal/Operator/WO/Produk ============ -->
+  <div id="wizardOverlay" class="qm-overlay hide">
+    <div class="qm-modal wizard-modal" id="wizardModal"></div>
+  </div>
+
   <!-- ============ AREA CETAK (hanya tampil saat Print, lihat @media print) ============ -->
   <div id="printArea" class="print-only"></div>
 
@@ -1007,6 +1021,7 @@
   <script src="./js/formmode.js"></script>
   <script src="./js/formfull.js"></script>
   <script src="./js/bulkfill.js"></script>
+  <script src="./js/wizard.js"></script>
   <script src="./js/printsheet.js"></script>
   <script src="./js/scene.js"></script>
   <script src="./js/nature.js"></script>

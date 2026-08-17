@@ -201,9 +201,10 @@ const UI = (() => {
   };
 
   // ====== MODE TAMPILAN: TABEL vs FORM vs FORM LENGKAP ======
-  const setViewMode = (mode) => {
+  const setViewMode = (mode, opts) => {
     if (!State.el.tblWrap || !State.el.formPanel) return;
     if (mode !== 'table' && mode !== 'form' && mode !== 'form-full') mode = 'table';
+    const userChoice = !!(opts && opts.userChoice);
 
     State.el.tblWrap.hidden = mode !== 'table';
     State.el.formPanel.hidden = mode !== 'form';
@@ -221,7 +222,14 @@ const UI = (() => {
     const logsheetSec = document.querySelector('.sec[data-screen="logsheet"]');
     if (logsheetSec) logsheetSec.dataset.view = mode;
 
-    try { localStorage.setItem(CONFIG.VIEW_MODE_KEY, mode); } catch(e){}
+    try {
+      localStorage.setItem(CONFIG.VIEW_MODE_KEY, mode);
+      // Tandai HANYA kalau ini benar-benar dipilih manual oleh user (klik
+      // tombol 📋 Tabel / 🧾 Form / 🗂️ Form Lengkap) — supaya tebakan
+      // otomatis (lihat loadViewMode) tetap bisa jalan tiap kunjungan baru
+      // selama user belum pernah memilih sendiri.
+      if (userChoice) localStorage.setItem(CONFIG.VIEW_MODE_USER_SET_KEY, '1');
+    } catch(e){}
 
     if (mode === 'form' && typeof FormMode !== 'undefined') FormMode.render();
     if (mode === 'form-full' && typeof FormModeFull !== 'undefined') FormModeFull.render();
@@ -230,16 +238,34 @@ const UI = (() => {
   const bindViewModeToggle = () => {
     if (!State.el.viewModeToggle) return;
     State.el.viewModeToggle.querySelectorAll('button[data-view]').forEach(b => {
-      b.addEventListener('click', () => setViewMode(b.getAttribute('data-view')));
+      b.addEventListener('click', () => setViewMode(b.getAttribute('data-view'), { userChoice: true }));
     });
   };
 
   const loadViewMode = () => {
-    let mode = 'table';
-    try {
-      const saved = localStorage.getItem(CONFIG.VIEW_MODE_KEY);
-      if (saved === 'form' || saved === 'form-full') mode = saved;
-    } catch(e){}
+    let userSet = false;
+    try { userSet = localStorage.getItem(CONFIG.VIEW_MODE_USER_SET_KEY) === '1'; } catch(e){}
+
+    let saved = null;
+    if (userSet) {
+      try {
+        const v = localStorage.getItem(CONFIG.VIEW_MODE_KEY);
+        if (v === 'form' || v === 'form-full' || v === 'table') saved = v;
+      } catch(e){}
+    }
+
+    let mode = saved;
+    if (!mode) {
+      // User belum PERNAH memilih tampilan sendiri lewat tombol (baik
+      // pengguna baru, maupun pengguna lama yang tampilannya masih
+      // tersimpan dari nilai default versi lama) → tebak otomatis tiap
+      // buka app: di layar sempit (mayoritas operator pakai ponsel)
+      // langsung pakai "Form Lengkap" (kartu 1 baris per layar, tanpa
+      // geser tabel lebar & tanpa banyak elemen lain di sekitarnya) — mirip
+      // pengalaman aplikasi native. Di layar lebar (laptop/tablet besar)
+      // tetap default Tabel.
+      mode = (window.innerWidth <= 640) ? 'form-full' : 'table';
+    }
     setViewMode(mode);
   };
 

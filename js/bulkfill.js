@@ -61,7 +61,34 @@ const BulkFill = (() => {
     lines.forEach((input, i) => {
       const numEl = input.closest('.bulk-line').querySelector('.bulk-num');
       if (numEl) numEl.textContent = `${base + i}.`;
+      updateLineCat(input);
     });
+  };
+
+  // ====== WARNA KATEGORI PER BARIS (mengikuti Kode, sama seperti di tabel) ======
+  /**
+   * Kolom Kode: warna langsung dari ANGKA yang sedang diketik user di baris
+   * itu (baris tabelnya belum tentu ada — bisa baris baru yang akan
+   * dibuat saat Simpan).
+   * Kolom lain (Jam Mulai/Selesai/Durasi/Good/Defect/Kegiatan): warna
+   * mengikuti Kode baris tabel yang SUDAH ada di posisi tsb, supaya
+   * operator langsung lihat baris ini nanti masuk kategori Produksi
+   * (hijau) / Planned DT (kuning) / Unplanned DT (merah) sebelum disimpan.
+   */
+  const updateLineCat = (input) => {
+    const wrap = input.closest('.bulk-line');
+    if (!wrap) return;
+    let cat = null;
+    if (currentCol === 'kode') {
+      cat = Utils.catOf(input.value.trim());
+    } else {
+      const idx = lines.indexOf(input);
+      const rowIdx = startRow() - 1 + idx;
+      const tr = Rows.rows()[rowIdx];
+      const kodeEl = tr ? tr.querySelector('[data-f="kode"]') : null;
+      cat = kodeEl ? Utils.catOf(kodeEl.value.trim()) : null;
+    }
+    if (cat) wrap.dataset.cat = cat; else delete wrap.dataset.cat;
   };
 
   // ====== BUAT 1 BARIS NOMOR BARU DI DALAM DAFTAR ======
@@ -84,6 +111,7 @@ const BulkFill = (() => {
     const input = wrap.querySelector('input');
     lines.push(input);
     bindLine(listEl, input, def);
+    updateLineCat(input);
     if (currentCol === 'kegiatan' && typeof Suggest !== 'undefined') Suggest.attachGhost(input);
     return input;
   };
@@ -100,6 +128,7 @@ const BulkFill = (() => {
       if (def.kind === 'digit') {
         const v = input.value.replace(/\D/g, '').slice(0, 1);
         input.value = v;
+        updateLineCat(input);
         if (v.length >= 1) {
           const idx = lines.indexOf(input);
           const next = lines[idx + 1] || addLine(listEl, def);
@@ -157,6 +186,7 @@ const BulkFill = (() => {
         for (let i = 0; i < digits.length; i++) {
           const cell = lines[idx + i] || addLine(listEl, def);
           cell.value = digits[i];
+          updateLineCat(cell);
           last = cell;
         }
         last.focus();

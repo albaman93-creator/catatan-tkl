@@ -54,9 +54,9 @@ const Storage = (() => {
    */
   const collect = () => ({
     products: {
-      p1Name: State.el.prodName1.value, p1Rate: State.el.prodRate1.value,
-      p2Name: State.el.prodName2.value, p2Rate: State.el.prodRate2.value,
-      p3Name: State.el.prodName3.value, p3Rate: State.el.prodRate3.value,
+      p1Name: State.el.prodName1.value, p1Rate: State.el.prodRate1.value, p1Wo: State.el.prodWo1.value,
+      p2Name: State.el.prodName2.value, p2Rate: State.el.prodRate2.value, p2Wo: State.el.prodWo2.value,
+      p3Name: State.el.prodName3.value, p3Rate: State.el.prodRate3.value, p3Wo: State.el.prodWo3.value,
     },
     operators: {
       op1: State.el.op1.value, op2: State.el.op2.value, op3: State.el.op3.value,
@@ -88,14 +88,17 @@ const Storage = (() => {
     if (d && d.products) {
       State.el.prodName1.value = d.products.p1Name || '';
       State.el.prodRate1.value = d.products.p1Rate || '';
+      State.el.prodWo1.value   = d.products.p1Wo || '';
       State.el.prodName2.value = d.products.p2Name || '';
       State.el.prodRate2.value = d.products.p2Rate || '';
+      State.el.prodWo2.value   = d.products.p2Wo || '';
       State.el.prodName3.value = d.products.p3Name || '';
       State.el.prodRate3.value = d.products.p3Rate || '';
+      State.el.prodWo3.value   = d.products.p3Wo || '';
     } else {
-      State.el.prodName1.value = ''; State.el.prodRate1.value = '';
-      State.el.prodName2.value = ''; State.el.prodRate2.value = '';
-      State.el.prodName3.value = ''; State.el.prodRate3.value = '';
+      State.el.prodName1.value = ''; State.el.prodRate1.value = ''; State.el.prodWo1.value = '';
+      State.el.prodName2.value = ''; State.el.prodRate2.value = ''; State.el.prodWo2.value = '';
+      State.el.prodName3.value = ''; State.el.prodRate3.value = ''; State.el.prodWo3.value = '';
     }
 
     // Operators

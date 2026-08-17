@@ -26,15 +26,19 @@ const CONFIG = Object.freeze({
   EVAL_SHIFT_KEY: 'fima_eval_shift',
   TOOLBAR_COLLAPSED_KEY: 'fima_toolbar_collapsed',
   ACTIVE_SCREEN_KEY: 'fima_active_screen',
+  COL_PRESET_KEY: 'fima_col_preset',
+  WIZARD_SEEN_KEY: 'fima_wizard_seen',
+  DEFAULT_WO_KEY: 'fima_default_wo',
   COL_TOGGLE_OPEN_KEY: 'fima_col_toggle_open',
   VIEW_MODE_KEY: 'fima_view_mode',
+  VIEW_MODE_USER_SET_KEY: 'fima_view_mode_user_set',
 
   // Auto-save LOKAL (localStorage) setiap N ms. Tidak menyentuh Supabase —
   // hanya menjaga-jaga data tidak hilang kalau browser/tab tertutup tiba-tiba.
   AUTO_SAVE_INTERVAL_MS: 60000, // 1 menit
 
   // ====== DEFAULTS ======
-  DEFAULT_ROWS: 30,
+  DEFAULT_ROWS: 10,
 
   // ====== SHIFT (menit) ======
   // S1=510, S2=480, S3=450

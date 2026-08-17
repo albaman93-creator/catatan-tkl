@@ -64,6 +64,11 @@ const App = (() => {
     Navigation.bindKeyboard();
     Navigation.bindFocusin();
     Navigation.bindColumnToggles();
+    Navigation.bindColumnPresets();
+    Navigation.loadColumnPreset();
+    if (State.el.oeeIndicator) {
+      State.el.oeeIndicator.addEventListener('click', () => UI.showScreen('oee'));
+    }
 
     // Row interactions (delegation pada tbody)
     State.el.tbody.addEventListener('input', (e) => {
@@ -75,7 +80,11 @@ const App = (() => {
       // Kode: strip non-digit
       if (t.getAttribute('data-f') === 'kode') {
         t.value = t.value.replace(/\D/g, '');
-        Rows.applyCat(t.closest('tr'));
+        const trKode = t.closest('tr');
+        Rows.applyCat(trKode);
+        // Begitu Kode terisi & baris ini sudah punya Produk & Batch dipilih
+        // duluan, langsung susulkan No. WO-nya juga (lihat rows.js).
+        Rows.autoFillWoForRow(trKode);
       }
       // Jam mulai → auto-copy ke jam selesai baris sebelumnya
       if (t.getAttribute('data-f') === 'mulai') {
@@ -103,7 +112,13 @@ const App = (() => {
     });
 
     State.el.tbody.addEventListener('change', (e) => {
-      if (e.target.getAttribute('data-f') === 'batch') Calculation.recalc();
+      if (e.target.getAttribute('data-f') === 'batch') {
+        // Produk dipilih → No. WO baris ini otomatis mengikuti produk
+        // (kalau Kode-nya sudah terisi; kalau belum, ditunda sampai
+        // Kode diisi — lihat gerbang di Rows.autoFillWoForRow).
+        Rows.autoFillWoForRow(e.target.closest('tr'), { force: true });
+        Calculation.recalc();
+      }
       if (e.target.getAttribute('data-f') === 'kode') Rows.applyCat(e.target.closest('tr'));
     });
 
@@ -196,6 +211,7 @@ const App = (() => {
     // Isi Massal (kotak input daftar bernomor untuk kolom Kode / Jam Mulai)
     if (typeof BulkFill !== 'undefined') BulkFill.init();
     if (typeof PrintSheet !== 'undefined') PrintSheet.bind();
+    if (typeof Wizard !== 'undefined') Wizard.init();
 
     Auth.initSession();
 

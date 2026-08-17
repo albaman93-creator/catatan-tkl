@@ -162,6 +162,16 @@ const Calculation = (() => {
     oeeEl.textContent = Utils.nf2(oee) + '%';
     oeeEl.style.color = oee >= CONFIG.TARGET.OEE ? '#2ee27e' : '#f87171';
 
+    // Badge %OEE mini di toolbar atas — biar kelihatan real-time tanpa
+    // harus pindah ke screen "Perhitungan OEE".
+    if (State.el.oeeIndicatorValue) {
+      State.el.oeeIndicatorValue.textContent = Utils.nf2(oee) + '%';
+      if (State.el.oeeIndicator) {
+        State.el.oeeIndicator.classList.toggle('good', oee >= CONFIG.TARGET.OEE);
+        State.el.oeeIndicator.classList.toggle('bad', oee < CONFIG.TARGET.OEE);
+      }
+    }
+
     // === DIAGNOSTIK ===
     const issues = [];
     if (nShift === 0) issues.push(`Tidak ada baris log pada Shift ${State.evalShift + 1} — cek tombol SHIFT atau jam mulai.`);

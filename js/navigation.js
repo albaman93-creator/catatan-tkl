@@ -108,8 +108,43 @@ const Navigation = (() => {
 
   const bindColumnToggles = () => {
     document.querySelectorAll('.col-toggle-bar input[type="checkbox"]').forEach(chk => {
-      chk.addEventListener('change', syncColumnVisibility);
+      chk.addEventListener('change', () => {
+        syncColumnVisibility();
+        try { localStorage.setItem(CONFIG.COL_PRESET_KEY, 'custom'); } catch(e){}
+      });
     });
+  };
+
+  // ====== PRESET KOLOM: Mode Hitung Cepat / Mode Lengkap ======
+  // Kolom yang tetap tampil di "Mode Hitung Cepat" — cukup buat menghitung
+  // OEE saja: Kode, Jam Mulai, Jam Selesai, Durasi, Good, Defect (+ Aksi).
+  const QUICK_PRESET_COLS = ['col-num', 'col-kode', 'col-mulai', 'col-selesai', 'col-durasi', 'col-good', 'col-defect', 'col-aksi'];
+
+  const applyColumnPreset = (preset) => {
+    document.querySelectorAll('.col-toggle-bar input[type="checkbox"]').forEach(chk => {
+      const col = chk.getAttribute('data-col');
+      chk.checked = (preset === 'full') || QUICK_PRESET_COLS.includes(col);
+    });
+    syncColumnVisibility();
+    try { localStorage.setItem(CONFIG.COL_PRESET_KEY, preset); } catch(e){}
+    document.querySelectorAll('.col-preset-btn').forEach(b => b.classList.remove('on'));
+    const activeBtn = document.getElementById(preset === 'quick' ? 'presetQuick' : 'presetFull');
+    if (activeBtn) activeBtn.classList.add('on');
+  };
+
+  const bindColumnPresets = () => {
+    if (State.el.presetQuick) State.el.presetQuick.addEventListener('click', () => applyColumnPreset('quick'));
+    if (State.el.presetFull) State.el.presetFull.addEventListener('click', () => applyColumnPreset('full'));
+  };
+
+  const loadColumnPreset = () => {
+    let preset = 'full';
+    try {
+      const saved = localStorage.getItem(CONFIG.COL_PRESET_KEY);
+      if (saved === 'quick' || saved === 'full') preset = saved;
+      else if (saved === 'custom') { syncColumnVisibility(); return; } // biarkan centang manual user
+    } catch(e){}
+    applyColumnPreset(preset);
   };
 
   // ====== KEYBOARD HANDLER ======
@@ -203,6 +238,7 @@ const Navigation = (() => {
     navCells, applyTabOrder,
     flash, updatePos, hlColumn, focusCell,
     syncColumnVisibility, bindColumnToggles,
+    applyColumnPreset, bindColumnPresets, loadColumnPreset,
     bindKeyboard, bindFocusin,
   };
 })();
