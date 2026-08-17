@@ -74,7 +74,7 @@ const App = (() => {
     State.el.tbody.addEventListener('input', (e) => {
       const t = e.target;
       // Auto-resize textarea
-      if (t.tagName === 'TEXTAREA' && ['kegiatan','masalah','disposisi'].includes(t.getAttribute('data-f'))) {
+      if (t.tagName === 'TEXTAREA' && ['kegiatan','masalah','disposisi','wo'].includes(t.getAttribute('data-f'))) {
         UI.autoResizeTextarea(t);
       }
       // Kode: strip non-digit

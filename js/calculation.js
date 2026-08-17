@@ -163,12 +163,15 @@ const Calculation = (() => {
     oeeEl.style.color = oee >= CONFIG.TARGET.OEE ? '#2ee27e' : '#f87171';
 
     // Badge %OEE mini di toolbar atas — biar kelihatan real-time tanpa
-    // harus pindah ke screen "Perhitungan OEE".
+    // harus pindah ke screen "Perhitungan OEE". 3 tingkat warna:
+    // merah (<80%) / kuning (80% s.d. sebelum target) / hijau (≥ target).
     if (State.el.oeeIndicatorValue) {
       State.el.oeeIndicatorValue.textContent = Utils.nf2(oee) + '%';
       if (State.el.oeeIndicator) {
-        State.el.oeeIndicator.classList.toggle('good', oee >= CONFIG.TARGET.OEE);
-        State.el.oeeIndicator.classList.toggle('bad', oee < CONFIG.TARGET.OEE);
+        State.el.oeeIndicator.classList.remove('good', 'warn', 'bad');
+        if (oee >= CONFIG.TARGET.OEE) State.el.oeeIndicator.classList.add('good');
+        else if (oee >= 80) State.el.oeeIndicator.classList.add('warn');
+        else State.el.oeeIndicator.classList.add('bad');
       }
     }
 

@@ -8,19 +8,47 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: 260px;
+  width: 268px;
   background: #ffffff;
   border-right: 1px solid var(--line, #e8e8ed);
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 4px 0 24px rgba(13, 33, 53, 0.08);
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 16px 14px;
+  gap: 9px;
+  padding: 0 14px 16px;
   overflow-y: auto;
   transform: translateX(-100%);
-  transition: transform 0.22s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: transform 0.24s cubic-bezier(0.25, 0.1, 0.25, 1);
   -webkit-overflow-scrolling: touch;
+}
+
+/* Header sidebar — judul + ikon, nempel di atas sekali */
+.sidebar-header {
+  display: flex; align-items: center; gap: 9px;
+  position: sticky; top: 0; z-index: 2;
+  background: linear-gradient(180deg, #fff 70%, rgba(255,255,255,0));
+  padding: 18px 2px 12px;
+  margin-bottom: 2px;
+}
+.sidebar-header-icon { font-size: 19px; line-height: 1; }
+.sidebar-header-title {
+  font: 800 14px var(--mono, monospace); letter-spacing: .3px; color: var(--navy, #0d2135);
+}
+
+/* Label pemisah antar-grup menu */
+.sidebar-section-label {
+  font: 700 10px var(--mono, monospace); letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--mut, #6b8093); padding: 6px 4px 2px; margin-top: 2px;
+}
+
+/* Garis pemisah antar grup aksi */
+.sidebar-divider { height: 1px; background: var(--line, #e8e8ed); margin: 6px 2px; flex: none; }
+
+/* Footer kecil (jam terakhir simpan) di paling bawah sidebar */
+.sidebar-footer {
+  font: 600 11px var(--mono, monospace); color: var(--mut, #6b8093);
+  text-align: center; padding: 10px 4px 2px; border-top: 1px dashed var(--line, #e8e8ed); margin-top: 4px;
 }
 
 /* Saat sidebar terbuka */
@@ -46,7 +74,7 @@ body.sidebar-open .sidebar-backdrop {
 
 /* Konten utama bergeser ke kanan saat sidebar terbuka */
 body.sidebar-open #appContainer {
-  margin-left: 260px;
+  margin-left: 268px;
 }
 
 /* Item menu di dalam sidebar */

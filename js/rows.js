@@ -97,6 +97,15 @@ const Rows = (() => {
         if (p === currentVal) opt.selected = true;
         sel.appendChild(opt);
       });
+      // Belum ada pilihan sama sekali -> otomatis default ke Produk 1 (atau
+      // satu-satunya produk kalau memang cuma ada 1) supaya operator tidak
+      // perlu klik pilih manual lagi. No. WO ikut mengikuti (lihat
+      // applyWoFromBatch, hanya berlaku kalau Kode baris sudah terisi).
+      if ((!currentVal || !prods.includes(currentVal)) && prods.length > 0) {
+        sel.value = prods[0];
+      }
+      const tr = sel.closest('tr');
+      if (tr) applyWoFromBatch(tr);
     });
   };
 
@@ -152,7 +161,7 @@ const Rows = (() => {
       <td class="col-kegiatan"><textarea data-f="kegiatan" data-nav class="in" placeholder="Kegiatan " aria-label="Kegiatan" rows="1"></textarea></td>
       <td class="col-masalah"><textarea data-f="masalah" data-nav class="in" placeholder="Penyebab " aria-label="Masalah" rows="1"></textarea></td>
       <td class="col-disposisi"><textarea data-f="disposisi" data-nav class="in" placeholder="Tindakan " aria-label="Disposisi" rows="1"></textarea></td>
-      <td class="col-wo"><input data-f="wo" data-nav class="in mono" placeholder="No WO " aria-label="Nomor WO"></td>
+      <td class="col-wo"><textarea data-f="wo" data-nav class="in mono wo-wrap" placeholder="No WO " aria-label="Nomor WO" rows="1"></textarea></td>
       <td class="col-batch"><select data-f="batch" data-nav class="in mono" aria-label="Produk & Batch">${optionsHtml}</select></td>
       <td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Good"></td>
       <td class="col-defect"><input data-f="defect" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Defect"></td>
@@ -169,6 +178,13 @@ const Rows = (() => {
           }
         }
       });
+    } else if (prods.length > 0) {
+      // Baris baru (bukan hasil load data lama) — Produk otomatis di-default
+      // ke Produk 1 (kalau cuma ada 1 produk terdaftar, otomatis itu saja,
+      // operator tidak perlu klik pilih lagi). No. WO ikut menyesuaikan
+      // (hanya kalau Kode baris ini sudah terisi — lihat applyWoFromBatch).
+      const batchEl = tr.querySelector('[data-f="batch"]');
+      if (batchEl) batchEl.value = prods[0];
     }
 
     State.el.tbody.appendChild(tr);
@@ -176,6 +192,7 @@ const Rows = (() => {
     Navigation.syncColumnVisibility();
     const kegiatanEl = tr.querySelector('[data-f="kegiatan"]');
     if (kegiatanEl && typeof Suggest !== 'undefined') Suggest.attachGhost(kegiatanEl);
+    applyWoFromBatch(tr);
     return tr;
   };
 

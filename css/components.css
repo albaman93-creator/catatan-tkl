@@ -114,7 +114,7 @@
 
 /* ====== MODAL / OVERLAY (Quick Mode, Bulk Fill, Wizard) ====== */
 .qm-overlay {
-  position: fixed; inset: 0; z-index: 950;
+  position: fixed; inset: 0; z-index: 1200;
   background: rgba(15, 36, 55, .6);
   display: flex; align-items: center; justify-content: center;
   padding: 20px; opacity: 1; visibility: visible;

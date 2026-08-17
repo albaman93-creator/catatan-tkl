@@ -24,8 +24,8 @@ col.col-durasi   { width: 38px; }
 col.col-kegiatan { width: 120px; }
 col.col-masalah  { width: 120px; }
 col.col-disposisi{ width: 120px; }
-col.col-wo       { width: 64px; }
-col.col-batch    { width: 90px; }
+col.col-wo       { width: 92px; }
+col.col-batch    { width: 130px; }
 col.col-good     { width: 38px; }
 col.col-defect   { width: 38px; }
 col.col-aksi     { width: 30px; }
@@ -284,6 +284,12 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
 .col-hide { display: none !important; }
 .col-kegiatan, .col-masalah, .col-disposisi, .col-batch {
   white-space: normal !important;
+}
+/* No. WO: textarea auto-tinggi, angka panjang (>8 digit) di-wrap ke baris
+   berikutnya (bukan terpotong/scroll ke samping) */
+.wo-wrap {
+  white-space: normal !important; word-break: break-all; overflow-wrap: break-word;
+  resize: none; overflow: hidden;
 }
 
 /* Footer total durasi */

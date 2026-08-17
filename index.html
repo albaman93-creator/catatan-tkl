@@ -456,7 +456,7 @@
       <div class="login-header">
         <div class="login-logo">TKL</div>
         <h2>OEE System Login</h2>
-        <p>Masuk dengan Email &amp; Password Supabase</p>
+        <p>Masukan Email &amp; Password</p>
       </div>
       <div id="loginError" class="login-error">Email atau password salah. Silakan coba lagi.</div>
       <div id="loginOfflineNote" class="login-error" style="display:none;background:#5a4b00;">
@@ -465,7 +465,7 @@
       <form id="loginForm" class="login-form">
         <div class="field">
           <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" placeholder="nama@pabrik.com" required autofocus autocomplete="username">
+          <input type="email" id="loginEmail" placeholder="" required autofocus autocomplete="username">
         </div>
         <div class="field">
           <label for="loginPassword">Password</label>
@@ -473,7 +473,7 @@
         </div>
         <button type="submit" class="login-btn" id="loginBtn">Masuk Aplikasi</button>
       </form>
-      <div class="login-hint">Akun dibuat oleh admin melalui Supabase Dashboard</div>
+      <div class="login-hint">Produksi-2026</div>
     </div>
   </div>
 
@@ -483,11 +483,6 @@
     <div class="toolbar app-bar">
       <div class="toolbar-backdrop"></div>
       <div class="twrap app-bar-inner">
-        <div class="app-bar-title">
-          <span class="app-bar-logo">📋</span>
-          <span class="app-bar-name">TKL-OEE</span>
-        </div>
-
         <div class="app-bar-badges">
           <span class="shift-indicator" id="shiftIndicator" title="Shift &amp; tanggal yang sedang Anda isi saat ini">
             <span class="si-dot"></span>
@@ -508,12 +503,19 @@
     <!-- SIDEBAR -->
     <div class="sidebar-backdrop"></div>
     <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-header-icon">⚙️</span>
+        <span class="sidebar-header-title">Menu &amp; Pengaturan</span>
+      </div>
+
+      <div class="sidebar-section-label">Aksi Cepat</div>
       <button type="button" class="menu-item" id="btnWizard" title="Setup Awal (Shift, Tahapan, Tanggal, Operator, WO, Produk)">
         🧭 Setup Awal
       </button>
 
       <span class="pos" id="pos"><span class="pos-dot"></span>SIAP · KLIK SEL / MULAI KETIK</span>
 
+      <div class="sidebar-section-label">Tampilan</div>
       <div class="navmode" title="Mode navigasi Tab">
         <span class="nm-cap">MODE TAB</span>
         <button type="button" data-mode="v" class="on">⇅ VERTIKAL</button>
@@ -522,14 +524,19 @@
 
       <span class="hint" id="hint"></span>
       <span class="spacer"></span>
-      <span id="lastSaved"></span>
 
-      <button class="btn btn-install" id="pwa-install-btn" type="button">📱 Install Aplikasi</button>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">Data &amp; Dokumen</div>
       <button class="btn btn-ghost" id="btnDashboard" type="button" title="Rekap data & grafik OEE">📊 Dashboard</button>
-      <button class="btn btn-ghost btn-logout" id="btnLogout" type="button" title="Keluar sesi">🔒 Keluar</button>
-      <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
-      <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
       <button class="btn" id="btnPrint" type="button">🖨️ Print</button>
+      <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
+
+      <div class="sidebar-divider"></div>
+      <button class="btn btn-install" id="pwa-install-btn" type="button">📱 Install Aplikasi</button>
+      <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
+      <button class="btn btn-ghost btn-logout" id="btnLogout" type="button" title="Keluar sesi">🔒 Keluar</button>
+
+      <div class="sidebar-footer" id="lastSaved"></div>
     </aside>
 
     <!-- Bottom Navigation Bar -->

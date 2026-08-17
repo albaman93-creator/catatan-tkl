@@ -92,6 +92,14 @@ const UI = (() => {
     const stageVal = State.el.fStage ? State.el.fStage.value : '';
     const stageText = stageVal ? '_' + stageVal.charAt(0).toUpperCase() + stageVal.slice(1) : '';
     State.el.shiftIndicatorText.textContent = `SHIFT ${State.evalShift + 1} · ${dateText}${stageText}`;
+
+    // Warna indikator mengikuti Tahapan Proses yang aktif
+    if (State.el.shiftIndicator) {
+      ['stage-mixing','stage-filling','stage-steril','stage-kemas','stage-visual'].forEach(c => {
+        State.el.shiftIndicator.classList.remove(c);
+      });
+      if (stageVal) State.el.shiftIndicator.classList.add('stage-' + stageVal);
+    }
   };
 
   const bindShiftButtons = () => {
@@ -138,6 +146,16 @@ const UI = (() => {
     const backdrop = document.querySelector('.sidebar-backdrop');
     if (backdrop) {
       backdrop.addEventListener('click', () => setSidebarOpen(false));
+    }
+
+    // Setelah user memilih/klik salah satu aksi di sidebar (Setup Awal,
+    // Dashboard, Print, Reset, Simpan, Keluar, Install, dsb) — sidebar
+    // otomatis tertutup lagi, fokus balik ke apa yang baru saja dipilih.
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+      sidebar.addEventListener('click', (e) => {
+        if (e.target.closest('button')) setSidebarOpen(false);
+      });
     }
   };
 

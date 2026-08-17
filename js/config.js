@@ -37,7 +37,7 @@ const CONFIG = Object.freeze({
   AUTO_SAVE_INTERVAL_MS: 60000, // 1 menit
 
   // ====== DEFAULTS ======
-  DEFAULT_ROWS: 30,
+  DEFAULT_ROWS: 10,
 
   // ====== SHIFT (menit) ======
   // S1=510, S2=480, S3=450

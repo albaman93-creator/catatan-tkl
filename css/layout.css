@@ -101,9 +101,35 @@
   background: linear-gradient(135deg, var(--green-d), #0c7c3d); border-color: #0a5c2e;
   box-shadow: 0 2px 8px -2px rgba(12,124,61,.55);
 }
+.oee-indicator.warn {
+  background: linear-gradient(135deg, #d97706, #b45309); border-color: #92400e; color: #fff;
+  box-shadow: 0 2px 8px -2px rgba(180,83,9,.55);
+}
 .oee-indicator.bad {
   background: linear-gradient(135deg, #b91c1c, #7f1d1d); border-color: #7f1d1d;
   box-shadow: 0 2px 8px -2px rgba(127,29,29,.55);
+}
+
+/* Warna indikator Shift mengikuti Tahapan Proses yang aktif */
+.shift-indicator.stage-mixing {
+  background: linear-gradient(135deg, var(--green-d), #0c7c3d); border-color: #0a5c2e;
+  box-shadow: 0 2px 8px -2px rgba(12,124,61,.55);
+}
+.shift-indicator.stage-filling {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8); border-color: #1e40af;
+  box-shadow: 0 2px 8px -2px rgba(29,78,216,.55);
+}
+.shift-indicator.stage-steril {
+  background: linear-gradient(135deg, #ec4899, #db2777); border-color: #be185d;
+  box-shadow: 0 2px 8px -2px rgba(219,39,119,.55);
+}
+.shift-indicator.stage-kemas {
+  background: linear-gradient(135deg, #f97316, #ea580c); border-color: #c2410c;
+  box-shadow: 0 2px 8px -2px rgba(234,88,12,.55);
+}
+.shift-indicator.stage-visual {
+  background: linear-gradient(135deg, #9333ea, #7e22ce); border-color: #6b21a8;
+  box-shadow: 0 2px 8px -2px rgba(126,34,206,.55);
 }
 .pos {
   display: inline-flex; align-items: center; gap: 9px;

@@ -13,7 +13,7 @@
   border: 1px solid var(--line); padding: 8px 10px; vertical-align: middle;
 }
 .oee-matrix-tbl th {
-  background: #16324c; color: #fff; text-align: center;
+  background: #64748b; color: #fff; text-align: center;
   font-family: var(--disp); letter-spacing: 1px; font-size: 15px;
 }
 .oee-matrix-tbl tr.sec-header td {
