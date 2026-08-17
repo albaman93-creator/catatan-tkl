@@ -1,0 +1,189 @@
+/* ================================================
+   SIDEBAR.CSS — Menu & Pengaturan sebagai Sidebar Kiri
+   ================================================ */
+
+/* Sidebar container */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: #ffffff;
+  border-right: 1px solid var(--line, #e8e8ed);
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 14px;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform 0.22s cubic-bezier(0.25, 0.1, 0.25, 1);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Saat sidebar terbuka */
+body.sidebar-open .sidebar {
+  transform: translateX(0);
+}
+
+/* Backdrop untuk sidebar (hanya tampil di mobile) */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 33, 53, 0.45);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+body.sidebar-open .sidebar-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Konten utama bergeser ke kanan saat sidebar terbuka */
+body.sidebar-open #appContainer {
+  margin-left: 260px;
+}
+
+/* Item menu di dalam sidebar */
+.sidebar .menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--line, #e8e8ed);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font: 700 13px var(--mono, monospace);
+  color: var(--ink2, #41586c);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+  box-shadow: 0 1px 3px rgba(13, 33, 53, 0.06);
+  white-space: nowrap;
+  text-align: left;
+}
+.sidebar .menu-item:hover {
+  background: #f5f5f7;
+  border-color: rgba(18, 161, 80, 0.5);
+  transform: translateY(-1px);
+}
+
+/* Indikator posisi, hint, last saved, dan kontrol lain */
+.sidebar .pos,
+.sidebar .hint,
+.sidebar #lastSaved {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 12.5px var(--mono, monospace);
+  color: var(--ink2, #41586c);
+  background: #f8fafc;
+  border: 1px solid var(--line, #e8e8ed);
+  border-radius: 10px;
+  padding: 8px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar .pos-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--green, #12a150);
+  flex: none;
+  animation: blink 1.2s steps(2) infinite;
+}
+
+/* Navigasi mode (Vertikal/Horizontal) */
+.sidebar .navmode {
+  display: inline-flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--line, #e8e8ed);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+}
+.sidebar .navmode .nm-cap {
+  font: 600 10px var(--mono, monospace);
+  letter-spacing: 1.5px;
+  color: var(--mut, #6b8093);
+  padding: 0 8px 0 10px;
+}
+.sidebar .navmode button {
+  border: 0;
+  background: transparent;
+  font: 600 12px var(--mono, monospace);
+  letter-spacing: .6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: var(--mut, #6b8093);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex: 1;
+  white-space: nowrap;
+}
+.sidebar .navmode button.on {
+  background: var(--navy, #0d2135);
+  color: #fff;
+  box-shadow: 0 2px 6px -2px rgba(13, 33, 53, 0.55);
+}
+.sidebar .navmode button:not(.on):hover {
+  background: #f2f6f8;
+  color: var(--ink, #0f2437);
+}
+
+/* Tombol aksi di sidebar */
+.sidebar .btn {
+  width: 100%;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 10px 14px;
+}
+
+/* Spacer untuk mendorong elemen ke bawah */
+.sidebar .spacer {
+  flex: 1;
+  min-height: 10px;
+}
+
+/* Responsif: di layar ≤ 768px, sidebar menjadi drawer overlay */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 80%;
+    max-width: 300px;
+    transform: translateX(-100%);
+  }
+
+  body.sidebar-open #appContainer {
+    margin-left: 0;
+  }
+
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  body.sidebar-open .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Animasi blink untuk pos-dot */
+@keyframes blink {
+  50% { opacity: .25; }
+}
+/* Sembunyikan hint "Tab / Enter → baris ..." di sidebar */
+.sidebar .hint {
+  display: none !important;
+}
+/* Sembunyikan kotak hint & kotak posisi di sidebar */
+.sidebar .hint,
+.sidebar .pos {
+  display: none !important;
+}

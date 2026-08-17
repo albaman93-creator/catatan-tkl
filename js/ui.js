@@ -2,6 +2,9 @@
  * UI.JS
  * Menangani komponen UI non-bisnis: clock, toast, mode navigasi, shift,
  * chip status sync, install PWA, dll.
+ * 
+ * Versi terbaru: Menu & Pengaturan menggunakan SIDEBAR KIRI.
+ * (Class .sidebar-open pada <body> menggantikan .toolbar.collapsed lama)
  */
 const UI = (() => {
   'use strict';
@@ -81,7 +84,7 @@ const UI = (() => {
     updateShiftIndicator();
   };
 
-  // ====== INDIKATOR SHIFT & TANGGAL AKTIF (di toolbar atas, tidak perlu scroll) ======
+  // ====== INDIKATOR SHIFT & TANGGAL AKTIF ======
   const updateShiftIndicator = () => {
     if (!State.el.shiftIndicatorText) return;
     const dateVal = State.el.fDate ? State.el.fDate.value : '';
@@ -110,43 +113,46 @@ const UI = (() => {
     } catch(e) {}
   };
 
-  // ====== APP BAR MENU (dropdown "☰", gaya native app) ======
-  const setToolbarCollapsed = (collapsed) => {
-    const toolbar = document.querySelector('.toolbar');
-    if (!toolbar) return;
-    toolbar.classList.toggle('collapsed', collapsed);
-    if (State.el.toolbarToggleIcon) State.el.toolbarToggleIcon.textContent = collapsed ? '☰' : '✕';
-    try { localStorage.setItem(CONFIG.TOOLBAR_COLLAPSED_KEY, collapsed ? '1' : '0'); } catch(e){}
+  // ====== SIDEBAR (Menu & Pengaturan) ======
+  /**
+   * Buka/tutup sidebar.
+   * @param {boolean} open - true = sidebar terbuka, false = tertutup
+   */
+  const setSidebarOpen = (open) => {
+    document.body.classList.toggle('sidebar-open', open);
+    if (State.el.toolbarToggleIcon) {
+      State.el.toolbarToggleIcon.textContent = open ? '✕' : '☰';
+    }
+    try { localStorage.setItem(CONFIG.TOOLBAR_COLLAPSED_KEY, open ? '0' : '1'); } catch(e){}
   };
 
   const bindToolbarToggle = () => {
     if (!State.el.toolbarToggle) return;
 
     State.el.toolbarToggle.addEventListener('click', () => {
-      const toolbar = document.querySelector('.toolbar');
-      const isCollapsed = toolbar && toolbar.classList.contains('collapsed');
-      setToolbarCollapsed(!isCollapsed);
+      const isOpen = document.body.classList.contains('sidebar-open');
+      setSidebarOpen(!isOpen);
     });
 
-    // Klik backdrop gelap = tutup menu
-    const backdrop = document.querySelector('.toolbar-backdrop');
+    // Klik backdrop untuk menutup sidebar
+    const backdrop = document.querySelector('.sidebar-backdrop');
     if (backdrop) {
-      backdrop.addEventListener('click', () => setToolbarCollapsed(true));
+      backdrop.addEventListener('click', () => setSidebarOpen(false));
     }
   };
 
   const loadToolbarCollapsed = () => {
-    // Default: menu TERTUTUP (gaya native app — dropdown baru muncul saat
-    // tombol ☰ diklik). Kalau user sudah pernah pilih sebelumnya, ikuti itu.
-    let collapsed = true;
+    // Default: sidebar terbuka di desktop, tertutup di mobile
+    let open = window.matchMedia('(min-width: 769px)').matches;
     try {
       const saved = localStorage.getItem(CONFIG.TOOLBAR_COLLAPSED_KEY);
-      if (saved !== null) collapsed = saved === '1';
+      if (saved === '0') open = true;
+      else if (saved === '1') open = false;
     } catch(e){}
-    setToolbarCollapsed(collapsed);
+    setSidebarOpen(open);
   };
 
-  // ====== SCREEN NAV (pindah antar section tanpa perlu scroll) ======
+  // ====== SCREEN NAV ======
   const showScreen = (screenId, silent) => {
     if (!screenId) return;
     document.querySelectorAll('.sheet > .sec[data-screen]').forEach(sec => {
@@ -177,7 +183,7 @@ const UI = (() => {
     showScreen(screenId, true);
   };
 
-  // ====== PANDUAN LOG SHEET (help panel, disembunyikan default) ======
+  // ====== PANDUAN LOG SHEET ======
   const bindLogsheetHelp = () => {
     if (!State.el.logsheetHelpBtn || !State.el.logsheetHelpPanel) return;
     State.el.logsheetHelpBtn.addEventListener('click', () => {
@@ -188,7 +194,7 @@ const UI = (() => {
     });
   };
 
-  // ====== CEKLIS TAMPILKAN KOLOM (bisa digulung, ringkas) ======
+  // ====== CEKLIS TAMPILKAN KOLOM ======
   const setColToggleOpen = (open) => {
     if (!State.el.colToggleBar || !State.el.colToggleHead) return;
     if (open) State.el.colToggleBar.removeAttribute('hidden');
@@ -207,7 +213,7 @@ const UI = (() => {
   };
 
   const loadColToggleState = () => {
-    let open = false; // ringkas/gulung secara default
+    let open = false;
     try { open = localStorage.getItem(CONFIG.COL_TOGGLE_OPEN_KEY) === '1'; } catch(e){}
     setColToggleOpen(open);
   };
@@ -227,9 +233,6 @@ const UI = (() => {
       });
     }
 
-    // Saat mode Form / Form Lengkap aktif, sembunyikan ceklis "Tampilkan Kolom"
-    // & panel Panduan — tidak relevan dan cuma bikin scroll tambahan saat
-    // sedang fokus mengisi satu baris (mirip pengalaman native di ponsel).
     const logsheetSec = document.querySelector('.sec[data-screen="logsheet"]');
     if (logsheetSec) logsheetSec.dataset.view = mode;
 

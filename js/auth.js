@@ -83,6 +83,13 @@ const Auth = (() => {
     currentUser = null;
     State.el.appContainer.classList.remove('show');
     State.el.loginOverlay.classList.remove('hide');
+
+    // ✅ Tutup sidebar saat logout
+    document.body.classList.remove('sidebar-open');
+    if (State.el.toolbarToggleIcon) {
+      State.el.toolbarToggleIcon.textContent = '☰';
+    }
+
     State.el.loginPassword.value = '';
     if (State.el.loginEmail) State.el.loginEmail.focus();
     UI.toast('Sesi diakhiri, Anda telah keluar 🔒');
@@ -134,6 +141,12 @@ const Auth = (() => {
         currentUser = null;
         State.el.appContainer.classList.remove('show');
         State.el.loginOverlay.classList.remove('hide');
+
+        // ✅ Tutup sidebar juga ketika session berakhir
+        document.body.classList.remove('sidebar-open');
+        if (State.el.toolbarToggleIcon) {
+          State.el.toolbarToggleIcon.textContent = '☰';
+        }
       }
     });
 
