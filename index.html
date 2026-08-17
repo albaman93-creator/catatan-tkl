@@ -20,8 +20,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- CSS (urutan penting) -->
-  <link rel="stylesheet" href="./css/style.css">
+  <!-- CSS (dipecah menjadi 9 file) -->
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/logsheet.css">
+  <link rel="stylesheet" href="./css/oee.css">
+  <link rel="stylesheet" href="./css/dashboard.css">
+  <link rel="stylesheet" href="./css/login.css">
+  <link rel="stylesheet" href="./css/nature.css">
+  <link rel="stylesheet" href="./css/print.css">
+  <!-- Apple Style Override -->
+<link rel="stylesheet" href="./css/apple-style.css">
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -340,6 +350,57 @@
             </g>
           </g>
 
+          <!-- Bunga Mawar Merah (dekoratif, tempat kupu-kupu hinggap/terbang) -->
+          <g id="roseGarden">
+            <!-- Mawar 1 (kiri bawah) -->
+            <g class="rose" transform="translate(200, 950)">
+              <path class="rose-stem" d="M0,0 C-5,-30 5,-55 0,-80"/>
+              <path class="rose-leaf" d="M0,-40 C-15,-35 -25,-45 -22,-25"/>
+              <path class="rose-leaf" d="M0,-55 C15,-50 25,-60 22,-40"/>
+              <circle class="rose-petal" cx="0" cy="-80" r="14"/>
+              <circle class="rose-petal-dark" cx="-6" cy="-86" r="10"/>
+              <circle class="rose-petal-dark" cx="6" cy="-86" r="10"/>
+              <circle class="rose-petal-light" cx="0" cy="-94" r="9"/>
+              <circle class="rose-center" cx="0" cy="-80" r="4"/>
+            </g>
+
+            <!-- Mawar 2 (kiri tengah) -->
+            <g class="rose" transform="translate(320, 920)">
+              <path class="rose-stem" d="M0,0 C-6,-28 6,-52 0,-76"/>
+              <path class="rose-leaf" d="M0,-38 C-16,-33 -26,-44 -23,-24"/>
+              <path class="rose-leaf" d="M0,-52 C16,-47 26,-58 23,-38"/>
+              <circle class="rose-petal" cx="0" cy="-76" r="12"/>
+              <circle class="rose-petal-dark" cx="-5" cy="-81" r="9"/>
+              <circle class="rose-petal-dark" cx="5" cy="-81" r="9"/>
+              <circle class="rose-petal-light" cx="0" cy="-88" r="8"/>
+              <circle class="rose-center" cx="0" cy="-76" r="3.5"/>
+            </g>
+
+            <!-- Mawar 3 (kanan bawah dekat gubuk) -->
+            <g class="rose" transform="translate(1600, 960)">
+              <path class="rose-stem" d="M0,0 C-5,-30 5,-55 0,-80"/>
+              <path class="rose-leaf" d="M0,-40 C-15,-35 -25,-45 -22,-25"/>
+              <path class="rose-leaf" d="M0,-55 C15,-50 25,-60 22,-40"/>
+              <circle class="rose-petal" cx="0" cy="-80" r="13"/>
+              <circle class="rose-petal-dark" cx="-5" cy="-86" r="9"/>
+              <circle class="rose-petal-dark" cx="5" cy="-86" r="9"/>
+              <circle class="rose-petal-light" cx="0" cy="-94" r="8"/>
+              <circle class="rose-center" cx="0" cy="-80" r="3.5"/>
+            </g>
+
+            <!-- Mawar 4 (kanan bawah dekat sungai) -->
+            <g class="rose" transform="translate(1720, 930)">
+              <path class="rose-stem" d="M0,0 C-5,-28 5,-52 0,-74"/>
+              <path class="rose-leaf" d="M0,-36 C-14,-31 -24,-42 -21,-22"/>
+              <path class="rose-leaf" d="M0,-50 C14,-45 24,-56 21,-36"/>
+              <circle class="rose-petal" cx="0" cy="-74" r="11"/>
+              <circle class="rose-petal-dark" cx="-4" cy="-79" r="8"/>
+              <circle class="rose-petal-dark" cx="4" cy="-79" r="8"/>
+              <circle class="rose-petal-light" cx="0" cy="-86" r="7"/>
+              <circle class="rose-center" cx="0" cy="-74" r="3"/>
+            </g>
+          </g>
+
           <g id="wildGrass">
             <g class="wg-clump" transform="translate(120,1015)"  style="--wg-d:0s">   <path class="wg-blade" d="M10,40 C8,26 13,15 9,0"/><path class="wg-blade" d="M5,40 C4,29 9,19 6,6"/><path class="wg-blade" d="M15,40 C16,28 11,18 13,4"/></g>
             <g class="wg-clump" transform="translate(165,1030) scale(.85)" style="--wg-d:.4s">  <path class="wg-blade" d="M10,40 C8,26 13,15 9,0"/><path class="wg-blade" d="M5,40 C4,29 9,19 6,6"/><path class="wg-blade" d="M15,40 C16,28 11,18 13,4"/></g>
@@ -355,27 +416,32 @@
           </g>
 
           <g id="butterflies" class="butterflies">
-            <g class="butterfly bf-yellow" style="--bf-x:210px; --bf-y:930px; animation-delay:0s, .1s;">
+            <!-- Kupu-kupu kuning dekat Mawar 1 -->
+            <g class="butterfly bf-yellow" style="--bf-x:230px; --bf-y:900px; animation-delay:0s, .1s;">
               <g class="bf-wingL"><ellipse cx="-6" cy="-4" rx="7" ry="5"/></g>
               <g class="bf-wingR"><ellipse cx="6" cy="-4" rx="7" ry="5"/></g>
               <line class="bf-body" x1="0" y1="-8" x2="0" y2="2"/>
             </g>
-            <g class="butterfly bf-purple" style="--bf-x:340px; --bf-y:960px; animation-delay:.6s, .2s;">
+            <!-- Kupu-kupu ungu dekat Mawar 1 -->
+            <g class="butterfly bf-purple" style="--bf-x:180px; --bf-y:940px; animation-delay:.6s, .2s;">
               <g class="bf-wingL"><ellipse cx="-6" cy="-4" rx="7" ry="5"/></g>
               <g class="bf-wingR"><ellipse cx="6" cy="-4" rx="7" ry="5"/></g>
               <line class="bf-body" x1="0" y1="-8" x2="0" y2="2"/>
             </g>
-            <g class="butterfly bf-blue" style="--bf-x:150px; --bf-y:970px; animation-delay:1.1s, 0s;">
+            <!-- Kupu-kupu hijau baru dekat Mawar 2 -->
+            <g class="butterfly bf-green" style="--bf-x:300px; --bf-y:950px; animation-delay:1.1s, 0s;">
               <g class="bf-wingL"><ellipse cx="-6" cy="-4" rx="7" ry="5"/></g>
               <g class="bf-wingR"><ellipse cx="6" cy="-4" rx="7" ry="5"/></g>
               <line class="bf-body" x1="0" y1="-8" x2="0" y2="2"/>
             </g>
-            <g class="butterfly bf-yellow" style="--bf-x:1650px; --bf-y:920px; animation-delay:1.6s, .3s;">
+            <!-- Kupu-kupu biru dekat Mawar 3 -->
+            <g class="butterfly bf-blue" style="--bf-x:1580px; --bf-y:920px; animation-delay:1.6s, .3s;">
               <g class="bf-wingL"><ellipse cx="-6" cy="-4" rx="7" ry="5"/></g>
               <g class="bf-wingR"><ellipse cx="6" cy="-4" rx="7" ry="5"/></g>
               <line class="bf-body" x1="0" y1="-8" x2="0" y2="2"/>
             </g>
-            <g class="butterfly bf-blue" style="--bf-x:1740px; --bf-y:960px; animation-delay:.3s, .5s;">
+            <!-- Kupu-kupu kuning kedua dekat Mawar 4 -->
+            <g class="butterfly bf-yellow" style="--bf-x:1740px; --bf-y:950px; animation-delay:.3s, .5s;">
               <g class="bf-wingL"><ellipse cx="-6" cy="-4" rx="7" ry="5"/></g>
               <g class="bf-wingR"><ellipse cx="6" cy="-4" rx="7" ry="5"/></g>
               <line class="bf-body" x1="0" y1="-8" x2="0" y2="2"/>
@@ -779,28 +845,28 @@
                   <button type="button" class="th-bulk-btn" data-bulk-col="kode" title="Isi massal Kode dari daftar">📥</button>
                 </th>
                 <th class="col-mulai" rowspan="2">
-                  Jam Mulai
+                  Mulai
                   <button type="button" class="th-bulk-btn" data-bulk-col="mulai" title="Isi massal Jam Mulai dari daftar">📥</button>
                 </th>
-                <th class="col-panggil" rowspan="2">Panggil Teknik</th>
-                <th class="col-teknik" rowspan="2">Teknik Datang</th>
+                <th class="col-panggil" rowspan="2">Panggil</th>
+                <th class="col-teknik" rowspan="2">Datang</th>
                 <th class="col-selesai" rowspan="2">
-                  Jam Selesai
+                  Selesai
                   <button type="button" class="th-bulk-btn" data-bulk-col="selesai" title="Isi massal Jam Selesai dari daftar">📥</button>
                 </th>
                 <th class="col-durasi" rowspan="2">
-                  Durasi (m)
+                  Durasi
                   <button type="button" class="th-bulk-btn" data-bulk-col="durasi" title="Isi massal Durasi dari daftar">📥</button>
                 </th>
                 <th class="col-kegiatan" rowspan="2">
                   Kegiatan
                   <button type="button" class="th-bulk-btn" data-bulk-col="kegiatan" title="Isi massal Kegiatan dari daftar">📥</button>
                 </th>
-                <th class="col-masalah" rowspan="2">Masalah / Penyebab</th>
-                <th class="col-disposisi" rowspan="2">Disposisi / Tindakan</th>
-                <th class="col-wo" rowspan="2">Nomor WO</th>
-                <th class="col-batch" rowspan="2">Kode Produk &amp; Batch</th>
-                <th colspan="2">Total Output</th>
+                <th class="col-masalah" rowspan="2">Masalah</th>
+                <th class="col-disposisi" rowspan="2">Disposisi</th>
+                <th class="col-wo" rowspan="2">WO</th>
+                <th class="col-batch" rowspan="2">Produk</th>
+                <th colspan="2">Output</th>
                 <th class="col-aksi" rowspan="2">Aksi</th>
               </tr>
               <tr>

@@ -1,0 +1,248 @@
+/* ================================================
+   LOGIN.CSS — Overlay login, kartu login, background scene
+   ================================================ */
+
+/* ====== LOGIN OVERLAY ====== */
+#loginOverlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background-color: var(--navy);
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+  overflow: hidden;
+  transition: opacity .3s ease, visibility .3s ease;
+}
+#loginOverlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* ====== BACKGROUND SCENE ====== */
+#bgScene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  --cloud-speed: 160s;
+}
+.bg-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+.bg-dim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13,33,53,.10) 0%, rgba(13,33,53,.42) 100%);
+  pointer-events: none;
+  opacity: var(--dim, .3);
+  transition: opacity 2s ease;
+}
+
+/* Palet waktu */
+.scene { transition: background-color 2s ease; }
+.scene--day     { --sky-top:#68c1f5; --sky-mid:#b3e1f9; --sky-bot:#e9f8ff; --hill-far:#a8dda6; --hill-mid:#6fc46f; --hill-near:#3d9440; --tree-leaf:#2a6d2e; --tree-leaf-front:#1c5520; --tree-trunk:#5a3a1f; --cloud:#ffffff; --grass:#26732a; --bird-stroke:#2c5f7c; --dim:.3; }
+.scene--sunrise { --sky-top:#7e96e8; --sky-mid:#f7b878; --sky-bot:#ffe3b5; --hill-far:#b8cf9a; --hill-mid:#82ab5e; --hill-near:#56824a; --tree-leaf:#3e7045; --tree-leaf-front:#2f5d35; --tree-trunk:#5a3a1f; --cloud:#fff1e0; --grass:#4a7e3a; --bird-stroke:#4a4a6a; --dim:.28; }
+.scene--sunset  { --sky-top:#4a3e86; --sky-mid:#e5714b; --sky-bot:#ffc872; --hill-far:#6a5c7a; --hill-mid:#4e4254; --hill-near:#2d2430; --tree-leaf:#2a2736; --tree-leaf-front:#1c1a26; --tree-trunk:#3a2818; --cloud:#f8c48a; --grass:#2e2630; --bird-stroke:#2a1f38; --dim:.45; }
+.scene--night   { --sky-top:#091830; --sky-mid:#0f2c50; --sky-bot:#184066; --hill-far:#153a30; --hill-mid:#102e25; --hill-near:#0b241c; --tree-leaf:#0d2c22; --tree-leaf-front:#0a2419; --tree-trunk:#3a2818; --cloud:#2c4a70; --grass:#0a241c; --bird-stroke:#2c4a70; --dim:.52; }
+
+.sky-stop-top { stop-color: var(--sky-top); transition: stop-color 2s ease; }
+.sky-stop-mid { stop-color: var(--sky-mid); transition: stop-color 2s ease; }
+.sky-stop-bot { stop-color: var(--sky-bot); transition: stop-color 2s ease; }
+
+.hill-far, .hill-mid, .hill-near { transition: fill 2s ease; }
+.hill-far  { fill: var(--hill-far); }
+.hill-mid  { fill: var(--hill-mid); }
+.hill-near { fill: var(--hill-near); }
+.tree-leaf        { fill: var(--tree-leaf);       transition: fill 2s ease; }
+.tree-leaf-front  { fill: var(--tree-leaf-front); transition: fill 2s ease; }
+.trees-front .tree-leaf { fill: var(--tree-leaf-front); }
+.tree-trunk { fill: var(--tree-trunk); transition: fill 2s ease; }
+.grass path { fill: var(--grass); transition: fill 2s ease; }
+
+/* Awan */
+.cloud { animation: cloudDrift var(--cloud-speed, 160s) linear infinite; }
+.cloud-puff { fill: var(--cloud); transition: fill 2s ease; opacity: .94; }
+.scene--night .cloud-puff { opacity: .45; }
+.c1 { animation-delay: 0s; }
+.c2 { animation-delay: -40s; }
+.c3 { animation-delay: -90s; }
+.c4 { animation-delay: -130s; }
+@keyframes cloudDrift {
+  from { transform: translateX(-350px); }
+  to   { transform: translateX(2250px); }
+}
+.scene--night   { --cloud-speed: 240s; }
+.scene--sunrise { --cloud-speed: 180s; }
+.scene--sunset  { --cloud-speed: 200s; }
+
+/* Matahari, bulan, bintang, burung */
+#sun { transition: opacity 1.6s ease; opacity: 1; }
+.scene--night #sun { opacity: 0; }
+#moon { opacity: 0; transition: opacity 1.6s ease; }
+.scene--night #moon { opacity: 1; }
+#stars { opacity: 0; transition: opacity 2s ease; }
+.scene--night #stars { opacity: 1; }
+.star { fill: #fff; animation: twinkle 2.8s ease-in-out infinite; }
+@keyframes twinkle { 50% { opacity: .2; } }
+#birds { transition: opacity 1.6s ease; opacity: .55; }
+.scene--night #birds { opacity: 0; }
+.scene--sunset #birds { opacity: .3; }
+
+/* Bunga kecil */
+.flower-yellow { fill: #ffd84d; transition: fill 2s ease; }
+.flower-pink   { fill: #ff7eb3; transition: fill 2s ease; }
+.flower-white  { fill: #fff;    transition: fill 2s ease; }
+.scene--night .flower-yellow, .scene--night .flower-pink, .scene--night .flower-white { opacity: .4; }
+
+/* Preview bar */
+.preview-bar {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+.preview-btn {
+  font: 600 11px var(--mono);
+  letter-spacing: .5px;
+  color: #eaf2fa;
+  background: rgba(13, 33, 53, .55);
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 99px;
+  padding: 7px 14px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: .2s;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25);
+  white-space: nowrap;
+}
+.preview-btn:hover { background: rgba(13, 33, 53, .8); transform: translateY(-1px); }
+.preview-btn:active { transform: translateY(0); }
+
+/* Weather chip */
+.wx-chip {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font: 500 12px var(--mono);
+  color: #fff;
+  background: rgba(13,33,53,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 5px 10px;
+  border-radius: 99px;
+  opacity: 0;
+  transition: opacity .3s ease;
+  pointer-events: none;
+  z-index: 3;
+}
+.wx-chip.show { opacity: 1; }
+
+/* Pelangi */
+.rainbow-group {
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+#bgScene.has-rainbow .rainbow-group { opacity: 0.85; }
+
+/* Efek hujan */
+#bgScene.is-rain .bg-scene {
+  filter: saturate(0.7) brightness(0.85);
+  transition: filter 1.2s ease;
+}
+#bgScene.is-rain .sky-stop-top  { stop-color: #4a5d6e !important; }
+#bgScene.is-rain .sky-stop-mid  { stop-color: #6b7d8f !important; }
+#bgScene.is-rain .sky-stop-bot  { stop-color: #8fa0b1 !important; }
+#bgScene.is-rain .cloud-puff    { fill: #5c6b7a !important; }
+
+/* Kartu login */
+.login-card {
+  position: relative;
+  overflow: hidden;
+  width: 100%; max-width: 420px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+  padding: 36px 30px;
+  border: 1px solid rgba(255,255,255,0.1);
+  animation: loginPop .4s cubic-bezier(.22,.8,.3,1) both;
+}
+.login-header { text-align: center; margin-bottom: 28px; position: relative; }
+.login-logo {
+  width: 64px; height: 64px; border-radius: 14px;
+  background: linear-gradient(160deg,#1cbe68,#0c7c3d);
+  display: grid; place-items: center; font: 700 28px var(--disp);
+  color: #fff; margin: 0 auto 16px;
+  box-shadow: 0 8px 20px -6px rgba(12,124,61,0.5);
+}
+.login-header h2 { font: 700 24px var(--disp); letter-spacing: 1px; color: var(--navy); text-transform: uppercase; }
+.login-header p  { font: 13px var(--mono); color: var(--mut); margin-top: 4px; }
+.login-form .field { margin-bottom: 18px; position: relative; }
+.login-form .field label {
+  color: var(--mut); font: 600 12px var(--mono);
+  text-transform: uppercase; margin-bottom: 6px; display: block;
+}
+.login-form .field input {
+  background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;
+  padding: 12px 14px; font: 600 18px var(--mono);
+  width: 100%; text-align: center; letter-spacing: 4px; color: var(--ink);
+  transition: .15s;
+}
+.login-form .field input::placeholder { color: #b6c4cf; }
+.login-form .field input:hover { background: #f1f5f9; }
+.login-form .field input:focus {
+  outline: none; border-color: var(--green);
+  background: #fff; box-shadow: 0 0 0 3px rgba(18,161,80,.16);
+}
+.login-remember { display: flex; align-items: center; gap: 8px; margin: 16px 0 20px; }
+.login-remember input { width: 16px; height: 16px; accent-color: var(--green-d); cursor: pointer; }
+.login-remember label { font: 500 13px var(--body); color: #475569; cursor: pointer; user-select: none; }
+.login-btn {
+  width: 100%; background: var(--green-d); color: #fff; border: 0;
+  padding: 13px; font: 600 15px var(--body); border-radius: 9px;
+  cursor: pointer; transition: .2s; box-shadow: 0 4px 12px rgba(12,124,61,0.3);
+}
+.login-btn:hover { background: var(--green); transform: translateY(-1px); }
+.login-error {
+  background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3);
+  color: var(--red); padding: 10px 14px; border-radius: 8px;
+  font: 500 12.5px var(--mono); margin-bottom: 16px;
+  display: none; text-align: center;
+}
+.login-error.show { display: block; animation: shake .3s; }
+.login-hint { text-align: center; margin-top: 20px; font: 11.5px var(--mono); color: #94a3b8; }
+.login-hint b { color: var(--green-d); }
+@keyframes loginPop {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* FX canvas & flash */
+.fx-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.fx-flash {
+  position: absolute; inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.fx-flash.flash-once {
+  animation: flashBlink 0.5s ease-out;
+}
+@keyframes flashBlink {
+  0%   { opacity: 0; }
+  10%  { opacity: 0.85; }
+  20%  { opacity: 0.1; }
+  30%  { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-canvas, .fx-flash { display: none !important; }
+}

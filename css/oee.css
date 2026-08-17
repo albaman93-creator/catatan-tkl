@@ -1,0 +1,65 @@
+/* ================================================
+   OEE.CSS — Tabel matriks OEE, performa produk, diagnostik
+   ================================================ */
+
+/* Tabel matriks OEE */
+.oee-matrix-tbl {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--mono); font-size: 13px;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 10px; overflow: hidden;
+}
+.oee-matrix-tbl th, .oee-matrix-tbl td {
+  border: 1px solid var(--line); padding: 8px 10px; vertical-align: middle;
+}
+.oee-matrix-tbl th {
+  background: #16324c; color: #fff; text-align: center;
+  font-family: var(--disp); letter-spacing: 1px; font-size: 15px;
+}
+.oee-matrix-tbl tr.sec-header td {
+  background: #f0f4f8; font-weight: 700; color: var(--navy);
+  text-transform: uppercase; letter-spacing: 0.8px;
+}
+.oee-matrix-tbl td.code-col {
+  width: 40px; text-align: center; font-weight: 700; background: #fbfcfd;
+}
+.oee-matrix-tbl td.desc-col { color: var(--ink2); }
+.oee-matrix-tbl td.val-col { text-align: right; font-weight: 600; color: var(--ink); width: 130px; }
+.oee-matrix-tbl tr.highlight-res td {
+  background: linear-gradient(180deg,#123049,#0d2135);
+  color: #fff; font-size: 15px; font-weight: 700;
+}
+.oee-matrix-tbl .oee-title {
+  letter-spacing: 1px; font-family: var(--disp); font-size: 16px;
+}
+.oee-matrix-tbl tr.highlight-res td:last-child {
+  text-align: right; font-size: 22px; font-family: var(--disp);
+}
+.oee-matrix-tbl small { font-size: 11px; color: var(--mut); }
+.oee-matrix-tbl tr.highlight-res small { color: #94a3b8; font-weight: 400; }
+
+/* Performance head & badge average */
+.perf-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.badge-avg {
+  background: var(--green-bg); color: var(--green-d);
+  padding: 2px 8px; border-radius: 6px; font-weight: 700;
+  font-size: 13px; border: 1px solid rgba(18,161,80,0.3);
+}
+
+/* Rincian performa produk */
+.perf-detail-box {
+  display: flex; flex-direction: column; gap: 3px;
+  width: 100%; box-sizing: border-box;
+}
+.perf-detail-box > div {
+  display: block; white-space: normal; word-break: break-word;
+}
+
+/* Diagnostik */
+.diag { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.d-item {
+  padding: 10px 14px; border-radius: 8px;
+  font-family: var(--mono); font-size: 13px;
+}
+.d-item.ok  { background: rgba(46,226,126,0.12);  border: 1px solid rgba(46,226,126,0.35); color: #0c7c3d; }
+.d-item.err { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); color: var(--red); }
