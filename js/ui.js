@@ -110,27 +110,39 @@ const UI = (() => {
     } catch(e) {}
   };
 
-  // ====== TOOLBAR COLLAPSE (ringkas di ponsel) ======
+  // ====== APP BAR MENU (dropdown "☰", gaya native app) ======
   const setToolbarCollapsed = (collapsed) => {
     const toolbar = document.querySelector('.toolbar');
     if (!toolbar) return;
     toolbar.classList.toggle('collapsed', collapsed);
-    if (State.el.toolbarToggleIcon) State.el.toolbarToggleIcon.textContent = collapsed ? '▸' : '▾';
+    if (State.el.toolbarToggleIcon) State.el.toolbarToggleIcon.textContent = collapsed ? '☰' : '✕';
     try { localStorage.setItem(CONFIG.TOOLBAR_COLLAPSED_KEY, collapsed ? '1' : '0'); } catch(e){}
   };
 
   const bindToolbarToggle = () => {
     if (!State.el.toolbarToggle) return;
+
     State.el.toolbarToggle.addEventListener('click', () => {
       const toolbar = document.querySelector('.toolbar');
       const isCollapsed = toolbar && toolbar.classList.contains('collapsed');
       setToolbarCollapsed(!isCollapsed);
     });
+
+    // Klik backdrop gelap = tutup menu
+    const backdrop = document.querySelector('.toolbar-backdrop');
+    if (backdrop) {
+      backdrop.addEventListener('click', () => setToolbarCollapsed(true));
+    }
   };
 
   const loadToolbarCollapsed = () => {
-    let collapsed = false;
-    try { collapsed = localStorage.getItem(CONFIG.TOOLBAR_COLLAPSED_KEY) === '1'; } catch(e){}
+    // Default: menu TERTUTUP (gaya native app — dropdown baru muncul saat
+    // tombol ☰ diklik). Kalau user sudah pernah pilih sebelumnya, ikuti itu.
+    let collapsed = true;
+    try {
+      const saved = localStorage.getItem(CONFIG.TOOLBAR_COLLAPSED_KEY);
+      if (saved !== null) collapsed = saved === '1';
+    } catch(e){}
     setToolbarCollapsed(collapsed);
   };
 
@@ -201,10 +213,9 @@ const UI = (() => {
   };
 
   // ====== MODE TAMPILAN: TABEL vs FORM vs FORM LENGKAP ======
-  const setViewMode = (mode, opts) => {
+  const setViewMode = (mode) => {
     if (!State.el.tblWrap || !State.el.formPanel) return;
     if (mode !== 'table' && mode !== 'form' && mode !== 'form-full') mode = 'table';
-    const userChoice = !!(opts && opts.userChoice);
 
     State.el.tblWrap.hidden = mode !== 'table';
     State.el.formPanel.hidden = mode !== 'form';
@@ -222,14 +233,7 @@ const UI = (() => {
     const logsheetSec = document.querySelector('.sec[data-screen="logsheet"]');
     if (logsheetSec) logsheetSec.dataset.view = mode;
 
-    try {
-      localStorage.setItem(CONFIG.VIEW_MODE_KEY, mode);
-      // Tandai HANYA kalau ini benar-benar dipilih manual oleh user (klik
-      // tombol 📋 Tabel / 🧾 Form / 🗂️ Form Lengkap) — supaya tebakan
-      // otomatis (lihat loadViewMode) tetap bisa jalan tiap kunjungan baru
-      // selama user belum pernah memilih sendiri.
-      if (userChoice) localStorage.setItem(CONFIG.VIEW_MODE_USER_SET_KEY, '1');
-    } catch(e){}
+    try { localStorage.setItem(CONFIG.VIEW_MODE_KEY, mode); } catch(e){}
 
     if (mode === 'form' && typeof FormMode !== 'undefined') FormMode.render();
     if (mode === 'form-full' && typeof FormModeFull !== 'undefined') FormModeFull.render();
@@ -238,34 +242,16 @@ const UI = (() => {
   const bindViewModeToggle = () => {
     if (!State.el.viewModeToggle) return;
     State.el.viewModeToggle.querySelectorAll('button[data-view]').forEach(b => {
-      b.addEventListener('click', () => setViewMode(b.getAttribute('data-view'), { userChoice: true }));
+      b.addEventListener('click', () => setViewMode(b.getAttribute('data-view')));
     });
   };
 
   const loadViewMode = () => {
-    let userSet = false;
-    try { userSet = localStorage.getItem(CONFIG.VIEW_MODE_USER_SET_KEY) === '1'; } catch(e){}
-
-    let saved = null;
-    if (userSet) {
-      try {
-        const v = localStorage.getItem(CONFIG.VIEW_MODE_KEY);
-        if (v === 'form' || v === 'form-full' || v === 'table') saved = v;
-      } catch(e){}
-    }
-
-    let mode = saved;
-    if (!mode) {
-      // User belum PERNAH memilih tampilan sendiri lewat tombol (baik
-      // pengguna baru, maupun pengguna lama yang tampilannya masih
-      // tersimpan dari nilai default versi lama) → tebak otomatis tiap
-      // buka app: di layar sempit (mayoritas operator pakai ponsel)
-      // langsung pakai "Form Lengkap" (kartu 1 baris per layar, tanpa
-      // geser tabel lebar & tanpa banyak elemen lain di sekitarnya) — mirip
-      // pengalaman aplikasi native. Di layar lebar (laptop/tablet besar)
-      // tetap default Tabel.
-      mode = (window.innerWidth <= 640) ? 'form-full' : 'table';
-    }
+    let mode = 'table';
+    try {
+      const saved = localStorage.getItem(CONFIG.VIEW_MODE_KEY);
+      if (saved === 'form' || saved === 'form-full') mode = saved;
+    } catch(e){}
     setViewMode(mode);
   };
 

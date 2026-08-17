@@ -17,7 +17,7 @@
 const Wizard = (() => {
   'use strict';
 
-  const STEPS = ['shift', 'stage', 'date', 'operator', 'wo', 'produk'];
+  const STEPS = ['shift', 'stage', 'date', 'operator', 'produk'];
   let stepIndex = 0;
 
   const modalEl = () => document.getElementById('wizardModal');
@@ -180,42 +180,27 @@ const Wizard = (() => {
     bindNav();
   };
 
-  // ====== STEP 5: NO. WO (opsional, jadi default utk baris baru) ======
-  const renderWoStep = () => {
-    renderModal(`
-      ${progressHtml()}
-      <h3 class="qm-title">🧾 No. WO (opsional)</h3>
-      <p class="qm-sub">Kalau diisi, No. WO ini otomatis dipakai sebagai isian awal untuk baris-baris baru di Log Sheet — supaya tidak perlu ketik ulang di setiap baris. Boleh dilewati kalau WO berbeda-beda per kegiatan.</p>
-      <input type="text" id="wizWo" class="in mono" placeholder="Misal: WO-2026-0812" value="${Utils.escapeHtml(State.defaultWO || '')}">
-      ${navHtml({ showSkip: true })}
-    `);
-    const woInput = modalEl().querySelector('#wizWo');
-    woInput.addEventListener('input', () => {
-      State.defaultWO = woInput.value.trim();
-      try { localStorage.setItem(CONFIG.DEFAULT_WO_KEY, State.defaultWO); } catch(e){}
-    });
-    bindNav();
-  };
-
-  // ====== STEP 6: PRODUK & RATE PER MENIT ======
+  // ====== STEP 5: PRODUK, RATE PER MENIT & NO. WO (per produk) ======
   const renderProdukStep = () => {
     const slots = [
-      { name: State.el.prodName1, rate: State.el.prodRate1, wo: State.el.prodWo1, label: 'Produk 1 (Nama, Kecepatan &amp; No. WO)' },
+      { name: State.el.prodName1, rate: State.el.prodRate1, wo: State.el.prodWo1, label: 'Produk 1' },
       { name: State.el.prodName2, rate: State.el.prodRate2, wo: State.el.prodWo2, label: 'Produk 2 (Cadangan)' },
       { name: State.el.prodName3, rate: State.el.prodRate3, wo: State.el.prodWo3, label: 'Produk 3 (Cadangan)' },
     ];
     const slotsHtml = slots.map((s, i) => `
       <div class="qm-slot">
         <label class="qm-label">${s.label}</label>
-        <input type="text" data-prod-name="${i}" class="in" placeholder="Nama produk" value="${Utils.escapeHtml(s.name ? s.name.value : '')}">
-        <input type="number" inputmode="decimal" data-prod-rate="${i}" class="in" placeholder="Rate per menit" value="${s.rate ? s.rate.value : ''}">
-        <input type="text" data-prod-wo="${i}" class="in mono" placeholder="No. WO produk ini (mis. WO-2026-0812)" value="${Utils.escapeHtml(s.wo ? s.wo.value : '')}">
+        <div class="wiz-inline-row">
+          <input type="text" data-prod-name="${i}" class="in" placeholder="Nama produk_batch" value="${Utils.escapeHtml(s.name ? s.name.value : '')}">
+          <input type="number" inputmode="decimal" data-prod-rate="${i}" class="in" placeholder="Rate/mnt" value="${s.rate ? s.rate.value : ''}">
+        </div>
+        <input type="text" data-prod-wo="${i}" class="in mono" inputmode="numeric" maxlength="8" placeholder="No. WO (opsional)" value="${Utils.escapeHtml(s.wo ? s.wo.value : '')}" style="width:100%;">
       </div>`).join('');
 
     renderModal(`
       ${progressHtml()}
-      <h3 class="qm-title">📦 Produk, Rate &amp; No. WO</h3>
-      <p class="qm-sub">Minimal isi Produk 1. Produk 2 &amp; 3 opsional (cadangan). Tiap produk boleh punya No. WO sendiri — nanti saat pilih produk di kolom "Produk &amp; Batch" pada Log Sheet, kolom "Nomor WO" baris itu otomatis ikut terisi sendiri. Langsung tersinkron ke Master Produk &amp; Kecepatan Standar.</p>
+      <h3 class="qm-title">📦 Produk, Rate per Menit &amp; No. WO</h3>
+      <p class="qm-sub">Isi nama produk_batch dan WO</p>
       ${slotsHtml}
       ${navHtml({ nextLabel: 'Selesai · Mulai Isi Data ✓' })}
     `);
@@ -238,6 +223,9 @@ const Wizard = (() => {
     });
     modalEl().querySelectorAll('[data-prod-wo]').forEach(inp => {
       inp.addEventListener('input', () => {
+        // Hanya angka, maksimal 8 digit
+        const cleaned = inp.value.replace(/\D/g, '').slice(0, 8);
+        if (cleaned !== inp.value) inp.value = cleaned;
         const i = parseInt(inp.getAttribute('data-prod-wo'), 10);
         if (slots[i] && slots[i].wo) slots[i].wo.value = inp.value;
       });
@@ -250,7 +238,6 @@ const Wizard = (() => {
     stage: renderStageStep,
     date: renderDateStep,
     operator: renderOperatorStep,
-    wo: renderWoStep,
     produk: renderProdukStep,
   };
 
@@ -265,15 +252,7 @@ const Wizard = (() => {
     openModal();
   };
 
-  const loadDefaultWO = () => {
-    try {
-      const saved = localStorage.getItem(CONFIG.DEFAULT_WO_KEY);
-      if (saved) State.defaultWO = saved;
-    } catch(e){}
-  };
-
   const init = () => {
-    loadDefaultWO();
     if (State.el.btnWizard) State.el.btnWizard.addEventListener('click', open);
 
     // Tutup kalau klik area gelap di luar modal, atau tekan Esc
@@ -294,3 +273,4 @@ const Wizard = (() => {
 
   return { init, open, closeModal };
 })();
+

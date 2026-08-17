@@ -80,11 +80,7 @@ const App = (() => {
       // Kode: strip non-digit
       if (t.getAttribute('data-f') === 'kode') {
         t.value = t.value.replace(/\D/g, '');
-        const trKode = t.closest('tr');
-        Rows.applyCat(trKode);
-        // Begitu Kode terisi & baris ini sudah punya Produk & Batch dipilih
-        // duluan, langsung susulkan No. WO-nya juga (lihat rows.js).
-        Rows.autoFillWoForRow(trKode);
+        Rows.applyCat(t.closest('tr'));
       }
       // Jam mulai → auto-copy ke jam selesai baris sebelumnya
       if (t.getAttribute('data-f') === 'mulai') {
@@ -113,13 +109,13 @@ const App = (() => {
 
     State.el.tbody.addEventListener('change', (e) => {
       if (e.target.getAttribute('data-f') === 'batch') {
-        // Produk dipilih → No. WO baris ini otomatis mengikuti produk
-        // (kalau Kode-nya sudah terisi; kalau belum, ditunda sampai
-        // Kode diisi — lihat gerbang di Rows.autoFillWoForRow).
-        Rows.autoFillWoForRow(e.target.closest('tr'), { force: true });
+        Rows.applyWoFromBatch(e.target.closest('tr'));
         Calculation.recalc();
       }
-      if (e.target.getAttribute('data-f') === 'kode') Rows.applyCat(e.target.closest('tr'));
+      if (e.target.getAttribute('data-f') === 'kode') {
+        Rows.applyCat(e.target.closest('tr'));
+        Rows.applyWoFromBatch(e.target.closest('tr')); // jaga-jaga kalau Batch sudah dipilih duluan
+      }
     });
 
     State.el.tbody.addEventListener('focusout', (e) => {

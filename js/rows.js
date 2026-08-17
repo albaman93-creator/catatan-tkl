@@ -43,60 +43,44 @@ const Rows = (() => {
     return idx >= 0 ? rates[idx] : 0;
   };
 
-  /**
-   * No. WO yang terdaftar untuk 1 produk di Master Produk (slot 1/2/3).
-   * Dipakai supaya kolom "Nomor WO" pada baris log bisa otomatis mengikuti
-   * produk yang dipilih di kolom "Produk & Batch" — tiap produk boleh
-   * punya No. WO sendiri-sendiri.
-   */
+  /** Cari No. WO yang terdaftar untuk 1 nama produk (Master Produk). */
   const getWoForProduct = (prodName) => {
-    if (!prodName || !State.el.prodWo1) return '';
+    if (!prodName) return '';
     const names = [
       State.el.prodName1.value.trim(),
       State.el.prodName2.value.trim(),
       State.el.prodName3.value.trim()
     ];
     const wos = [
-      State.el.prodWo1.value.trim(),
-      State.el.prodWo2.value.trim(),
-      State.el.prodWo3.value.trim(),
+      State.el.prodWo1 ? State.el.prodWo1.value.trim() : '',
+      State.el.prodWo2 ? State.el.prodWo2.value.trim() : '',
+      State.el.prodWo3 ? State.el.prodWo3.value.trim() : '',
     ];
     const idx = names.indexOf(prodName);
     return idx >= 0 ? wos[idx] : '';
   };
 
   /**
-   * Auto-isi kolom "Nomor WO" pada 1 baris berdasarkan produk yang dipilih
-   * di kolom "Produk & Batch" baris itu (fallback ke WO default Wizard
-   * kalau produknya tidak punya WO khusus).
+   * Isi No. WO satu baris secara otomatis mengikuti Produk yang dipilih di
+   * kolom Batch — SETIAP produk punya No. WO sendiri-sendiri (didaftarkan
+   * di Master Produk / Wizard Setup), jadi operator tidak perlu klik/ketik
+   * No. WO manual satu-satu lagi.
    *
-   * SENGAJA hanya mengisi No. WO kalau kolom Kode baris tsb SUDAH terisi
-   * (kolom Produk & Batch sendiri boleh ke-cascade duluan ke banyak baris —
-   * lihat QuickMode.handleBatchChange — tapi No. WO baru menyusul begitu
-   * operator benar-benar mengisi Kode baris itu, supaya baris kosong yang
-   * belum dipakai tidak kelihatan "sudah ada WO" padahal belum dikerjakan).
-   *
-   * @param {HTMLElement} tr - baris <tr> tabel log.
-   * @param {Object} opts - { force: true } untuk menimpa WO yang sudah
-   *        diisi manual (dipakai saat user baru saja MEMILIH produknya);
-   *        default false supaya tidak menimpa isian manual operator saat
-   *        trigger-nya cuma dari mengetik Kode.
+   * Aturan: hanya berlaku untuk baris yang kolom Kode-nya SUDAH terisi.
+   * Kalau Kode masih kosong, Batch & No. WO baris itu SENGAJA tidak
+   * diisi otomatis (baris belum dianggap "aktif").
    */
-  const autoFillWoForRow = (tr, opts) => {
+  const applyWoFromBatch = (tr) => {
     if (!tr) return;
-    const force = !!(opts && opts.force);
     const kodeEl = tr.querySelector('[data-f="kode"]');
-    if (!kodeEl || kodeEl.value.trim() === '') return; // gerbang: Kode wajib terisi dulu
     const batchEl = tr.querySelector('[data-f="batch"]');
     const woEl = tr.querySelector('[data-f="wo"]');
-    if (!batchEl || !woEl) return;
-    if (!force && woEl.value.trim() !== '') return; // jangan timpa isian manual
-    const prod = batchEl.value;
-    if (!prod) return;
-    const finalWo = getWoForProduct(prod) || State.defaultWO || '';
-    if (!finalWo || woEl.value === finalWo) return;
-    woEl.value = finalWo;
-    if (typeof FormModeFull !== 'undefined' && FormModeFull.refreshWoField) FormModeFull.refreshWoField(tr);
+    if (!kodeEl || !batchEl || !woEl) return;
+    if (!kodeEl.value.trim()) return; // Kode belum diisi -> jangan auto-isi WO
+    const prodName = batchEl.value;
+    if (!prodName) return;
+    const wo = getWoForProduct(prodName);
+    if (wo) woEl.value = wo;
   };
 
   // ====== DROPDOWN PRODUK ======
@@ -186,10 +170,6 @@ const Rows = (() => {
         }
       });
     }
-    // Catatan: No. WO baris baru yang masih kosong SENGAJA tidak diisi di
-    // sini — baru diisi otomatis lewat autoFillWoForRow() begitu operator
-    // mengisi kolom Kode baris ini (lihat app.js & quickmode.js), supaya
-    // baris kosong yang belum dipakai tidak ikut kecolongan keisi WO/Batch.
 
     State.el.tbody.appendChild(tr);
     applyCat(tr);
@@ -302,7 +282,7 @@ const Rows = (() => {
   };
 
   return {
-    getActiveProducts, getRateForProduct, getWoForProduct, autoFillWoForRow,
+    getActiveProducts, getRateForProduct, getWoForProduct, applyWoFromBatch,
     rows, updateRowNumbers, applyCat, makeRow,
     updateAllDropdowns, updateMatrixProductHeaders,
     updateProductDetailTable,

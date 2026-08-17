@@ -270,17 +270,5 @@ const FormModeFull = (() => {
     render();
   };
 
-  /**
-   * Sinkronkan tampilan kolom "No. WO" di Form Lengkap dengan nilai asli di
-   * baris tabel — dipanggil dari Rows.autoFillWoForRow() saat WO ter-isi
-   * otomatis (misal setelah pilih Produk & Batch), supaya kartu Form
-   * Lengkap yang sedang terbuka langsung ikut ter-update tanpa perlu
-   * pindah baris dulu.
-   */
-  const refreshWoField = (tr) => {
-    if (!State.el.ffWo || currentRow() !== tr) return;
-    State.el.ffWo.value = readField(tr, 'wo');
-  };
-
-  return { init, render, resetAndRender, refreshWoField };
+  return { init, render, resetAndRender };
 })();

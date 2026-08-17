@@ -21,6 +21,7 @@ html { scroll-behavior: smooth; }
 body {
   font-family: var(--body); font-size: 16px; color: var(--ink);
   min-height: 100vh;
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); /* ruang utk Bottom Nav fixed */
   background:
     radial-gradient(900px 420px at 50% -10%, rgba(18,161,80,.10), transparent 60%),
     linear-gradient(rgba(15,36,55,.05) 1px, transparent 1px),
@@ -237,23 +238,81 @@ kbd {
 #appContainer { display: none; }
 #appContainer.show { display: block; }
 
-/* ====== TOOLBAR ====== */
+/* ====== APP BAR (native-style, ringkas: judul + badge + menu) ====== */
 .toolbar {
-  position: sticky; top: 0; z-index: 50;
-  background: rgba(238,242,245,.95); backdrop-filter: blur(6px);
-  border-bottom: 1px solid var(--line); padding: 10px 14px;
+  position: sticky; top: 0; z-index: 60;
+  background: #fff; border-bottom: 1px solid var(--line);
+  padding: 0; box-shadow: 0 1px 4px -1px rgba(0,0,0,.06);
 }
-.twrap { max-width: var(--page); margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.toolbar-body { display: contents; }
-.toolbar.collapsed .toolbar-body { display: none; }
-.toolbar-toggle {
-  display: inline-flex; align-items: center; gap: 5px;
-  background: #fff; border: 1px solid var(--line); border-radius: 8px;
-  padding: 9px 12px; font: 700 12px var(--mono); color: var(--ink2);
-  cursor: pointer; transition: .15s;
+.app-bar-inner {
+  max-width: var(--page); margin: 0 auto; position: relative;
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
 }
-.toolbar-toggle:hover { border-color: #b8c6d0; color: var(--ink); }
-.toolbar.collapsed .toolbar-toggle #toolbarToggleIcon { transform: rotate(-90deg); display: inline-block; }
+.app-bar-title { display: flex; align-items: center; gap: 7px; flex: none; }
+.app-bar-logo { font-size: 18px; line-height: 1; }
+.app-bar-name { font: 800 14.5px var(--mono); letter-spacing: .3px; color: var(--navy); white-space: nowrap; }
+.app-bar-badges {
+  display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
+  overflow-x: auto; scrollbar-width: none;
+}
+.app-bar-badges::-webkit-scrollbar { display: none; }
+.app-bar-menu-btn {
+  flex: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--line); border-radius: 9px;
+  font-size: 18px; cursor: pointer; transition: .15s; color: var(--ink2);
+}
+.app-bar-menu-btn:hover { border-color: #b8c6d0; color: var(--ink); }
+.toolbar:not(.collapsed) .app-bar-menu-btn {
+  background: var(--green-bg); border-color: rgba(18,161,80,.4); color: var(--green-d);
+}
+
+/* ==== BACKDROP GELAP SAAT MENU DIBUKA ==== */
+.toolbar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 59;                        /* di bawah toolbar (z-index 60) */
+  background: rgba(13, 33, 53, 0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.toolbar:not(.collapsed) .toolbar-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Panel "Menu" — dropdown yang meluncur turun dari App Bar, TERTUTUP
+   secara default (native app style), dibuka lewat tombol ☰ */
+.more-panel { display: none; }
+.toolbar:not(.collapsed) .more-panel {
+  display: flex; flex-direction: column; align-items: stretch; gap: 10px;
+  position: absolute; top: 100%; left: 0; right: 0;
+  background: #fff; border-bottom: 1px solid var(--line);
+  box-shadow: 0 10px 24px -8px rgba(0,0,0,.18);
+  padding: 14px; max-height: 75vh; overflow-y: auto;
+  animation: menuDrop .18s ease both;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(13, 33, 53, 0.10);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 24px 50px -12px rgba(13, 33, 53, 0.35);
+  padding: 16px;
+}
+@keyframes menuDrop { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.menu-item {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  background: #fff; border: 1px solid var(--line); border-radius: 10px;
+  padding: 11px 14px; font: 700 13px var(--mono); color: var(--ink2);
+  cursor: pointer; transition: transform .12s ease, border-color .15s ease, box-shadow .15s ease;
+  box-shadow: 0 1px 3px rgba(13, 33, 53, 0.06);
+}
+.menu-item:hover {
+  border-color: rgba(18, 161, 80, 0.5);
+  box-shadow: 0 4px 10px -2px rgba(18, 161, 80, 0.18);
+  transform: translateY(-1px);
+}
 .shift-indicator {
   display: inline-flex; align-items: center; gap: 9px;
   font: 800 13.5px var(--mono); letter-spacing: .4px; color: #fff;
@@ -362,31 +421,28 @@ kbd {
   pointer-events: none;
 }
 
-/* ====== SCREEN NAV — kini menyatu di Toolbar (persingkat: Data, Produk,
-   Sheet, Inisial, Perform/Produk, Hasil OEE) supaya tidak makan tempat ====== */
-.screen-nav {
-  display: inline-flex; flex-wrap: wrap; gap: 4px;
-  background: #fff; border: 1px solid var(--line);
-  border-radius: 9px; padding: 3px;
+/* ====== BOTTOM NAVIGATION BAR (native-app style, fixed di bawah layar) ====== */
+.bottom-nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
+  display: flex; background: #fff; border-top: 1px solid var(--line);
+  box-shadow: 0 -2px 12px -2px rgba(0,0,0,.08);
+  padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px));
+  max-width: var(--page); margin: 0 auto; left: 50%; transform: translateX(-50%);
+  width: 100%;
 }
-.screen-tab {
-  display: inline-flex; align-items: center; gap: 5px;
-  border: 0; background: transparent; color: var(--mut);
-  font: 700 12px var(--mono); letter-spacing: .3px;
-  padding: 9px 11px; border-radius: 7px; cursor: pointer; transition: .15s;
-  white-space: nowrap;
+.bn-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; background: transparent; border: 0; padding: 7px 2px 6px;
+  color: var(--mut); cursor: pointer; transition: color .15s, transform .15s;
+  border-radius: 10px;
 }
-.screen-tab:hover { color: var(--ink); background: #f2f6f8; }
-.screen-tab.on {
-  background: var(--navy); color: #fff;
-  box-shadow: 0 2px 6px -2px rgba(13,33,53,.55);
-}
-@media (max-width: 768px) {
-  .screen-nav { flex: 1 1 100%; justify-content: center; }
-  .screen-tab { flex: 1 1 calc(33.333% - 4px); justify-content: center; padding: 9px 4px; font-size: 10.5px; }
-}
+.bn-item:active { transform: scale(.94); }
+.bn-icon { font-size: 19px; line-height: 1; }
+.bn-label { font: 700 9.5px var(--mono); letter-spacing: .2px; white-space: nowrap; }
+.bn-item.on { color: var(--green-d); }
+.bn-item.on .bn-icon { transform: translateY(-1px) scale(1.08); }
 
-/* Section disembunyikan kecuali yang sedang aktif (dipilih lewat Screen Nav) */
+/* Section disembunyikan kecuali yang sedang aktif (dipilih lewat Bottom Nav) */
 .sheet > .sec[data-screen] { display: none; }
 .sheet > .sec[data-screen].active { display: block; animation: rise .3s cubic-bezier(.22,.8,.3,1) both; }
 .brand { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
@@ -440,15 +496,9 @@ h1 { font: 700 clamp(24px,5vw,34px)/1 var(--disp); letter-spacing: .8px; text-tr
 .split-input   { display: flex; gap: 6px; }
 .split-input input:first-child { flex: 2; }
 .split-input input:last-child  { flex: 1; }
-/* Variasi 3 kolom (Nama + Rate + No. WO) di Master Produk */
-.split-input-3 input:first-child  { flex: 2; }
+.split-input-3 input:first-child { flex: 2; }
 .split-input-3 input:nth-child(2) { flex: 1; }
-.split-input-3 input:last-child   { flex: 1.3; }
-@media (max-width: 480px) {
-  .split-input-3 { flex-wrap: wrap; }
-  .split-input-3 input:first-child { flex: 1 1 100%; }
-  .split-input-3 input:nth-child(2), .split-input-3 input:last-child { flex: 1 1 calc(50% - 3px); }
-}
+.split-input-3 input:last-child { flex: 1.2; }
 
 /* ====== SYNC CHIP ====== */
 .edit-info {
@@ -910,6 +960,20 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
 .wiz-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; gap: 8px; }
 .wiz-actions-right { display: flex; gap: 8px; }
 
+/* Wizard Produk: nama produk + rate per menit dalam 1 baris */
+.wiz-inline-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.wiz-inline-row input[data-prod-name] {
+  flex: 2;
+  min-width: 0;
+}
+.wiz-inline-row input[data-prod-rate] {
+  flex: 1;
+  min-width: 0;
+}
 
 /* Dropdown pilihan jam mulai (per shift) pada baris pertama Mode Cepat */
 .qm-time-dropdown {
@@ -943,16 +1007,14 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
   border: 1px solid var(--line2); border-radius: 10px; padding: 8px;
   background: #fbfcfd;
 }
-.bulk-line { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding: 3px 6px; border-radius: 8px; border-left: 4px solid transparent; transition: background .15s, border-color .15s; }
+.bulk-line { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding: 4px 6px; border-radius: 6px; transition: background-color .15s; }
 .bulk-line:last-child { margin-bottom: 0; }
 .bulk-line .ghost-wrap { flex: 1; }
-/* Warna kategori mengikuti Kode — sama seperti pewarnaan baris di tabel
-   Log Sheet (lihat tr.log-row[data-cat]), supaya operator langsung lihat
-   di modal Isi Massal baris ini nanti masuk Produksi/Planned/Unplanned DT
-   sebelum diklik Simpan. */
-.bulk-line[data-cat="prod"]      { border-left-color: var(--green); background: var(--green-bg); }
-.bulk-line[data-cat="planned"]   { border-left-color: var(--amber); background: rgba(217,119,6,.08); }
-.bulk-line[data-cat="unplanned"] { border-left-color: var(--red);   background: rgba(220,38,38,.08); }
+/* Warna baris Isi Massal mengikuti kategori Kode baris tsb — sama seperti
+   warna baris di tabel Log Sheet (planned=oranye, unplanned=merah, prod=hijau) */
+.bulk-line.bl-planned   { background-color: rgba(217, 119, 6, 0.18); }
+.bulk-line.bl-unplanned { background-color: rgba(220, 38, 38, 0.20); }
+.bulk-line.bl-prod      { background-color: rgba(18, 161, 80, 0.20); }
 .bulk-num {
   flex: 0 0 26px; text-align: right; font: 700 13px var(--mono); color: var(--mut);
 }
@@ -1188,8 +1250,6 @@ textarea.in {
 
 /* ====== MOBILE ====== */
 @media (max-width: 768px) {
-  .toolbar-toggle { display: inline-flex; }
-  .toolbar.collapsed { padding-bottom: 10px; }
   .twrap { gap: 8px; }
   .pos { flex: 1 1 100%; min-width: 0; justify-content: center; }
   .navmode, .shiftsel { flex: 1 1 45%; }

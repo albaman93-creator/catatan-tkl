@@ -201,10 +201,9 @@ const QuickMode = (() => {
     Rows.updateMatrixProductHeaders();
 
     // Isi Batch baris yang masih kosong dengan produk pertama yang dipilih
-    // (seperti semula) — tidak menunggu Kode terisi dulu.
     Rows.rows().forEach(tr => {
       const sel = tr.querySelector('[data-f="batch"]');
-      if (sel && !sel.value) { sel.value = chosenNames[0]; Rows.autoFillWoForRow(tr, { force: true }); }
+      if (sel && !sel.value) sel.value = chosenNames[0];
     });
 
     refreshRowStates();
@@ -246,13 +245,15 @@ const QuickMode = (() => {
       mulaiEl.readOnly = false;
       mulaiEl.classList.remove('ro-mulai');
       if (State.inputMode !== 'normal' && i > 0) {
+        const kodeEl = tr.querySelector('[data-f="kode"]');
         const batchEl = tr.querySelector('[data-f="batch"]');
         const prevBatchEl = rowsArr[i - 1] && rowsArr[i - 1].querySelector('[data-f="batch"]');
-        // Cascade Batch (+WO) ke baris baru di bawahnya — seperti semula,
-        // tidak menunggu Kode terisi dulu.
-        if (batchEl && prevBatchEl && !batchEl.value && prevBatchEl.value) {
+        // Batch (& otomatis No. WO ikut) cuma di-cascade ke baris yang
+        // Kode-nya SUDAH terisi — baris yang Kode-nya masih kosong
+        // sengaja dilewati (belum dianggap baris aktif).
+        if (kodeEl && kodeEl.value.trim() && batchEl && prevBatchEl && !batchEl.value && prevBatchEl.value) {
           batchEl.value = prevBatchEl.value;
-          Rows.autoFillWoForRow(tr, { force: true });
+          Rows.applyWoFromBatch(tr);
         }
       }
     });
@@ -492,24 +493,16 @@ const QuickMode = (() => {
     timeDropdownEl = div;
   };
 
-  // ====== E: CASCADE DROPDOWN KODE PRODUK & BATCH (semua mode input) ======
+  // ====== E: CASCADE DROPDOWN KODE PRODUK & BATCH (Mode Cepat) ======
   const handleBatchChange = (t) => {
+    if (State.inputMode === 'normal') return;
     const tr = t.closest('tr');
     const allRows = Rows.rows();
     const idx = allRows.indexOf(tr);
     if (idx < 0) return;
-    // Pilih Produk & Batch di 1 baris → otomatis mengisi SEMUA baris di
-    // bawahnya (baris kosong maupun yang sudah ada Kode-nya), sampai user
-    // mengganti lagi di baris lain di tengah (lalu ganti itu yang berlaku
-    // ke bawahnya). Berlaku di Mode Normal maupun Mode Cepat — operator
-    // tidak perlu klik satu-satu lagi.
     for (let i = idx + 1; i < allRows.length; i++) {
-      const row = allRows[i];
-      const sel = row.querySelector('[data-f="batch"]');
-      if (sel) {
-        sel.value = t.value;
-        Rows.autoFillWoForRow(row, { force: true });
-      }
+      const sel = allRows[i].querySelector('[data-f="batch"]');
+      if (sel) sel.value = t.value;
     }
     Calculation.recalc();
   };
