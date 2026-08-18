@@ -1,29 +1,7 @@
 /* ================================================
-   DASHBOARD.CSS — Overlay dashboard, filter, grafik, tabel rekap
+   DASHBOARD.CSS — Screen Dashboard: filter, grafik, tabel rekap
+   (sejajar dengan screen lain di Bottom Nav, bukan overlay lagi)
    ================================================ */
-
-.dash-overlay {
-  position: fixed; inset: 0; z-index: 1200;
-  background: rgba(15, 36, 55, .55);
-  display: flex; align-items: flex-start; justify-content: center;
-  padding: 28px 16px;
-  overflow-y: auto;
-  opacity: 1; visibility: visible;
-  transition: opacity .2s ease, visibility .2s ease;
-}
-.dash-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-
-.dash-panel {
-  width: 100%; max-width: 1180px;
-  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-  box-shadow: 0 20px 60px -20px rgba(0,0,0,.4);
-  padding: 22px 24px 28px;
-}
-
-.dash-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
-.dash-head h2 { font: 800 22px var(--disp); letter-spacing: .3px; color: var(--ink); margin: 0 0 4px; }
-.dash-sub { font-size: 12.5px; color: var(--mut); }
-.dash-head .spacer { flex: 1; }
 
 .dash-filters {
   display: grid;
@@ -86,5 +64,4 @@
 
 @media (max-width: 860px) {
   .dash-filters { grid-template-columns: 1fr 1fr; }
-  .dash-panel { padding: 16px; }
 }

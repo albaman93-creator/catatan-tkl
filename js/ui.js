@@ -180,6 +180,8 @@ const UI = (() => {
       tab.classList.toggle('on', tab.getAttribute('data-screen') === screenId);
     });
     try { localStorage.setItem(CONFIG.ACTIVE_SCREEN_KEY, screenId); } catch(e){}
+    // Dashboard baru menarik data dari Supabase saat tabnya benar-benar dibuka
+    if (screenId === 'dashboard' && typeof Dashboard !== 'undefined') Dashboard.open();
     if (!silent) {
       const sheet = document.querySelector('.sheet');
       if (sheet) sheet.scrollIntoView({ behavior: 'smooth', block: 'start' });

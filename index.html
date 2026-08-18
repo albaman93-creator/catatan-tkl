@@ -527,7 +527,6 @@
 
       <div class="sidebar-divider"></div>
       <div class="sidebar-section-label">Data &amp; Dokumen</div>
-      <button class="btn btn-ghost" id="btnDashboard" type="button" title="Rekap data & grafik OEE">📊 Dashboard</button>
       <button class="btn" id="btnPrint" type="button">🖨️ Print</button>
       <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
 
@@ -558,6 +557,9 @@
       </button>
       <button type="button" class="screen-tab bn-item" data-screen="oee">
         <span class="bn-icon">🎯</span><span class="bn-label">OEE</span>
+      </button>
+      <button type="button" class="screen-tab bn-item" data-screen="dashboard">
+        <span class="bn-icon">📊</span><span class="bn-label">Dashboard</span>
       </button>
     </nav>
 
@@ -934,6 +936,60 @@
         <div class="diag" id="diag"></div>
       </section>
 
+      <!-- Section: Dashboard OEE -->
+      <section class="sec" data-screen="dashboard">
+        <div class="sec-h">
+          <span class="no">07</span>
+          <div><h2>📊 Dashboard OEE</h2><div class="sub2">Rekap data &amp; grafik OEE dari Supabase — semua user yang login bisa akses</div></div>
+        </div>
+
+        <div class="dash-filters">
+          <div class="field"><label>Dari Tanggal</label><input type="date" id="dashFrom"></div>
+          <div class="field"><label>Sampai Tanggal</label><input type="date" id="dashTo"></div>
+          <div class="field"><label>Line</label>
+            <select id="dashLine">
+              <option value="">Semua Line</option>
+              <option value="1">Line 1</option><option value="2">Line 2</option><option value="4">Line 4</option>
+            </select>
+          </div>
+          <div class="field"><label>Shift</label>
+            <select id="dashShift">
+              <option value="">Semua Shift</option>
+              <option value="1">Shift 1</option><option value="2">Shift 2</option><option value="3">Shift 3</option>
+            </select>
+          </div>
+          <div class="field"><label>Tahapan</label>
+            <select id="dashStage">
+              <option value="">Semua Tahapan</option>
+              <option value="mixing">Mixing</option><option value="filling">Filling</option>
+              <option value="steril">Steril</option><option value="visual">Visual</option><option value="kemas">Kemas</option>
+            </select>
+          </div>
+          <button type="button" id="dashApply" class="btn btn-primary">🔍 Terapkan Filter</button>
+        </div>
+
+        <div id="dashStatus" class="dash-status"></div>
+
+        <div class="dash-chart-wrap">
+          <div class="dash-chart-title">Grafik OEE per Record <span class="dash-legend"><i class="dot ok"></i>≥85% <i class="dot warn"></i>60–85% <i class="dot bad"></i>&lt;60%</span></div>
+          <div id="dashChart" class="dash-chart"></div>
+        </div>
+
+        <div class="dash-table-wrap">
+          <table class="dash-table" id="dashTable">
+            <thead>
+              <tr>
+                <th>Tanggal</th><th>Shift</th><th>Line</th><th>Tahapan</th>
+                <th>Avail%</th><th>Perf%</th><th>Qual%</th><th>OEE%</th>
+                <th>DT(m)</th><th>Good</th><th>Defect</th>
+                <th>Produk / Batch</th><th>Operator</th><th>Update Terakhir</th>
+              </tr>
+            </thead>
+            <tbody id="dashTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- Footer sheet -->
       <div class="sheet-f">
         <span><kbd>Ctrl</kbd>+<kbd>S</kbd> simpan cepat &amp; sinkron cloud</span>
@@ -945,66 +1001,6 @@
 
   <!-- Toast -->
   <div id="toast"></div>
-
-  <!-- Dashboard Overlay -->
-  <div class="dash-overlay hide" id="dashOverlay">
-    <div class="dash-panel">
-      <div class="dash-head">
-        <div>
-          <h2>📊 Dashboard OEE</h2>
-          <div class="dash-sub">Rekap data &amp; grafik OEE dari Supabase — semua user yang login bisa akses</div>
-        </div>
-        <span class="spacer"></span>
-        <button type="button" id="dashClose" class="btn btn-ghost">✕ Tutup</button>
-      </div>
-
-      <div class="dash-filters">
-        <div class="field"><label>Dari Tanggal</label><input type="date" id="dashFrom"></div>
-        <div class="field"><label>Sampai Tanggal</label><input type="date" id="dashTo"></div>
-        <div class="field"><label>Line</label>
-          <select id="dashLine">
-            <option value="">Semua Line</option>
-            <option value="1">Line 1</option><option value="2">Line 2</option><option value="4">Line 4</option>
-          </select>
-        </div>
-        <div class="field"><label>Shift</label>
-          <select id="dashShift">
-            <option value="">Semua Shift</option>
-            <option value="1">Shift 1</option><option value="2">Shift 2</option><option value="3">Shift 3</option>
-          </select>
-        </div>
-        <div class="field"><label>Tahapan</label>
-          <select id="dashStage">
-            <option value="">Semua Tahapan</option>
-            <option value="mixing">Mixing</option><option value="filling">Filling</option>
-            <option value="steril">Steril</option><option value="visual">Visual</option><option value="kemas">Kemas</option>
-          </select>
-        </div>
-        <button type="button" id="dashApply" class="btn btn-primary">🔍 Terapkan Filter</button>
-      </div>
-
-      <div id="dashStatus" class="dash-status"></div>
-
-      <div class="dash-chart-wrap">
-        <div class="dash-chart-title">Grafik OEE per Record <span class="dash-legend"><i class="dot ok"></i>≥85% <i class="dot warn"></i>60–85% <i class="dot bad"></i>&lt;60%</span></div>
-        <div id="dashChart" class="dash-chart"></div>
-      </div>
-
-      <div class="dash-table-wrap">
-        <table class="dash-table" id="dashTable">
-          <thead>
-            <tr>
-              <th>Tanggal</th><th>Shift</th><th>Line</th><th>Tahapan</th>
-              <th>Avail%</th><th>Perf%</th><th>Qual%</th><th>OEE%</th>
-              <th>DT(m)</th><th>Good</th><th>Defect</th>
-              <th>Produk / Batch</th><th>Operator</th><th>Update Terakhir</th>
-            </tr>
-          </thead>
-          <tbody id="dashTbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
 
   <!-- MODE CEPAT -->
   <div id="qmOverlay" class="qm-overlay hide">

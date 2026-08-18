@@ -1,26 +1,23 @@
 /**
  * DASHBOARD.JS
- * Panel "Lihat Data" di dalam aplikasi — rekap tabel + grafik OEE sederhana.
- * Bisa diakses semua user yang sudah login (tidak perlu akun Supabase),
- * karena query dilakukan lewat client Supabase yang sama dengan sesi login user.
+ * Screen "Dashboard OEE" — rekap tabel + grafik OEE sederhana, sejajar
+ * dengan screen lain (Data/Produk/Sheet/Inisial/Performa/OEE) di Bottom
+ * Nav. Bisa diakses semua user yang sudah login (tidak perlu akun
+ * Supabase terpisah), karena query dilakukan lewat client Supabase yang
+ * sama dengan sesi login user.
  */
 const Dashboard = (() => {
   'use strict';
 
-  let opened = false;
+  let loaded = false;
 
-  // ====== BUKA / TUTUP ======
+  // ====== DIPANGGIL SETIAP KALI TAB "DASHBOARD" DIBUKA ======
   const open = () => {
-    State.el.dashOverlay.classList.remove('hide');
-    if (!opened) {
+    if (!loaded) {
       setDefaultFilters();
       fetchAndRender();
-      opened = true;
+      loaded = true;
     }
-  };
-
-  const close = () => {
-    State.el.dashOverlay.classList.add('hide');
   };
 
   const setDefaultFilters = () => {
@@ -173,14 +170,9 @@ const Dashboard = (() => {
 
   // ====== INIT ======
   const init = () => {
-    if (!State.el.btnDashboard) return; // guard kalau elemen belum ada
-    State.el.btnDashboard.addEventListener('click', open);
-    State.el.dashClose.addEventListener('click', close);
+    if (!State.el.dashApply) return; // guard kalau elemen belum ada
     State.el.dashApply.addEventListener('click', fetchAndRender);
-    State.el.dashOverlay.addEventListener('click', (e) => {
-      if (e.target === State.el.dashOverlay) close(); // klik area luar panel → tutup
-    });
   };
 
-  return { init, open, close };
+  return { init, open };
 })();

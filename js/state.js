@@ -44,7 +44,7 @@ const State = (() => {
       'tbody', 'tbodyProdDetail', 'btnAdd', 'btnSave', 'btnReset', 'btnLogout',
       'btnPrint', 'printArea', 'presetQuick', 'presetFull',
       'btnWizard', 'wizardOverlay', 'wizardModal',
-      'btnDashboard', 'dashOverlay', 'dashClose', 'dashFrom', 'dashTo', 'dashLine',
+      'dashFrom', 'dashTo', 'dashLine',
       'dashShift', 'dashStage', 'dashApply', 'dashStatus', 'dashChart', 'dashTbody',
       'pwa-install-btn',
       'clock', 'dateEl', 'rincSub',
