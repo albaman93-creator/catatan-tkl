@@ -1,0 +1,256 @@
+/* ============================================================
+   MODERN-SHEET.CSS — Native-inspired visual layer for TKL-OEE
+   Fokus: sheet/logsheet, mobile-first, glass + soft nature background.
+   Tidak mengubah business logic/state.
+   ============================================================ */
+
+:root {
+  --ms-surface: rgba(255,255,255,.84);
+  --ms-surface-strong: rgba(255,255,255,.94);
+  --ms-border: rgba(255,255,255,.70);
+  --ms-shadow: 0 18px 50px rgba(15, 36, 55, .16);
+}
+
+/* ===== GLOBAL CANVAS ===== */
+body {
+  background:
+    linear-gradient(180deg, rgba(244,250,255,.78) 0%, rgba(233,242,247,.90) 48%, rgba(225,236,228,.94) 100%),
+    url('../icons/bg-login.jpg') center top / cover fixed no-repeat;
+  background-attachment: fixed;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(700px 360px at 15% 8%, rgba(255,255,255,.60), transparent 70%),
+    radial-gradient(620px 380px at 88% 20%, rgba(115,190,255,.16), transparent 72%),
+    radial-gradient(680px 420px at 48% 95%, rgba(36,180,100,.11), transparent 75%);
+}
+
+/* ===== APP SHEET ===== */
+.sheet {
+  background: rgba(250,253,255,.78);
+  border-color: rgba(255,255,255,.72);
+  box-shadow: 0 28px 80px rgba(13,33,53,.20);
+  backdrop-filter: blur(16px) saturate(125%);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+}
+
+/* Keep the sheet header crisp while making the shell lighter. */
+.hwrap {
+  background:
+    linear-gradient(135deg, rgba(13,33,53,.95), rgba(22,60,86,.88)),
+    linear-gradient(160deg, rgba(18,161,80,.16), transparent 55%);
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,.08);
+}
+
+/* ===== UNIFIED CONTROL ===== */
+.sheet-unified-control {
+  border-color: rgba(255,255,255,.80);
+  background: linear-gradient(180deg, rgba(255,255,255,.93), rgba(248,252,255,.76));
+  box-shadow: 0 16px 34px rgba(15,36,55,.10), inset 0 1px 0 rgba(255,255,255,.80);
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+}
+
+.sheet-stage-btn {
+  border-color: rgba(185,199,210,.64);
+  background: rgba(255,255,255,.80);
+  box-shadow: 0 2px 8px rgba(15,36,55,.06);
+}
+.sheet-stage-btn:hover { transform: translateY(-1px) scale(1.01); }
+.sheet-stage-btn.on {
+  box-shadow: 0 8px 18px -8px var(--sheet-accent), inset 0 1px 0 rgba(255,255,255,.20);
+}
+.sheet-stage-btn[data-sheet-stage="mixing"].on { background: linear-gradient(180deg,#1cc46b,#118c4a); }
+.sheet-stage-btn[data-sheet-stage="filling"].on { background: linear-gradient(180deg,#4f83f7,#2563eb); }
+.sheet-stage-btn[data-sheet-stage="steril"].on { background: linear-gradient(180deg,#ec4f98,#d52774); }
+.sheet-stage-btn[data-sheet-stage="visual"].on { background: linear-gradient(180deg,#9857e0,#7e22ce); }
+.sheet-stage-btn[data-sheet-stage="kemas"].on { background: linear-gradient(180deg,#f79a4f,#ea580c); }
+
+.sheet-inline-controls {
+  padding: 3px 0;
+}
+.sheet-mini-segment {
+  background: rgba(241,246,249,.78);
+  border-color: rgba(180,195,206,.72);
+  box-shadow: inset 0 1px 1px rgba(15,36,55,.05);
+}
+.sheet-mini-segment button:hover { transform: translateY(-1px); }
+.sheet-mini-segment button.on { box-shadow: 0 4px 9px rgba(15,36,55,.12); }
+#sheetLine button.on { background: linear-gradient(180deg,#20b55f,#0c7c3d); }
+
+.sheet-date-trigger {
+  background: rgba(255,255,255,.90);
+  border-color: rgba(180,195,206,.72);
+  box-shadow: 0 3px 10px rgba(15,36,55,.06);
+}
+
+/* ===== KPI: compact, colorful, modern ===== */
+.sheet-kpi-row {
+  border-top-color: rgba(195,207,216,.64);
+}
+.sheet-kpi {
+  position: relative;
+  overflow: hidden;
+  min-height: 27px;
+  padding: 3px 5px;
+  border-radius: 9px;
+  border-color: color-mix(in srgb, var(--kpi-color) 24%, rgba(214,224,231,.75));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--kpi-color) 10%, #fff), color-mix(in srgb, var(--kpi-color) 5%, #fff));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.78);
+}
+.sheet-kpi::after {
+  content: '';
+  position: absolute;
+  right: -12px;
+  top: -12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--kpi-color) 14%, transparent);
+}
+.sheet-kpi span {
+  position: relative;
+  z-index: 1;
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+.sheet-kpi b {
+  position: relative;
+  z-index: 1;
+  font-variant-numeric: tabular-nums;
+}
+.sheet-kpi-oee {
+  background: linear-gradient(135deg, rgba(255,247,238,.98), rgba(255,237,220,.88));
+  box-shadow: inset 0 -2px 0 rgba(234,88,12,.18), 0 3px 12px rgba(234,88,12,.08);
+}
+
+/* ===== LOGSHEET TOOLBAR ===== */
+.logsheet-topbar {
+  padding: 5px 6px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.55);
+  border: 1px solid rgba(255,255,255,.70);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.80);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.logsheet-topbar .sec-h .no {
+  background: linear-gradient(160deg,#1a2935,#0d2135);
+  box-shadow: 0 5px 12px rgba(13,33,53,.18);
+}
+.logsheet-topbar .col-preset-btn,
+.logsheet-topbar .col-toggle-head,
+.logsheet-topbar .help-btn,
+.logsheet-topbar .view-toggle {
+  border-color: rgba(183,197,208,.68);
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 2px 8px rgba(15,36,55,.05);
+}
+.logsheet-topbar .col-preset-btn:hover,
+.logsheet-topbar .col-toggle-head:hover,
+.logsheet-topbar .help-btn:hover {
+  transform: translateY(-1px);
+}
+.logsheet-topbar .view-toggle button.on {
+  box-shadow: 0 4px 10px rgba(15,36,55,.12);
+}
+
+/* ===== TABLE: clean, readable, less rigid ===== */
+.tbl-wrap {
+  border-color: rgba(203,216,225,.82);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(15,36,55,.08);
+  background: rgba(255,255,255,.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.log th {
+  background: linear-gradient(180deg, rgba(247,250,252,.97), rgba(237,244,248,.96));
+  color: #5f7486;
+  border-bottom-color: rgba(195,208,218,.9);
+}
+.log thead tr:first-child th,
+.log thead tr:nth-child(2) th { background: rgba(245,249,251,.96); }
+.log td { border-bottom-color: rgba(225,232,237,.86); }
+.log tbody tr:hover { background: rgba(255,255,255,.84); }
+.log tbody tr:focus-within {
+  outline-color: var(--green);
+  box-shadow: inset 0 0 0 1px rgba(18,161,80,.18);
+}
+
+/* Slightly softer category surfaces; the left stripe carries the stronger signal. */
+tr.log-row[data-cat="planned"] { background-color: rgba(245,158,11,.10); }
+tr.log-row[data-cat="unplanned"] { background-color: rgba(239,68,68,.10); }
+tr.log-row[data-cat="prod"] { background-color: rgba(34,197,94,.10); }
+tr.log-row[data-cat="planned"]:hover { background-color: rgba(245,158,11,.16); }
+tr.log-row[data-cat="unplanned"]:hover { background-color: rgba(239,68,68,.16); }
+tr.log-row[data-cat="prod"]:hover { background-color: rgba(34,197,94,.16); }
+
+/* ===== MOBILE NATIVE FEEL ===== */
+@media (max-width: 640px) {
+  body {
+    background:
+      linear-gradient(180deg, rgba(244,250,255,.90), rgba(231,240,245,.95) 55%, rgba(226,237,229,.97)),
+      url('../icons/bg-login.jpg') center top / cover fixed no-repeat;
+  }
+  .sheet {
+    margin-top: 8px;
+    border-radius: 16px;
+    box-shadow: 0 18px 46px rgba(13,33,53,.16);
+  }
+  .sec[data-screen="logsheet"] {
+    padding-top: 9px;
+  }
+  .sheet-unified-control {
+    margin-left: -2px;
+    margin-right: -2px;
+    border-radius: 14px;
+  }
+  .sheet-process-tabs { padding-left: 1px; padding-right: 1px; }
+  .sheet-inline-controls { gap: 4px; }
+  .sheet-date-trigger { box-shadow: 0 2px 7px rgba(15,36,55,.07); }
+  .logsheet-topbar {
+    border-radius: 11px;
+    padding: 4px;
+  }
+  .tbl-wrap { border-radius: 12px; }
+}
+
+@media (max-width: 390px) {
+  body::before {
+    background:
+      radial-gradient(500px 280px at 15% 10%, rgba(255,255,255,.60), transparent 70%),
+      radial-gradient(460px 260px at 90% 16%, rgba(115,190,255,.10), transparent 72%);
+  }
+  .sheet {
+    border-radius: 14px;
+  }
+  .sheet-unified-control {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+  .sheet-stage-btn {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .sheet-kpi {
+    min-height: 24px;
+    border-radius: 8px;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .sheet,
+  .sheet-unified-control,
+  .logsheet-topbar,
+  .tbl-wrap {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: #fff;
+  }
+}

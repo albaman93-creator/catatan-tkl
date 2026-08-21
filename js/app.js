@@ -54,6 +54,7 @@ const App = (() => {
     // Shift & Mode
     UI.bindModeButtons();
     UI.bindShiftButtons();
+    UI.bindUnifiedControls();
     UI.bindToolbarToggle();
     UI.bindScreenNav();
     UI.bindLogsheetHelp();
@@ -157,7 +158,8 @@ const App = (() => {
     });
     // Indikator Shift & Tanggal di toolbar atas ikut update tiap tanggal/tahapan diganti
     State.el.fDate.addEventListener('input', UI.updateShiftIndicator);
-    State.el.fStage.addEventListener('change', UI.updateShiftIndicator);
+    State.el.fStage.addEventListener('change', () => { UI.updateShiftIndicator(); });
+    State.el.fLine.addEventListener('change', () => { UI.updateUnifiedControl(); });
 
     // Buttons
     State.el.btnSave.addEventListener('click', () => Storage.saveData());

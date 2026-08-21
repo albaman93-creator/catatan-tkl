@@ -196,6 +196,9 @@ const Calculation = (() => {
 
     Rows.updateProductDetailTable();
     Navigation.applyTabOrder();
+
+    // Sinkronkan KPI compact pada kontrol unified di atas log sheet.
+    if (typeof UI !== 'undefined' && UI.updateUnifiedControl) UI.updateUnifiedControl();
   };
 
   return { validateTimeInput, validateAllTimeInputs, recalc };

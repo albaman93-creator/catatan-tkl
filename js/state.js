@@ -38,6 +38,8 @@ const State = (() => {
       'ffKode', 'ffMulai', 'ffPanggil', 'ffTeknik', 'ffSelesai', 'ffDurasi',
       'ffKegiatan', 'ffMasalah', 'ffDisposisi', 'ffWo', 'ffBatch', 'ffGood', 'ffDefect',
       'fDate', 'fLine', 'fStage',
+      'sheetUnifiedControl', 'sheetShift', 'sheetLine', 'sheetDateTrigger', 'sheetDateText',
+      'sheetKpiA', 'sheetKpiP', 'sheetKpiQ', 'sheetKpiOEE',
       'op1','op2','op3','op4','op5','op6',
       'prodName1','prodRate1','prodWo1','prodName2','prodRate2','prodWo2','prodName3','prodRate3','prodWo3',
       'thProd1','thProd2','thProd3',

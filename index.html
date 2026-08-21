@@ -32,6 +32,7 @@
   <link rel="stylesheet" href="./css/print.css">
   <link rel="stylesheet" href="./css/apple-style.css">
   <link rel="stylesheet" href="./css/sidebar.css">
+  <link rel="stylesheet" href="./css/modern-sheet.css">
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -652,10 +653,89 @@
 
       <!-- Section: Log Sheet Harian -->
       <section class="sec" data-screen="logsheet">
-        <div class="sec-h">
-          <span class="no">01</span>
-          <div><h2>Log Sheet Harian</h2></div>
-          <span class="spacer"></span>
+        <!-- Unified single-row control: proses → shift/line/tanggal → KPI -->
+        <div class="sheet-unified-control" id="sheetUnifiedControl" data-stage="mixing">
+          <div class="sheet-process-tabs" role="tablist" aria-label="Tahapan Proses">
+            <button type="button" class="sheet-stage-btn" data-sheet-stage="mixing" role="tab" aria-selected="true">Mixing</button>
+            <button type="button" class="sheet-stage-btn" data-sheet-stage="filling" role="tab" aria-selected="false">Filling</button>
+            <button type="button" class="sheet-stage-btn" data-sheet-stage="steril" role="tab" aria-selected="false">Steril</button>
+            <button type="button" class="sheet-stage-btn" data-sheet-stage="visual" role="tab" aria-selected="false">Visual</button>
+            <button type="button" class="sheet-stage-btn" data-sheet-stage="kemas" role="tab" aria-selected="false">Kemas</button>
+          </div>
+
+          <div class="sheet-inline-controls">
+            <div class="sheet-control-group sheet-shift-control" role="group" aria-label="Shift">
+              <span class="sheet-control-label">Shift</span>
+              <div class="sheet-mini-segment shiftsel" id="sheetShift" title="Shift evaluasi">
+                <button type="button" data-shift="0" data-sheet-shift="0">1</button>
+                <button type="button" data-shift="1" data-sheet-shift="1">2</button>
+                <button type="button" data-shift="2" data-sheet-shift="2">3</button>
+              </div>
+            </div>
+
+            <div class="sheet-control-divider" aria-hidden="true"></div>
+
+            <div class="sheet-control-group sheet-line-control" role="group" aria-label="Line">
+              <span class="sheet-control-label">Line</span>
+              <div class="sheet-mini-segment" id="sheetLine">
+                <button type="button" data-sheet-line="1">1</button>
+                <button type="button" data-sheet-line="2">2</button>
+                <button type="button" data-sheet-line="4">4</button>
+              </div>
+            </div>
+
+            <div class="sheet-date-control">
+              <button type="button" class="sheet-date-trigger" id="sheetDateTrigger" title="Pilih tanggal">
+                <span class="sheet-date-icon">▣</span>
+                <span id="sheetDateText">21 AUG 2026</span>
+                <span class="sheet-date-chevron">▾</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="sheet-kpi-row" aria-label="Ringkasan OEE">
+            <div class="sheet-kpi"><span>A</span><b id="sheetKpiA">0,00%</b></div>
+            <div class="sheet-kpi"><span>P</span><b id="sheetKpiP">0,00%</b></div>
+            <div class="sheet-kpi"><span>Q</span><b id="sheetKpiQ">0,00%</b></div>
+            <div class="sheet-kpi sheet-kpi-oee"><span>OEE</span><b id="sheetKpiOEE">0,00%</b></div>
+          </div>
+        </div>
+
+        <div class="logsheet-topbar" aria-label="Kontrol tampilan log sheet">
+          <div class="sec-h">
+            <span class="no">01</span>
+            <div class="logsheet-title"><h2>Log Sheet Harian</h2></div>
+          </div>
+
+          <div class="col-preset-bar">
+            <button type="button" class="col-preset-btn" id="presetQuick" title="Sembunyikan kolom detail, sisakan Kode/Jam/Durasi/Good/Defect saja">⚡ Mode Hitung Cepat</button>
+            <button type="button" class="col-preset-btn" id="presetFull" title="Tampilkan semua kolom">📋 Mode Lengkap</button>
+          </div>
+
+          <div class="col-toggle-wrap">
+            <button type="button" class="col-toggle-head" id="colToggleHead" aria-expanded="false">
+              <span id="colToggleIcon">▸</span> Tampilkan Kolom
+            </button>
+            <div class="col-toggle-bar" id="colToggleBar" hidden>
+              <label><input type="checkbox" data-col="col-num" checked> #</label>
+              <label><input type="checkbox" data-col="col-kode" checked> Kode</label>
+              <label><input type="checkbox" data-col="col-mulai" checked> Jam Mulai</label>
+              <label><input type="checkbox" data-col="col-panggil" checked> Panggil Teknik</label>
+              <label><input type="checkbox" data-col="col-teknik" checked> Teknik Datang</label>
+              <label><input type="checkbox" data-col="col-selesai" checked> Jam Selesai</label>
+              <label><input type="checkbox" data-col="col-durasi" checked> Durasi</label>
+              <label><input type="checkbox" data-col="col-kegiatan" checked> Kegiatan</label>
+              <label><input type="checkbox" data-col="col-masalah" checked> Masalah</label>
+              <label><input type="checkbox" data-col="col-disposisi" checked> Disposisi</label>
+              <label><input type="checkbox" data-col="col-wo" checked> No. WO</label>
+              <label><input type="checkbox" data-col="col-batch" checked> Batch</label>
+              <label><input type="checkbox" data-col="col-good" checked> Good</label>
+              <label><input type="checkbox" data-col="col-defect" checked> Defect</label>
+              <label><input type="checkbox" data-col="col-aksi" checked> Aksi</label>
+            </div>
+          </div>
+
+          <span class="logsheet-top-spacer" aria-hidden="true"></span>
           <button type="button" class="help-btn" id="logsheetHelpBtn" title="Panduan pengisian" aria-expanded="false">ⓘ Panduan</button>
           <div class="view-toggle" id="viewModeToggle" title="Ganti tampilan pengisian">
             <button type="button" data-view="table" class="on">📋 Tabel</button>
@@ -670,34 +750,6 @@
             <span class="lg"><i class="sw sw-a"></i>Kode 5,6,7,8 → Planned Down Time (Putih)</span>
             <span class="lg"><i class="sw sw-r"></i>Kode 1,3,4,9 → Unplanned Down Time (Merah)</span>
             <span class="lg"><i class="sw sw-g"></i>Kode 2 / Lainnya → Produksi (Hijau)</span>
-          </div>
-        </div>
-
-        <div class="col-preset-bar">
-          <button type="button" class="col-preset-btn" id="presetQuick" title="Sembunyikan kolom detail, sisakan Kode/Jam/Durasi/Good/Defect saja">⚡ Mode Hitung Cepat</button>
-          <button type="button" class="col-preset-btn" id="presetFull" title="Tampilkan semua kolom">📋 Mode Lengkap</button>
-        </div>
-
-        <div class="col-toggle-wrap">
-          <button type="button" class="col-toggle-head" id="colToggleHead" aria-expanded="false">
-            <span id="colToggleIcon">▸</span> Tampilkan Kolom
-          </button>
-          <div class="col-toggle-bar" id="colToggleBar" hidden>
-            <label><input type="checkbox" data-col="col-num" checked> #</label>
-            <label><input type="checkbox" data-col="col-kode" checked> Kode</label>
-            <label><input type="checkbox" data-col="col-mulai" checked> Jam Mulai</label>
-            <label><input type="checkbox" data-col="col-panggil" checked> Panggil Teknik</label>
-            <label><input type="checkbox" data-col="col-teknik" checked> Teknik Datang</label>
-            <label><input type="checkbox" data-col="col-selesai" checked> Jam Selesai</label>
-            <label><input type="checkbox" data-col="col-durasi" checked> Durasi</label>
-            <label><input type="checkbox" data-col="col-kegiatan" checked> Kegiatan</label>
-            <label><input type="checkbox" data-col="col-masalah" checked> Masalah</label>
-            <label><input type="checkbox" data-col="col-disposisi" checked> Disposisi</label>
-            <label><input type="checkbox" data-col="col-wo" checked> No. WO</label>
-            <label><input type="checkbox" data-col="col-batch" checked> Batch</label>
-            <label><input type="checkbox" data-col="col-good" checked> Good</label>
-            <label><input type="checkbox" data-col="col-defect" checked> Defect</label>
-            <label><input type="checkbox" data-col="col-aksi" checked> Aksi</label>
           </div>
         </div>
 

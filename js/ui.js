@@ -85,6 +85,46 @@ const UI = (() => {
   };
 
   // ====== INDIKATOR SHIFT & TANGGAL AKTIF ======
+  const formatSheetDate = (raw) => {
+    if (!raw) return 'PILIH TANGGAL';
+    const d = new Date(raw + 'T00:00:00');
+    if (Number.isNaN(d.getTime())) return raw;
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+  };
+
+  const updateUnifiedControl = () => {
+    const stageVal = State.el.fStage ? State.el.fStage.value : 'mixing';
+    const lineVal = State.el.fLine ? String(State.el.fLine.value) : '1';
+    const dateVal = State.el.fDate ? State.el.fDate.value : '';
+
+    const root = State.el.sheetUnifiedControl;
+    if (root) root.dataset.stage = stageVal;
+
+    document.querySelectorAll('[data-sheet-stage]').forEach(btn => {
+      const on = btn.getAttribute('data-sheet-stage') === stageVal;
+      btn.classList.toggle('on', on);
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+
+    document.querySelectorAll('[data-sheet-line]').forEach(btn => {
+      btn.classList.toggle('on', btn.getAttribute('data-sheet-line') === lineVal);
+    });
+
+    document.querySelectorAll('#sheetShift button[data-shift]').forEach(btn => {
+      const shift = parseInt(btn.getAttribute('data-shift'), 10);
+      btn.classList.toggle('on', shift === State.evalShift);
+    });
+
+    if (State.el.sheetDateText) State.el.sheetDateText.textContent = formatSheetDate(dateVal);
+
+    // KPI mini-bar membaca elemen kalkulasi resmi sehingga tidak ada state ganda.
+    if (State.el.sheetKpiA && State.el.oF) State.el.sheetKpiA.textContent = `${State.el.oF.textContent}%`;
+    if (State.el.sheetKpiP && State.el.oITotal) State.el.sheetKpiP.textContent = `${State.el.oITotal.textContent}%`;
+    if (State.el.sheetKpiQ && State.el.oM) State.el.sheetKpiQ.textContent = `${State.el.oM.textContent}%`;
+    if (State.el.sheetKpiOEE && State.el.oee) State.el.sheetKpiOEE.textContent = State.el.oee.textContent;
+  };
+
+  // ====== INDIKATOR SHIFT & TANGGAL AKTIF ======
   const updateShiftIndicator = () => {
     if (!State.el.shiftIndicatorText) return;
     const dateVal = State.el.fDate ? State.el.fDate.value : '';
@@ -100,17 +140,24 @@ const UI = (() => {
       });
       if (stageVal) State.el.shiftIndicator.classList.add('stage-' + stageVal);
     }
+    updateUnifiedControl();
+  };
+
+  const setEvalShift = (shift) => {
+    const next = Math.max(0, Math.min(2, parseInt(shift, 10) || 0));
+    State.evalShift = next;
+    try { localStorage.setItem(CONFIG.EVAL_SHIFT_KEY, String(next)); } catch(e){}
+    applyShiftUI();
+    updateUnifiedControl();
+    if (typeof Storage !== 'undefined' && Storage.loadRecord) Storage.loadRecord();
+    toast(`Shift ${next + 1} · A = ${CONFIG.SHIFT_A[next]} mnt`);
   };
 
   const bindShiftButtons = () => {
-    document.querySelectorAll('.shiftsel button').forEach(b => {
-      b.addEventListener('click', () => {
-        State.evalShift = parseInt(b.getAttribute('data-shift'), 10) || 0;
-        try { localStorage.setItem(CONFIG.EVAL_SHIFT_KEY, String(State.evalShift)); } catch(e){}
-        applyShiftUI();
-        Storage.loadRecord();
-        toast(`Shift ${State.evalShift + 1} · A = ${CONFIG.SHIFT_A[State.evalShift]} mnt`);
-      });
+    // Tombol shift lama tetap berfungsi, tetapi hanya #fShift agar
+    // kontrol unified tidak menerima dua handler sekaligus.
+    document.querySelectorAll('#fShift button[data-shift]').forEach(b => {
+      b.addEventListener('click', () => setEvalShift(b.getAttribute('data-shift')));
     });
   };
 
@@ -119,6 +166,65 @@ const UI = (() => {
       const e = parseInt(localStorage.getItem(CONFIG.EVAL_SHIFT_KEY), 10);
       if (e >= 0 && e <= 2) State.evalShift = e;
     } catch(e) {}
+  };
+
+  // ====== UNIFIED SHEET CONTROL ======
+  const bindUnifiedControls = () => {
+    const root = State.el.sheetUnifiedControl;
+    if (!root) return;
+
+    // Satu event delegation: lebih tahan terhadap re-render/DOM patch dan
+    // memastikan tombol unified selalu benar-benar mengubah filter utama.
+    root.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn || !root.contains(btn)) return;
+
+      const shift = btn.getAttribute('data-sheet-shift');
+      if (shift !== null) {
+        e.preventDefault();
+        setEvalShift(shift);
+        return;
+      }
+
+      const stage = btn.getAttribute('data-sheet-stage');
+      if (stage && State.el.fStage) {
+        e.preventDefault();
+        State.el.fStage.value = stage;
+        updateShiftIndicator();
+        // Load record untuk kombinasi filter baru.
+        if (typeof Storage !== 'undefined' && Storage.loadRecord) Storage.loadRecord();
+        toast(`Tahapan: ${stage.charAt(0).toUpperCase() + stage.slice(1)}`);
+        return;
+      }
+
+      const line = btn.getAttribute('data-sheet-line');
+      if (line && State.el.fLine) {
+        e.preventDefault();
+        State.el.fLine.value = line;
+        updateUnifiedControl();
+        if (typeof Storage !== 'undefined' && Storage.loadRecord) Storage.loadRecord();
+        toast(`Line ${line}`);
+      }
+    });
+
+    if (State.el.sheetDateTrigger && State.el.fDate) {
+      State.el.sheetDateTrigger.addEventListener('click', () => {
+        try {
+          if (typeof State.el.fDate.showPicker === 'function') State.el.fDate.showPicker();
+          else { State.el.fDate.focus(); State.el.fDate.click(); }
+        } catch (e) {
+          State.el.fDate.focus();
+          State.el.fDate.click();
+        }
+      });
+    }
+
+    if (State.el.fDate) {
+      State.el.fDate.addEventListener('input', updateUnifiedControl);
+      State.el.fDate.addEventListener('change', updateUnifiedControl);
+    }
+
+    updateUnifiedControl();
   };
 
   // ====== SIDEBAR (Menu & Pengaturan) ======
@@ -353,7 +459,7 @@ const UI = (() => {
     tick, startClock, toast, autoResizeTextarea,
     applyModeUI, bindModeButtons, loadNavMode,
     applyShiftUI, bindShiftButtons, loadEvalShift,
-    updateShiftIndicator,
+    updateShiftIndicator, updateUnifiedControl, bindUnifiedControls,
     bindToolbarToggle, loadToolbarCollapsed,
     bindScreenNav, loadActiveScreen, showScreen,
     bindLogsheetHelp,
