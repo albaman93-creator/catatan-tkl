@@ -62,6 +62,49 @@
   filter: drop-shadow(0 0 7px rgba(255, 224, 140, .85));
 }
 
+/* Tenda Kemah */
+.tent-shadow { fill: rgba(15, 35, 20, .18); }
+.tent-body  { fill: #f2c34d; stroke: #c99a2e; stroke-width: 2; transition: fill 2s ease, stroke 2s ease; }
+.tent-shade { fill: #d9a93a; transition: fill 2s ease; }
+.tent-stripe{ fill: #e2574c; opacity: .85; transition: fill 2s ease, opacity 2s ease; }
+.tent-door  { fill: #6b4321; stroke: #4a2d15; stroke-width: 1.5; }
+.tent-rope  { stroke: #8b6541; stroke-width: 1.6; }
+.tent-peg   { stroke: #6b5237; stroke-width: 2; }
+
+#bgScene.scene--sunrise .tent-body,
+#bgScene.scene--sunset  .tent-body { filter: saturate(.85) brightness(.94); }
+#bgScene.scene--night .tent-body   { fill: #8a6a2e; }
+#bgScene.scene--night .tent-shade  { fill: #6b5323; }
+#bgScene.scene--night .tent-stripe { opacity: .5; }
+
+/* Api Unggun */
+.fire-shadow { fill: rgba(15, 35, 20, .18); }
+.fire-logs rect { fill: #6b4321; stroke: #4a2d15; stroke-width: 1; }
+.fire-stones circle { fill: #9a9a9a; stroke: #6d6d6d; stroke-width: 1; transition: fill 2s ease; }
+#bgScene.scene--night .fire-stones circle { fill: #6f6f6f; }
+
+.fire-flame { opacity: 0; transition: opacity 1.6s ease; }
+#bgScene.scene--night  .fire-flame { opacity: 1; }
+#bgScene.scene--sunset .fire-flame { opacity: .55; }
+
+.flame { transform-origin: 0px -2px; }
+.flame-outer { fill: #ff7b1a; animation: flameFlickerA 1.3s ease-in-out infinite; }
+.flame-mid   { fill: #ff9f2e; animation: flameFlickerB 1.0s ease-in-out infinite; }
+.flame-inner { fill: #ffe066; animation: flameFlickerA 0.8s ease-in-out infinite reverse; }
+
+@keyframes flameFlickerA {
+  0%, 100% { transform: scaleY(1) scaleX(1) translateX(0); }
+  50%      { transform: scaleY(1.15) scaleX(.9) translateX(1px); }
+}
+@keyframes flameFlickerB {
+  0%, 100% { transform: scaleY(1) scaleX(1) translateX(0); }
+  50%      { transform: scaleY(.9) scaleX(1.1) translateX(-1px); }
+}
+
+#bgScene.scene--night #campfire .fire-flame {
+  filter: drop-shadow(0 0 16px rgba(255, 140, 20, .9));
+}
+
 /* Bunga matahari */
 .sf-stem   { fill: none; stroke: #3f7d34; stroke-width: 5; stroke-linecap: round; }
 .sf-leaf   { fill: #4c9440; }
@@ -172,7 +215,7 @@
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   #windmillBlades, .river-shine, .wg-blade, .butterflies .butterfly,
-  .bf-wingL, .bf-wingR, .firefly, .autumn-leaf {
+  .bf-wingL, .bf-wingR, .firefly, .autumn-leaf, .flame {
     animation: none !important;
   }
 }
