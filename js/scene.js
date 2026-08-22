@@ -36,7 +36,7 @@ const Scene = (() => {
     // 05:30 (330) = terbit timur, 18:30 (1110) = terbenam barat
     const p = Math.max(0, Math.min(1, (mins - 330) / 780));
     const x = 100 + p * 1720;                     // kiri → kanan
-    const y = 680 - Math.sin(p * Math.PI) * 570;  // puncak y=110 (tinggi di atas login card)
+    const y = 680 - Math.sin(p * Math.PI) * 620;  // puncak y=110 (tinggi di atas login card)
     return { x, y };
   };
 
