@@ -761,49 +761,57 @@
             <button type="button" class="sheet-stage-btn" data-sheet-stage="kemas" role="tab" aria-selected="false">Kemas</button>
           </div>
 
-          <div class="sheet-inline-controls">
-            <div class="sheet-control-group sheet-shift-control" role="group" aria-label="Shift">
-              <span class="sheet-control-label">Shift</span>
-              <div class="sheet-mini-segment" id="sheetShift" title="Shift evaluasi">
-                <button type="button" data-shift="0" data-sheet-shift="0">1</button>
-                <button type="button" data-shift="1" data-sheet-shift="1">2</button>
-                <button type="button" data-shift="2" data-sheet-shift="2">3</button>
-              </div>
-            </div>
+ <div class="sheet-inline-controls">
+  <!-- ===== BARIS 1: Tanggal | Shift | Line ===== -->
+  <div class="sheet-top-row">
+    <!-- Tanggal -->
+    <div class="sheet-date-control">
+      <button type="button" class="sheet-date-trigger" id="sheetDateTrigger" title="Pilih tanggal">
+        <span class="sheet-date-icon">▣</span>
+        <span id="sheetDateText">21 AUG 2026</span>
+        <span class="sheet-date-chevron">▾</span>
+      </button>
+    </div>
 
-            <div class="sheet-control-divider" aria-hidden="true"></div>
+    <div class="sheet-control-divider" aria-hidden="true"></div>
 
-            <div class="sheet-control-group sheet-line-control" role="group" aria-label="Line">
-              <span class="sheet-control-label">Line</span>
-              <div class="sheet-mini-segment" id="sheetLine">
-                <button type="button" data-sheet-line="1">1</button>
-                <button type="button" data-sheet-line="2">2</button>
-                <button type="button" data-sheet-line="4">4</button>
-              </div>
-            </div>
+    <!-- Shift -->
+    <div class="sheet-control-group sheet-shift-control" role="group" aria-label="Shift">
+      <span class="sheet-control-label">Shift</span>
+      <div class="sheet-mini-segment" id="sheetShift" title="Shift evaluasi">
+        <button type="button" data-shift="0" data-sheet-shift="0">1</button>
+        <button type="button" data-shift="1" data-sheet-shift="1">2</button>
+        <button type="button" data-shift="2" data-sheet-shift="2">3</button>
+      </div>
+    </div>
 
-            <div class="sheet-date-control">
-              <button type="button" class="sheet-date-trigger" id="sheetDateTrigger" title="Pilih tanggal">
-                <span class="sheet-date-icon">▣</span>
-                <span id="sheetDateText">21 AUG 2026</span>
-                <span class="sheet-date-chevron">▾</span>
-              </button>
-            </div>
+    <div class="sheet-control-divider" aria-hidden="true"></div>
 
-            <div class="sheet-control-divider" aria-hidden="true"></div>
+    <!-- Line -->
+    <div class="sheet-control-group sheet-line-control" role="group" aria-label="Line">
+      <span class="sheet-control-label">Line</span>
+      <div class="sheet-mini-segment" id="sheetLine">
+        <button type="button" data-sheet-line="1">1</button>
+        <button type="button" data-sheet-line="2">2</button>
+        <button type="button" data-sheet-line="4">4</button>
+      </div>
+    </div>
+  </div>
 
-            <div class="sheet-control-group sheet-op-control" role="group" aria-label="Inisial Operator">
-              <span class="sheet-control-label">OP</span>
-              <div class="sheet-op-boxes" id="sheetOpBoxes">
-                <input type="text" class="sheet-op-box" data-sheet-op="1" maxlength="3" placeholder="OP1" autocomplete="off">
-                <input type="text" class="sheet-op-box" data-sheet-op="2" maxlength="3" placeholder="OP2" autocomplete="off">
-                <input type="text" class="sheet-op-box" data-sheet-op="3" maxlength="3" placeholder="OP3" autocomplete="off">
-                <input type="text" class="sheet-op-box" data-sheet-op="4" maxlength="3" placeholder="OP4" autocomplete="off">
-                <input type="text" class="sheet-op-box" data-sheet-op="5" maxlength="3" placeholder="OP5" autocomplete="off">
-                <input type="text" class="sheet-op-box" data-sheet-op="6" maxlength="3" placeholder="OP6" autocomplete="off">
-              </div>
-            </div>
-          </div>
+  <!-- BARIS 2: 6 Kolom OP -->
+<div class="sheet-op-row">
+  <div class="sheet-control-group sheet-op-control" role="group" aria-label="Inisial Operator">
+    <span class="sheet-control-label">OP</span>
+    <div class="sheet-op-boxes" id="sheetOpBoxes">
+      <input type="text" class="sheet-op-box" data-sheet-op="1" maxlength="3" placeholder="OP1" autocomplete="off">
+      <input type="text" class="sheet-op-box" data-sheet-op="2" maxlength="3" placeholder="OP2" autocomplete="off">
+      <input type="text" class="sheet-op-box" data-sheet-op="3" maxlength="3" placeholder="OP3" autocomplete="off">
+      <input type="text" class="sheet-op-box" data-sheet-op="4" maxlength="3" placeholder="OP4" autocomplete="off">
+      <input type="text" class="sheet-op-box" data-sheet-op="5" maxlength="3" placeholder="OP5" autocomplete="off">
+      <input type="text" class="sheet-op-box" data-sheet-op="6" maxlength="3" placeholder="OP6" autocomplete="off">
+    </div>
+  </div>
+</div>
 
           <div class="sheet-kpi-row" aria-label="Ringkasan OEE">
             <div class="sheet-kpi"><span>A</span><b id="sheetKpiA">0,00%</b></div>

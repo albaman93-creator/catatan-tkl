@@ -747,3 +747,134 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
   }
 }
 
+/* ============================================================
+   DUA BARIS UNTUK KONTROL SHEET (Tanggal, Shift, Line | OP)
+   ============================================================ */
+
+.sheet-inline-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+/* Baris 1: Tanggal, Shift, Line — satu baris, bisa scroll */
+.sheet-top-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.sheet-top-row::-webkit-scrollbar {
+  display: none;
+}
+
+//* ============================================================
+   PERBAIKAN: 6 KOLOM OP DALAM SATU BARIS
+   ============================================================ */
+
+/* Pastikan baris OP tidak wrap */
+.sheet-op-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  width: 100%;
+}
+.sheet-op-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* OP boxes container — tidak wrap, bisa scroll */
+.sheet-op-boxes {
+  display: flex;
+  gap: 3px;
+  flex-wrap: nowrap !important;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.sheet-op-boxes::-webkit-scrollbar {
+  display: none;
+}
+
+/* Setiap kotak OP — kecil dan kompak */
+.sheet-op-box {
+  flex: 0 0 auto;
+  width: 32px;
+  min-width: 28px;
+  max-width: 38px;
+  text-align: center;
+  text-transform: uppercase;
+  font: 700 10px var(--mono);
+  letter-spacing: .2px;
+  border: 1px solid #d6dee5;
+  border-radius: 5px;
+  padding: 4px 1px;
+  color: #0f2437;
+  background: #fbfcfd;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.sheet-op-box::placeholder {
+  color: #b6c4cf;
+  font-size: 7.5px;
+  text-transform: none;
+}
+.sheet-op-box:hover {
+  background: #f4f8fa;
+}
+.sheet-op-box:focus {
+  outline: none;
+  border-color: #12a150;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(18,161,80,.16);
+}
+.sheet-op-box.filled {
+  border-color: rgba(18,161,80,.5);
+  background: rgba(18,161,80,.06);
+}
+
+/* Label OP lebih kecil */
+.sheet-op-control .sheet-control-label {
+  font-size: 8.5px;
+  letter-spacing: .6px;
+  margin-right: 2px;
+  flex: 0 0 auto;
+}
+
+/* Responsif untuk HP sempit */
+@media (max-width: 480px) {
+  .sheet-op-box {
+    width: 28px;
+    min-width: 24px;
+    font-size: 9px;
+    padding: 3px 1px;
+    border-radius: 4px;
+  }
+  .sheet-op-box::placeholder {
+    font-size: 6.5px;
+  }
+  .sheet-op-row {
+    gap: 2px;
+  }
+  .sheet-op-boxes {
+    gap: 2px;
+  }
+}
+
+@media (max-width: 380px) {
+  .sheet-op-box {
+    width: 24px;
+    min-width: 22px;
+    font-size: 8px;
+    padding: 2px 1px;
+  }
+}
