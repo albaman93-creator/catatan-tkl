@@ -9,14 +9,21 @@
  * Matahari/bulan bergerak sepanjang busur langit mengikuti waktu.
  * Tombol preview di pojok kanan bawah memungkinkan cycle manual untuk testing.
  *
- * Dispatch event 'scenechange' saat nama scene berubah, agar modul lain
- * (misalnya weather.js) bisa merespon untuk efek visual (pelangi, dll).
+ * Fase bulan astronomis (sinodik) otomatis menentukan bentuk:
+ *   - p≈0   → bulan baru (gelap)
+ *   - p≈0.25 → kuartal pertama (separuh)
+ *   - p≈0.5  → purnama (bulat penuh)
+ *   - p≈0.75 → kuartal akhir (separuh)
+ *   - p→1   → sabit tipis ("tandan tua")
+ *
+ * Dispatch event 'scenechange' saat nama scene berubah.
  */
 const Scene = (() => {
   'use strict';
 
   let manualMode = null;
   let lastName   = null;
+
   const MODES = ['auto', 'day', 'sunset', 'night', 'sunrise'];
   const SCENE_CLASSES = ['scene--night', 'scene--day', 'scene--sunrise', 'scene--sunset'];
 
@@ -29,20 +36,17 @@ const Scene = (() => {
 
   /**
    * Posisi matahari di busur langit (05:30 → 18:30).
-   * Bergerak dari timur (kiri) ke barat (kanan) dengan tinggi maksimum di tengah hari.
-   * Puncak diatur cukup tinggi (y=110) agar tidak terhalang login card di tengah layar.
    */
   const sunPosition = (mins) => {
     // 05:30 (330) = terbit timur, 18:30 (1110) = terbenam barat
     const p = Math.max(0, Math.min(1, (mins - 330) / 780));
     const x = 100 + p * 1720;                     // kiri → kanan
-    const y = 680 - Math.sin(p * Math.PI) * 620;  // puncak y=110 (tinggi di atas login card)
+    const y = 680 - Math.sin(p * Math.PI) * 620;  // puncak y≈110
     return { x, y };
   };
 
   /**
    * Posisi bulan di busur langit (18:00 → 06:00 berikutnya).
-   * Puncak di tengah malam pada posisi atas tengah layar.
    */
   const moonPosition = (mins) => {
     // Normalize: 18:00 (1080) → 06:00 berikutnya (360 + 1440)
@@ -51,6 +55,46 @@ const Scene = (() => {
     const x = 100 + p * 1720;
     const y = 680 - Math.sin(p * Math.PI) * 570;
     return { x, y };
+  };
+
+  /**
+   * Hitung fase bulan astronomis (0 = bulan baru, 0.5 = purnama, 1 = kembali ke bulan baru).
+   * Rumus siklus sinodik standar — otomatis selaras dengan kalender Hijriyah.
+   */
+  const moonPhase = () => {
+    const synodicMonth = 29.530588853; // hari
+    const knownNewMoon = Date.UTC(2000, 0, 6, 18, 14, 0); // referensi bulan baru
+    const daysSince = (Date.now() - knownNewMoon) / 86400000;
+    let phase = (daysSince % synodicMonth) / synodicMonth;
+    if (phase < 0) phase += 1;
+    return phase;
+  };
+
+  /**
+   * Geser #moonShadow supaya bentuk bulan sesuai fase saat ini.
+   * - p ≤ 0.5 → waxing (bayangan menjauh ke kiri)
+   * - p > 0.5 → waning (bayangan datang dari kanan)
+   */
+  const applyMoonPhase = () => {
+    const shadow = document.getElementById('moonShadow');
+    if (!shadow) return;
+
+    const R = 52;
+    const p = moonPhase();
+
+    let offset, dir;
+    if (p <= 0.5) {
+      // 0 → 2R saat p: 0 → 0.5 (bayangan menjauh, waxing)
+      offset = 4 * R * p;
+      dir = -1;
+    } else {
+      // 2R → 0 saat p: 0.5 → 1 (bayangan kembali, waning)
+      offset = 4 * R * (1 - p);
+      dir = 1;
+    }
+    offset = Math.min(offset, 2 * R);
+
+    shadow.setAttribute('cx', String(dir * offset));
   };
 
   const labels = {
@@ -78,13 +122,17 @@ const Scene = (() => {
     const moon = document.getElementById('moon');
     const sp = sunPosition(mins);
     const mp = moonPosition(mins);
+
     if (sun)  sun.setAttribute('transform',  `translate(${sp.x} ${sp.y})`);
     if (moon) moon.setAttribute('transform', `translate(${mp.x} ${mp.y})`);
+
+    // Update bentuk fase bulan
+    applyMoonPhase();
 
     const btn = document.getElementById('sceneToggle');
     if (btn) btn.textContent = labels[manualMode || 'auto'];
 
-    // Dispatch event saat scene berubah, supaya modul lain (weather) tahu
+    // Dispatch event saat scene berubah
     if (name !== lastName) {
       lastName = name;
       window.dispatchEvent(new CustomEvent('scenechange', { detail: { name } }));
@@ -115,6 +163,7 @@ const Scene = (() => {
     apply();
     // Update setiap 30 detik agar posisi matahari/bulan terlihat bergerak pelan
     setInterval(apply, 30000);
+
     const btn = document.getElementById('sceneToggle');
     if (btn) btn.addEventListener('click', cycle);
   };
