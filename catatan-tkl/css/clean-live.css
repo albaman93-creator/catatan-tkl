@@ -1,0 +1,83 @@
+/* =====================================================
+   TKL-OEE - CLEAN LIVE HEADER
+   Menghilangkan jam LIVE, tanggal, status LIVE
+   ===================================================== */
+
+/* Selector umum yang sering dipakai untuk live clock */
+.live-clock,
+.live-time,
+.live-date,
+.live-status,
+.live-indicator,
+.live-badge,
+.status-live,
+.badge-live,
+.clock,
+.clock-time,
+.clock-date,
+.dashboard-clock,
+.dashboard-live,
+.dashboard-date,
+.header-live,
+.header-clock,
+.oee-live,
+.oee-clock,
+.oee-date,
+
+#clock,
+#liveClock,
+#liveTime,
+#liveDate,
+#liveStatus,
+#clockTime,
+#clockDate,
+#dashboardClock,
+#dashboardLive,
+#dashboardDate,
+
+[class*="live-clock" i],
+[class*="live-time" i],
+[class*="live-date" i],
+[class*="live-status" i],
+[class*="live-indicator" i],
+[class*="live-badge" i],
+[class*="status-live" i],
+[class*="badge-live" i],
+[class*="clock-time" i],
+[class*="clock-date" i],
+[class*="dashboard-clock" i],
+[class*="dashboard-live" i],
+[class*="dashboard-date" i],
+[class*="header-live" i],
+[class*="header-clock" i],
+[class*="oee-live" i],
+[class*="oee-clock" i],
+[class*="oee-date" i],
+
+[id*="live-clock" i],
+[id*="live-time" i],
+[id*="live-date" i],
+[id*="live-status" i],
+[id*="live-indicator" i],
+[id*="live-badge" i],
+[id*="clock-time" i],
+[id*="clock-date" i],
+[id*="dashboard-clock" i],
+[id*="dashboard-live" i],
+[id*="dashboard-date" i] {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  line-height: 0 !important;
+  font-size: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

@@ -1,0 +1,211 @@
+/* =====================================================
+   TOKENS.CSS — Fima Farma OEE Design System
+   Satu sumber kebenaran untuk warna, tipografi, spacing,
+   radius, dan motion di seluruh aplikasi.
+
+   Dimuat PALING AWAL (sebelum base.css dan file CSS lain).
+   Jangan definisikan warna hex baru di file CSS lain di luar
+   sini — kalau butuh warna baru, tambahkan token di sini dulu.
+
+   Font IBM Plex Sans di-self-host (fonts/*.woff2, bukan Google Fonts
+   CDN) supaya PWA benar-benar bisa dipakai offline — sebelumnya font
+   dikecualikan dari cache service worker sehingga gagal muat saat
+   offline. @font-face didefinisikan di sini, file fisiknya masuk
+   precache di sw.js.
+   ===================================================== */
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('../fonts/ibm-plex-sans-latin-400-normal.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('../fonts/ibm-plex-sans-latin-500-normal.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('../fonts/ibm-plex-sans-latin-600-normal.woff2') format('woff2');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('../fonts/ibm-plex-sans-latin-700-normal.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+:root {
+  /* ---------- 1. Skala netral (slate) ---------- */
+  --slate-50:  #F8FAFC;
+  --slate-100: #F1F5F9;
+  --slate-200: #E2E8F0;
+  --slate-300: #CBD5E1;
+  --slate-400: #94A3B8;
+  --slate-500: #64748B;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1E293B;
+  --slate-900: #0F172A;
+  --slate-950: #0B1220;
+
+  /* ---------- 2. Warna aksen korporat (biru) ---------- */
+  --brand-900: #0D2135;   /* = theme-color PWA sekarang, jangan diubah tanpa update manifest.webmanifest juga */
+  --brand-700: #0B5FA5;
+  --brand-600: #0B5FA5;   /* alias — dipakai sbg warna aksi utama */
+  --brand-500: #1877C4;   /* hover/focus */
+  --brand-100: #CFE6F7;
+  --brand-50:  #EAF3FB;
+
+  /* ---------- 3. Warna status semantik (target OEE, downtime) ---------- */
+  --success-600: #0C7C3D;
+  --success-bg:  #E7F6EC;
+  --warning-700: #B45309;
+  --warning-bg:  #FEF3E2;
+  --danger-600:  #DC2626;
+  --danger-bg:   #FDEAEA;
+
+  /* ---------- 4. Alias per-peran (biar kode pemanggilnya jelas maksudnya) ---------- */
+  --bg-page:          var(--slate-50);
+  --bg-surface:       #FFFFFF;
+  --bg-surface-hover: var(--slate-100);
+  --bg-selected:      var(--brand-50);
+  --border-default:   var(--slate-200);
+  --border-strong:    var(--slate-300);
+  --text-primary:     var(--slate-900);
+  --text-secondary:   var(--slate-600);
+  --text-muted:       var(--slate-400);
+  --text-on-brand:    #FFFFFF;
+
+  /* Kategori kode downtime (Log Sheet) */
+  --dt-unplanned:     var(--danger-600);
+  --dt-unplanned-bg:  var(--danger-bg);
+  --dt-planned:       var(--warning-700);
+  --dt-planned-bg:    var(--warning-bg);
+  --dt-produksi:      var(--success-600);
+  --dt-produksi-bg:   var(--success-bg);
+
+  /* Status pencapaian target OEE (Dashboard, kartu KPI) */
+  --oee-tercapai:   var(--success-600);
+  --oee-mendekati:  var(--warning-700);
+  --oee-dibawah:    var(--danger-600);
+
+  /* ---------- 5. Tipografi ---------- */
+  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --fs-h1:       26px;
+  --fs-h2:       19px;
+  --fs-h3:       15px;
+  --fs-body:     14px;
+  --fs-label:    12px;
+  --fs-caption:  11px;
+  --fs-num-lg:   30px;   /* angka OEE besar di kartu KPI */
+  --fs-num-md:   20px;
+  --fs-num-table:13px;
+  --lh-body: 1.5;
+
+  /* ---------- 6. Spacing (grid 8px) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ---------- 7. Radius ---------- */
+  --radius-card:    12px;
+  --radius-control: 8px;
+  --radius-badge:   6px;
+  --radius-pill:    999px;
+
+  /* ---------- 8. Motion ---------- */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 250ms ease;
+
+  /* ---------- 9. Elevasi (border tipis > shadow tebal; shadow cuma utk overlay) ---------- */
+  --shadow-overlay: 0 4px 24px rgba(15, 23, 42, 0.12);
+
+  /* =====================================================
+     ALIAS MUNDUR-KOMPATIBEL — variabel lama dari base.css.
+     JANGAN DIHAPUS DULU: banyak CSS lain (logsheet.css, oee.css,
+     dashboard.css, dst.) masih memanggil nama-nama ini langsung.
+     Akan dibersihkan bertahap per halaman di Tahap B–E, begitu
+     tiap file CSS lama benar-benar dimigrasi ke nama token baru
+     di atas. Untuk saat ini alias ini yang membuat halaman lama
+     otomatis ikut memakai palet baru tanpa perlu disentuh satu-satu.
+     ===================================================== */
+  --ink:   var(--text-primary);
+  --ink2:  var(--text-secondary);
+  --mut:   var(--text-muted);
+  --paper: var(--bg-page);
+  --card:  var(--bg-surface);
+  --line:  var(--border-default);
+  --line2: var(--border-default);
+  --navy:  var(--brand-900);
+  --blue:  var(--brand-600);
+  --green:    var(--success-600);
+  --green-d:  var(--success-600);
+  --green-bg: var(--success-bg);
+  --amber: var(--warning-700);
+  --red:   var(--danger-600);
+  --mono:  var(--font-sans);  /* dulu IBM Plex Mono → sekarang IBM Plex Sans + tabular-nums */
+  --disp:  var(--font-sans);  /* dulu Barlow Condensed → sekarang IBM Plex Sans (weight 600) */
+  --body:  var(--font-sans);
+}
+
+/* ---------- Mode gelap ---------- */
+[data-theme="dark"] {
+  --bg-page:          var(--slate-950);
+  --bg-surface:       var(--slate-900);
+  --bg-surface-hover: #16213A;
+  --bg-selected:      #10304D;
+  --border-default:   var(--slate-800);
+  --border-strong:    var(--slate-700);
+  --text-primary:     var(--slate-100);
+  --text-secondary:   var(--slate-400);
+  --text-muted:       var(--slate-500);
+  --brand-600: #4C9FE0;   /* dinaikkan terangnya supaya AA-contrast di atas bg gelap */
+  --brand-500: #6BB2E8;
+  --success-600: #34D399;
+  --warning-700: #FBBF24;
+  --danger-600:  #F87171;
+}
+
+/* ---------- Ikon (Lucide, di-self-host dari icons/sprite.svg) ---------- */
+.icon {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+  vertical-align: -3px;
+}
+.icon-sm { width: 14px; height: 14px; }
+.icon-lg { width: 22px; height: 22px; }
+
+/* ---------- Utilitas angka rapi sejajar (tabel, kartu KPI) ---------- */
+.tabular-nums,
+.fig-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* ---------- Aksesibilitas: fokus keyboard & gerakan ---------- */
+:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
