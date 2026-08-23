@@ -41,6 +41,10 @@ const App = (() => {
 
     // Dashboard (rekap data & grafik) — bind sekali saat app utama siap
     if (typeof Dashboard !== 'undefined') Dashboard.init();
+
+    // Wizard Setup Awal — HANYA di-init setelah login berhasil, supaya
+    // auto-open pertama kali tidak menimpa layar login.
+    if (typeof Wizard !== 'undefined') Wizard.init();
   };
 
   /**
@@ -209,7 +213,6 @@ const App = (() => {
     // Isi Massal (kotak input daftar bernomor untuk kolom Kode / Jam Mulai)
     if (typeof BulkFill !== 'undefined') BulkFill.init();
     if (typeof PrintSheet !== 'undefined') PrintSheet.bind();
-    if (typeof Wizard !== 'undefined') Wizard.init();
 
     Auth.initSession();
 
