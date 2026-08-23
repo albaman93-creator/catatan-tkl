@@ -59,6 +59,9 @@
             <stop offset="0%"   stop-color="#dbe4ff" stop-opacity="0.55"/>
             <stop offset="100%" stop-color="#dbe4ff" stop-opacity="0"/>
           </radialGradient>
+          <clipPath id="moonClip">
+            <circle r="52"/>
+          </clipPath>
           <linearGradient id="riverGrad" x1="0" y1="0" x2="0.35" y2="1">
             <stop offset="0%"   stop-color="#a9e2f7"/>
             <stop offset="55%"  stop-color="#6cbde3"/>
@@ -97,11 +100,23 @@
 
         <g id="moon" transform="translate(1500 200)">
           <circle r="120" fill="url(#moonGlow)"/>
+          <g clip-path="url(#moonClip)">
           <circle r="52" fill="#f4f5dc"/>
           <circle cx="-14" cy="-10" r="9" fill="#dcdcbc"/>
           <circle cx="12" cy="14" r="6" fill="#dcdcbc"/>
           <circle cx="18" cy="-18" r="5" fill="#e6e7c8"/>
+            <circle id="moonShadow" r="52" fill="#0d1f36"/>
         </g>
+
+
+
+
+
+        </g>
+
+
+
+
 
         <g id="sun" transform="translate(1550 220)">
           <circle r="180" fill="url(#sunGlow)"/>
@@ -109,11 +124,26 @@
           <circle r="60" fill="#fff3a8"/>
         </g>
 
+
+
+
+
+
+
+
+        <!-- ... (rest of code) ... -->
         <g id="birds" fill="none" stroke="var(--bird-stroke, #2c5f7c)" stroke-width="2.5" stroke-linecap="round" opacity="0.55">
           <path d="M900,260 Q905,252 912,258 Q917,252 924,260"/>
           <path d="M950,240 Q954,234 960,238 Q964,234 970,240"/>
           <path d="M980,270 Q985,264 991,268"/>
-        </g>
+            </g>
+
+
+
+
+
+
+
 
         <g id="clouds">
           <g transform="translate(0, 180)">
@@ -124,6 +154,18 @@
               <ellipse class="cloud-puff" cx="92" cy="4"  rx="40" ry="18"/>
             </g>
           </g>
+
+
+
+
+
+
+
+
+
+
+
+
           <g transform="translate(0, 260) scale(.85)">
             <g class="cloud c2">
               <ellipse class="cloud-puff" cx="0"  cy="0"  rx="95" ry="30"/>
@@ -137,16 +179,50 @@
               <ellipse class="cloud-puff" cx="0"  cy="0"  rx="75" ry="26"/>
               <ellipse class="cloud-puff" cx="42" cy="-15" rx="55" ry="28"/>
               <ellipse class="cloud-puff" cx="-36" cy="-8" rx="50" ry="22"/>
-            </g>
-          </g>
+        </g>
+
+
+
+
+
+
+
+
+        </g>
+
+
+
+
+
+
+
+
+
+
+
           <g transform="translate(0, 340) scale(.9)">
             <g class="cloud c4">
               <ellipse class="cloud-puff" cx="0"  cy="0"  rx="70" ry="24"/>
               <ellipse class="cloud-puff" cx="40" cy="-14" rx="50" ry="26"/>
               <ellipse class="cloud-puff" cx="-34" cy="-8" rx="45" ry="20"/>
-            </g>
           </g>
-        </g>
+
+
+
+
+
+          </g>
+
+
+
+
+
+          </g>
+
+
+
+
+
 
         <g id="rainbow" class="rainbow-group">
           <path d="M 300,900 A 660,660 0 0 1 1620,900" stroke="#ff3b3b" stroke-width="8" fill="none" opacity="0.75"/>
@@ -155,7 +231,12 @@
           <path d="M 420,900 A 540,540 0 0 1 1500,900" stroke="#6bcb77" stroke-width="8" fill="none" opacity="0.75"/>
           <path d="M 460,900 A 500,500 0 0 1 1460,900" stroke="#4d96ff" stroke-width="8" fill="none" opacity="0.75"/>
           <path d="M 500,900 A 460,460 0 0 1 1420,900" stroke="#b26dff" stroke-width="8" fill="none" opacity="0.75"/>
-        </g>
+          </g>
+
+
+
+
+
 
         <path class="hill-far"  d="M0,680 C200,560 380,610 560,640 C780,675 950,590 1180,620 C1380,645 1580,580 1920,650 L1920,1080 L0,1080 Z"/>
         <path class="hill-mid"  d="M0,780 C220,660 420,720 640,730 C860,740 1020,670 1280,710 C1500,745 1700,680 1920,740 L1920,1080 L0,1080 Z"/>
@@ -173,31 +254,71 @@
             <polygon class="tree-leaf" points="0,-26 -20,55 20,55"/>
             <polygon class="tree-leaf" points="0,-48 -15,26 15,26"/>
             <rect class="tree-trunk" x="-4" y="80" width="8" height="22"/>
-          </g>
+        </g>
+
+
+
+
+
+
+
+
+
+
+
+
           <g class="tree" transform="translate(880, 690) scale(.95)">
             <polygon class="tree-leaf" points="0,0 -30,95 30,95"/>
             <polygon class="tree-leaf" points="0,-32 -25,63 25,63"/>
             <polygon class="tree-leaf" points="0,-60 -18,32 18,32"/>
             <rect class="tree-trunk" x="-5" y="95" width="10" height="26"/>
-          </g>
+              </g>
+
+
+
+
+
           <g class="tree" transform="translate(1380, 695) scale(.88)">
             <polygon class="tree-leaf" points="0,0 -26,88 26,88"/>
             <polygon class="tree-leaf" points="0,-28 -22,58 22,58"/>
             <polygon class="tree-leaf" points="0,-52 -16,28 16,28"/>
             <rect class="tree-trunk" x="-4" y="88" width="8" height="24"/>
-          </g>
+            </g>
+
+
+
+
+
           <g class="tree" transform="translate(1720, 705) scale(.82)">
             <polygon class="tree-leaf" points="0,0 -22,78 22,78"/>
             <polygon class="tree-leaf" points="0,-24 -18,52 18,52"/>
             <polygon class="tree-leaf" points="0,-45 -13,24 13,24"/>
             <rect class="tree-trunk" x="-4" y="78" width="8" height="22"/>
-          </g>
-        </g>
+            </g>
+
+
+
+
+
+            </g>
+
+
+
+
 
           <g id="river" transform="translate(-480, 0)">
             <path id="riverBody" class="river-body" d="M 1650.8,632.3 L 1649.2,634.6 L 1647.0,637.2 L 1644.3,640.3 L 1641.0,643.6 L 1637.5,647.3 L 1633.6,651.3 L 1629.4,655.5 L 1625.1,660.0 L 1620.7,664.7 L 1616.3,669.6 L 1612.0,674.8 L 1607.7,680.1 L 1603.6,685.7 L 1599.8,691.4 L 1596.3,697.4 L 1593.2,703.6 L 1590.6,710.1 L 1588.7,716.9 L 1587.5,724.0 L 1587.2,731.3 L 1587.7,738.5 L 1589.0,745.6 L 1590.7,752.7 L 1593.0,759.9 L 1595.8,767.1 L 1598.9,774.3 L 1602.4,781.6 L 1606.2,788.8 L 1610.2,796.1 L 1614.4,803.4 L 1618.8,810.8 L 1623.3,818.1 L 1627.8,825.4 L 1632.4,832.7 L 1636.9,840.0 L 1641.3,847.2 L 1645.6,854.3 L 1649.8,861.4 L 1653.7,868.3 L 1657.4,875.2 L 1661.1,882.4 L 1665.0,889.7 L 1668.9,897.2 L 1672.8,904.7 L 1676.9,912.3 L 1680.9,920.0 L 1685.1,927.7 L 1689.3,935.5 L 1693.5,943.4 L 1697.8,951.3 L 1702.2,959.2 L 1706.7,967.1 L 1711.2,975.0 L 1715.8,982.9 L 1720.4,990.8 L 1725.2,998.6 L 1730.0,1006.5 L 1734.9,1014.2 L 1739.9,1022.0 L 1745.0,1029.7 L 1750.4,1037.6 L 1756.2,1045.6 L 1762.2,1053.7 L 1768.4,1061.8 L 1774.8,1069.9 L 1781.2,1078.0 L 1787.7,1086.0 L 1794.2,1094.0 L 1800.6,1101.8 L 1807.0,1109.5 L 1813.2,1117.0 L 1819.2,1124.2 L 1824.9,1131.2 L 1830.3,1137.8 L 1835.3,1144.1 L 1839.8,1150.0 L 1843.9,1155.4 L 1847.3,1160.3 L 1850.0,1164.6 L 1852.3,1168.4 L 1947.7,1071.6 L 1943.3,1068.9 L 1938.2,1065.6 L 1932.8,1062.0 L 1926.9,1058.0 L 1920.7,1053.7 L 1914.1,1049.1 L 1907.3,1044.2 L 1900.2,1039.0 L 1892.9,1033.6 L 1885.5,1028.0 L 1878.0,1022.3 L 1870.4,1016.4 L 1862.9,1010.5 L 1855.4,1004.5 L 1848.1,998.6 L 1840.9,992.6 L 1833.9,986.8 L 1827.3,981.1 L 1821.0,975.6 L 1815.0,970.3 L 1809.2,964.9 L 1803.3,959.3 L 1797.5,953.5 L 1791.6,947.6 L 1785.8,941.6 L 1780.0,935.4 L 1774.3,929.2 L 1768.5,922.9 L 1762.8,916.5 L 1757.2,910.0 L 1751.5,903.5 L 1745.9,896.9 L 1740.4,890.4 L 1734.9,883.8 L 1729.4,877.2 L 1724.0,870.7 L 1718.6,864.1 L 1713.2,857.7 L 1707.9,851.2 L 1702.6,844.8 L 1697.1,838.2 L 1691.4,831.5 L 1685.6,824.9 L 1679.8,818.4 L 1674.0,812.0 L 1668.2,805.6 L 1662.5,799.3 L 1656.9,793.1 L 1651.4,787.0 L 1646.2,780.9 L 1641.2,775.0 L 1636.5,769.2 L 1632.0,763.5 L 1628.0,757.9 L 1624.3,752.5 L 1621.0,747.3 L 1618.2,742.3 L 1615.9,737.5 L 1614.1,732.9 L 1612.8,728.7 L 1612.1,724.7 L 1611.9,720.4 L 1612.3,715.7 L 1613.2,710.8 L 1614.8,705.7 L 1616.8,700.4 L 1619.3,695.1 L 1622.1,689.7 L 1625.3,684.4 L 1628.7,679.1 L 1632.2,674.0 L 1635.8,669.0 L 1639.5,664.2 L 1643.0,659.6 L 1646.5,655.2 L 1649.7,651.1 L 1652.6,647.3 L 1655.2,643.7 L 1657.5,640.5 L 1659.2,637.7 Z"/>
             <path id="riverShine" class="river-shine" d="M 1655.0,635.0 L 1642.0,651.2 L 1622.5,674.4 L 1605.5,701.6 L 1600.0,730.0 L 1610.0,759.8 L 1630.3,792.2 L 1655.4,826.0 L 1680.0,860.0 L 1703.1,894.8 L 1727.5,930.6 L 1753.1,966.2 L 1780.0,1000.0 L 1811.4,1034.2 L 1846.2,1068.8 L 1878.0,1098.9 L 1900.0,1120.0" fill="none"/>
           </g>
+
+
+
+
+
+
+
+
+
 
         <g class="trees-front">
           <g class="tree" transform="translate(80, 820)">
@@ -205,7 +326,16 @@
             <polygon class="tree-leaf" points="0,-50 -42,100 42,100"/>
             <polygon class="tree-leaf" points="0,-95 -32,50 32,50"/>
             <rect class="tree-trunk" x="-8" y="160" width="16" height="45"/>
-              </g>
+            </g>
+
+
+
+
+
+
+
+
+
           <g class="tree" transform="translate(260, 835)">
             <polygon class="tree-leaf" points="0,0 -42,140 42,140"/>
             <polygon class="tree-leaf" points="0,-42 -35,88 35,88"/>
@@ -218,19 +348,49 @@
             <polygon class="tree-leaf" points="0,-90 -30,48 30,48"/>
             <rect class="tree-trunk" x="-7" y="155" width="14" height="42"/>
             </g>
+
+
+
+
+
+
+
+
+
+
+
+
           <g class="tree" transform="translate(1200, 820)">
             <polygon class="tree-leaf" points="0,0 -52,170 52,170"/>
             <polygon class="tree-leaf" points="0,-52 -44,106 44,106"/>
             <polygon class="tree-leaf" points="0,-98 -34,54 34,54"/>
             <rect class="tree-trunk" x="-8" y="170" width="16" height="48"/>
             </g>
+
           <g class="tree" transform="translate(1820, 815)">
             <polygon class="tree-leaf" points="0,0 -50,165 50,165"/>
             <polygon class="tree-leaf" points="0,-50 -42,104 42,104"/>
             <polygon class="tree-leaf" points="0,-94 -32,52 32,52"/>
             <rect class="tree-trunk" x="-8" y="165" width="16" height="46"/>
           </g>
-          </g>
+                </g>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         <g class="grass">
           <path d="M340,1030 L336,1005 L342,1030 Z"/>
@@ -240,7 +400,11 @@
           <path d="M1080,1030 L1076,1008 L1082,1030 Z"/>
           <path d="M1440,1040 L1436,1018 L1442,1040 Z"/>
           <path d="M1780,1035 L1776,1012 L1782,1035 Z"/>
-            </g>
+              </g>
+
+
+
+
 
         <g>
           <circle class="flower-yellow" cx="400"  cy="1045" r="3.2"/>
@@ -251,6 +415,19 @@
           <circle class="flower-pink"   cx="560"  cy="1052" r="2.4"/>
           <circle class="flower-white"  cx="1520" cy="1050" r="2.4"/>
             </g>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         <!-- NATURE EXTRAS -->
         <g id="natureExtra">
@@ -263,10 +440,32 @@
                 <ellipse class="wm-blade" cx="0" cy="-36" rx="8.5" ry="36" transform="rotate(90)"/>
                 <ellipse class="wm-blade" cx="0" cy="-36" rx="8.5" ry="36" transform="rotate(180)"/>
                 <ellipse class="wm-blade" cx="0" cy="-36" rx="8.5" ry="36" transform="rotate(270)"/>
-            </g>
+              </g>
+
+
+
+
+
+
+
+
+
+
               <circle class="wm-hub" r="6.5"/>
+            </g>
+
+
+
+
+
+
           </g>
-                </g>
+
+
+
+
+
+
           <g id="roundTree" class="round-tree" transform="translate(1710, 828)">
             <ellipse class="rt-shadow" cx="0" cy="20" rx="66" ry="13"/>
             <path class="rt-trunk" d="M-9,16 C-11,-14 -8,-44 -6,-76 L6,-76 C8,-44 11,-14 9,16 Z"/>
@@ -284,13 +483,32 @@
               <circle class="rt-leaf" cx="0"   cy="-96" r="37"/>
               <circle class="rt-leaf-hi" cx="-16" cy="-106" r="15"/>
               <circle class="rt-leaf-hi" cx="18"  cy="-88"  r="11"/>
-              </g>
+            </g>
+
+
+
+
             <g class="rt-bush">
               <circle class="rt-leaf-back" cx="0"   cy="16" r="23"/>
               <circle class="rt-leaf"      cx="-29" cy="10" r="19"/>
               <circle class="rt-leaf"      cx="29"  cy="12" r="21"/>
             </g>
-                </g>
+            </g>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           <g id="hut" transform="translate(1560, 845)">
             <rect class="hut-wall" x="-58" y="-6" width="116" height="66" rx="2"/>
             <line class="hut-plank" x1="-58" y1="14" x2="58" y2="14"/>
@@ -303,7 +521,22 @@
             <rect class="hut-window" x="24" y="6" width="22" height="20"/>
             <line class="hut-window-x" x1="35" y1="6" x2="35" y2="26"/>
             <line class="hut-window-x" x1="24" y1="16" x2="46" y2="16"/>
-              </g>
+            </g>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           <g id="campTent" transform="translate(150, 860) scale(.85)">
             <ellipse class="tent-shadow" cx="0" cy="20" rx="72" ry="14"/>
             <polygon class="tent-shade" points="0,-78 58,18 22,18"/>
@@ -321,7 +554,7 @@
             <g class="fire-logs">
               <rect x="-16" y="-2" width="32" height="6" rx="3" transform="rotate(18)"/>
               <rect x="-16" y="-2" width="32" height="6" rx="3" transform="rotate(-22)"/>
-          </g>
+            </g>
             <g class="fire-stones">
               <circle cx="-20" cy="8" r="7.5"/>
               <circle cx="-6"  cy="11" r="7"/>
@@ -334,7 +567,26 @@
               <path class="flame flame-mid"   d="M0,-2 C-8,-12 -6,-22 0,-32 C6,-22 8,-12 0,-2 Z"/>
               <path class="flame flame-inner" d="M0,-2 C-5,-9 -4,-16 0,-24 C4,-16 5,-9 0,-2 Z"/>
             </g>
+
+
+
+
+
+
+
+
+
+
             </g>
+
+
+
+
+
+
+
+
+
           <g id="sunflowers">
             <g class="sunflower" transform="translate(230, 990)">
               <path class="sf-stem" d="M0,0 C-6,-30 6,-55 0,-85"/>
@@ -350,8 +602,26 @@
                   <ellipse class="sf-petal" cx="0" cy="-30" rx="10" ry="22" transform="rotate(270)"/>
                   <ellipse class="sf-petal" cx="0" cy="-30" rx="10" ry="22" transform="rotate(315)"/>
                   <circle class="sf-center" r="16"/>
-            </g>
           </g>
+
+
+
+
+
+
+
+
+
+          </g>
+
+
+
+
+
+
+
+
+
           </g>
             <g class="sunflower" transform="translate(300, 1015) scale(.7)">
               <path class="sf-stem" d="M0,0 C-6,-30 6,-55 0,-85"/>
@@ -366,10 +636,35 @@
                   <ellipse class="sf-petal" cx="0" cy="-30" rx="10" ry="22" transform="rotate(270)"/>
                   <ellipse class="sf-petal" cx="0" cy="-30" rx="10" ry="22" transform="rotate(315)"/>
                   <circle class="sf-center" r="14"/>
+        </g>
+
+
+
+
+
+
+
+
+
+
+
+
+          </g>
+
+
+
+
+
             </g>
+
+
+
+
             </g>
-            </g>
-            </g>
+
+
+
+
           <g id="roseGarden">
             <g class="rose" transform="translate(200, 950)">
               <path class="rose-stem" d="M0,0 C-5,-30 5,-55 0,-80"/>
@@ -381,6 +676,10 @@
               <circle class="rose-petal-light" cx="0" cy="-94" r="9"/>
               <circle class="rose-center" cx="0" cy="-80" r="4"/>
             </g>
+
+
+
+
             <g class="rose" transform="translate(320, 920)">
               <path class="rose-stem" d="M0,0 C-6,-28 6,-52 0,-76"/>
               <path class="rose-leaf" d="M0,-38 C-16,-33 -26,-44 -23,-24"/>
@@ -390,7 +689,11 @@
               <circle class="rose-petal-dark" cx="5" cy="-81" r="9"/>
               <circle class="rose-petal-light" cx="0" cy="-88" r="8"/>
               <circle class="rose-center" cx="0" cy="-76" r="3.5"/>
-          </g>
+            </g>
+
+
+
+
             <g class="rose" transform="translate(1600, 960)">
               <path class="rose-stem" d="M0,0 C-5,-30 5,-55 0,-80"/>
               <path class="rose-leaf" d="M0,-40 C-15,-35 -25,-45 -22,-25"/>
@@ -400,7 +703,7 @@
               <circle class="rose-petal-dark" cx="5" cy="-86" r="9"/>
               <circle class="rose-petal-light" cx="0" cy="-94" r="8"/>
               <circle class="rose-center" cx="0" cy="-80" r="3.5"/>
-          </g>
+            </g>
             <g class="rose" transform="translate(1720, 930)">
               <path class="rose-stem" d="M0,0 C-5,-28 5,-52 0,-74"/>
               <path class="rose-leaf" d="M0,-36 C-14,-31 -24,-42 -21,-22"/>
@@ -411,7 +714,26 @@
               <circle class="rose-petal-light" cx="0" cy="-86" r="7"/>
               <circle class="rose-center" cx="0" cy="-74" r="3"/>
           </g>
-        </g>
+
+
+
+
+
+
+
+
+
+
+          </g>
+
+
+
+
+
+
+
+
+
           <g id="wildGrass">
             <g class="wg-clump" transform="translate(120,1015)"  style="--wg-d:0s">   <path class="wg-blade" d="M10,40 C8,26 13,15 9,0"/><path class="wg-blade" d="M5,40 C4,29 9,19 6,6"/><path class="wg-blade" d="M15,40 C16,28 11,18 13,4"/></g>
             <g class="wg-clump" transform="translate(165,1030) scale(.85)" style="--wg-d:.4s">  <path class="wg-blade" d="M10,40 C8,26 13,15 9,0"/><path class="wg-blade" d="M5,40 C4,29 9,19 6,6"/><path class="wg-blade" d="M15,40 C16,28 11,18 13,4"/></g>
@@ -430,7 +752,14 @@
               <g class="bf-wingL"><ellipse cx="-6" cy="-4" rx="7" ry="5"/></g>
               <g class="bf-wingR"><ellipse cx="6" cy="-4" rx="7" ry="5"/></g>
               <line class="bf-body" x1="0" y1="-8" x2="0" y2="2"/>
-            </g>
+        </g>
+
+
+
+
+
+
+
             <g class="butterfly bf-purple" style="--bf-x:180px; --bf-y:940px; animation-delay:.6s, .2s;">
               <g class="bf-wingL"><ellipse cx="-6" cy="-4" rx="7" ry="5"/></g>
               <g class="bf-wingR"><ellipse cx="6" cy="-4" rx="7" ry="5"/></g>
@@ -476,12 +805,22 @@
         </g>
       </svg>
       <div class="bg-dim"></div>
-    </div>
+      </div>
+
+
+
+
+
+
+
     <div class="preview-bar">
       <button type="button" id="weatherToggle" class="preview-btn" title="Preview efek cuaca (manual)">🌤 auto</button>
       <button type="button" id="sceneToggle" class="preview-btn" title="Ganti tema langit (preview)">🕐 auto</button>
       <button type="button" id="natureToggle" class="preview-btn" title="Preview kupu-kupu (paksa tampil, untuk cek tanpa menunggu pagi)">🦋 auto</button>
       </div>
+
+
+
     <span id="wxChip" class="wx-chip"></span>
 
     <div class="login-card">
@@ -489,25 +828,201 @@
         <div class="login-logo">TKL</div>
         <h2>OEE System Login</h2>
         <p>Masukan Email &amp; Password</p>
-      </div>
+        </div>
+
+
+
+
       <div id="loginError" class="login-error">Email atau password salah. Silakan coba lagi.</div>
       <div id="loginOfflineNote" class="login-error" style="display:none;background:#5a4b00;">
         ⚠ Tidak ada koneksi internet. Login pertama kali wajib online.
         </div>
       <form id="loginForm" class="login-form">
-        <div class="field">
+          <div class="field">
+
+
           <label for="loginEmail">Email</label>
           <input type="email" id="loginEmail" placeholder="" required autofocus autocomplete="username">
-        </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           <div class="field">
+
+
+
+
+
           <label for="loginPassword">Password</label>
           <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
-            </div>
+  </div>
         <button type="submit" class="login-btn" id="loginBtn">Masuk Aplikasi</button>
       </form>
       <div class="login-hint">Produksi-2026</div>
-          </div>
-            </div>
+  </div>
+
+
+
+
+
+
+  </div>
+
+
+
+
+
+
+
 
   <!-- ============ MAIN APP ============ -->
   <div id="appContainer">
@@ -526,11 +1041,31 @@
           </span>
             </div>
 
+
         <button type="button" class="app-bar-menu-btn" id="toolbarToggle" title="Menu &amp; Pengaturan">
           <span id="toolbarToggleIcon">☰</span>
         </button>
         </div>
+
+
+
+
+
+
+
+
+
+
+
+
           </div>
+
+
+
+
+
+
+
 
     <!-- SIDEBAR -->
     <div class="sidebar-backdrop"></div>
@@ -540,10 +1075,19 @@
         <span class="sidebar-header-title">Menu &amp; Pengaturan</span>
               </div>
 
+
       <div class="sidebar-section-label">Aksi Cepat</div>
       <button type="button" class="menu-item" id="btnWizard" title="Setup Awal (Shift, Tahapan, Tanggal, Operator, WO, Produk)">
         🧭 Setup Awal
               </button>
+
+
+
+
+
+
+
+
 
       <span class="pos" id="pos"><span class="pos-dot"></span>SIAP · KLIK SEL / MULAI KETIK</span>
 
@@ -552,10 +1096,236 @@
         <span class="nm-cap">MODE TAB</span>
         <button type="button" data-mode="v" class="on">⇅ VERTIKAL</button>
         <button type="button" data-mode="h">⇄ HORIZONTAL</button>
-            </div>
+              </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       <span class="hint" id="hint"></span>
           <span class="spacer"></span>
+
+
+
 
       <div class="sidebar-divider"></div>
       <div class="sidebar-section-label">Data &amp; Dokumen</div>
@@ -595,6 +1365,22 @@
       </button>
     </nav>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <!-- Sheet -->
     <div class="sheet">
       <!-- Header disembunyikan, silakan lihat layout.css bagian bawah -->
@@ -609,6 +1395,13 @@
           <span class="spacer"></span>
           <span id="syncStatus" class="edit-info"><i class="sync-dot"></i>tersambung otomatis</span>
         </div>
+
+
+
+
+
+
+
         <div class="filter-grid">
           <div class="field"><label>Tanggal <span class="unit">log sheet</span></label><input type="date" id="fDate"></div>
           <div class="field"><label>Shift <span class="unit">evaluasi</span></label>
@@ -617,20 +1410,121 @@
               <button type="button" data-shift="1">S2·480</button>
               <button type="button" data-shift="2">S3·450</button>
         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                   </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           <div class="field"><label>Line <span class="unit">produksi</span></label>
             <select id="fLine">
               <option value="1">Line 1</option><option value="2">Line 2</option><option value="4">Line 4</option>
             </select>
           </div>
+
+
+
+
+
+
+
+
+
           <div class="field"><label>Tahapan Proses</label>
             <select id="fStage">
               <option value="mixing">Mixing</option><option value="filling">Filling</option>
               <option value="steril">Steril</option><option value="visual">Visual</option><option value="kemas">Kemas</option>
             </select>
           </div>
+
         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       </section>
+
+
+
+
+
 
       <!-- Section: Operator -->
       <section class="sec" data-screen="operator">
@@ -654,6 +1548,12 @@
           <span class="no">⚙️</span>
           <div><h2>Master Produk &amp; Kecepatan Standar</h2><div class="sub2">Daftarkan produk &amp; kecepatan standarnya (unit/menit)</div></div>
   </div>
+
+
+
+
+
+
         <div class="product-grid">
           <div class="field">
             <label>Produk 1 (Nama, Kecepatan &amp; No. WO)</label>
@@ -662,7 +1562,15 @@
               <input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal">
               <input type="text" id="prodWo1" placeholder="No. WO" class="mono">
   </div>
+
+
+
+
   </div>
+
+
+
+
           <div class="field">
             <label>Produk 2 (Cadangan)</label>
             <div class="split-input split-input-3">
@@ -1036,69 +1944,6 @@
             </select>
           </div>
           <div class="field"><label>Shift</label>
-            <select id="dashShift">
-              <option value="">Semua Shift</option>
-              <option value="1">Shift 1</option><option value="2">Shift 2</option><option value="3">Shift 3</option>
-            </select>
-          </div>
-          <div class="field"><label>Tahapan</label>
-            <select id="dashStage">
-              <option value="">Semua Tahapan</option>
-              <option value="mixing">Mixing</option><option value="filling">Filling</option>
-              <option value="steril">Steril</option><option value="visual">Visual</option><option value="kemas">Kemas</option>
-            </select>
-          </div>
-          <button type="button" id="dashApply" class="btn btn-primary">🔍 Terapkan Filter</button>
-        </div>
-
-        <div id="dashStatus" class="dash-status"></div>
-
-        <div class="dash-chart-wrap">
-          <div class="dash-chart-title">Grafik OEE per Record <span class="dash-legend"><i class="dot ok"></i>≥85% <i class="dot warn"></i>60–85% <i class="dot bad"></i>&lt;60%</span></div>
-          <div id="dashChart" class="dash-chart"></div>
-        </div>
-
-        <div class="dash-table-wrap">
-          <table class="dash-table" id="dashTable">
-            <thead>
-              <tr>
-                <th>Tanggal</th><th>Shift</th><th>Line</th><th>Tahapan</th>
-                <th>Avail%</th><th>Perf%</th><th>Qual%</th><th>OEE%</th>
-                <th>DT(m)</th><th>Good</th><th>Defect</th>
-                <th>Produk / Batch</th><th>Operator</th><th>Update Terakhir</th>
-              </tr>
-            </thead>
-            <tbody id="dashTbody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Footer sheet -->
-      <div class="sheet-f">
-        <span><kbd>Ctrl</kbd>+<kbd>S</kbd> simpan cepat &amp; sinkron cloud</span>
-        <span>Shift: S1 07.00–15.30 · S2 15.30–23.30 · S3 23.30–07.00</span>
-        <span>TKL-Produksi-OEE 2026 System</span>
-      </div>
-    </div>
-  </div>
-  <!-- Toast -->
-  <div id="toast"></div>
-
-  <!-- MODE CEPAT -->
-  <div id="qmOverlay" class="qm-overlay hide">
-    <div class="qm-modal" id="qmModal"></div>
-  </div>
-
-  <!-- ISI MASSAL -->
-  <div id="bulkOverlay" class="qm-overlay hide">
-    <div class="qm-modal bulk-modal" id="bulkModal"></div>
-  </div>
-
-  <!-- WIZARD SETUP AWAL -->
-  <div id="wizardOverlay" class="qm-overlay hide">
-    <div class="qm-modal wizard-modal" id="wizardModal"></div>
-  </div>
-
   <!-- AREA CETAK -->
   <div id="printArea" class="print-only"></div>
 
