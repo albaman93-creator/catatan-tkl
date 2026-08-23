@@ -302,6 +302,59 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
 .log tfoot td:nth-child(2) span { font: 11px var(--mono); color: var(--mut); }
 .log tfoot td:last-child { text-align: left; font: 11px var(--mono); color: var(--mut); padding-left: 8px; }
 
+/* Perkecil tombol Shift agar sejajar dengan Line */
+.sheet-shift-control .sheet-mini-segment button,
+.sheet-line-control .sheet-mini-segment button {
+  min-width: 28px;
+  padding: 4px 6px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* Paksa 1 baris mutlak */
+.sheet-inline-controls {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  gap: 8px !important;
+  align-items: center;
+  padding-bottom: 4px;
+  /* Tambahkan ini agar tidak meluap ke bawah */
+  min-height: 40px;
+}
+
+/* Pastikan semua child tidak pernah turun ke bawah */
+.sheet-inline-controls > * {
+  flex: 0 0 auto !important; /* Mencegah elemen mengecil atau membungkus */
+  white-space: nowrap;
+}
+
+/* Khusus untuk area inisial operator agar tidak memaksa baris jadi sangat panjang */
+.sheet-op-control {
+  flex: 0 0 auto !important;
+  overflow: hidden;
+  max-width: 150px; /* Batasi lebar agar tidak mendorong elemen lain */
+}
+
+/* Pastikan date trigger tidak punya margin yang aneh */
+.sheet-date-control {
+  margin-left: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+/* Opsi tambahan: Jika layar sangat sempit, perkecil font/padding tombol */
+@media (max-width: 420px) {
+  .sheet-mini-segment button {
+    min-width: 24px !important;
+    padding: 3px 4px !important;
+    font-size: 10px !important;
+  }
+  .sheet-date-trigger {
+    font-size: 9px !important;
+    padding: 4px 5px !important;
+  }
+}
+
 /* Responsif kecil */
 @media (max-width: 640px) {
   .fp-grid { grid-template-columns: 1fr 1fr; }
@@ -316,7 +369,6 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
   .form-panel-full .ff-scroll { max-height: 46vh; }
   .tbl-wrap { max-height: 56vh; }
 }
-
 /* ============================================================
    PENYESUAIAN TAMBAHAN — lebih ringkas & rapi
    ============================================================ */
@@ -418,13 +470,6 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
   box-shadow: 0 4px 10px -5px var(--sheet-accent);
 }
 
-.sheet-inline-controls {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  min-width: 0;
-  width: 100%;
-}
 .sheet-control-group {
   display: inline-flex;
   align-items: center;
@@ -490,11 +535,6 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
   color: #fff;
 }
 
-.sheet-date-control {
-  margin-left: auto;
-  flex: 0 1 auto;
-  min-width: 0;
-}
 .sheet-date-trigger {
   width: auto;
   max-width: 100%;
@@ -706,3 +746,4 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
     max-width: 88vw;
   }
 }
+
