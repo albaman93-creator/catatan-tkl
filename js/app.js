@@ -147,12 +147,30 @@ const App = (() => {
       }, 190);
     });
 
-    // Master Produk & Operator → recalc
+    // Master Produk & Operator → recalc + sync ke Master
     ['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3','prodWo1','prodWo2','prodWo3'].forEach(id => {
+      if (!State.el[id]) return;
       State.el[id].addEventListener('input', () => {
-        Rows.updateAllDropdowns();
-        Rows.updateMatrixProductHeaders();
-        Calculation.recalc();
+        if (id.startsWith('prodName') || id.startsWith('prodRate')) {
+          Rows.updateAllDropdowns();
+          Rows.updateMatrixProductHeaders();
+          Calculation.recalc();
+        }
+        // Sync ke input di halaman Master Produk (jika ada)
+        const masterEl = document.querySelector(`[data-sync="${id}"]`);
+        if (masterEl && masterEl.value !== State.el[id].value) masterEl.value = State.el[id].value;
+      });
+    });
+
+    // Sync dua arah: Master Produk ↔ Sheet Produk
+    document.querySelectorAll('#masterProductGrid [data-sync]').forEach(el => {
+      el.addEventListener('input', () => {
+        const targetId = el.getAttribute('data-sync');
+        const target = State.el[targetId] || document.getElementById(targetId);
+        if (target && target.value !== el.value) {
+          target.value = el.value;
+          target.dispatchEvent(new Event('input', { bubbles: true }));
+        }
       });
     });
 

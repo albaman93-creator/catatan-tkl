@@ -46,36 +46,6 @@
     }
     .sheet-control-group { flex: none; }
 
-    /* Produk aktif di Sheet — ringkas seperti barisan Log Sheet Harian.
-       Slot 2/3 dibuka lewat tombol +; bila lebar layar tidak cukup,
-       area ini dapat digeser horizontal tanpa merusak layout. */
-    .sheet-product-control {
-      display:flex; align-items:center; gap:6px; flex:1 1 auto; min-width:0;
-    }
-    .sheet-product-strip {
-      display:flex; align-items:center; gap:5px; min-width:0; overflow-x:auto;
-      flex:1 1 auto; padding-bottom:2px; -webkit-overflow-scrolling:touch;
-      scrollbar-width:none;
-    }
-    .sheet-product-strip::-webkit-scrollbar { display:none; }
-    .sheet-product-slot {
-      display:flex; align-items:center; gap:3px; flex:0 0 auto;
-    }
-    .sheet-product-input {
-      height:31px; border:1px solid #d6dee5; border-radius:7px; background:#fbfcfd;
-      color:#0f2437; font:600 11px 'IBM Plex Sans',sans-serif; outline:none;
-      padding:5px 7px;
-    }
-    .sheet-product-input:focus { border-color:#12a150; background:#fff; box-shadow:0 0 0 3px rgba(18,161,80,.12); }
-    .sheet-product-name { width:145px; }
-    .sheet-product-rate { width:58px; text-align:center; font-family:'IBM Plex Mono',monospace; }
-    .sheet-product-wo { width:105px; font-family:'IBM Plex Mono',monospace; }
-    .sheet-product-add {
-      width:31px; height:31px; flex:0 0 31px; border:1px dashed #aebdc8; border-radius:8px;
-      background:#f7fafb; color:#12a150; font-size:19px; font-weight:800; cursor:pointer;
-    }
-    .sheet-product-add:hover { background:#eef8f2; border-color:#12a150; }
-
     /* Inisial Operator — kotak ringkas menyatu di baris Shift/Line/Tanggal */
     .sheet-op-control {
       display: flex; align-items: center; gap: 6px;
@@ -112,8 +82,6 @@
     @media (max-width: 640px) {
       .sheet-op-box { width: 36px; padding: 6px 2px; font-size: 11.5px; }
       .sheet-control-label { font-size: 10.5px; }
-      .sheet-product-name { width:125px; }
-      .sheet-product-wo { width:92px; }
     }
 
     /* Layar sangat sempit: pastikan Shift/Line/Tanggal juga tidak berdempet */
@@ -751,31 +719,31 @@
       <section class="sec" data-screen="master-produk">
         <div class="sec-h">
           <span class="no">⚙️</span>
-          <div><h2>Master Produk &amp; Kecepatan Standar</h2><div class="sub2">Daftarkan produk &amp; kecepatan standarnya (unit/menit)</div></div>
-  </div>
-        <div class="product-grid">
+          <div><h2>Master Produk &amp; Kecepatan Standar</h2><div class="sub2">Daftarkan produk &amp; kecepatan standarnya (unit/menit). Pengisian juga tersedia di halaman Sheet.</div></div>
+        </div>
+        <div class="product-grid" id="masterProductGrid">
           <div class="field">
             <label>Produk 1 (Nama, Kecepatan &amp; No. WO)</label>
             <div class="split-input split-input-3">
-              <input type="text" id="prodName1" placeholder="Misal: VTTS1 L030001">
-              <input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal">
-              <input type="text" id="prodWo1" placeholder="No. WO" class="mono">
-  </div>
-  </div>
+              <input type="text" id="masterProdName1" placeholder="Misal: VTTS1 L030001" data-sync="prodName1">
+              <input type="number" id="masterProdRate1" placeholder="Rate/mnt" inputmode="decimal" data-sync="prodRate1">
+              <input type="text" id="masterProdWo1" placeholder="No. WO" class="mono" data-sync="prodWo1">
+            </div>
+          </div>
           <div class="field">
             <label>Produk 2 (Cadangan)</label>
             <div class="split-input split-input-3">
-              <input type="text" id="prodName2" placeholder="Misal: VPEL1 L027001">
-              <input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal">
-              <input type="text" id="prodWo2" placeholder="No. WO" class="mono">
-  </div>
+              <input type="text" id="masterProdName2" placeholder="Misal: VPEL1 L027001" data-sync="prodName2">
+              <input type="number" id="masterProdRate2" placeholder="Rate/mnt" inputmode="decimal" data-sync="prodRate2">
+              <input type="text" id="masterProdWo2" placeholder="No. WO" class="mono" data-sync="prodWo2">
+            </div>
           </div>
           <div class="field">
             <label>Produk 3 (Cadangan)</label>
             <div class="split-input split-input-3">
-              <input type="text" id="prodName3" placeholder="Misal: PROD-C">
-              <input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal">
-              <input type="text" id="prodWo3" placeholder="No. WO" class="mono">
+              <input type="text" id="masterProdName3" placeholder="Misal: PROD-C" data-sync="prodName3">
+              <input type="number" id="masterProdRate3" placeholder="Rate/mnt" inputmode="decimal" data-sync="prodRate3">
+              <input type="text" id="masterProdWo3" placeholder="No. WO" class="mono" data-sync="prodWo3">
             </div>
           </div>
         </div>
@@ -824,30 +792,6 @@
 
             <div class="sheet-control-divider" aria-hidden="true"></div>
 
-            <div class="sheet-product-control" role="group" aria-label="Produk, Rate dan Nomor WO">
-              <span class="sheet-control-label">Produk</span>
-              <div class="sheet-product-strip" id="sheetProductStrip">
-                <div class="sheet-product-slot" data-product-slot="1">
-                  <input type="text" class="sheet-product-input sheet-product-name" data-sheet-product="1" data-field="name" placeholder="Nama Produk" autocomplete="off">
-                  <input type="number" class="sheet-product-input sheet-product-rate" data-sheet-product="1" data-field="rate" placeholder="Rate" inputmode="decimal">
-                  <input type="text" class="sheet-product-input sheet-product-wo" data-sheet-product="1" data-field="wo" placeholder="No. WO" autocomplete="off">
-                </div>
-                <div class="sheet-product-slot" data-product-slot="2" hidden>
-                  <input type="text" class="sheet-product-input sheet-product-name" data-sheet-product="2" data-field="name" placeholder="Nama Produk" autocomplete="off">
-                  <input type="number" class="sheet-product-input sheet-product-rate" data-sheet-product="2" data-field="rate" placeholder="Rate" inputmode="decimal">
-                  <input type="text" class="sheet-product-input sheet-product-wo" data-sheet-product="2" data-field="wo" placeholder="No. WO" autocomplete="off">
-                </div>
-                <div class="sheet-product-slot" data-product-slot="3" hidden>
-                  <input type="text" class="sheet-product-input sheet-product-name" data-sheet-product="3" data-field="name" placeholder="Nama Produk" autocomplete="off">
-                  <input type="number" class="sheet-product-input sheet-product-rate" data-sheet-product="3" data-field="rate" placeholder="Rate" inputmode="decimal">
-                  <input type="text" class="sheet-product-input sheet-product-wo" data-sheet-product="3" data-field="wo" placeholder="No. WO" autocomplete="off">
-                </div>
-              </div>
-              <button type="button" class="sheet-product-add" id="sheetProductAdd" title="Tambah produk cadangan">+</button>
-            </div>
-
-            <div class="sheet-control-divider" aria-hidden="true"></div>
-
             <div class="sheet-control-group sheet-op-control" role="group" aria-label="Inisial Operator">
               <span class="sheet-control-label">OP</span>
               <div class="sheet-op-boxes" id="sheetOpBoxes">
@@ -861,29 +805,38 @@
             </div>
           </div>
 
-          <div class="sheet-kpi-row" aria-label="Health Bar OEE">
-            <div class="sheet-kpi" id="sheetKpiCardA" data-metric="availability" data-target="90">
-              <div class="sheet-kpi-head"><span>A</span><b id="sheetKpiA">0,00%</b></div>
-              <div class="sheet-health-track" aria-hidden="true"><i id="sheetHealthA"></i></div>
-              <span class="sheet-kpi-star" aria-hidden="true">✦</span>
+          <div class="sheet-kpi-row" aria-label="Ringkasan OEE">
+            <div class="sheet-kpi"><span>A</span><b id="sheetKpiA">0,00%</b></div>
+            <div class="sheet-kpi"><span>P</span><b id="sheetKpiP">0,00%</b></div>
+            <div class="sheet-kpi"><span>Q</span><b id="sheetKpiQ">0,00%</b></div>
+            <div class="sheet-kpi sheet-kpi-oee"><span>OEE</span><b id="sheetKpiOEE">0,00%</b></div>
+          </div>
+        </div>
+
+        <!-- Produk aktif di halaman Sheet -->
+        <div class="product-grid sheet-product-bar" id="sheetProductBar" style="margin: 10px 0 6px; padding: 0 2px;">
+          <div class="field">
+            <label>Produk 1 (Nama, Kecepatan &amp; No. WO)</label>
+            <div class="split-input split-input-3">
+              <input type="text" id="prodName1" placeholder="Misal: VTTS1 L030001">
+              <input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal">
+              <input type="text" id="prodWo1" placeholder="No. WO" class="mono">
             </div>
-            <div class="sheet-kpi" id="sheetKpiCardP" data-metric="performance" data-target="98">
-              <div class="sheet-kpi-head"><span>P</span><b id="sheetKpiP">0,00%</b></div>
-              <div class="sheet-health-track" aria-hidden="true"><i id="sheetHealthP"></i></div>
-              <span class="sheet-kpi-warning" aria-hidden="true">!</span>
-              <span class="sheet-kpi-star" aria-hidden="true">✦</span>
+          </div>
+          <div class="field">
+            <label>Produk 2 (Cadangan)</label>
+            <div class="split-input split-input-3">
+              <input type="text" id="prodName2" placeholder="Misal: VPEL1 L027001">
+              <input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal">
+              <input type="text" id="prodWo2" placeholder="No. WO" class="mono">
             </div>
-            <div class="sheet-kpi" id="sheetKpiCardQ" data-metric="quality" data-target="99.5">
-              <div class="sheet-kpi-head"><span>Q</span><b id="sheetKpiQ">0,00%</b></div>
-              <div class="sheet-health-track" aria-hidden="true"><i id="sheetHealthQ"></i></div>
-              <span class="sheet-kpi-warning" aria-hidden="true">!</span>
-              <span class="sheet-kpi-star" aria-hidden="true">✦</span>
-            </div>
-            <div class="sheet-kpi sheet-kpi-oee" id="sheetKpiCardOEE" data-metric="oee" data-target="88">
-              <div class="sheet-kpi-head"><span>OEE</span><b id="sheetKpiOEE">0,00%</b></div>
-              <div class="sheet-health-track" aria-hidden="true"><i id="sheetHealthOEE"></i></div>
-              <span class="sheet-kpi-warning" aria-hidden="true">!</span>
-              <span class="sheet-kpi-star" aria-hidden="true">✦</span>
+          </div>
+          <div class="field">
+            <label>Produk 3 (Cadangan)</label>
+            <div class="split-input split-input-3">
+              <input type="text" id="prodName3" placeholder="Misal: PROD-C">
+              <input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal">
+              <input type="text" id="prodWo3" placeholder="No. WO" class="mono">
             </div>
           </div>
         </div>
@@ -1284,6 +1237,5 @@
   <script src="./js/weather.js"></script>
   <script src="./js/app.js"></script>
   <script src="./js/sheet-op-sync.js"></script>
-  <script src="./js/sheet-product-sync.js"></script>
 </body>
 </html>
