@@ -36,6 +36,62 @@
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* Baris terpadu Shift/Line/Tanggal/OP — biar bisa membungkus rapi di layar sempit */
+    .sheet-inline-controls {
+      display: flex;
+      flex-wrap: wrap;
+      row-gap: 8px;
+    }
+    .sheet-control-group { flex: none; }
+
+    /* Inisial Operator — kotak ringkas menyatu di baris Shift/Line/Tanggal */
+    .sheet-op-control {
+      display: flex; align-items: center; gap: 6px;
+      flex: 1 1 100%;      /* di layar sempit: pindah ke baris sendiri, penuh lebar */
+      min-width: 0;
+    }
+    .sheet-op-boxes {
+      display: flex; gap: 4px;
+      flex: 1;
+      min-width: 0;
+      overflow-x: auto;    /* kalau tetap sempit, geser horizontal (bukan tabrakan) */
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .sheet-op-boxes::-webkit-scrollbar { display: none; }
+    .sheet-op-box {
+      flex: none;
+      width: 40px; text-align: center; text-transform: uppercase;
+      font: 700 12.5px 'IBM Plex Mono', monospace; letter-spacing: .5px;
+      border: 1px solid #d6dee5; border-radius: 7px;
+      padding: 7px 2px; color: #0f2437; background: #fbfcfd;
+      transition: border-color .15s, box-shadow .15s, background .15s;
+    }
+    .sheet-op-box::placeholder { color: #b6c4cf; }
+    .sheet-op-box:hover { background: #f4f8fa; }
+    .sheet-op-box:focus {
+      outline: none; border-color: #12a150; background: #fff;
+      box-shadow: 0 0 0 3px rgba(18,161,80,.16);
+    }
+    .sheet-op-box.filled { border-color: rgba(18,161,80,.5); background: rgba(18,161,80,.06); }
+
+    /* Layar sedang: kotak sedikit lebih kecil */
+    @media (max-width: 640px) {
+      .sheet-op-box { width: 36px; padding: 6px 2px; font-size: 11.5px; }
+      .sheet-control-label { font-size: 10.5px; }
+    }
+
+    /* Layar sangat sempit: pastikan Shift/Line/Tanggal juga tidak berdempet */
+    @media (max-width: 420px) {
+      .sheet-shift-control,
+      .sheet-line-control { flex: 1 1 auto; }
+      .sheet-date-control { flex: 1 1 100%; }
+      .sheet-op-box { width: 34px; }
+    }
+  </style>
 </head>
 <body>
 
@@ -733,6 +789,20 @@
                 <span class="sheet-date-chevron">▾</span>
               </button>
             </div>
+
+            <div class="sheet-control-divider" aria-hidden="true"></div>
+
+            <div class="sheet-control-group sheet-op-control" role="group" aria-label="Inisial Operator">
+              <span class="sheet-control-label">OP</span>
+              <div class="sheet-op-boxes" id="sheetOpBoxes">
+                <input type="text" class="sheet-op-box" data-sheet-op="1" maxlength="3" placeholder="OP1" autocomplete="off">
+                <input type="text" class="sheet-op-box" data-sheet-op="2" maxlength="3" placeholder="OP2" autocomplete="off">
+                <input type="text" class="sheet-op-box" data-sheet-op="3" maxlength="3" placeholder="OP3" autocomplete="off">
+                <input type="text" class="sheet-op-box" data-sheet-op="4" maxlength="3" placeholder="OP4" autocomplete="off">
+                <input type="text" class="sheet-op-box" data-sheet-op="5" maxlength="3" placeholder="OP5" autocomplete="off">
+                <input type="text" class="sheet-op-box" data-sheet-op="6" maxlength="3" placeholder="OP6" autocomplete="off">
+              </div>
+            </div>
           </div>
 
           <div class="sheet-kpi-row" aria-label="Ringkasan OEE">
@@ -1138,5 +1208,6 @@
   <script src="./js/fx.js"></script>
   <script src="./js/weather.js"></script>
   <script src="./js/app.js"></script>
+  <script src="./js/sheet-op-sync.js"></script>
 </body>
 </html>
