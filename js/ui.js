@@ -153,6 +153,7 @@ const UI = (() => {
     applyShiftUI();
     updateUnifiedControl();
     if (typeof Storage !== 'undefined' && Storage.loadRecord) Storage.loadRecord();
+    if (typeof Rows !== 'undefined' && Rows.refreshFirstRowStartTime) Rows.refreshFirstRowStartTime(); // ← tambahan
     toast(`Shift ${next + 1} · A = ${CONFIG.SHIFT_A[next]} mnt`);
   };
 
