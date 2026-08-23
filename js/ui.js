@@ -117,10 +117,13 @@ const UI = (() => {
 
     if (State.el.sheetDateText) State.el.sheetDateText.textContent = formatSheetDate(dateVal);
 
-    // KPI mini-bar membaca elemen kalkulasi resmi sehingga tidak ada state ganda.
-    if (State.el.sheetKpiA && State.el.oF) State.el.sheetKpiA.textContent = `${State.el.oF.textContent}%`;
-    if (State.el.sheetKpiP && State.el.oITotal) State.el.sheetKpiP.textContent = `${State.el.oITotal.textContent}%`;
-    if (State.el.sheetKpiQ && State.el.oM) State.el.sheetKpiQ.textContent = `${State.el.oM.textContent}%`;
+    // KPI Sheet HARUS selalu mengikuti nilai resmi pada halaman Perhitungan OEE.
+    // P/Q tidak lagi diganti menjadi tanda ! hanya karena ada baris produksi
+    // lain yang belum lengkap. Jika ada data yang belum lengkap, peringatannya
+    // tetap ditampilkan melalui diagnostik, tetapi angka KPI tetap aktual.
+    if (State.el.sheetKpiA) State.el.sheetKpiA.textContent = State.el.oF ? `${State.el.oF.textContent}%` : '0,00%';
+    if (State.el.sheetKpiP) State.el.sheetKpiP.textContent = State.el.oITotal ? `${State.el.oITotal.textContent}%` : '0,00%';
+    if (State.el.sheetKpiQ) State.el.sheetKpiQ.textContent = State.el.oM ? `${State.el.oM.textContent}%` : '0,00%';
     if (State.el.sheetKpiOEE && State.el.oee) State.el.sheetKpiOEE.textContent = State.el.oee.textContent;
   };
 

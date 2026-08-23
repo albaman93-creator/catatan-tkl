@@ -37,12 +37,30 @@ const Calculation = (() => {
     });
   };
 
+  // ===== HEALTH BAR KPI DI SHEET =====
+  const updateHealthCard = (card, fill, value, target, incomplete = false) => {
+    if (!card || !fill) return;
+    const n = Number.isFinite(+value) ? +value : 0;
+    const pct = Math.max(0, Math.min(100, n));
+    const t = Number.isFinite(+target) ? +target : 100;
+    const near = t * 0.90;
+    const status = incomplete ? 'incomplete' : (n > t ? 'over' : n >= t ? 'target' : n >= near ? 'near' : 'low');
+    card.classList.remove('health-low','health-near','health-target','health-over','health-incomplete');
+    card.classList.add('health-' + status);
+    card.dataset.health = String(Math.round(pct * 100) / 100);
+    fill.style.width = pct + '%';
+    card.style.setProperty('--target-pos', Math.min(100, Math.max(0, t)) + '%');
+    fill.setAttribute('aria-valuenow', String(Math.round(pct * 100) / 100));
+    fill.setAttribute('aria-valuemax', '100');
+  };
+
   /**
    * Fungsi utama: recalculate semua angka OEE + update UI.
    */
   const recalc = () => {
     let B = 0, D = 0, tot = 0, nShift = 0;
     let sumGood = 0, sumDefect = 0;
+    let incompleteProduction = false;
     const sh = [{B:0,D:0},{B:0,D:0},{B:0,D:0}];
 
     const pNames = [
@@ -64,9 +82,18 @@ const Calculation = (() => {
       const prodName = g('batch');
       const durEl = tr.querySelector('.dur-v');
 
-      const gVal = parseFloat(g('good').replace(',', '.')) || 0;
-      const dVal = parseFloat(g('defect').replace(',', '.')) || 0;
+      const goodRaw = g('good').trim();
+      const dRaw = g('defect').trim();
+      const gVal = parseFloat(goodRaw.replace(',', '.')) || 0;
+      const dVal = parseFloat(dRaw.replace(',', '.')) || 0;
       const rowActual = gVal + dVal;
+
+      // Kode 2 = produksi. Jika Good belum diisi, atau produk/rate belum
+      // tersedia, P/Q/OEE belum layak dianggap sebagai hasil final.
+      if (kode === '2') {
+        const rowRate = Rows.getRateForProduct ? Rows.getRateForProduct(prodName) : 0;
+        if (!goodRaw || (!prodName && rowRate <= 0)) incompleteProduction = true;
+      }
 
       sumGood += gVal;
       sumDefect += dVal;
@@ -175,11 +202,31 @@ const Calculation = (() => {
       }
     }
 
+    // Health bar: isi 0–100% dan warna berdasarkan target masing-masing.
+    updateHealthCard(State.el.sheetKpiCardA, State.el.sheetHealthA, sF, CONFIG.TARGET.AVAILABILITY);
+    updateHealthCard(State.el.sheetKpiCardP, State.el.sheetHealthP, avgPerfI, CONFIG.TARGET.PERFORMANCE, false);
+    updateHealthCard(State.el.sheetKpiCardQ, State.el.sheetHealthQ, M, CONFIG.TARGET.QUALITY, false);
+    updateHealthCard(State.el.sheetKpiCardOEE, State.el.sheetHealthOEE, oee, CONFIG.TARGET.OEE, false);
+    [
+      [State.el.sheetKpiCardA, CONFIG.TARGET.AVAILABILITY, 'Availability'],
+      [State.el.sheetKpiCardP, CONFIG.TARGET.PERFORMANCE, 'Performance'],
+      [State.el.sheetKpiCardQ, CONFIG.TARGET.QUALITY, 'Quality'],
+      [State.el.sheetKpiCardOEE, CONFIG.TARGET.OEE, 'OEE'],
+    ].forEach(([card, target, label]) => {
+      if (card) card.title = `${label} · Target ${Utils.nf2(target)}%`;
+    });
+    if (incompleteProduction) {
+      [State.el.sheetKpiCardP, State.el.sheetKpiCardQ].forEach(card => {
+        if (card) card.title = 'Ada Kode 2 yang belum lengkap. Angka KPI tetap mengikuti hasil hitungan pada halaman OEE.';
+      });
+    }
+
     // === DIAGNOSTIK ===
     const issues = [];
     if (nShift === 0) issues.push(`Tidak ada baris log pada Shift ${State.evalShift + 1} — cek tombol SHIFT atau jam mulai.`);
     if (sC <= 0)      issues.push('Availability 0% — Planned DT (B) ≥ menit shift (A).');
     else if (sE <= 0) issues.push('Availability 0% — Unplanned DT (D) ≥ waktu terencana (C).');
+    if (incompleteProduction) issues.push('Kode 2 belum lengkap — isi Produk, Rate, dan Good agar Performance/Quality/OEE valid.');
     if (J <= 0)       issues.push('Quality/Performance 0% — Output aktual belum diisi.');
 
     const dEl = State.el.diag;

@@ -861,11 +861,30 @@
             </div>
           </div>
 
-          <div class="sheet-kpi-row" aria-label="Ringkasan OEE">
-            <div class="sheet-kpi"><span>A</span><b id="sheetKpiA">0,00%</b></div>
-            <div class="sheet-kpi"><span>P</span><b id="sheetKpiP">0,00%</b></div>
-            <div class="sheet-kpi"><span>Q</span><b id="sheetKpiQ">0,00%</b></div>
-            <div class="sheet-kpi sheet-kpi-oee"><span>OEE</span><b id="sheetKpiOEE">0,00%</b></div>
+          <div class="sheet-kpi-row" aria-label="Health Bar OEE">
+            <div class="sheet-kpi" id="sheetKpiCardA" data-metric="availability" data-target="90">
+              <div class="sheet-kpi-head"><span>A</span><b id="sheetKpiA">0,00%</b></div>
+              <div class="sheet-health-track" aria-hidden="true"><i id="sheetHealthA"></i></div>
+              <span class="sheet-kpi-star" aria-hidden="true">✦</span>
+            </div>
+            <div class="sheet-kpi" id="sheetKpiCardP" data-metric="performance" data-target="98">
+              <div class="sheet-kpi-head"><span>P</span><b id="sheetKpiP">0,00%</b></div>
+              <div class="sheet-health-track" aria-hidden="true"><i id="sheetHealthP"></i></div>
+              <span class="sheet-kpi-warning" aria-hidden="true">!</span>
+              <span class="sheet-kpi-star" aria-hidden="true">✦</span>
+            </div>
+            <div class="sheet-kpi" id="sheetKpiCardQ" data-metric="quality" data-target="99.5">
+              <div class="sheet-kpi-head"><span>Q</span><b id="sheetKpiQ">0,00%</b></div>
+              <div class="sheet-health-track" aria-hidden="true"><i id="sheetHealthQ"></i></div>
+              <span class="sheet-kpi-warning" aria-hidden="true">!</span>
+              <span class="sheet-kpi-star" aria-hidden="true">✦</span>
+            </div>
+            <div class="sheet-kpi sheet-kpi-oee" id="sheetKpiCardOEE" data-metric="oee" data-target="88">
+              <div class="sheet-kpi-head"><span>OEE</span><b id="sheetKpiOEE">0,00%</b></div>
+              <div class="sheet-health-track" aria-hidden="true"><i id="sheetHealthOEE"></i></div>
+              <span class="sheet-kpi-warning" aria-hidden="true">!</span>
+              <span class="sheet-kpi-star" aria-hidden="true">✦</span>
+            </div>
           </div>
         </div>
 
