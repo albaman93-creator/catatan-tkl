@@ -148,7 +148,7 @@ const App = (() => {
     });
 
     // Master Produk & Operator → recalc
-    ['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3'].forEach(id => {
+    ['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3','prodWo1','prodWo2','prodWo3'].forEach(id => {
       State.el[id].addEventListener('input', () => {
         Rows.updateAllDropdowns();
         Rows.updateMatrixProductHeaders();
