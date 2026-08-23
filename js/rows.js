@@ -83,6 +83,48 @@ const Rows = (() => {
     if (wo) woEl.value = wo;
   };
 
+  // ====== DEFAULT JAM MULAI BARIS PERTAMA (mengikuti Shift terpilih) ======
+  // Shift 1 -> 07:00, Shift 2 -> 15:30, Shift 3 -> 23:30
+  const SHIFT_START_TIME = {
+    0: '07:00', // Shift 1
+    1: '15:30', // Shift 2
+    2: '23:30', // Shift 3
+  };
+
+  const getSelectedShiftIndex = () => {
+    const v = State.evalShift;
+    return (typeof v === 'number' && v >= 0 && v <= 2) ? v : 0;
+  };
+
+  /** Isi jam mulai default HANYA untuk baris pertama & HANYA kalau kosong. */
+  const applyDefaultStartTimeForFirstRow = (tr) => {
+    if (!tr) return;
+    if (rows().indexOf(tr) !== 0) return; // cuma baris pertama
+    const mulaiEl = tr.querySelector('[data-f="mulai"]');
+    if (!mulaiEl || mulaiEl.value.trim()) return; // sudah ada isi -> jangan timpa
+    const defaultTime = SHIFT_START_TIME[getSelectedShiftIndex()];
+    if (defaultTime) mulaiEl.value = defaultTime;
+  };
+
+  /**
+   * Dipanggil saat user GANTI SHIFT (lihat UI.setEvalShift). Kalau jam mulai
+   * baris pertama masih kosong ATAU masih berupa salah satu nilai default
+   * (07:00 / 15:30 / 23:30 — bukan hasil isian manual operator), maka
+   * di-refresh mengikuti shift yang baru dipilih.
+   */
+  const refreshFirstRowStartTime = () => {
+    const first = rows()[0];
+    if (!first) return;
+    const mulaiEl = first.querySelector('[data-f="mulai"]');
+    if (!mulaiEl) return;
+    const currentVal = mulaiEl.value.trim();
+    const isStillDefault = !currentVal || Object.values(SHIFT_START_TIME).includes(currentVal);
+    if (isStillDefault) {
+      const defaultTime = SHIFT_START_TIME[getSelectedShiftIndex()];
+      if (defaultTime) mulaiEl.value = defaultTime;
+    }
+  };
+
   // ====== DROPDOWN PRODUK ======
   const updateAllDropdowns = () => {
     const prods = getActiveProducts();
@@ -193,6 +235,9 @@ const Rows = (() => {
     const kegiatanEl = tr.querySelector('[data-f="kegiatan"]');
     if (kegiatanEl && typeof Suggest !== 'undefined') Suggest.attachGhost(kegiatanEl);
     applyWoFromBatch(tr);
+    // Baris baru kosong (bukan hasil load data lama) -> kalau ini baris
+    // pertama, isi jam mulai otomatis sesuai Shift yang sedang dipilih.
+    if (!data) applyDefaultStartTimeForFirstRow(tr);
     return tr;
   };
 
@@ -303,5 +348,6 @@ const Rows = (() => {
     rows, updateRowNumbers, applyCat, makeRow,
     updateAllDropdowns, updateMatrixProductHeaders,
     updateProductDetailTable,
+    applyDefaultStartTimeForFirstRow, refreshFirstRowStartTime,
   };
 })();
