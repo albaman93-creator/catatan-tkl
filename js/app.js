@@ -30,7 +30,12 @@ const App = (() => {
     Storage.loadRecord();
 
     // Auto-save LOKAL tiap N ms (default 1 menit) — tidak menyentuh Supabase
-    setInterval(Storage.autoSaveLocal, CONFIG.AUTO_SAVE_INTERVAL_MS || 60000);
+    // (lewat Perf.every supaya ikut berhenti saat app disembunyikan/background)
+    if (typeof Perf !== 'undefined') {
+      Perf.every(CONFIG.AUTO_SAVE_INTERVAL_MS || 60000, Storage.autoSaveLocal);
+    } else {
+      setInterval(Storage.autoSaveLocal, CONFIG.AUTO_SAVE_INTERVAL_MS || 60000);
+    }
 
     // Start clock
     UI.startClock();

@@ -162,7 +162,9 @@ const Scene = (() => {
   const init = () => {
     apply();
     // Update setiap 30 detik agar posisi matahari/bulan terlihat bergerak pelan
-    setInterval(apply, 30000);
+    // (lewat Perf.every supaya berhenti saat app disembunyikan)
+    if (typeof Perf !== 'undefined') Perf.every(30000, apply);
+    else setInterval(apply, 30000);
 
     const btn = document.getElementById('sceneToggle');
     if (btn) btn.addEventListener('click', cycle);

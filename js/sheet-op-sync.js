@@ -78,7 +78,11 @@
   // Sinkron ulang kotak ringkas setiap kali data record dimuat/direset
   // (Storage.applyRecord mengubah #op1..#op6 secara langsung tanpa event,
   // jadi kita polling ringan setiap 500ms — murah & aman untuk 6 input kecil).
-  const startPolling = () => setInterval(syncFromOriginal, 500);
+  // Lewat Perf.every supaya berhenti saat app disembunyikan (hemat baterai/CPU)
+  const startPolling = () => {
+    if (typeof Perf !== 'undefined') Perf.every(500, syncFromOriginal);
+    else setInterval(syncFromOriginal, 500);
+  };
 
   document.addEventListener('DOMContentLoaded', () => {
     if (!boxes().length) return; // guard kalau markup belum ada

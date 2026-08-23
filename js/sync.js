@@ -77,7 +77,11 @@ const Sync = (() => {
   };
 
   window.addEventListener('online', flushQueue);
-  setInterval(flushQueue, 30000);
+  // Lewat Perf.every supaya berhenti saat app disembunyikan (event 'online'
+  // di atas tetap jalan independen, jadi begitu koneksi balik saat app
+  // sedang dibuka, antrean tetap langsung terkirim).
+  if (typeof Perf !== 'undefined') Perf.every(30000, flushQueue);
+  else setInterval(flushQueue, 30000);
 
   return { queuePush, queueLength, pushRow, flushQueue };
 })();

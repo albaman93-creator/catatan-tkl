@@ -272,7 +272,9 @@ const Weather = (() => {
 
     updateBtn();
     refresh();
-    setInterval(refresh, CONFIG.WEATHER_REFRESH_MIN * 60 * 1000);
+    // Lewat Perf.every supaya berhenti saat app disembunyikan
+    if (typeof Perf !== 'undefined') Perf.every(CONFIG.WEATHER_REFRESH_MIN * 60 * 1000, refresh);
+    else setInterval(refresh, CONFIG.WEATHER_REFRESH_MIN * 60 * 1000);
   }
 
   // Public API (untuk console debugging)

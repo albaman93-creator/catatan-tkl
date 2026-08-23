@@ -20,7 +20,10 @@ const UI = (() => {
 
   const startClock = () => {
     tick();
-    setInterval(tick, 1000);
+    // Lewat Perf.every supaya jam berhenti "berdetak" saat app disembunyikan
+    // (hemat baterai/CPU), lalu langsung update lagi begitu dibuka kembali.
+    if (typeof Perf !== 'undefined') Perf.every(1000, tick);
+    else setInterval(tick, 1000);
   };
 
   // ====== TOAST ======

@@ -108,7 +108,9 @@ const Nature = (() => {
     if (!wrap) return; // guard: elemen belum ada di halaman ini
 
     refreshAll();
-    setInterval(refreshAll, REFRESH_MS);
+    // Lewat Perf.every supaya berhenti saat app disembunyikan
+    if (typeof Perf !== 'undefined') Perf.every(REFRESH_MS, refreshAll);
+    else setInterval(refreshAll, REFRESH_MS);
 
     // Ikut update instan saat scene berganti (event ini sudah di-dispatch
     // oleh scene.js sebelumnya — di sini kita hanya MENDENGARKAN, additive).
