@@ -116,6 +116,18 @@ const CONFIG = Object.freeze({
     ],
   },
 
+  // ====== KODE PRODUK REFERENSI (autocomplete nama produk) ======
+  // Filter prefix saat mengetik di kolom Nama Produk. Klik pilihan → isi kode,
+  // kursor di akhir supaya bisa lanjut ketik bebas (mis. "VTTS1 L030001").
+  // visual & kemas memakai sufiks huruf; tahapan lain memakai sufiks angka.
+  PRODUCT_CODE_SUGGESTIONS: {
+    mixing:  ['VTTS1','VKAM1','VLON1','VMON1','VTRA1','VCLN2','VMNT1','VTRM1','VPEL1','ITTC2','VTTC1'],
+    filling: ['VTTS1','VKAM1','VLON1','VMON1','VTRA1','VCLN2','VMNT1','VTRM1','VPEL1','ITTC2','VTTC1'],
+    steril:  ['VTTS1','VKAM1','VLON1','VMON1','VTRA1','VCLN2','VMNT1','VTRM1','VPEL1','ITTC2','VTTC1'],
+    visual:  ['VTTSA','VKAMA','VLONA','VMONA','VTRAB','VCLNB','VMNTA','VTRME','VPELA','ITTCB','VTTCA'],
+    kemas:   ['VTTSA','VKAMA','VLONA','VMONA','VTRAB','VCLNB','VMNTA','VTRME','VPELA','ITTCB','VTTCA'],
+  },
+
   // ====== MODE INPUT (Normal / Cepat 1 / Cepat 2) ======
   INPUT_MODE_KEY: 'fima_input_mode',
 

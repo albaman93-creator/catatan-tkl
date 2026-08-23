@@ -232,6 +232,11 @@ const App = (() => {
     if (typeof BulkFill !== 'undefined') BulkFill.init();
     if (typeof PrintSheet !== 'undefined') PrintSheet.bind();
 
+    // Autocomplete kode produk di kolom Nama Produk (Sheet + Master)
+    if (typeof Suggest !== 'undefined' && Suggest.attachProductAll) {
+      Suggest.attachProductAll('#prodName1, #prodName2, #prodName3, #masterProdName1, #masterProdName2, #masterProdName3');
+    }
+
     Auth.initSession();
 
     // Coba kirim antrean offline yang tertunda (jika ada) begitu app siap

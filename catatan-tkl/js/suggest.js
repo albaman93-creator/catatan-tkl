@@ -170,5 +170,172 @@ const Suggest = (() => {
     document.querySelectorAll(selector).forEach(attachGhost);
   };
 
-  return { attachGhost, attachAll, getSuggestions };
+  // ====== AUTOCOMPLETE KODE PRODUK (dropdown klik) ======
+  const getProductCodes = () => {
+    const stage = (State.el.fStage && State.el.fStage.value) || 'mixing';
+    const map = CONFIG.PRODUCT_CODE_SUGGESTIONS || {};
+    const list = map[stage] || map.mixing || [];
+    return [...new Set(list)];
+  };
+
+  const filterProductCodes = (query) => {
+    const q = (query || '').trim().toUpperCase();
+    const all = getProductCodes();
+    if (!q) return all.slice(0, 12);
+    return all.filter(code => code.toUpperCase().startsWith(q)).slice(0, 12);
+  };
+
+  let _prodDrop = null;
+  let _prodActiveInput = null;
+  let _prodHighlight = -1;
+
+  const ensureProdDropdown = () => {
+    if (_prodDrop) return _prodDrop;
+    _prodDrop = document.createElement('div');
+    _prodDrop.className = 'prod-suggest-drop';
+    _prodDrop.setAttribute('role', 'listbox');
+    _prodDrop.hidden = true;
+    document.body.appendChild(_prodDrop);
+    document.addEventListener('mousedown', (e) => {
+      if (!_prodDrop || _prodDrop.hidden) return;
+      if (_prodDrop.contains(e.target)) return;
+      if (_prodActiveInput && _prodActiveInput === e.target) return;
+      hideProdDropdown();
+    });
+    return _prodDrop;
+  };
+
+  const positionProdDropdown = (input) => {
+    const drop = ensureProdDropdown();
+    const r = input.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - r.bottom;
+    const maxH = Math.min(220, Math.max(120, spaceBelow - 8));
+    drop.style.position = 'fixed';
+    drop.style.left = Math.max(4, r.left) + 'px';
+    drop.style.width = Math.max(r.width, 140) + 'px';
+    drop.style.maxHeight = maxH + 'px';
+    if (spaceBelow < 100 && r.top > spaceBelow) {
+      drop.style.top = 'auto';
+      drop.style.bottom = (window.innerHeight - r.top + 4) + 'px';
+    } else {
+      drop.style.bottom = 'auto';
+      drop.style.top = (r.bottom + 4) + 'px';
+    }
+  };
+
+  const hideProdDropdown = () => {
+    if (_prodDrop) _prodDrop.hidden = true;
+    _prodActiveInput = null;
+    _prodHighlight = -1;
+  };
+
+  const selectProductCode = (input, code) => {
+    if (!input || !code) return;
+    const val = input.value || '';
+    const m = val.match(/^([A-Za-z0-9]*)(.*)$/);
+    const rest = m ? m[2] : '';
+    const next = code + rest;
+    input.value = next;
+    const pos = code.length;
+    input.setSelectionRange(pos, pos);
+    input.focus();
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    hideProdDropdown();
+  };
+
+  const renderProdDropdown = (input, items) => {
+    const drop = ensureProdDropdown();
+    _prodActiveInput = input;
+    _prodHighlight = items.length ? 0 : -1;
+    if (!items.length) {
+      drop.hidden = true;
+      return;
+    }
+    drop.innerHTML = items.map((code, i) =>
+      `<button type="button" class="prod-suggest-item${i === 0 ? ' on' : ''}" role="option" data-code="${code}">${code}</button>`
+    ).join('');
+    drop.querySelectorAll('.prod-suggest-item').forEach(btn => {
+      btn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        selectProductCode(input, btn.getAttribute('data-code'));
+      });
+    });
+    positionProdDropdown(input);
+    drop.hidden = false;
+  };
+
+  const refreshProdDropdown = (input) => {
+    const val = input.value || '';
+    const caret = typeof input.selectionStart === 'number' ? input.selectionStart : val.length;
+    // Setelah spasi = user sedang ketik bebas di belakang kode
+    const spaceIdx = val.search(/\s/);
+    if (spaceIdx >= 0 && caret > spaceIdx) {
+      hideProdDropdown();
+      return;
+    }
+    const beforeCaret = val.slice(0, caret);
+    const token = (beforeCaret.match(/^[A-Za-z0-9]*/) || [''])[0];
+    const items = filterProductCodes(token);
+    if (items.length === 1 && items[0].toUpperCase() === token.toUpperCase() && token.length > 0) {
+      hideProdDropdown();
+      return;
+    }
+    renderProdDropdown(input, items);
+  };
+
+  const attachProductAutocomplete = (el) => {
+    if (!el || el.dataset.prodSuggestBound === '1') return;
+    el.dataset.prodSuggestBound = '1';
+    el.setAttribute('autocomplete', 'off');
+    el.setAttribute('spellcheck', 'false');
+
+    el.addEventListener('focus', () => refreshProdDropdown(el));
+    el.addEventListener('input', () => refreshProdDropdown(el));
+    el.addEventListener('click', () => refreshProdDropdown(el));
+
+    el.addEventListener('keydown', (e) => {
+      if (!_prodDrop || _prodDrop.hidden || _prodActiveInput !== el) {
+        if (e.key === 'Escape') hideProdDropdown();
+        return;
+      }
+      const items = [..._prodDrop.querySelectorAll('.prod-suggest-item')];
+      if (!items.length) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        _prodHighlight = (_prodHighlight + 1) % items.length;
+        items.forEach((b, i) => b.classList.toggle('on', i === _prodHighlight));
+        items[_prodHighlight].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        _prodHighlight = (_prodHighlight - 1 + items.length) % items.length;
+        items.forEach((b, i) => b.classList.toggle('on', i === _prodHighlight));
+        items[_prodHighlight].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter' || e.key === 'Tab') {
+        if (_prodHighlight >= 0 && items[_prodHighlight]) {
+          e.preventDefault();
+          selectProductCode(el, items[_prodHighlight].getAttribute('data-code'));
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        hideProdDropdown();
+      }
+    });
+
+    el.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (document.activeElement !== el) hideProdDropdown();
+      }, 150);
+    });
+  };
+
+  const attachProductAll = (selector) => {
+    document.querySelectorAll(selector).forEach(attachProductAutocomplete);
+  };
+
+  return {
+    attachGhost, attachAll, getSuggestions,
+    attachProductAutocomplete, attachProductAll,
+    getProductCodes, filterProductCodes,
+  };
 })();

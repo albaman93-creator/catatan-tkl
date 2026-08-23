@@ -302,3 +302,37 @@ textarea.in {
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
 #toast.err  { border-left-color: var(--red); }
 #toast.warn { border-left-color: var(--amber); background: #713f12; color: #fef08a; }
+/* ===== Product code autocomplete dropdown ===== */
+.prod-suggest-drop {
+  z-index: 10050;
+  overflow-y: auto;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 36, 55, 0.12);
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(15, 36, 55, 0.14), 0 2px 8px rgba(15, 36, 55, 0.06);
+  -webkit-overflow-scrolling: touch;
+}
+.prod-suggest-drop[hidden] { display: none !important; }
+.prod-suggest-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #0f2437;
+  font: 700 12.5px 'IBM Plex Mono', ui-monospace, monospace;
+  letter-spacing: 0.4px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.prod-suggest-item:hover,
+.prod-suggest-item.on {
+  background: rgba(18, 161, 80, 0.12);
+  color: #0b7a3b;
+}
+.prod-suggest-item:active {
+  background: rgba(18, 161, 80, 0.2);
+}
