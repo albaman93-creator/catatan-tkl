@@ -171,10 +171,29 @@ const Suggest = (() => {
   };
 
   // ====== AUTOCOMPLETE KODE PRODUK (dropdown klik) ======
+  const getActiveStage = () => {
+    // Utama: dropdown fStage; cadangan: tab sheet yang aktif
+    let stage = (State.el.fStage && State.el.fStage.value) || '';
+    if (!stage) {
+      const on = document.querySelector('.sheet-stage-btn.on, .sheet-stage-btn[aria-selected="true"]');
+      if (on) stage = on.getAttribute('data-sheet-stage') || '';
+    }
+    return stage || 'mixing';
+  };
+
+  const FALLBACK_PRODUCT_CODES = {
+    mixing:  ['VTTS1','VKAM1','VLON1','VMON1','VTRA1','VCLN2','VMNT1','VTRM1','VPEL1','ITTC2','VTTC1'],
+    filling: ['VTTS1','VKAM1','VLON1','VMON1','VTRA1','VCLN2','VMNT1','VTRM1','VPEL1','ITTC2','VTTC1'],
+    steril:  ['VTTS1','VKAM1','VLON1','VMON1','VTRA1','VCLN2','VMNT1','VTRM1','VPEL1','ITTC2','VTTC1'],
+    visual:  ['VTTSA','VKAMA','VLONA','VMONA','VTRAB','VCLNB','VMNTA','VTRME','VPELA','ITTCB','VTTCA'],
+    kemas:   ['VTTSA','VKAMA','VLONA','VMONA','VTRAB','VCLNB','VMNTA','VTRME','VPELA','ITTCB','VTTCA'],
+  };
+
   const getProductCodes = () => {
-    const stage = (State.el.fStage && State.el.fStage.value) || 'mixing';
-    const map = CONFIG.PRODUCT_CODE_SUGGESTIONS || {};
-    const list = map[stage] || map.mixing || [];
+    const stage = getActiveStage();
+    const map = (typeof CONFIG !== 'undefined' && CONFIG.PRODUCT_CODE_SUGGESTIONS)
+      || FALLBACK_PRODUCT_CODES;
+    const list = map[stage] || map.mixing || FALLBACK_PRODUCT_CODES.mixing;
     return [...new Set(list)];
   };
 
@@ -333,9 +352,46 @@ const Suggest = (() => {
     document.querySelectorAll(selector).forEach(attachProductAutocomplete);
   };
 
+  // Delegasi global: tetap jalan meski input di-render ulang / user belum attach manual
+  const isProductNameInput = (el) => {
+    if (!el || el.tagName !== 'INPUT') return false;
+    if (el.type && el.type !== 'text' && el.type !== 'search') return false;
+    const id = el.id || '';
+    if (/^prodName[123]$/.test(id) || /^masterProdName[123]$/.test(id)) return true;
+    if (el.classList.contains('sheet-product-name')) return true;
+    if (el.dataset && el.dataset.field === 'name' && el.closest('.sheet-product-slot, .sheet-product-bar, .product-grid')) return true;
+    return false;
+  };
+
+  const bindProductDelegation = () => {
+    if (document.documentElement.dataset.prodSuggestDelegation === '1') return;
+    document.documentElement.dataset.prodSuggestDelegation = '1';
+
+    document.addEventListener('focusin', (e) => {
+      const el = e.target;
+      if (!isProductNameInput(el)) return;
+      attachProductAutocomplete(el);
+      refreshProdDropdown(el);
+    }, true);
+
+    document.addEventListener('input', (e) => {
+      const el = e.target;
+      if (!isProductNameInput(el)) return;
+      attachProductAutocomplete(el);
+      refreshProdDropdown(el);
+    }, true);
+  };
+
+  // Auto-bind saat script termuat
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindProductDelegation);
+  } else {
+    bindProductDelegation();
+  }
+
   return {
     attachGhost, attachAll, getSuggestions,
     attachProductAutocomplete, attachProductAll,
-    getProductCodes, filterProductCodes,
+    getProductCodes, filterProductCodes, bindProductDelegation,
   };
 })();
