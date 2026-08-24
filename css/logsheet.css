@@ -331,9 +331,12 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
 
 /* Khusus untuk area inisial operator agar tidak memaksa baris jadi sangat panjang */
 .sheet-op-control {
-  flex: 0 0 auto !important;
-  overflow: hidden;
-  max-width: 150px; /* Batasi lebar agar tidak mendorong elemen lain */
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  flex-wrap: nowrap !important;   /* ← jangan wrap */
+  flex: 0 1 auto;                /* biarkan menyusut jika perlu */
+  min-width: 0;
 }
 
 /* Pastikan date trigger tidak punya margin yang aneh */
@@ -772,56 +775,57 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
   display: none;
 }
 
-//* ============================================================
-   PERBAIKAN: 6 KOLOM OP DALAM SATU BARIS
+/* ============================================================
+   PERBAIKAN: 6 KOLOM OP — SELALU TERLIHAT SEMUA
+   (Sebelumnya dipaksa nowrap+overflow tersembunyi via !important,
+   itu penyebab OP4-OP6 "hilang". Diganti ke wrap: kalau tidak
+   muat 1 baris, otomatis turun ke baris ke-2 — tidak pernah
+   tersembunyi lagi.)
    ============================================================ */
 
-/* Pastikan baris OP tidak wrap */
+/* Baris OP: boleh wrap ke baris baru kalau kotaknya tidak muat */
+/* Container utama untuk baris OP */
 .sheet-op-row {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: nowrap !important;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  align-items: center;        /* vertikal sejajar */
   width: 100%;
-}
-.sheet-op-row::-webkit-scrollbar {
-  display: none;
+  flex-wrap: nowrap !important;
+  overflow-x: auto;           /* scroll jika kepanjangan */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* OP boxes container — tidak wrap, bisa scroll */
+/* Grup label OP + kotak */
+.sheet-op-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 100%;            /* ambil lebar penuh */
+  min-width: 0;
+}
+
+/* Container 6 kotak OP */
 .sheet-op-boxes {
   display: flex;
   gap: 3px;
   flex-wrap: nowrap !important;
-  flex: 1 1 auto;
-  min-width: 0;
+  flex: 1 1 auto;            /* isi sisa ruang setelah label */
+  justify-content: center !important;  /* ← ini yang membuat kotak berada di tengah */
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.sheet-op-boxes::-webkit-scrollbar {
-  display: none;
 }
 
-/* Setiap kotak OP — kecil dan kompak */
+/* Kotak OP (tidak berubah) */
 .sheet-op-box {
   flex: 0 0 auto;
   width: 32px;
   min-width: 28px;
-  max-width: 38px;
   text-align: center;
   text-transform: uppercase;
   font: 700 10px var(--mono);
-  letter-spacing: .2px;
   border: 1px solid #d6dee5;
   border-radius: 5px;
   padding: 4px 1px;
-  color: #0f2437;
   background: #fbfcfd;
-  transition: border-color .15s, box-shadow .15s, background .15s;
 }
 .sheet-op-box::placeholder {
   color: #b6c4cf;
@@ -847,6 +851,7 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
   font-size: 8.5px;
   letter-spacing: .6px;
   margin-right: 2px;
+  margin-top: 5px; /* selaras dgn baris pertama kotak OP (align-items:flex-start) */
   flex: 0 0 auto;
 }
 

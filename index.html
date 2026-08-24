@@ -46,22 +46,32 @@
     }
     .sheet-control-group { flex: none; }
 
+    /* Baris OP harus melebar penuh 1 baris (bukan cuma sebesar isinya),
+       supaya OP1-OP6 dapat ruang penuh dan tidak kepotong overflow-x. */
+    .sheet-op-row {
+      flex: 1 1 100%;
+      width: 100%;
+    }
+
     /* Inisial Operator — kotak ringkas menyatu di baris Shift/Line/Tanggal */
     .sheet-op-control {
-      display: flex; align-items: center; gap: 6px;
+      display: flex; align-items: flex-start; gap: 6px;
       flex: 1 1 100%;      /* di layar sempit: pindah ke baris sendiri, penuh lebar */
       min-width: 0;
     }
+    .sheet-op-control .sheet-control-label {
+      margin-top: 6px; /* selaras dengan baris pertama kotak OP setelah align-items:flex-start */
+    }
+
     .sheet-op-boxes {
-      display: flex; gap: 4px;
-      flex: 1;
+      display: flex;
+      flex-wrap: wrap;      /* kalau tidak muat 1 baris, turun ke baris baru — tidak pernah tersembunyi */
+      gap: 4px;
+      row-gap: 6px;
+      flex: 1 1 auto;
       min-width: 0;
-      overflow-x: auto;    /* kalau tetap sempit, geser horizontal (bukan tabrakan) */
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
       padding-bottom: 2px;
     }
-    .sheet-op-boxes::-webkit-scrollbar { display: none; }
     .sheet-op-box {
       flex: none;
       width: 40px; text-align: center; text-transform: uppercase;
