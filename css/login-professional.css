@@ -1,0 +1,220 @@
+/* ================================================
+   LOGIN-PROFESSIONAL.CSS
+   Tema login profesional (clean, minimalis, corporate).
+   Di-scope di bawah body.login-theme-professional agar
+   tema lama (nature/login.css) tetap aman & bisa dipakai
+   bergantian lewat pengaturan.
+   ================================================ */
+
+/* ====== LOGIN OVERLAY (background gradient gelap + blob animasi) ====== */
+body.login-theme-professional #loginOverlay {
+  background-color: #0f172a;
+  background-image: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #0b1220 100%);
+}
+
+/* Dua blob cahaya biru halus */
+body.login-theme-professional #loginOverlay::before,
+body.login-theme-professional #loginOverlay::after {
+  content: "";
+  position: fixed;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: .28;
+  z-index: 0;
+  pointer-events: none;
+}
+body.login-theme-professional #loginOverlay::before {
+  top: -80px; left: -90px;
+  background: rgba(59,130,246,.85);
+  animation: lpFloatBlob 12s ease-in-out infinite;
+}
+body.login-theme-professional #loginOverlay::after {
+  bottom: -100px; right: -80px;
+  background: rgba(14,165,233,.7);
+  animation: lpFloatBlob 14s ease-in-out infinite reverse;
+}
+@keyframes lpFloatBlob {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50%      { transform: translate(30px,20px) scale(1.1); }
+}
+
+/* ====== SEMBUNYIKAN ELEMEN NATURE/SCENE SAAT TEMA PROFESIONAL ====== */
+body.login-theme-professional #bgScene,
+body.login-theme-professional .preview-bar,
+body.login-theme-professional .wx-chip,
+body.login-theme-professional .fx-canvas,
+body.login-theme-professional .fx-flash { display: none !important; }
+
+/* ====== LOGIN CARD (dark glassmorphism) ====== */
+body.login-theme-professional .login-card {
+  z-index: 1;
+  max-width: 420px;
+  background: rgba(15,23,42,.78);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  animation: lpFadeUp .9s ease both;
+}
+@keyframes lpFadeUp {
+  from { opacity: 0; transform: translateY(30px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+/* ====== HEADER KARTU ====== */
+body.login-theme-professional .login-header {
+  padding: 28px 28px 18px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: linear-gradient(135deg, rgba(59,130,246,.22), rgba(14,165,233,.08));
+  border-radius: 24px 24px 0 0;
+  text-align: left;
+}
+/* Logo: kotak rounded biru profesional */
+body.login-theme-professional .login-logo {
+  width: 56px; height: 56px;
+  margin: 0 auto 14px;
+  font-size: 22px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  box-shadow: 0 8px 20px -6px rgba(37,99,235,.5);
+  border-radius: 14px;
+  letter-spacing: .5px;
+}
+body.login-theme-professional .login-header h2 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #f8fafc;
+  text-transform: uppercase;
+  text-align: center;
+}
+body.login-theme-professional .login-header p {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: #cbd5e1;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* ====== FORM / INPUT GROUP ====== */
+body.login-theme-professional .login-form { padding: 24px 28px 8px; }
+body.login-theme-professional .login-form .field { margin-bottom: 18px; }
+
+body.login-theme-professional .login-form .field label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #cbd5e1;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-bottom: 8px;
+}
+body.login-theme-professional .login-form .field input {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(148,163,184,.22);
+  background: rgba(15,23,42,.7);
+  color: #f8fafc;
+  transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+body.login-theme-professional .login-form .field input::placeholder { color: #94a3b8; }
+body.login-theme-professional .login-form .field input:hover  { border-color: rgba(148,163,184,.4); }
+body.login-theme-professional .login-form .field input:focus {
+  border-color: rgba(59,130,246,.85);
+  box-shadow: 0 0 0 4px rgba(59,130,246,.16);
+  transform: translateY(-1px);
+}
+
+/* ====== TOMBOL MASUK ====== */
+body.login-theme-professional .login-btn {
+  margin: 8px 28px 0;
+  width: calc(100% - 56px);
+  padding: 14px 16px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  box-shadow: 0 12px 24px rgba(37,99,235,.28);
+  transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+}
+body.login-theme-professional .login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(37,99,235,.36);
+}
+body.login-theme-professional .login-btn:active { transform: translateY(0); }
+
+/* ====== PESAN ERROR / OFFLINE NOTE ====== */
+body.login-theme-professional #loginError,
+body.login-theme-professional #loginOfflineNote {
+  margin: 16px 28px 0;
+  padding: 12px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  border-radius: 12px;
+  background: rgba(239,68,68,.16);
+  color: #fca5a5;
+  border: 1px solid rgba(239,68,68,.25);
+}
+body.login-theme-professional #loginOfflineNote {
+  background: rgba(245,158,11,.14);
+  color: #fcd34d;
+  border-color: rgba(245,158,11,.28);
+}
+
+/* ====== FOOTER HINT ====== */
+body.login-theme-professional .login-hint {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: #cbd5e1;
+  padding: 18px 28px 26px;
+  margin-top: 18px;
+  opacity: 0;
+  animation: lpFadeUp .8s ease .85s forwards;
+}
+body.login-theme-professional .login-hint b { color: #93c5fd; }
+
+/* Stagger halus untuk elemen dalam kartu */
+body.login-theme-professional .login-header,
+body.login-theme-professional .login-form .field:nth-of-type(1),
+body.login-theme-professional .login-form .field:nth-of-type(2),
+body.login-theme-professional .login-btn {
+  animation: lpFadeUp .8s ease both;
+}
+body.login-theme-professional .login-header                { animation-delay: .10s; }
+body.login-theme-professional .login-form .field:nth-of-type(1) { animation-delay: .45s; }
+body.login-theme-professional .login-form .field:nth-of-type(2) { animation-delay: .55s; }
+body.login-theme-professional .login-btn                   { animation-delay: .75s; }
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 480px) {
+  body.login-theme-professional .login-card        { border-radius: 20px; max-width: 100%; }
+  body.login-theme-professional .login-form,
+  body.login-theme-professional #loginError,
+  body.login-theme-professional #loginOfflineNote  { padding-left: 20px; padding-right: 20px; margin-left: 20px; margin-right: 20px; }
+  body.login-theme-professional .login-btn         { width: calc(100% - 40px); margin-left: 20px; margin-right: 20px; }
+  body.login-theme-professional .login-header h2   { font-size: 21px; }
+}
+
+/* ====== REDUCED MOTION ====== */
+@media (prefers-reduced-motion: reduce) {
+  body.login-theme-professional #loginOverlay::before,
+  body.login-theme-professional #loginOverlay::after,
+  body.login-theme-professional .login-card,
+  body.login-theme-professional .login-header,
+  body.login-theme-professional .login-form .field,
+  body.login-theme-professional .login-btn,
+  body.login-theme-professional .login-hint {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
