@@ -2,95 +2,95 @@
    NATURE.CSS — Elemen dekoratif background login
    ================================================ */
 
-#natureExtra { pointer-events: none; }
+.login-theme-santai #natureExtra{ pointer-events: none; }
 
 /* Sungai */
-.river-body { fill: url(#riverGrad); opacity: .9; transition: opacity 1.5s ease, filter 1.5s ease; }
-.river-shine {
+.login-theme-santai .river-body{ fill: url(#riverGrad); opacity: .9; transition: opacity 1.5s ease, filter 1.5s ease; }
+.login-theme-santai .river-shine{
   stroke: #f2fbff; stroke-width: 5; stroke-linecap: round;
   stroke-dasharray: 16 22; opacity: .5; filter: blur(.4px);
   animation: riverShineFlow 3.2s linear infinite;
 }
 @keyframes riverShineFlow { to { stroke-dashoffset: -76; } }
-#bgScene.scene--sunrise .river-body,
-#bgScene.scene--sunset  .river-body { filter: hue-rotate(-8deg) brightness(.92); }
-#bgScene.scene--night   .river-body { opacity: .82; filter: brightness(.5) saturate(.75); }
-#bgScene.scene--night   .river-shine { opacity: .28; }
+.login-theme-santai #bgScene.scene--sunrise .river-body,
+.login-theme-santai #bgScene.scene--sunset  .river-body{ filter: hue-rotate(-8deg) brightness(.92); }
+.login-theme-santai #bgScene.scene--night   .river-body{ opacity: .82; filter: brightness(.5) saturate(.75); }
+.login-theme-santai #bgScene.scene--night   .river-shine{ opacity: .28; }
 
 /* Kincir angin */
-.wm-pole       { fill: #d9d2c2; }
-.wm-pole-shade { fill: #b7ad98; }
-.wm-blade      { fill: #f6f1e3; stroke: #cfc6ac; stroke-width: 1.4; }
-.wm-hub        { fill: #7c7158; }
-#windmillBlades {
+.login-theme-santai .wm-pole{ fill: #d9d2c2; }
+.login-theme-santai .wm-pole-shade{ fill: #b7ad98; }
+.login-theme-santai .wm-blade{ fill: #f6f1e3; stroke: #cfc6ac; stroke-width: 1.4; }
+.login-theme-santai .wm-hub{ fill: #7c7158; }
+.login-theme-santai #windmillBlades{
   transform-origin: 0px 0px;
   animation: windmillSpin 7s linear infinite;
 }
 @keyframes windmillSpin { to { transform: rotate(360deg); } }
-#bgScene.scene--night .wm-blade { fill: #8f8a77; }
-#bgScene.scene--night .wm-pole  { fill: #5c5848; }
-#bgScene.scene--night .wm-pole-shade { fill: #46433a; }
+.login-theme-santai #bgScene.scene--night .wm-blade{ fill: #8f8a77; }
+.login-theme-santai #bgScene.scene--night .wm-pole{ fill: #5c5848; }
+.login-theme-santai #bgScene.scene--night .wm-pole-shade{ fill: #46433a; }
 
 /* Pohon rimbun */
-.rt-shadow { fill: rgba(15, 35, 20, .18); }
-.rt-trunk       { fill: #7c4a26; stroke: #5a3417; stroke-width: 1.5; transition: fill 2s ease; }
-.rt-trunk-line  { fill: none; stroke: #5a3417; stroke-width: 2; opacity: .5; }
-.rt-branch      { fill: none; stroke: #7c4a26; stroke-width: 5; stroke-linecap: round; transition: stroke 2s ease; }
-.rt-leaf        { fill: #63b24a; transition: fill 2s ease; }
-.rt-leaf-back   { fill: #4f9a3c; transition: fill 2s ease; }
-.rt-leaf-hi     { fill: #8fd66a; opacity: .85; transition: fill 2s ease; }
-#bgScene.scene--sunrise .round-tree .rt-leaf,
-#bgScene.scene--sunset  .round-tree .rt-leaf { filter: saturate(.85) brightness(.92); }
-#bgScene.scene--night .round-tree {
+.login-theme-santai .rt-shadow{ fill: rgba(15, 35, 20, .18); }
+.login-theme-santai .rt-trunk{ fill: #7c4a26; stroke: #5a3417; stroke-width: 1.5; transition: fill 2s ease; }
+.login-theme-santai .rt-trunk-line{ fill: none; stroke: #5a3417; stroke-width: 2; opacity: .5; }
+.login-theme-santai .rt-branch{ fill: none; stroke: #7c4a26; stroke-width: 5; stroke-linecap: round; transition: stroke 2s ease; }
+.login-theme-santai .rt-leaf{ fill: #63b24a; transition: fill 2s ease; }
+.login-theme-santai .rt-leaf-back{ fill: #4f9a3c; transition: fill 2s ease; }
+.login-theme-santai .rt-leaf-hi{ fill: #8fd66a; opacity: .85; transition: fill 2s ease; }
+.login-theme-santai #bgScene.scene--sunrise .round-tree .rt-leaf,
+.login-theme-santai #bgScene.scene--sunset  .round-tree .rt-leaf{ filter: saturate(.85) brightness(.92); }
+.login-theme-santai #bgScene.scene--night .round-tree{
   filter: brightness(.45) saturate(.7);
   transition: filter 2s ease;
 }
 
 /* Gubuk kayu */
-.hut-wall       { fill: #ab7d51; stroke: #7c5837; stroke-width: 2; transition: fill 2s ease; }
-.hut-plank      { stroke: #8b6541; stroke-width: 1.2; opacity: .55; }
-.hut-roof       { fill: #7c3c29; stroke: #5c2c1d; stroke-width: 2; transition: fill 2s ease; }
-.hut-chimney    { fill: #8d8d8d; }
-.hut-door       { fill: #5c3b22; stroke: #3c2513; stroke-width: 1.5; }
-.hut-knob       { fill: #d9b04c; }
-.hut-window     { fill: #bfe4f1; stroke: #5c3b22; stroke-width: 2; transition: fill 1.5s ease, filter 1.5s ease; }
-.hut-window-x   { stroke: #5c3b22; stroke-width: 1.4; }
-#bgScene.scene--night .hut-wall   { fill: #5b4230; }
-#bgScene.scene--night .hut-roof   { fill: #452019; }
-#bgScene.scene--night .hut-window {
+.login-theme-santai .hut-wall{ fill: #ab7d51; stroke: #7c5837; stroke-width: 2; transition: fill 2s ease; }
+.login-theme-santai .hut-plank{ stroke: #8b6541; stroke-width: 1.2; opacity: .55; }
+.login-theme-santai .hut-roof{ fill: #7c3c29; stroke: #5c2c1d; stroke-width: 2; transition: fill 2s ease; }
+.login-theme-santai .hut-chimney{ fill: #8d8d8d; }
+.login-theme-santai .hut-door{ fill: #5c3b22; stroke: #3c2513; stroke-width: 1.5; }
+.login-theme-santai .hut-knob{ fill: #d9b04c; }
+.login-theme-santai .hut-window{ fill: #bfe4f1; stroke: #5c3b22; stroke-width: 2; transition: fill 1.5s ease, filter 1.5s ease; }
+.login-theme-santai .hut-window-x{ stroke: #5c3b22; stroke-width: 1.4; }
+.login-theme-santai #bgScene.scene--night .hut-wall{ fill: #5b4230; }
+.login-theme-santai #bgScene.scene--night .hut-roof{ fill: #452019; }
+.login-theme-santai #bgScene.scene--night .hut-window{
   fill: #ffe08c;
   filter: drop-shadow(0 0 7px rgba(255, 224, 140, .85));
 }
 
 /* Tenda Kemah */
-.tent-shadow { fill: rgba(15, 35, 20, .18); }
-.tent-body  { fill: #f2c34d; stroke: #c99a2e; stroke-width: 2; transition: fill 2s ease, stroke 2s ease; }
-.tent-shade { fill: #d9a93a; transition: fill 2s ease; }
-.tent-stripe{ fill: #e2574c; opacity: .85; transition: fill 2s ease, opacity 2s ease; }
-.tent-door  { fill: #6b4321; stroke: #4a2d15; stroke-width: 1.5; }
-.tent-rope  { stroke: #8b6541; stroke-width: 1.6; }
-.tent-peg   { stroke: #6b5237; stroke-width: 2; }
+.login-theme-santai .tent-shadow{ fill: rgba(15, 35, 20, .18); }
+.login-theme-santai .tent-body{ fill: #f2c34d; stroke: #c99a2e; stroke-width: 2; transition: fill 2s ease, stroke 2s ease; }
+.login-theme-santai .tent-shade{ fill: #d9a93a; transition: fill 2s ease; }
+.login-theme-santai .tent-stripe{ fill: #e2574c; opacity: .85; transition: fill 2s ease, opacity 2s ease; }
+.login-theme-santai .tent-door{ fill: #6b4321; stroke: #4a2d15; stroke-width: 1.5; }
+.login-theme-santai .tent-rope{ stroke: #8b6541; stroke-width: 1.6; }
+.login-theme-santai .tent-peg{ stroke: #6b5237; stroke-width: 2; }
 
-#bgScene.scene--sunrise .tent-body,
-#bgScene.scene--sunset  .tent-body { filter: saturate(.85) brightness(.94); }
-#bgScene.scene--night .tent-body   { fill: #8a6a2e; }
-#bgScene.scene--night .tent-shade  { fill: #6b5323; }
-#bgScene.scene--night .tent-stripe { opacity: .5; }
+.login-theme-santai #bgScene.scene--sunrise .tent-body,
+.login-theme-santai #bgScene.scene--sunset  .tent-body{ filter: saturate(.85) brightness(.94); }
+.login-theme-santai #bgScene.scene--night .tent-body{ fill: #8a6a2e; }
+.login-theme-santai #bgScene.scene--night .tent-shade{ fill: #6b5323; }
+.login-theme-santai #bgScene.scene--night .tent-stripe{ opacity: .5; }
 
 /* Api Unggun */
-.fire-shadow { fill: rgba(15, 35, 20, .18); }
-.fire-logs rect { fill: #6b4321; stroke: #4a2d15; stroke-width: 1; }
-.fire-stones circle { fill: #9a9a9a; stroke: #6d6d6d; stroke-width: 1; transition: fill 2s ease; }
-#bgScene.scene--night .fire-stones circle { fill: #6f6f6f; }
+.login-theme-santai .fire-shadow{ fill: rgba(15, 35, 20, .18); }
+.login-theme-santai .fire-logs rect{ fill: #6b4321; stroke: #4a2d15; stroke-width: 1; }
+.login-theme-santai .fire-stones circle{ fill: #9a9a9a; stroke: #6d6d6d; stroke-width: 1; transition: fill 2s ease; }
+.login-theme-santai #bgScene.scene--night .fire-stones circle{ fill: #6f6f6f; }
 
-.fire-flame { opacity: 0; transition: opacity 1.6s ease; }
-#bgScene.scene--night  .fire-flame { opacity: 1; }
-#bgScene.scene--sunset .fire-flame { opacity: .55; }
+.login-theme-santai .fire-flame{ opacity: 0; transition: opacity 1.6s ease; }
+.login-theme-santai #bgScene.scene--night  .fire-flame{ opacity: 1; }
+.login-theme-santai #bgScene.scene--sunset .fire-flame{ opacity: .55; }
 
-.flame { transform-origin: 0px -2px; }
-.flame-outer { fill: #ff7b1a; animation: flameFlickerA 1.3s ease-in-out infinite; }
-.flame-mid   { fill: #ff9f2e; animation: flameFlickerB 1.0s ease-in-out infinite; }
-.flame-inner { fill: #ffe066; animation: flameFlickerA 0.8s ease-in-out infinite reverse; }
+.login-theme-santai .flame{ transform-origin: 0px -2px; }
+.login-theme-santai .flame-outer{ fill: #ff7b1a; animation: flameFlickerA 1.3s ease-in-out infinite; }
+.login-theme-santai .flame-mid{ fill: #ff9f2e; animation: flameFlickerB 1.0s ease-in-out infinite; }
+.login-theme-santai .flame-inner{ fill: #ffe066; animation: flameFlickerA 0.8s ease-in-out infinite reverse; }
 
 @keyframes flameFlickerA {
   0%, 100% { transform: scaleY(1) scaleX(1) translateX(0); }
@@ -101,68 +101,68 @@
   50%      { transform: scaleY(.9) scaleX(1.1) translateX(-1px); }
 }
 
-#bgScene.scene--night #campfire .fire-flame {
+.login-theme-santai #bgScene.scene--night #campfire .fire-flame{
   filter: drop-shadow(0 0 16px rgba(255, 140, 20, .9));
 }
 
 /* Bunga matahari */
-.sf-stem   { fill: none; stroke: #3f7d34; stroke-width: 5; stroke-linecap: round; }
-.sf-leaf   { fill: #4c9440; }
-.sf-petal  { fill: #ffd23f; stroke: #e0a800; stroke-width: .6; }
-.sf-center { fill: #7a5230; }
-.sf-head   { transform-origin: 0px 0px; transition: transform 3s ease; }
-#bgScene.scene--sunset .sf-petal, #bgScene.scene--sunrise .sf-petal { fill: #ffcf5c; }
-#bgScene.scene--night .sunflower { opacity: .55; transition: opacity 2s ease; }
+.login-theme-santai .sf-stem{ fill: none; stroke: #3f7d34; stroke-width: 5; stroke-linecap: round; }
+.login-theme-santai .sf-leaf{ fill: #4c9440; }
+.login-theme-santai .sf-petal{ fill: #ffd23f; stroke: #e0a800; stroke-width: .6; }
+.login-theme-santai .sf-center{ fill: #7a5230; }
+.login-theme-santai .sf-head{ transform-origin: 0px 0px; transition: transform 3s ease; }
+.login-theme-santai #bgScene.scene--sunset .sf-petal, .login-theme-santai #bgScene.scene--sunrise .sf-petal{ fill: #ffcf5c; }
+.login-theme-santai #bgScene.scene--night .sunflower{ opacity: .55; transition: opacity 2s ease; }
 
 /* Bunga mawar merah */
-.rose-stem       { fill: none; stroke: #2d6a2d; stroke-width: 4; stroke-linecap: round; }
-.rose-leaf       { fill: #4a8c3f; }
-.rose-petal      { fill: #b30000; }
-.rose-petal-dark { fill: #cc0000; }
-.rose-petal-light{ fill: #ff4d4d; }
-.rose-center     { fill: #ffcccc; }
-#bgScene.scene--night .rose-petal,
-#bgScene.scene--night .rose-petal-dark,
-#bgScene.scene--night .rose-petal-light {
+.login-theme-santai .rose-stem{ fill: none; stroke: #2d6a2d; stroke-width: 4; stroke-linecap: round; }
+.login-theme-santai .rose-leaf{ fill: #4a8c3f; }
+.login-theme-santai .rose-petal{ fill: #b30000; }
+.login-theme-santai .rose-petal-dark{ fill: #cc0000; }
+.login-theme-santai .rose-petal-light{ fill: #ff4d4d; }
+.login-theme-santai .rose-center{ fill: #ffcccc; }
+.login-theme-santai #bgScene.scene--night .rose-petal,
+.login-theme-santai #bgScene.scene--night .rose-petal-dark,
+.login-theme-santai #bgScene.scene--night .rose-petal-light{
   filter: brightness(.6) saturate(.8);
 }
-#bgScene.scene--night .rose-leaf {
+.login-theme-santai #bgScene.scene--night .rose-leaf{
   fill: #2f5d2f;
 }
 
 /* Rumput liar */
-.wg-clump  { transform-origin: 50% 100%; }
-.wg-blade {
+.login-theme-santai .wg-clump{ transform-origin: 50% 100%; }
+.login-theme-santai .wg-blade{
   fill: none; stroke: var(--grass, #2f8f3a); stroke-width: 3; stroke-linecap: round;
   transform-origin: 50% 100%;
   animation: wgSway 3.6s ease-in-out infinite;
   animation-delay: var(--wg-d, 0s);
   transition: stroke 2s ease;
 }
-.wg-clump .wg-blade:nth-child(2) { animation-delay: calc(var(--wg-d, 0s) + .15s); }
-.wg-clump .wg-blade:nth-child(3) { animation-delay: calc(var(--wg-d, 0s) + .3s); }
+.login-theme-santai .wg-clump .wg-blade:nth-child(2){ animation-delay: calc(var(--wg-d, 0s) + .15s); }
+.login-theme-santai .wg-clump .wg-blade:nth-child(3){ animation-delay: calc(var(--wg-d, 0s) + .3s); }
 @keyframes wgSway {
   0%, 100% { transform: rotate(-4deg); }
   50%      { transform: rotate(5deg); }
 }
 
 /* Kupu-kupu */
-.butterflies .butterfly {
+.login-theme-santai .butterflies .butterfly{
   opacity: 0;
   transform: translate(var(--bf-x), var(--bf-y));
   transition: opacity 1.8s ease;
 }
-.butterflies.is-morning .butterfly {
+.login-theme-santai .butterflies.is-morning .butterfly{
   opacity: 1;
   animation: bfWander 11s ease-in-out infinite, bfBob 2.6s ease-in-out infinite;
 }
-.bf-wingL, .bf-wingR { transform-origin: 0px -4px; animation: bfFlap .5s ease-in-out infinite alternate; }
-.bf-wingR { animation-direction: alternate-reverse; }
-.bf-body  { stroke: #3a2b1a; stroke-width: 1.6; stroke-linecap: round; }
-.bf-yellow .bf-wingL ellipse, .bf-yellow .bf-wingR ellipse { fill: #ffd23f; stroke: #e0a800; stroke-width: .6; }
-.bf-purple .bf-wingL ellipse, .bf-purple .bf-wingR ellipse { fill: #b57bff; stroke: #8a4fd6; stroke-width: .6; }
-.bf-blue   .bf-wingL ellipse, .bf-blue   .bf-wingR ellipse { fill: #5aa9ff; stroke: #2f7fd6; stroke-width: .6; }
-.bf-green .bf-wingL ellipse, .bf-green .bf-wingR ellipse {
+.login-theme-santai .bf-wingL, .login-theme-santai .bf-wingR{ transform-origin: 0px -4px; animation: bfFlap .5s ease-in-out infinite alternate; }
+.login-theme-santai .bf-wingR{ animation-direction: alternate-reverse; }
+.login-theme-santai .bf-body{ stroke: #3a2b1a; stroke-width: 1.6; stroke-linecap: round; }
+.login-theme-santai .bf-yellow .bf-wingL ellipse, .login-theme-santai .bf-yellow .bf-wingR ellipse{ fill: #ffd23f; stroke: #e0a800; stroke-width: .6; }
+.login-theme-santai .bf-purple .bf-wingL ellipse, .login-theme-santai .bf-purple .bf-wingR ellipse{ fill: #b57bff; stroke: #8a4fd6; stroke-width: .6; }
+.login-theme-santai .bf-blue   .bf-wingL ellipse, .login-theme-santai .bf-blue   .bf-wingR ellipse{ fill: #5aa9ff; stroke: #2f7fd6; stroke-width: .6; }
+.login-theme-santai .bf-green .bf-wingL ellipse, .login-theme-santai .bf-green .bf-wingR ellipse{
   fill: #58d68d;
   stroke: #2e8b57;
   stroke-width: .6;
@@ -178,9 +178,9 @@
 }
 
 /* Kunang-kunang */
-.fireflies { opacity: 0; transition: opacity 2s ease; }
-#bgScene.scene--night .fireflies { opacity: 1; }
-.firefly {
+.login-theme-santai .fireflies{ opacity: 0; transition: opacity 2s ease; }
+.login-theme-santai #bgScene.scene--night .fireflies{ opacity: 1; }
+.login-theme-santai .firefly{
   fill: #eaff8a;
   filter: drop-shadow(0 0 4px #eaff8a);
   animation: ffGlow 2.4s ease-in-out infinite, ffDrift 7s ease-in-out infinite;
@@ -190,20 +190,20 @@
 @keyframes ffDrift { 0% { transform: translate(0,0); } 50% { transform: translate(10px,-14px); } 100% { transform: translate(-6px,4px); } }
 
 /* Daun musim gugur */
-.af-wrap { transform: translate(var(--af-x), -40px); }
-.autumn-leaf {
+.login-theme-santai .af-wrap{ transform: translate(var(--af-x), -40px); }
+.login-theme-santai .autumn-leaf{
   opacity: 0;
   transform-origin: 0px 0px;
   animation: none;
 }
-.autumn-leaves.is-autumn .autumn-leaf {
+.login-theme-santai .autumn-leaves.is-autumn .autumn-leaf{
   opacity: .85;
   animation: leafFall var(--af-dur, 10s) linear infinite;
   animation-delay: var(--af-d, 0s);
 }
-.leaf-a { fill: #d9772e; }
-.leaf-b { fill: #c0392b; }
-.leaf-c { fill: #e0a63e; }
+.login-theme-santai .leaf-a{ fill: #d9772e; }
+.login-theme-santai .leaf-b{ fill: #c0392b; }
+.login-theme-santai .leaf-c{ fill: #e0a63e; }
 @keyframes leafFall {
   0%   { transform: translate(0,0) rotate(0deg);       opacity: 0; }
   10%  { opacity: .85; }
@@ -214,8 +214,8 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  #windmillBlades, .river-shine, .wg-blade, .butterflies .butterfly,
-  .bf-wingL, .bf-wingR, .firefly, .autumn-leaf, .flame {
+  .login-theme-santai #windmillBlades, .login-theme-santai .river-shine, .login-theme-santai .wg-blade, .login-theme-santai .butterflies .butterfly,
+  .login-theme-santai .bf-wingL, .login-theme-santai .bf-wingR, .login-theme-santai .firefly, .login-theme-santai .autumn-leaf, .login-theme-santai .flame{
     animation: none !important;
   }
 }

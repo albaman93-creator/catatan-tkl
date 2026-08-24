@@ -18,7 +18,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- CSS (dipecah) -->
   <link rel="stylesheet" href="./css/base.css">
@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="./css/dashboard.css">
   <link rel="stylesheet" href="./css/login.css">
   <link rel="stylesheet" href="./css/nature.css">
+  <link rel="stylesheet" href="./css/login-professional.css">
   <link rel="stylesheet" href="./css/print.css">
   <link rel="stylesheet" href="./css/apple-style.css">
   <link rel="stylesheet" href="./css/sidebar.css">
@@ -106,7 +107,10 @@
 <body>
 
   <!-- ============ LOGIN OVERLAY ============ -->
-  <div id="loginOverlay">
+  <div id="loginOverlay" class="login-theme-santai">
+    <!-- Tema login (santai/professional) diterapkan sesegera mungkin di sini,
+         sebelum children lain diparse, supaya tidak ada flash tema salah. -->
+    <script src="./js/login-theme.js"></script>
     <!-- 🎨 Cartoon landscape (auto day/night based on system clock) -->
     <div id="bgScene" class="scene scene--day">
       <svg class="bg-scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -560,6 +564,11 @@
       <button type="button" id="natureToggle" class="preview-btn" title="Preview kupu-kupu (paksa tampil, untuk cek tanpa menunggu pagi)">🦋 auto</button>
       </div>
     <span id="wxChip" class="wx-chip"></span>
+    <!-- Toggle tema login (santai/profesional) — sengaja di luar .preview-bar
+         supaya tetap terlihat di kedua tema (preview-bar disembunyikan saat
+         tema profesional aktif). Label & event listener dipasang oleh
+         js/login-theme.js. -->
+    <button type="button" id="loginThemeToggle" class="login-theme-toggle-btn" title="Ganti tampilan login">🌃 Tema Profesional</button>
 
     <div class="login-card">
       <div class="login-header">
