@@ -28,7 +28,8 @@
   display: none;
 }
 
-/* ====== BLOB DEKORATIF (CSS-only, tanpa markup tambahan) ====== */
+/* ====== BLOB DEKORATIF (CSS-only, tanpa markup tambahan) ======
+   Di-hide di mobile untuk mengurangi beban visual & GPU */
 .login-theme-professional#loginOverlay::before,
 .login-theme-professional#loginOverlay::after {
   content: '';
@@ -71,6 +72,63 @@
   padding: 36px 30px;
   animation: loginPop .4s cubic-bezier(.22,.8,.3,1) both; /* keyframes global dari login.css */
 }
+
+/* ====== RESPONSIVE MOBILE ====== */
+/* Ukuran kecil (<480px): kurangi padding & max-width */
+@media (max-width: 480px) {
+  .login-theme-professional .login-card {
+    max-width: 100%;
+    padding: 28px 20px;
+    border-radius: 14px;
+  }
+  
+  /* Sembunyikan blob di mobile untuk performa & ruang */
+  .login-theme-professional#loginOverlay::before,
+  .login-theme-professional#loginOverlay::after {
+    display: none;
+  }
+  
+  .login-theme-professional .login-logo {
+    width: 56px; height: 56px; font: 700 24px 'Inter', sans-serif;
+  }
+  
+  .login-theme-professional .login-header h2 {
+    font: 700 20px 'Inter', sans-serif;
+  }
+  
+  .login-theme-professional .login-header p {
+    font: 12px 'Inter', sans-serif;
+  }
+}
+
+/* Ukuran lebih kecil (<360px): mini mode */
+@media (max-width: 360px) {
+  .login-theme-professional .login-card {
+    padding: 24px 16px;
+  }
+  
+  .login-theme-professional .login-logo {
+    width: 48px; height: 48px; margin-bottom: 12px;
+    font: 700 20px 'Inter', sans-serif;
+  }
+  
+  .login-theme-professional .login-header {
+    margin-bottom: 20px;
+  }
+  
+  .login-theme-professional .login-header h2 {
+    font: 700 18px 'Inter', sans-serif; letter-spacing: 0.5px;
+  }
+  
+  .login-theme-professional .login-form .field input {
+    padding: 10px 12px; font: 600 16px 'Inter', sans-serif;
+  }
+  
+  .login-theme-professional .login-btn {
+    padding: 11px; font: 600 14px 'Inter', sans-serif;
+  }
+}
+
 .login-theme-professional .login-header { text-align: center; margin-bottom: 28px; position: relative; }
 .login-theme-professional .login-logo {
   width: 64px; height: 64px; border-radius: 14px;
