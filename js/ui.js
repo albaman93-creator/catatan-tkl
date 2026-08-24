@@ -125,6 +125,56 @@ const UI = (() => {
     if (State.el.sheetKpiP && State.el.oITotal) State.el.sheetKpiP.textContent = `${State.el.oITotal.textContent}%`;
     if (State.el.sheetKpiQ && State.el.oM) State.el.sheetKpiQ.textContent = `${State.el.oM.textContent}%`;
     if (State.el.sheetKpiOEE && State.el.oee) State.el.sheetKpiOEE.textContent = State.el.oee.textContent;
+
+    // Health bar + warna dinamis per KPI (merah/kuning/hijau/biru sesuai target)
+    updateKpiHealthBar(State.el.sheetKpiA && State.el.sheetKpiA.closest('.sheet-kpi'), State.el.oF && State.el.oF.textContent);
+    updateKpiHealthBar(State.el.sheetKpiP && State.el.sheetKpiP.closest('.sheet-kpi'), State.el.oITotal && State.el.oITotal.textContent);
+    updateKpiHealthBar(State.el.sheetKpiQ && State.el.sheetKpiQ.closest('.sheet-kpi'), State.el.oM && State.el.oM.textContent);
+    updateKpiHealthBar(State.el.sheetKpiOEE && State.el.sheetKpiOEE.closest('.sheet-kpi'), State.el.oee && State.el.oee.textContent);
+  };
+
+  // ====== KPI HEALTH BAR ======
+  // Mengisi .kpi-fill (lebar) & data-state (warna) pada kartu .sheet-kpi
+  // berdasarkan rasio nilai aktual terhadap data-target di HTML.
+  // Aturan: >target = biru (terlampaui) | =target = hijau (tercapai)
+  //         >=75% target = kuning (mendekati) | <75% target = merah (jauh)
+  // Efek bintang emas otomatis muncul saat status hijau/biru (target tercapai).
+  const updateKpiHealthBar = (kpiEl, rawValueText) => {
+    if (!kpiEl) return;
+    const fillEl = kpiEl.querySelector('.kpi-fill');
+    if (!fillEl) return;
+
+    const target = parseFloat(kpiEl.getAttribute('data-target'));
+    const value = parseFloat(String(rawValueText || '0').replace(',', '.'));
+
+    if (!isFinite(target) || target <= 0 || !isFinite(value)) {
+      fillEl.style.width = '0%';
+      kpiEl.setAttribute('data-state', 'red');
+      kpiEl.classList.remove('kpi-achieved');
+      return;
+    }
+
+    const EPS = 0.001; // toleransi floating-point untuk anggap "sama dengan target"
+    const ratio = value / target;
+    const widthPct = Math.max(0, Math.min(ratio * 100, 100));
+
+    let state;
+    let achieved = false;
+    if (value > target + EPS) {
+      state = 'blue';       // melebihi target
+      achieved = true;
+    } else if (value >= target - EPS) {
+      state = 'green';      // mencapai target
+      achieved = true;
+    } else if (value >= target * 0.75) {
+      state = 'yellow';     // mendekati target
+    } else {
+      state = 'red';        // masih jauh dari target
+    }
+
+    fillEl.style.width = `${widthPct}%`;
+    kpiEl.setAttribute('data-state', state);
+    kpiEl.classList.toggle('kpi-achieved', achieved);
   };
 
   // ====== INDIKATOR SHIFT & TANGGAL AKTIF ======

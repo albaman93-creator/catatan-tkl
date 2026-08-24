@@ -124,15 +124,94 @@ body::before {
   z-index: 1;
   font-variant-numeric: tabular-nums;
 }
+
+/* ===== KPI HEALTH BAR (dinamis sesuai target) ===== */
+.sheet-kpi {
+  --kpi-color: #94a3b8; /* abu-abu default sebelum kalkulasi jalan */
+}
+.sheet-kpi[data-state="red"]    { --kpi-color: #ef4444; }
+.sheet-kpi[data-state="yellow"] { --kpi-color: #f59e0b; }
+.sheet-kpi[data-state="green"]  { --kpi-color: #22c55e; }
+.sheet-kpi[data-state="blue"]   { --kpi-color: #3b82f6; }
+
+/* Bar mengisi dari kiri sesuai persentase capaian terhadap target */
+.kpi-fill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 0;
+  height: 4px;
+  width: 0%;
+  border-radius: 0 0 9px 9px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--kpi-color) 78%, #fff), var(--kpi-color));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--kpi-color) 55%, transparent);
+  transition: width .6s cubic-bezier(.4,0,.2,1), background .4s ease;
+}
+
+/* Kartu KPI berkedip halus saat target tercapai/terlampaui */
+.sheet-kpi.kpi-achieved {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.78),
+    0 0 0 1px color-mix(in srgb, var(--kpi-color) 45%, transparent),
+    0 4px 14px color-mix(in srgb, var(--kpi-color) 32%, transparent);
+}
+
+/* Efek bintang emas — muncul otomatis saat kpi-achieved aktif */
+.kpi-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+}
+.kpi-stars::before,
+.kpi-stars::after {
+  content: '✨';
+  position: absolute;
+  font-size: 11px;
+  line-height: 1;
+  opacity: 0;
+  filter: drop-shadow(0 0 3px rgba(255,205,60,.85));
+}
+.kpi-stars::before { top: -3px; right: 3px; }
+.kpi-stars::after   { bottom: -3px; left: 5px; }
+
+.sheet-kpi.kpi-achieved .kpi-stars {
+  opacity: 1;
+}
+.sheet-kpi.kpi-achieved .kpi-stars::before {
+  animation: kpiStarPop 1.3s ease-out infinite;
+}
+.sheet-kpi.kpi-achieved .kpi-stars::after {
+  animation: kpiStarPop 1.3s ease-out .4s infinite;
+}
+
+@keyframes kpiStarPop {
+  0%   { opacity: 0; transform: scale(.4) rotate(-8deg) translateY(3px); }
+  25%  { opacity: 1; transform: scale(1.15) rotate(6deg) translateY(-2px); }
+  65%  { opacity: 1; transform: scale(1) rotate(0deg) translateY(-5px); }
+  100% { opacity: 0; transform: scale(.55) rotate(10deg) translateY(-9px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kpi-fill { transition: none; }
+  .sheet-kpi.kpi-achieved .kpi-stars::before,
+  .sheet-kpi.kpi-achieved .kpi-stars::after {
+    animation: none;
+    opacity: .9;
+  }
+}
 .sheet-kpi-oee {
   background: linear-gradient(135deg, rgba(255,247,238,.98), rgba(255,237,220,.88));
   box-shadow: inset 0 -2px 0 rgba(234,88,12,.18), 0 3px 12px rgba(234,88,12,.08);
 }
 
 /* ===== SHEET PRODUCT BAR ===== */
+/* repeat(3, ...) dipakai (bukan auto-fit) supaya Produk 1/2/3 SELALU 1 baris,
+   tidak pernah turun ke baris baru meski layar sedang. */
 .sheet-product-bar {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   padding: 10px 8px !important;
   margin: 8px 0 6px !important;
@@ -206,6 +285,48 @@ body::before {
   .sheet-product-bar .split-input-3 input {
     font-size: 12px;
     padding: 6px 7px;
+  }
+}
+
+/* ===== MODE DESKTOP (>900px): dibesarkan, bukan sekadar versi mobile yang di-scale ===== */
+@media (min-width: 901px) {
+  .sheet-product-bar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    padding: 16px 18px !important;
+    margin: 14px 0 10px !important;
+    border-radius: 14px;
+  }
+  .sheet-product-bar .field label {
+    font-size: 12.5px;
+    margin-bottom: 6px;
+  }
+  .sheet-product-bar .split-input-3 {
+    gap: 8px;
+  }
+  .sheet-product-bar .split-input-3 input {
+    font-size: 13.5px;
+    padding: 10px 12px;
+    border-radius: 9px;
+  }
+
+  .sheet-kpi-row {
+    gap: 12px;
+    padding: 4px 0 2px;
+  }
+  .sheet-kpi {
+    min-height: 38px;
+    padding: 8px 14px;
+    border-radius: 12px;
+  }
+  .sheet-kpi span {
+    font-size: 12.5px;
+  }
+  .sheet-kpi b {
+    font-size: 16px;
+  }
+  .kpi-fill {
+    height: 5px;
   }
 }
 

@@ -813,15 +813,7 @@
   </div>
 </div>
 
-          <div class="sheet-kpi-row" aria-label="Ringkasan OEE">
-            <div class="sheet-kpi"><span>A</span><b id="sheetKpiA">0,00%</b></div>
-            <div class="sheet-kpi"><span>P</span><b id="sheetKpiP">0,00%</b></div>
-            <div class="sheet-kpi"><span>Q</span><b id="sheetKpiQ">0,00%</b></div>
-            <div class="sheet-kpi sheet-kpi-oee"><span>OEE</span><b id="sheetKpiOEE">0,00%</b></div>
-          </div>
-        </div>
-
-        <!-- Produk aktif di halaman Sheet -->
+                    <!-- Produk aktif di halaman Sheet (dipindah ke atas, sebelum KPI) -->
         <div class="product-grid sheet-product-bar" id="sheetProductBar" style="margin: 10px 0 6px; padding: 0 2px;">
           <div class="field">
             <label>Produk 1 (Nama, Kecepatan &amp; No. WO)</label>
@@ -848,6 +840,29 @@
             </div>
           </div>
         </div>
+
+        <div class="sheet-kpi-row" aria-label="Ringkasan OEE">
+            <div class="sheet-kpi" data-kpi="A" data-target="90">
+              <div class="kpi-fill" style="width:0%"></div>
+              <div class="kpi-stars" aria-hidden="true"></div>
+              <span>A</span><b id="sheetKpiA">0,00%</b>
+            </div>
+            <div class="sheet-kpi" data-kpi="P" data-target="98">
+              <div class="kpi-fill" style="width:0%"></div>
+              <div class="kpi-stars" aria-hidden="true"></div>
+              <span>P</span><b id="sheetKpiP">0,00%</b>
+            </div>
+            <div class="sheet-kpi" data-kpi="Q" data-target="99.5">
+              <div class="kpi-fill" style="width:0%"></div>
+              <div class="kpi-stars" aria-hidden="true"></div>
+              <span>Q</span><b id="sheetKpiQ">0,00%</b>
+            </div>
+            <div class="sheet-kpi sheet-kpi-oee" data-kpi="OEE" data-target="88">
+              <div class="kpi-fill" style="width:0%"></div>
+              <div class="kpi-stars" aria-hidden="true"></div>
+              <span>OEE</span><b id="sheetKpiOEE">0,00%</b>
+            </div>
+          </div>
 
         <div class="logsheet-topbar" aria-label="Kontrol tampilan log sheet">
           <div class="sec-h">

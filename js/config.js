@@ -123,7 +123,7 @@ const CONFIG = Object.freeze({
   // memakai sufiks angka. Silakan tambah/ubah daftar di sini — tidak perlu
   // sentuh js/suggest.js.
   PRODUCT_CODE_SUGGESTIONS: {
-    mixing:  ['VTTS1','VKAM1','VLON1','VMON1','VTRA1','VCLN2','VMNT1','VTRM1','VPEL1','ITTC2','VTTC1'],
+mixing: ['VTTS1 Mixing L', 'VTTS1 Loading L', 'VKAM1 Mixing L', 'VKAM1 Loading L', 'VLON1 Mixing L', 'VLON1 Loading L', 'VMON1 Mixing L', 'VMON1 Loading L', 'VTRA1 Mixing L', 'VTRA1 Loading L', 'VCLN2 Mixing L', 'VCLN2 Loading L', 'VMNT1 Mixing L', 'VMNT1 Loading L', 'VTRM1 Mixing L', 'VTRM1 Loading L', 'VPEL1 Mixing L', 'VPEL1 Loading L', 'ITTC2 Mixing L', 'ITTC2 Loading L', 'VTTC1 Mixing L', 'VTTC1 Loading L'],
     filling: ['VTTS1','VKAM1','VLON1','VMON1','VTRA1','VCLN2','VMNT1','VTRM1','VPEL1','ITTC2','VTTC1'],
     steril:  ['VTTS1','VKAM1','VLON1','VMON1','VTRA1','VCLN2','VMNT1','VTRM1','VPEL1','ITTC2','VTTC1'],
     visual:  ['VTTSA','VKAMA','VLONA','VMONA','VTRAB','VCLNB','VMNTA','VTRME','VPELA','ITTCB','VTTCA'],
