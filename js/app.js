@@ -87,6 +87,7 @@ const App = (() => {
       if (t.tagName === 'TEXTAREA' && ['kegiatan','masalah','disposisi','wo'].includes(t.getAttribute('data-f'))) {
         UI.autoResizeTextarea(t);
       }
+      
       // Kode: strip non-digit
       if (t.getAttribute('data-f') === 'kode') {
         t.value = t.value.replace(/\D/g, '');
