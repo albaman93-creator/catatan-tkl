@@ -80,19 +80,23 @@ const App = (() => {
       State.el.oeeIndicator.addEventListener('click', () => UI.showScreen('oee'));
     }
 
-    // Row interactions (delegation pada tbody)
+    // ============================================================
+    // ROW INTERACTIONS (delegation pada tbody)
+    // ============================================================
     State.el.tbody.addEventListener('input', (e) => {
       const t = e.target;
+
       // Auto-resize textarea
       if (t.tagName === 'TEXTAREA' && ['kegiatan','masalah','disposisi','wo'].includes(t.getAttribute('data-f'))) {
         UI.autoResizeTextarea(t);
       }
-      
+
       // Kode: strip non-digit
       if (t.getAttribute('data-f') === 'kode') {
         t.value = t.value.replace(/\D/g, '');
         Rows.applyCat(t.closest('tr'));
       }
+
       // Jam mulai → auto-copy ke jam selesai baris sebelumnya
       if (t.getAttribute('data-f') === 'mulai') {
         const tr = t.closest('tr');
@@ -108,6 +112,7 @@ const App = (() => {
           }
         }
       }
+
       // Masking jam
       if (t.classList.contains('t-time')) {
         const v = Utils.maskTime(t.value);
@@ -115,12 +120,23 @@ const App = (() => {
         t.classList.remove('invalid');
         Calculation.validateTimeInput(t);
       }
+
       Calculation.recalc();
     });
 
+    // ============================================================
+    // EVENT CHANGE (Batch & Kode)
+    // ============================================================
     State.el.tbody.addEventListener('change', (e) => {
       if (e.target.getAttribute('data-f') === 'batch') {
-        Rows.applyWoFromBatch(e.target.closest('tr'));
+        const tr = e.target.closest('tr');
+        const productName = e.target.value;
+        // Update WO untuk baris ini
+        Rows.applyWoFromBatch(tr);
+        // Cascade produk ke bawah
+        if (productName) {
+          Rows.cascadeProductToBelow(tr, productName);
+        }
         Calculation.recalc();
       }
       if (e.target.getAttribute('data-f') === 'kode') {
@@ -129,6 +145,9 @@ const App = (() => {
       }
     });
 
+    // ============================================================
+    // FOCUSOUT (validasi waktu)
+    // ============================================================
     State.el.tbody.addEventListener('focusout', (e) => {
       const t = e.target;
       if (t.classList && t.classList.contains('t-time')) {
@@ -140,6 +159,9 @@ const App = (() => {
       }
     });
 
+    // ============================================================
+    // HAPUS BARIS (tombol del)
+    // ============================================================
     State.el.tbody.addEventListener('click', (e) => {
       const btn = e.target.closest('.del');
       if (!btn) return;
@@ -153,7 +175,9 @@ const App = (() => {
       }, 190);
     });
 
-    // Master Produk & Operator → recalc + sync ke Master
+    // ============================================================
+    // MASTER PRODUK & OPERATOR → recalc + sync ke Master
+    // ============================================================
     ['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3','prodWo1','prodWo2','prodWo3'].forEach(id => {
       if (!State.el[id]) return;
       State.el[id].addEventListener('input', () => {
@@ -168,7 +192,9 @@ const App = (() => {
       });
     });
 
-    // Sync dua arah: Master Produk ↔ Sheet Produk
+    // ============================================================
+    // SYNC DUA ARAH: Master Produk ↔ Sheet Produk
+    // ============================================================
     document.querySelectorAll('#masterProductGrid [data-sync]').forEach(el => {
       el.addEventListener('input', () => {
         const targetId = el.getAttribute('data-sync');
@@ -180,7 +206,9 @@ const App = (() => {
       });
     });
 
-    // Filter changes → reload
+    // ============================================================
+    // FILTER CHANGES → reload
+    // ============================================================
     ['fDate','fLine','fStage'].forEach(id => {
       State.el[id].addEventListener('change', Storage.loadRecord);
     });
@@ -189,7 +217,9 @@ const App = (() => {
     State.el.fStage.addEventListener('change', () => { UI.updateShiftIndicator(); });
     State.el.fLine.addEventListener('change', () => { UI.updateUnifiedControl(); });
 
-    // Buttons
+    // ============================================================
+    // BUTTONS
+    // ============================================================
     State.el.btnSave.addEventListener('click', () => Storage.saveData());
     State.el.btnReset.addEventListener('click', () => {
       if (!confirm('Reset seluruh form? Data yang belum disimpan akan hilang.')) return;
@@ -206,7 +236,9 @@ const App = (() => {
       if (kodeCell) Navigation.focusCell(kodeCell);
     });
 
-    // Ctrl+S shortcut
+    // ============================================================
+    // Ctrl+S SHORTCUT
+    // ============================================================
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
         e.preventDefault();

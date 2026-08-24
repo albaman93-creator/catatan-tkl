@@ -241,6 +241,28 @@ const Rows = (() => {
     return tr;
   };
 
+  // ====== CASCADE PRODUK KE BAWAH ======
+  /**
+   * Ketika user mengubah produk di suatu baris, semua baris di bawahnya
+   * akan mengikuti produk yang sama. Baris di atas tidak berubah.
+   */
+  const cascadeProductToBelow = (startTr, productName) => {
+    const allRows = rows();
+    const startIdx = allRows.indexOf(startTr);
+    if (startIdx < 0 || !productName) return;
+
+    // Loop mulai dari baris setelah startTr
+    for (let i = startIdx + 1; i < allRows.length; i++) {
+      const tr = allRows[i];
+      const batchEl = tr.querySelector('[data-f="batch"]');
+      if (batchEl) {
+        batchEl.value = productName;
+        // Update WO langsung tanpa memicu event change agar tidak infinite loop
+        applyWoFromBatch(tr);
+      }
+    }
+  };
+
   // ====== TABEL RINCIAN PRODUK ======
   const updateProductDetailTable = () => {
     const tbody = State.el.tbodyProdDetail;
@@ -254,16 +276,16 @@ const Rows = (() => {
     }
 
     const summary = {};
-    prods.forEach(p => { 
-      summary[p] = { 
+    prods.forEach(p => {
+      summary[p] = {
         durasiValid: 0,       // Waktu produktif valid (Kode produksi dengan Good >= 1) untuk target
         durasiTotal: 0,       // Total waktu keseluruhan aktivitas dengan batch ini (kode apapun)
         durasiProdAll: 0,     // Total waktu seluruh kode produksi (baik ada good maupun kosong)
         durasiPlannedDT: 0,   // Total waktu Planned Down Time (Kode 5, 6, 7, 8)
         durasiUnplannedDT: 0, // Total waktu Unplanned Down Time (Kode 1, 3, 4, 9)
-        rate: getRateForProduct(p), 
-        actual: 0 
-      }; 
+        rate: getRateForProduct(p),
+        actual: 0
+      };
     });
 
     rows().forEach(tr => {
@@ -343,11 +365,21 @@ const Rows = (() => {
     }
   };
 
+  // ====== EXPORT ======
   return {
-    getActiveProducts, getRateForProduct, getWoForProduct, applyWoFromBatch,
-    rows, updateRowNumbers, applyCat, makeRow,
-    updateAllDropdowns, updateMatrixProductHeaders,
+    getActiveProducts,
+    getRateForProduct,
+    getWoForProduct,
+    applyWoFromBatch,
+    rows,
+    updateRowNumbers,
+    applyCat,
+    makeRow,
+    updateAllDropdowns,
+    updateMatrixProductHeaders,
     updateProductDetailTable,
-    applyDefaultStartTimeForFirstRow, refreshFirstRowStartTime,
+    applyDefaultStartTimeForFirstRow,
+    refreshFirstRowStartTime,
+    cascadeProductToBelow,
   };
 })();

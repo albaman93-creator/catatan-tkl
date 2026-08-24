@@ -4,31 +4,87 @@
    ================================================ */
 
 /* Wrapper tabel */
+/* ============================================================
+   PERBAIKAN SCROLL HORIZONTAL DI HP
+   ============================================================ */
+
 .tbl-wrap {
-  overflow: auto; -webkit-overflow-scrolling: touch;
-  max-height: 66vh; border: 1px solid var(--line); border-radius: 8px;
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  max-height: 66vh;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  width: 100%;
+  /* Pastikan scroll terlihat di HP */
 }
-table { width: 100%; border-collapse: collapse; }
 
-/* Tabel Log Sheet */
-table.log { table-layout: fixed; width: auto; max-width: none; }
+/* Tabel tidak boleh lebih lebar dari konten */
+table.log {
+  table-layout: auto; /* biarkan lebar mengikuti konten, bukan fixed */
+  width: 100%;
+  min-width: 800px; /* pastikan lebar cukup untuk memicu scroll */
+}
 
-/* Lebar kolom — sudah dirapatkan */
-col.col-num      { width: 26px; }
-col.col-kode     { width: 38px; }
-col.col-mulai    { width: 48px; }
-col.col-panggil  { width: 52px; }
-col.col-teknik   { width: 52px; }
-col.col-selesai  { width: 48px; }
-col.col-durasi   { width: 38px; }
-col.col-kegiatan { width: 120px; }
-col.col-masalah  { width: 120px; }
-col.col-disposisi{ width: 120px; }
-col.col-wo       { width: 92px; }
-col.col-batch    { width: 130px; }
-col.col-good     { width: 38px; }
-col.col-defect   { width: 38px; }
-col.col-aksi     { width: 30px; }
+/* Kolom pertama sticky tetap berfungsi */
+.log td.col-num,
+.log th.col-num {
+  position: sticky;
+  left: 0;
+  z-index: 6;
+  background: #fff;
+  min-width: 32px;
+}
+.log thead th.col-num {
+  z-index: 25;
+  background: #f4f7f9;
+}
+
+/* Pastikan header baris tetap di atas */
+.log thead th {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: #f4f7f9;
+}
+
+/* Responsif untuk HP */
+@media (max-width: 768px) {
+  .tbl-wrap {
+    max-height: 56vh;
+    border-radius: 6px;
+  }
+  table.log {
+    min-width: 700px; /* cukup untuk memicu scroll horizontal */
+  }
+  .log th,
+  .log td {
+    padding: 4px 3px;
+    font-size: 11px;
+  }
+  .log th .th-bulk-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+}
+
+/* Lebar kolom — diperlebar untuk Kegiatan, WO, dan Batch */
+col.col-num      { width: 26px; min-width: 26px; }
+col.col-kode     { width: 38px; min-width: 38px; }
+col.col-mulai    { width: 48px; min-width: 48px; }
+col.col-panggil  { width: 52px; min-width: 52px; }
+col.col-teknik   { width: 52px; min-width: 52px; }
+col.col-selesai  { width: 48px; min-width: 48px; }
+col.col-durasi   { width: 38px; min-width: 38px; }
+/* +++ PERLEBARAN +++ */
+col.col-kegiatan { width: 220px; min-width: 180px; }
+col.col-masalah  { width: 160px; min-width: 140px; }
+col.col-disposisi{ width: 160px; min-width: 140px; }
+col.col-wo       { width: 150px; min-width: 120px; }
+col.col-batch    { width: 180px; min-width: 150px; }
+col.col-good     { width: 48px; min-width: 48px; }
+col.col-defect   { width: 48px; min-width: 48px; }
+col.col-aksi     { width: 30px; min-width: 30px; }
 col.col-hide { display: none; }
 
 /* Header tabel: kecil, satu baris */
