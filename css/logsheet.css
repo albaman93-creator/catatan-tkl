@@ -846,32 +846,16 @@ table.log.qm-cepat1 .durasi-input, table.log.qm-cepat2 .durasi-input {
   background: rgba(18,161,80,.06);
 }
 
-/* Label OP lebih kecil */
+/* Buat label "Inisial Operator" tidak turun baris */
 .sheet-op-control .sheet-control-label {
-  font-size: 8.5px;
-  letter-spacing: .6px;
-  margin-right: 2px;
-  margin-top: 5px; /* selaras dgn baris pertama kotak OP (align-items:flex-start) */
-  flex: 0 0 auto;
+  white-space: nowrap;
+  font-size: 8.5px; /* sedikit lebih kecil agar proporsional */
 }
 
-/* Responsif untuk HP sempit */
-@media (max-width: 480px) {
-  .sheet-op-box {
-    width: 28px;
-    min-width: 24px;
-    font-size: 9px;
-    padding: 3px 1px;
-    border-radius: 4px;
-  }
-  .sheet-op-box::placeholder {
-    font-size: 6.5px;
-  }
-  .sheet-op-row {
-    gap: 2px;
-  }
-  .sheet-op-boxes {
-    gap: 2px;
+/* Di layar sangat sempit (< 420px), perkecil lagi font label */
+@media (max-width: 420px) {
+  .sheet-op-control .sheet-control-label {
+    font-size: 7px;
   }
 }
 
