@@ -71,7 +71,7 @@ const Storage = (() => {
     rows: Rows.rows().map(tr => {
       const g = (f) => { const el = tr.querySelector(`[data-f="${f}"]`); return el ? el.value : ''; };
       return {
-        kode: g('kode'), mulai: g('mulai'), panggil: g('panggil'),
+        kode: g('kode'), op: g('op'), mulai: g('mulai'), panggil: g('panggil'),
         teknik: g('teknik'), selesai: g('selesai'),
         kegiatan: g('kegiatan'), masalah: g('masalah'), disposisi: g('disposisi'),
         wo: g('wo'), batch: g('batch'), good: g('good'), defect: g('defect'),

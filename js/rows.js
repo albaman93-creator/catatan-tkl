@@ -43,44 +43,63 @@ const Rows = (() => {
     return idx >= 0 ? rates[idx] : 0;
   };
 
-  /** Cari No. WO yang terdaftar untuk 1 nama produk (Master Produk). */
-  const getWoForProduct = (prodName) => {
-    if (!prodName) return '';
-    const names = [
-      State.el.prodName1.value.trim(),
-      State.el.prodName2.value.trim(),
-      State.el.prodName3.value.trim()
-    ];
-    const wos = [
-      State.el.prodWo1 ? State.el.prodWo1.value.trim() : '',
-      State.el.prodWo2 ? State.el.prodWo2.value.trim() : '',
-      State.el.prodWo3 ? State.el.prodWo3.value.trim() : '',
-    ];
-    const idx = names.indexOf(prodName);
-    return idx >= 0 ? wos[idx] : '';
+  /** Baca nilai produk/WO langsung dari DOM (lebih andal dari cache State). */
+  const readProdSlot = (i) => {
+    const nameEl = (State.el['prodName' + i]) || document.getElementById('prodName' + i)
+      || document.getElementById('masterProdName' + i);
+    const woEl = (State.el['prodWo' + i]) || document.getElementById('prodWo' + i)
+      || document.getElementById('masterProdWo' + i);
+    return {
+      name: nameEl ? String(nameEl.value || '').trim() : '',
+      wo: woEl ? String(woEl.value || '').trim() : '',
+    };
   };
 
   /**
-   * Isi No. WO satu baris secara otomatis mengikuti Produk yang dipilih di
-   * kolom Batch — SETIAP produk punya No. WO sendiri-sendiri (didaftarkan
-   * di Master Produk / Wizard Setup), jadi operator tidak perlu klik/ketik
-   * No. WO manual satu-satu lagi.
-   *
-   * Aturan: hanya berlaku untuk baris yang kolom Kode-nya SUDAH terisi.
-   * Kalau Kode masih kosong, Batch & No. WO baris itu SENGAJA tidak
-   * diisi otomatis (baris belum dianggap "aktif").
+   * Cari No. WO untuk nama produk.
+   * Cocokkan exact (ignore case), lalu prefix (VKAM1 ≈ VKAM1 Mixing L).
+   */
+  const getWoForProduct = (prodName) => {
+    if (!prodName) return '';
+    const needle = prodName.trim().toLowerCase();
+    const slots = [1, 2, 3].map(readProdSlot);
+
+    // 1) Exact match
+    let hit = slots.find(s => s.name && s.name.toLowerCase() === needle);
+    if (hit && hit.wo) return hit.wo;
+
+    // 2) Prefix / contains (kode pendek vs nama panjang)
+    hit = slots.find(s => {
+      if (!s.name) return false;
+      const n = s.name.toLowerCase();
+      return n.startsWith(needle) || needle.startsWith(n) || n.includes(needle) || needle.includes(n);
+    });
+    if (hit && hit.wo) return hit.wo;
+
+    return hit ? (hit.wo || '') : '';
+  };
+
+  /**
+   * Isi No. WO baris mengikuti Produk yang dipilih.
+   * Selalu dijalankan saat produk dipilih — tidak tergantung Kode.
    */
   const applyWoFromBatch = (tr) => {
     if (!tr) return;
-    const kodeEl = tr.querySelector('[data-f="kode"]');
     const batchEl = tr.querySelector('[data-f="batch"]');
     const woEl = tr.querySelector('[data-f="wo"]');
-    if (!kodeEl || !batchEl || !woEl) return;
-    if (!kodeEl.value.trim()) return; // Kode belum diisi -> jangan auto-isi WO
-    const prodName = batchEl.value;
+    if (!batchEl || !woEl) return;
+    const prodName = (batchEl.value || '').trim();
     if (!prodName) return;
     const wo = getWoForProduct(prodName);
-    if (wo) woEl.value = wo;
+    if (wo) {
+      woEl.value = wo;
+      try { woEl.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+    }
+  };
+
+  /** Isi ulang WO di semua baris sesuai produk masing-masing. */
+  const refreshAllRowWo = () => {
+    rows().forEach(tr => applyWoFromBatch(tr));
   };
 
   // ====== DEFAULT JAM MULAI BARIS PERTAMA (mengikuti Shift terpilih) ======
@@ -142,13 +161,15 @@ const Rows = (() => {
       // Belum ada pilihan sama sekali -> otomatis default ke Produk 1 (atau
       // satu-satunya produk kalau memang cuma ada 1) supaya operator tidak
       // perlu klik pilih manual lagi. No. WO ikut mengikuti (lihat
-      // applyWoFromBatch, hanya berlaku kalau Kode baris sudah terisi).
+      // applyWoFromBatch, refreshAllRowWo, hanya berlaku kalau Kode baris sudah terisi).
       if ((!currentVal || !prods.includes(currentVal)) && prods.length > 0) {
         sel.value = prods[0];
       }
       const tr = sel.closest('tr');
       if (tr) applyWoFromBatch(tr);
     });
+    // Pastikan semua baris dapat WO terbaru
+    refreshAllRowWo();
   };
 
   const updateMatrixProductHeaders = () => {
@@ -195,6 +216,7 @@ const Rows = (() => {
       <td class="col-kode"><div class="c-kode"><span class="dot"></span>
         <input data-f="kode" data-nav class="in mono ctr" type="tel" inputmode="numeric" maxlength="1" placeholder=" " aria-label="Kode">
       </div></td>
+      <td class="col-op"><input data-f="op" data-nav class="in mono ctr" type="text" inputmode="numeric" maxlength="12" placeholder=" " aria-label="OP"></td>
       <td class="col-mulai"><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>
       <td class="col-panggil"><input data-f="panggil" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Panggil Teknik"></td>
       <td class="col-teknik"><input data-f="teknik" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Teknik Datang"></td>
@@ -339,18 +361,11 @@ const Rows = (() => {
         ? 'color:var(--green-d);font-weight:700;'
         : 'color:var(--red);font-weight:700;';
 
+      // Baris 1: metrik produk (satu baris rapi)
       const tr = document.createElement('tr');
+      tr.className = 'perf-prod-row';
       tr.innerHTML = `
-        <td style="text-align:left; padding: 10px 12px;">
-          <div style="font-weight:700; color:var(--ink); font-size: 14px;">📦 ${p}</div>
-          <div style="font-size: 11.5px; color: var(--mut); margin-top: 6px; line-height: 1.5; background: #f8fafc; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--line2);" class="perf-detail-box">
-            <div>⏱️ Total Waktu Keseluruhan: <b>${Utils.nf0(item.durasiTotal)} mnt</b></div>
-            <div>⚙️ Waktu Produktif (Semua Kode 2): <b>${Utils.nf0(item.durasiProdAll)} mnt</b></div>
-            <div>✅ Waktu Produktif Valid (Good ≥ 1): <b style="color:var(--green-d);">${Utils.nf0(item.durasiValid)} mnt</b></div>
-            <div>🟨 Planned Down Time (Kode 5,6,7,8): <b style="color:var(--amber);">${Utils.nf0(item.durasiPlannedDT)} mnt</b></div>
-            <div>🟥 Unplanned Down Time (Kode 1,3,4,9): <b style="color:var(--red);">${Utils.nf0(item.durasiUnplannedDT)} mnt</b></div>
-          </div>
-        </td>
+        <td style="text-align:left; padding: 10px 12px; font-weight:700; color:var(--ink);">📦 ${Utils.escapeHtml ? Utils.escapeHtml(p) : p}</td>
         <td style="text-align:center;"><b>${Utils.nf0(item.durasiValid)}</b></td>
         <td style="text-align:center;">${Utils.nf0(item.rate)}</td>
         <td style="text-align:center;">${Utils.nf0(targetG)}</td>
@@ -358,6 +373,22 @@ const Rows = (() => {
         <td style="text-align:center; ${perfColor}">${Utils.nf2(perfP)} %</td>
       `;
       tbody.appendChild(tr);
+
+      // Baris 2: ringkasan waktu (full width di bawah produk)
+      const trSum = document.createElement('tr');
+      trSum.className = 'perf-summary-row';
+      trSum.innerHTML = `
+        <td colspan="6" style="padding: 0 12px 12px;">
+          <div class="perf-detail-box" style="font-size: 12px; color: var(--mut); line-height: 1.65; background: #f8fafc; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line2, #e8eef3);">
+            <div>⏱️ Total Waktu Keseluruhan SHIFT: <b>${Utils.nf0(item.durasiTotal)} mnt</b></div>
+            <div>✅ Waktu Produktif (total Kode 2): <b>${Utils.nf0(item.durasiProdAll)} mnt</b></div>
+            <div>✅ Waktu Produktif kode 2 dgn (Output ≥ 1 pcs): <b style="color:var(--green-d);">${Utils.nf0(item.durasiValid)} mnt</b></div>
+            <div>🟨 Planned Down Time (Kode 5,6,7,8): <b style="color:var(--amber);">${Utils.nf0(item.durasiPlannedDT)} mnt</b></div>
+            <div>🟥 Unplanned Down Time (Kode 1,3,4,9): <b style="color:var(--red);">${Utils.nf0(item.durasiUnplannedDT)} mnt</b></div>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(trSum);
     });
 
     if (!hasData) {

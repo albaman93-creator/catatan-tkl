@@ -79,6 +79,7 @@ const PrintSheet = (() => {
       return `
         <tr>
           <td class="pc">${Utils.escapeHtml(readField(tr, 'kode'))}</td>
+          <td class="pc">${Utils.escapeHtml(readField(tr, 'op'))}</td>
           <td class="pt">${Utils.escapeHtml(readField(tr, 'mulai'))}</td>
           <td class="pt">${Utils.escapeHtml(readField(tr, 'panggil'))}</td>
           <td class="pt">${Utils.escapeHtml(readField(tr, 'teknik'))}</td>
@@ -117,6 +118,7 @@ const PrintSheet = (() => {
           <thead>
             <tr>
               <th rowspan="2">Kode</th>
+              <th rowspan="2">OP</th>
               <th colspan="4">Definisi Waktu</th>
               <th rowspan="2">Durasi<br>(menit)</th>
               <th rowspan="2">Aktivitas Kegiatan</th>
@@ -133,7 +135,7 @@ const PrintSheet = (() => {
           </thead>
           <tbody>${bodyRows}</tbody>
           <tfoot>
-            <tr><td colspan="5" class="tot-label">Total Durasi</td><td class="pc"><b>${Utils.nf0(totalDurasi)}</b></td><td colspan="7"></td></tr>
+            <tr><td colspan="6" class="tot-label">Total Durasi</td><td class="pc"><b>${Utils.nf0(totalDurasi)}</b></td><td colspan="7"></td></tr>
           </tfoot>
         </table>
 

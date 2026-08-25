@@ -113,6 +113,7 @@ table.log {
 
 col.col-num       { width: 26px; }
 col.col-kode      { width: 38px; }
+col.col-op        { width: 32px; }
 col.col-mulai     { width: 48px; }
 col.col-panggil   { width: 52px; }
 col.col-teknik    { width: 52px; }
@@ -2369,4 +2370,19 @@ table.log .col-wo {
 
     padding-right: 3px;
   }
+}
+
+/* Kolom OP — 1 karakter di antara Kode dan Mulai */
+.log td.col-op,
+.log th.col-op {
+  text-align: center;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+.log td.col-op .in {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 700;
+  max-width: 28px;
+  padding: 4px 2px;
 }

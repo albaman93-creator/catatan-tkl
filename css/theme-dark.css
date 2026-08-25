@@ -609,3 +609,14 @@
   border-color: rgba(52, 211, 153, 0.55) !important;
   color: #a7f3d0 !important;
 }
+
+
+/* Rincian performa produk */
+[data-theme="dark"] .perf-detail-box {
+  background: rgba(255,255,255,0.04) !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #a7b6ca !important;
+}
+[data-theme="dark"] .perf-prod-row td {
+  color: #edf4ff !important;
+}

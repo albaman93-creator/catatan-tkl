@@ -819,12 +819,12 @@
           <div><h2>Inisial Operator</h2><div class="sub2">Masukkan inisial operator (maks. 3 huruf per kolom)</div></div>
       </div>
         <div class="operator-grid">
-          <div class="field"><label>Operator 1</label><input type="text" id="op1" maxlength="3" placeholder="---" class="mono"></div>
-          <div class="field"><label>Operator 2</label><input type="text" id="op2" maxlength="3" placeholder="---" class="mono"></div>
-          <div class="field"><label>Operator 3</label><input type="text" id="op3" maxlength="3" placeholder="---" class="mono"></div>
-          <div class="field"><label>Operator 4</label><input type="text" id="op4" maxlength="3" placeholder="---" class="mono"></div>
-          <div class="field"><label>Operator 5</label><input type="text" id="op5" maxlength="3" placeholder="---" class="mono"></div>
-          <div class="field"><label>Operator 6</label><input type="text" id="op6" maxlength="3" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 1</label><input type="text" id="op1" maxlength="18" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 2</label><input type="text" id="op2" maxlength="18" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 3</label><input type="text" id="op3" maxlength="18" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 4</label><input type="text" id="op4" maxlength="18" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 5</label><input type="text" id="op5" maxlength="18" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 6</label><input type="text" id="op6" maxlength="18" placeholder="---" class="mono"></div>
     </div>
       </section>
 
@@ -916,12 +916,12 @@
   <div class="sheet-control-group sheet-op-control" role="group" aria-label="Inisial Operator">
     <span class="sheet-control-label">Inisial Operator</span>
     <div class="sheet-op-boxes" id="sheetOpBoxes">
-      <input type="text" class="sheet-op-box" data-sheet-op="1" maxlength="3" placeholder="OP1" autocomplete="off">
-      <input type="text" class="sheet-op-box" data-sheet-op="2" maxlength="3" placeholder="OP2" autocomplete="off">
-      <input type="text" class="sheet-op-box" data-sheet-op="3" maxlength="3" placeholder="OP3" autocomplete="off">
-      <input type="text" class="sheet-op-box" data-sheet-op="4" maxlength="3" placeholder="OP4" autocomplete="off">
-      <input type="text" class="sheet-op-box" data-sheet-op="5" maxlength="3" placeholder="OP5" autocomplete="off">
-      <input type="text" class="sheet-op-box" data-sheet-op="6" maxlength="3" placeholder="OP6" autocomplete="off">
+      <input type="text" class="sheet-op-box" data-sheet-op="1" maxlength="18" placeholder="OP1" autocomplete="off">
+      <input type="text" class="sheet-op-box" data-sheet-op="2" maxlength="18" placeholder="OP2" autocomplete="off">
+      <input type="text" class="sheet-op-box" data-sheet-op="3" maxlength="18" placeholder="OP3" autocomplete="off">
+      <input type="text" class="sheet-op-box" data-sheet-op="4" maxlength="18" placeholder="OP4" autocomplete="off">
+      <input type="text" class="sheet-op-box" data-sheet-op="5" maxlength="18" placeholder="OP5" autocomplete="off">
+      <input type="text" class="sheet-op-box" data-sheet-op="6" maxlength="18" placeholder="OP6" autocomplete="off">
     </div>
   </div>
 </div>
@@ -995,6 +995,7 @@
             <div class="col-toggle-bar" id="colToggleBar" hidden>
               <label><input type="checkbox" data-col="col-num" checked> #</label>
               <label><input type="checkbox" data-col="col-kode" checked> Kode</label>
+              <label><input type="checkbox" data-col="col-op" checked> OP</label>
               <label><input type="checkbox" data-col="col-mulai" checked> Jam Mulai</label>
               <label><input type="checkbox" data-col="col-panggil" checked> Panggil Teknik</label>
               <label><input type="checkbox" data-col="col-teknik" checked> Teknik Datang</label>
@@ -1109,6 +1110,7 @@
             <colgroup>
               <col class="col-num">
               <col class="col-kode">
+              <col class="col-op">
               <col class="col-mulai">
               <col class="col-panggil">
               <col class="col-teknik">
@@ -1130,6 +1132,7 @@
                   Kode
                   <button type="button" class="th-bulk-btn" data-bulk-col="kode" title="Isi massal Kode dari daftar">📥</button>
                 </th>
+                <th class="col-op" rowspan="2">OP</th>
                 <th class="col-mulai" rowspan="2">
                   Mulai
                   <button type="button" class="th-bulk-btn" data-bulk-col="mulai" title="Isi massal Jam Mulai dari daftar">📥</button>

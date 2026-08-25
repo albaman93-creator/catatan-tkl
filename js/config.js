@@ -73,14 +73,14 @@ const CONFIG = Object.freeze({
   // (disembunyikan otomatis di Mode Normal, tidak ikut tab order berkat
   // filter offsetParent di Navigation.navCells).
   NAV_FIELDS: [
-    'kode', 'mulai', 'panggil', 'teknik', 'selesai', 'durasi',
+    'kode', 'op', 'mulai', 'panggil', 'teknik', 'selesai', 'durasi',
     'kegiatan', 'masalah', 'disposisi', 'wo', 'batch',
     'good', 'defect'
   ],
 
   // ====== LABEL KOLOM (untuk indikator posisi) ======
   FIELD_LABELS: {
-    kode: 'KODE', mulai: 'JAM MULAI', panggil: 'PANGGIL TEKNIK',
+    kode: 'KODE', op: 'OP', mulai: 'JAM MULAI', panggil: 'PANGGIL TEKNIK',
     teknik: 'TEKNIK DATANG', selesai: 'JAM SELESAI', durasi: 'DURASI (MENIT)',
     kegiatan: 'KEGIATAN',
     masalah: 'MASALAH', disposisi: 'DISPOSISI', wo: 'NOMOR WO',

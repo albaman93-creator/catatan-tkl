@@ -56,11 +56,27 @@
       const i = box.getAttribute('data-sheet-op');
 
       box.addEventListener('input', () => {
-        const cleaned = box.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, MAXLEN);
+        let cleaned = box.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        // Overflow: "KOKO" → box ini "KOK", sisa ke box berikutnya
+        if (cleaned.length > MAXLEN) {
+          let rest = cleaned;
+          let p = idx;
+          const list = boxes();
+          while (rest.length > 0 && p < list.length) {
+            const chunk = rest.slice(0, MAXLEN);
+            rest = rest.slice(MAXLEN);
+            list[p].value = chunk;
+            list[p].classList.toggle('filled', !!chunk);
+            writeToOriginal(list[p].getAttribute('data-sheet-op'), chunk);
+            p++;
+          }
+          const last = Math.min(p - 1, list.length - 1);
+          if (list[last]) { list[last].focus(); list[last].select(); }
+          return;
+        }
         box.value = cleaned;
         box.classList.toggle('filled', !!cleaned);
         writeToOriginal(i, cleaned);
-        // Auto-pindah ke kotak berikutnya begitu 3 karakter terisi penuh
         if (cleaned.length >= MAXLEN) focusNext(idx);
       });
 

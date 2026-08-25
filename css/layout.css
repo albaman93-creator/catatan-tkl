@@ -457,3 +457,30 @@ h1 { font: 700 clamp(24px,5vw,34px)/1 var(--disp); letter-spacing: .8px; text-tr
     min-width: 3.8em;
   }
 }
+
+
+/* Garis tipis coklat pada toggle Shift / Line / Tahapan */
+.shiftsel,
+.linesel,
+.stagesel,
+#fShift,
+#fLineSel,
+#fStageSel {
+  border: 1px solid #c4a484 !important;
+  box-shadow: 0 0 0 1px rgba(196, 164, 132, 0.25);
+}
+.shiftsel button,
+.linesel button,
+.stagesel button {
+  border: 1px solid transparent;
+}
+.shiftsel button:not(.on),
+.linesel button:not(.on),
+.stagesel button:not(.on) {
+  border-color: rgba(196, 164, 132, 0.35);
+}
+.shiftsel button.on,
+.linesel button.on,
+.stagesel button.on {
+  border-color: #a67c52;
+}

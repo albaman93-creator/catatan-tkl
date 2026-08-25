@@ -500,7 +500,10 @@ const Suggest = (() => {
     const id = el.id || '';
     if (/^prodName[123]$/.test(id) || /^masterProdName[123]$/.test(id)) return true;
     if (el.classList.contains('sheet-product-name')) return true;
-    if (el.dataset && el.dataset.field === 'name' && el.closest('.sheet-product-slot, .sheet-product-bar, .product-grid')) return true;
+    // Wizard Setup Awal — input [data-prod-name]
+    if (el.hasAttribute('data-prod-name')) return true;
+    if (el.classList.contains('wiz-prod-name')) return true;
+    if (el.dataset && el.dataset.field === 'name' && el.closest('.sheet-product-slot, .sheet-product-bar, .product-grid, .wizard-modal, #wizardModal')) return true;
     return false;
   };
 

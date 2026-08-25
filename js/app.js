@@ -135,9 +135,9 @@ const App = (() => {
       if (e.target.getAttribute('data-f') === 'batch') {
         const tr = e.target.closest('tr');
         const productName = e.target.value;
-        // Update WO untuk baris ini
+        // Update WO untuk baris ini (dari Master Produk)
         Rows.applyWoFromBatch(tr);
-        // Cascade produk ke bawah
+        // Cascade produk + WO ke baris bawah
         if (productName) {
           Rows.cascadeProductToBelow(tr, productName);
         }
@@ -145,9 +145,74 @@ const App = (() => {
       }
       if (e.target.getAttribute('data-f') === 'kode') {
         Rows.applyCat(e.target.closest('tr'));
-        Rows.applyWoFromBatch(e.target.closest('tr')); // jaga-jaga kalau Batch sudah dipilih duluan
+        Rows.applyWoFromBatch(e.target.closest('tr'));
       }
     });
+    // Juga tangkap input (beberapa browser/select custom)
+    State.el.tbody.addEventListener('input', (e) => {
+      if (e.target.getAttribute('data-f') === 'batch') {
+        Rows.applyWoFromBatch(e.target.closest('tr'));
+      }
+      // Kolom OP: angka saja, 1 digit per baris.
+      // Ketik "234" → baris ini=2, baris berikutnya=3, dst.
+      if (e.target.getAttribute('data-f') === 'op') {
+        const raw = (e.target.value || '').replace(/\D/g, '');
+        if (!raw) { e.target.value = ''; return; }
+        const tr = e.target.closest('tr');
+        const allRows = Rows.rows();
+        const startIdx = allRows.indexOf(tr);
+        if (startIdx < 0) { e.target.value = raw.slice(0, 1); return; }
+        for (let i = 0; i < raw.length; i++) {
+          const row = allRows[startIdx + i];
+          if (!row) break;
+          const opEl = row.querySelector('[data-f="op"]');
+          if (opEl) opEl.value = raw[i];
+        }
+        e.target.value = raw[0];
+        // Fokus ke baris terakhir yang terisi (atau baris berikutnya kosong)
+        const lastIdx = Math.min(startIdx + raw.length - 1, allRows.length - 1);
+        const focusRow = allRows[lastIdx];
+        const focusEl = focusRow && focusRow.querySelector('[data-f="op"]');
+        if (focusEl && focusEl !== e.target && raw.length > 1) {
+          focusEl.focus();
+          focusEl.select();
+        }
+      }
+    });
+
+    // Inisial Operator (#op1..#op6): max 3 per kolom, overflow ke kolom berikutnya
+    // Contoh: ketik "koko" di OP1 → OP1="KOK", OP2="O"
+    const bindOperatorOverflow = () => {
+      for (let i = 1; i <= 6; i++) {
+        const el = State.el['op' + i] || document.getElementById('op' + i);
+        if (!el || el.dataset.opOverflowBound === '1') continue;
+        el.dataset.opOverflowBound = '1';
+        // Izinkan ketik lebih dari 3 sementara agar overflow terdeteksi
+        el.removeAttribute('maxlength');
+        el.addEventListener('input', () => {
+          let cleaned = (el.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+          if (cleaned.length <= 3) {
+            el.value = cleaned;
+            return;
+          }
+          // Sebar ke op i, i+1, ...
+          let pos = i;
+          let rest = cleaned;
+          while (rest.length > 0 && pos <= 6) {
+            const target = State.el['op' + pos] || document.getElementById('op' + pos);
+            if (!target) break;
+            target.value = rest.slice(0, 3);
+            rest = rest.slice(3);
+            pos++;
+          }
+          // Fokus ke kolom terakhir yang diisi
+          const last = Math.min(pos - 1, 6);
+          const focusEl = State.el['op' + last] || document.getElementById('op' + last);
+          if (focusEl) { focusEl.focus(); focusEl.select(); }
+        });
+      }
+    };
+    bindOperatorOverflow();
 
     // ============================================================
     // FOCUSOUT (validasi waktu)
@@ -189,6 +254,11 @@ const App = (() => {
           Rows.updateAllDropdowns();
           Rows.updateMatrixProductHeaders();
           Calculation.recalc();
+        }
+        // WO / nama master berubah → refresh No. WO di semua baris
+        if (id.startsWith('prodWo') || id.startsWith('prodName')) {
+          if (Rows.refreshAllRowWo) Rows.refreshAllRowWo();
+          else Rows.rows().forEach(tr => Rows.applyWoFromBatch(tr));
         }
         // Sync ke input di halaman Master Produk (jika ada)
         const masterEl = document.querySelector(`[data-sync="${id}"]`);

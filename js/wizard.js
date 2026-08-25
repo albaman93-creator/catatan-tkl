@@ -230,7 +230,7 @@ const Wizard = (() => {
       <div class="qm-slot">
         <label class="qm-label">${s.label}</label>
         <div class="wiz-inline-row">
-          <input type="text" data-prod-name="${i}" class="in" placeholder="Nama produk_batch" value="${Utils.escapeHtml(s.name ? s.name.value : '')}">
+          <input type="text" data-prod-name="${i}" class="in wiz-prod-name" placeholder="Nama produk_batch" autocomplete="off" value="${Utils.escapeHtml(s.name ? s.name.value : '')}">
           <input type="number" inputmode="decimal" data-prod-rate="${i}" class="in" placeholder="Rate/mnt" value="${s.rate ? s.rate.value : ''}">
         </div>
         <input type="text" data-prod-wo="${i}" class="in mono" inputmode="numeric" maxlength="8" placeholder="No. WO (opsional)" value="${Utils.escapeHtml(s.wo ? s.wo.value : '')}" style="width:100%;">
@@ -270,6 +270,10 @@ const Wizard = (() => {
       });
     });
     bindNav();
+    // Suggestion produk sama seperti di Sheet (ikut tahapan aktif)
+    if (typeof Suggest !== 'undefined' && Suggest.attachProductAll) {
+      Suggest.attachProductAll('#wizardModal [data-prod-name], #wizardModal .wiz-prod-name');
+    }
   };
 
   const STEP_RENDERERS = {
