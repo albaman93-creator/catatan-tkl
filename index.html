@@ -1371,6 +1371,26 @@
         <article class="dash-panel dash-panel-wide">
           <div class="dash-panel-head dash-code-head"><div><h3>Analisis Kode Aktivitas 1–9</h3><p>Waktu, frekuensi, kontribusi, dan kegiatan yang paling sering muncul</p></div><div class="dash-view-switch" id="dashCodeSwitch"><button class="is-active" data-code-view="table">Tabel</button><button data-code-view="donut">Donut</button></div></div>
           <div id="dashCodeSummary" class="dash-code-summary"></div>
+          <section id="activityCodeDetail" class="activity-code-detail" hidden aria-live="polite">
+            <div class="activity-detail-head">
+              <div>
+                <button id="backToCodeSummary" class="btn-back" type="button">← Kembali ke Analisis Kode</button>
+                <h3 id="detailCodeTitle">Kode 2 — Produktif</h3>
+                <p>Seluruh kegiatan berdasarkan filter dashboard yang aktif.</p>
+              </div>
+              <div id="detailCodeStats" class="detail-code-stats"></div>
+            </div>
+            <div class="activity-top-summary">
+              <div class="activity-top-summary-title">Kegiatan teratas</div>
+              <div id="activityCodeTopActivities" class="activity-top-list"></div>
+            </div>
+            <div class="activity-detail-table-wrap">
+              <table class="activity-detail-table">
+                <thead><tr><th>Tanggal</th><th>Shift</th><th>Line</th><th>Tahapan</th><th>Produk</th><th>Kegiatan</th><th>Durasi</th><th>Operator</th></tr></thead>
+                <tbody id="activityCodeDetailRows"></tbody>
+              </table>
+            </div>
+          </section>
         </article>
 
         <article class="dash-panel dash-panel-wide">
