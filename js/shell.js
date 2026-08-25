@@ -86,7 +86,7 @@ const Shell = (() => {
   const applyThemeIcon = () => {
     const btn = document.getElementById('themeToggleBtn');
     if (!btn) return;
-    const dark = Settings.getDisplayMode() === 'dark';
+    const dark = Settings.getTheme() === 'dark';
     btn.innerHTML = '<svg class="icon"><use href="./icons/sprite.svg#' + (dark ? 'i-sun' : 'i-moon') + '"></use></svg>';
   };
 
@@ -100,7 +100,7 @@ const Shell = (() => {
   const syncSettingsSwitches = () => {
     if (State.el.settingsDecorSwitch) State.el.settingsDecorSwitch.checked = Settings.isDecorEnabled();
     const themeSwitch = document.getElementById('settingsThemeSwitch');
-    if (themeSwitch) themeSwitch.checked = Settings.getDisplayMode() === 'dark';
+    if (themeSwitch) themeSwitch.checked = Settings.getTheme() === 'dark';
   };
 
   const bindSettingsPage = () => {

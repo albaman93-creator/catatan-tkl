@@ -315,11 +315,6 @@ const UI = (() => {
       backdrop.addEventListener('click', () => setSidebarOpen(false));
     }
 
-    const sidebarClose = document.getElementById('sidebarClose');
-    if (sidebarClose) {
-      sidebarClose.addEventListener('click', () => setSidebarOpen(false));
-    }
-
     // Setelah user memilih/klik salah satu aksi di sidebar (Setup Awal,
     // Dashboard, Print, Reset, Simpan, Keluar, Install, dsb) — sidebar
     // otomatis tertutup lagi, fokus balik ke apa yang baru saja dipilih.
