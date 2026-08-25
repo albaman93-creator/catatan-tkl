@@ -35,6 +35,7 @@
   <link rel="stylesheet" href="./css/sidebar.css">
   <link rel="stylesheet" href="./css/modern-sheet.css">
   <link rel="stylesheet" href="./css/theme-professional.css">
+  <link rel="stylesheet" href="./css/theme-dark.css">
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -605,6 +606,10 @@
     <div class="toolbar app-bar">
       <div class="toolbar-backdrop"></div>
       <div class="twrap app-bar-inner">
+        <button type="button" class="app-bar-menu-btn" id="toolbarToggle" title="Menu &amp; Pengaturan">
+          <span id="toolbarToggleIcon">☰</span>
+        </button>
+
         <div class="app-bar-badges">
           <span class="shift-indicator" id="shiftIndicator" title="Shift &amp; tanggal yang sedang Anda isi saat ini">
             <span class="si-dot"></span>
@@ -614,54 +619,116 @@
             <span class="oi-label">OEE</span>
             <span id="oeeIndicatorValue">0,00%</span>
           </span>
-            </div>
-
-        <button type="button" class="app-bar-menu-btn" id="toolbarToggle" title="Menu &amp; Pengaturan">
-          <span id="toolbarToggleIcon">☰</span>
-        </button>
         </div>
-          </div>
+      </div>
+    </div>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR — Menu & Pengaturan (dark glass style) -->
     <div class="sidebar-backdrop"></div>
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <span class="sidebar-header-icon">⚙️</span>
-        <span class="sidebar-header-title">Menu &amp; Pengaturan</span>
-              </div>
+        <div class="sidebar-header-left">
+          <span class="sidebar-header-icon" aria-hidden="true">🌿</span>
+          <div class="sidebar-header-text">
+            <span class="sidebar-header-title">Menu &amp; Pengaturan</span>
+            <span class="sidebar-header-sub">Atur aplikasi sesuai kebutuhanmu</span>
+          </div>
+        </div>
+        <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Tutup menu">×</button>
+      </div>
 
       <div class="sidebar-section-label">Aksi Cepat</div>
-      <button type="button" class="menu-item" id="btnWizard" title="Setup Awal (Shift, Tahapan, Tanggal, Operator, WO, Produk)">
-        🧭 Setup Awal
-              </button>
+      <button type="button" class="menu-row" id="btnWizard" title="Setup Awal (Shift, Tahapan, Tanggal, Operator, WO, Produk)">
+        <span class="menu-row-icon menu-row-icon--green">⏱</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Setup Awal</span>
+          <span class="menu-row-sub">Konfigurasi aplikasi pertama kali</span>
+        </span>
+        <span class="menu-row-chevron">›</span>
+      </button>
 
       <span class="pos" id="pos"><span class="pos-dot"></span>SIAP · KLIK SEL / MULAI KETIK</span>
 
       <div class="sidebar-section-label">Tampilan</div>
-            <div class="navmode" title="Mode navigasi Tab">
-        <span class="nm-cap">MODE TAB</span>
-        <button type="button" data-mode="v" class="on">⇅ VERTIKAL</button>
-        <button type="button" data-mode="h">⇄ HORIZONTAL</button>
-            </div>
 
-      <div class="app-theme-toggle" id="appThemeToggle" title="Tema tampilan aplikasi">
-        <span class="nm-cap">TEMA APLIKASI</span>
-        <button type="button" data-app-theme="light" class="on">🌿 Standar</button>
-        <button type="button" data-app-theme="professional">◈ Profesional</button>
+      <div class="menu-row menu-row--static" title="Tema tampilan aplikasi">
+        <span class="menu-row-icon menu-row-icon--green">🎨</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Tema Aplikasi</span>
+          <span class="menu-row-sub">Pilih tema tampilan aplikasi</span>
+        </span>
+        <div class="app-theme-toggle pill-group" id="appThemeToggle">
+          <button type="button" data-app-theme="light" class="on">🌿 Standar</button>
+          <button type="button" data-app-theme="professional">◈ Profesional</button>
+        </div>
+      </div>
+
+      <div class="menu-row menu-row--static" title="Mode navigasi Tab">
+        <span class="menu-row-icon menu-row-icon--amber">⇄</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Mode Tab</span>
+          <span class="menu-row-sub">Arah navigasi baris / kolom</span>
+        </span>
+        <div class="navmode pill-group">
+          <button type="button" data-mode="v" class="on">⇅ Vertikal</button>
+          <button type="button" data-mode="h">⇄ Horizontal</button>
+        </div>
+      </div>
+
+      <div class="menu-row menu-row--static" title="Mode tampilan terang atau gelap">
+        <span class="menu-row-icon">◐</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Mode Tampilan</span>
+          <span class="menu-row-sub">Pilih mode terang atau gelap</span>
+        </span>
+        <div class="color-mode-toggle pill-group" id="colorModeToggle">
+          <button type="button" data-color-mode="light" class="on">☀ Terang</button>
+          <button type="button" data-color-mode="dark">☾ Gelap</button>
+        </div>
       </div>
 
       <span class="hint" id="hint"></span>
-          <span class="spacer"></span>
+      <span class="spacer"></span>
 
-      <div class="sidebar-divider"></div>
       <div class="sidebar-section-label">Data &amp; Dokumen</div>
-      <button class="btn" id="btnPrint" type="button">🖨️ Print</button>
-      <button class="btn btn-primary" id="btnSave" type="button">💾 Simpan Data</button>
 
-      <div class="sidebar-divider"></div>
-      <button class="btn btn-install" id="pwa-install-btn" type="button">📱 Install Aplikasi</button>
-      <button class="btn btn-ghost" id="btnReset" type="button">↺ Reset</button>
-      <button class="btn btn-ghost btn-logout" id="btnLogout" type="button" title="Keluar sesi">🔒 Keluar</button>
+      <button type="button" class="menu-row" id="btnPrint">
+        <span class="menu-row-icon">🖨</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Print</span>
+          <span class="menu-row-sub">Cetak laporan</span>
+        </span>
+        <span class="menu-row-chevron">›</span>
+      </button>
+
+      <button type="button" class="menu-row menu-row--primary" id="btnSave">
+        <span class="menu-row-icon menu-row-icon--blue">💾</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Simpan Data</span>
+          <span class="menu-row-sub">Simpan ke perangkat</span>
+        </span>
+        <span class="menu-row-chevron">›</span>
+      </button>
+
+      <button type="button" class="menu-row" id="btnReset">
+        <span class="menu-row-icon">↺</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Reset</span>
+          <span class="menu-row-sub">Atur ulang aplikasi</span>
+        </span>
+        <span class="menu-row-chevron">›</span>
+      </button>
+
+      <button type="button" class="menu-row menu-row--danger" id="btnLogout" title="Keluar sesi">
+        <span class="menu-row-icon menu-row-icon--red">⎋</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Keluar</span>
+          <span class="menu-row-sub">Keluar dari aplikasi</span>
+        </span>
+        <span class="menu-row-chevron">›</span>
+      </button>
+
+      <button type="button" class="btn btn-install" id="pwa-install-btn" style="display:none">📱 Install Aplikasi</button>
 
       <div class="sidebar-footer" id="lastSaved"></div>
     </aside>

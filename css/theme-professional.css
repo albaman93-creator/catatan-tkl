@@ -38,8 +38,8 @@
   border: 1px solid rgba(11, 42, 71, .10);
 }
 [data-theme="professional"] .menu-item:hover {
-  border-color: var(--pro-blue);
-  box-shadow: 0 4px 10px -2px rgba(11,95,165,.20);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 /* Badge shift di app bar dipakai sbg identitas brand (bukan status data),
@@ -52,23 +52,21 @@
   box-shadow: 0 2px 8px -2px rgba(11,95,165,.5);
 }
 
-/* ====== SIDEBAR (pinggiran kiri) ====== */
-[data-theme="professional"] .sidebar { box-shadow: 4px 0 24px rgba(11, 95, 165, .12); }
-[data-theme="professional"] .sidebar-header-title { color: var(--navy); }
-[data-theme="professional"] .sidebar .menu-item:hover {
-  background: var(--pro-blue-lt);
-  border-color: var(--pro-blue);
+/* ====== SIDEBAR (pinggiran kiri) ======
+   Panel sidebar dark glass tetap (sidebar.css). Aksen netral SuperGrok. */
+[data-theme="professional"] .sidebar .pill-group button.on {
+  background: #f5f5f7;
+  color: #0c0c0e;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
-[data-theme="professional"] .sidebar .pos,
-[data-theme="professional"] .sidebar .hint,
-[data-theme="professional"] .sidebar #lastSaved { background: var(--pro-blue-lt); }
-[data-theme="professional"] .sidebar .pos-dot { background: var(--pro-blue); }
-[data-theme="professional"] .sidebar .navmode button.on,
-[data-theme="professional"] .app-theme-toggle button.on {
-  background: var(--pro-blue);
-  box-shadow: 0 2px 6px -2px rgba(11,95,165,.55);
+[data-theme="professional"] .sidebar-section-label {
+  color: #636366;
 }
-[data-theme="professional"] .sidebar-backdrop { background: rgba(11, 42, 71, .45); }
+[data-theme="professional"] .sidebar-header-icon {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
 
 /* ====== BOTTOM NAVIGATION (pinggiran bawah) ====== */
 [data-theme="professional"] .bottom-nav { box-shadow: 0 -2px 12px -2px rgba(11,95,165,.14); }

@@ -20,6 +20,11 @@ const Settings = (() => {
 
   const applyTheme = (mode) => {
     document.documentElement.setAttribute('data-theme', mode);
+    // Sinkronkan pill Mode Tampilan di sidebar
+    document.querySelectorAll('[data-color-mode]').forEach(btn => {
+      const isDark = mode === 'dark';
+      btn.classList.toggle('on', isDark ? btn.dataset.colorMode === 'dark' : btn.dataset.colorMode === 'light');
+    });
   };
 
   const setTheme = (mode) => {
@@ -28,7 +33,16 @@ const Settings = (() => {
   };
 
   const toggleTheme = () => {
-    const next = getTheme() === 'dark' ? 'light' : 'dark';
+    let next;
+    if (getTheme() === 'dark') {
+      // Kembali ke style terang terakhir (Standar/Profesional)
+      try {
+        const style = localStorage.getItem('fima_app_style') || 'light';
+        next = style === 'professional' ? 'professional' : 'light';
+      } catch(e) { next = 'light'; }
+    } else {
+      next = 'dark';
+    }
     setTheme(next);
     return next;
   };
@@ -65,6 +79,17 @@ const Settings = (() => {
     return setLoginTheme(next);
   };
 
+  /*
+   * Sinkronisasi tema aplikasi dengan tema yang dipakai saat login.
+   * Jika user masuk menggunakan Login Profesional, aplikasi langsung
+   * memakai tema Profesional tanpa perlu memilih tema lagi di dalam aplikasi.
+   */
+  const syncAppThemeWithLoginTheme = () => {
+    const appTheme = getLoginTheme() === 'professional' ? 'professional' : 'light';
+    setTheme(appTheme);
+    return appTheme;
+  };
+
   // Terapkan tema aplikasi tersimpan.
   applyTheme(getTheme());
 
@@ -86,6 +111,7 @@ const Settings = (() => {
     toggleTheme,
     getLoginTheme,
     setLoginTheme,
-    toggleLoginTheme
+    toggleLoginTheme,
+    syncAppThemeWithLoginTheme
   };
 })();

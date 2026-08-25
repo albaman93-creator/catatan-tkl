@@ -282,27 +282,83 @@ const App = (() => {
   };
 
   /**
-   * Toggle Tema Aplikasi (Standar / Profesional) — dipakai di seluruh
-   * aplikasi (app bar, sidebar, bottom nav, tombol, dst), bukan cuma
-   * layar login. Nilainya independen dari tema login.
+   * Toggle Tema Aplikasi (Standar / Profesional).
+   * Hanya berlaku di mode terang. Saat gelap, tetap SuperGrok dark.
+   * Preferensi Standar/Profesional disimpan di localStorage KEY terpisah
+   * lewat Settings — saat kembali ke terang, style sebelumnya dipulihkan.
    */
+  const KEY_STYLE = 'fima_app_style'; /* 'light' | 'professional' */
+
+  const getAppStyle = () => {
+    try { return localStorage.getItem(KEY_STYLE) || 'light'; } catch(e) { return 'light'; }
+  };
+  const setAppStyle = (style) => {
+    try { localStorage.setItem(KEY_STYLE, style); } catch(e) {}
+  };
+
   const bindAppThemeToggle = () => {
     const buttons = document.querySelectorAll('[data-app-theme]');
     if (!buttons.length || typeof Settings === 'undefined') return;
 
     const sync = () => {
-      const current = Settings.getTheme();
+      const style = getAppStyle();
       buttons.forEach(btn => {
-        btn.classList.toggle('on', btn.dataset.appTheme === current);
+        btn.classList.toggle('on', btn.dataset.appTheme === style);
       });
     };
 
     buttons.forEach(btn => {
       btn.addEventListener('click', () => {
-        Settings.setTheme(btn.dataset.appTheme);
+        const style = btn.dataset.appTheme; // 'light' | 'professional'
+        setAppStyle(style);
+        // Hanya terapkan ke data-theme jika sedang mode terang
+        if (Settings.getTheme() !== 'dark') {
+          Settings.setTheme(style === 'professional' ? 'professional' : 'light');
+        }
         sync();
         if (typeof UI !== 'undefined' && UI.toast) {
-          UI.toast(btn.dataset.appTheme === 'professional' ? 'Tema aplikasi Profesional aktif' : 'Tema aplikasi Standar aktif');
+          UI.toast(style === 'professional' ? 'Tema aplikasi Profesional aktif' : 'Tema aplikasi Standar aktif');
+        }
+      });
+    });
+
+    sync();
+  };
+
+  /**
+   * Mode Tampilan: Terang / Gelap (SuperGrok premium dark untuk sheet).
+   */
+  const bindColorModeToggle = () => {
+    const buttons = document.querySelectorAll('[data-color-mode]');
+    if (!buttons.length || typeof Settings === 'undefined') return;
+
+    const sync = () => {
+      const isDark = Settings.getTheme() === 'dark';
+      buttons.forEach(btn => {
+        const mode = btn.dataset.colorMode;
+        btn.classList.toggle('on', isDark ? mode === 'dark' : mode === 'light');
+      });
+    };
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.colorMode; // 'light' | 'dark'
+        if (mode === 'dark') {
+          Settings.setTheme('dark');
+        } else {
+          // Kembali ke style terang yang terakhir dipilih (Standar/Profesional)
+          const style = getAppStyle();
+          Settings.setTheme(style === 'professional' ? 'professional' : 'light');
+        }
+        sync();
+        // Sync icon topbar (jika ada tombol theme di shell)
+        const themeBtn = document.getElementById('themeToggleBtn');
+        if (themeBtn) {
+          const dark = mode === 'dark';
+          themeBtn.innerHTML = '<svg class="icon"><use href="./icons/sprite.svg#' + (dark ? 'i-sun' : 'i-moon') + '"></use></svg>';
+        }
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast(mode === 'dark' ? 'Mode gelap aktif' : 'Mode terang aktif');
         }
       });
     });
@@ -314,6 +370,7 @@ const App = (() => {
     State.initElements();
     bindLoginThemeToggle();
     bindAppThemeToggle();
+    bindColorModeToggle();
 
     // Inisialisasi client Supabase (butuh CONFIG.SUPABASE_URL/ANON_KEY terisi benar)
     if (typeof SupabaseClient !== 'undefined') SupabaseClient.init();

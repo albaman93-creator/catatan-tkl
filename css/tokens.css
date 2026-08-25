@@ -155,22 +155,46 @@
   --body:  var(--font-sans);
 }
 
-/* ---------- Mode gelap ---------- */
+/* ---------- Mode gelap (SuperGrok premium) ---------- */
 [data-theme="dark"] {
-  --bg-page:          var(--slate-950);
-  --bg-surface:       var(--slate-900);
-  --bg-surface-hover: #16213A;
-  --bg-selected:      #10304D;
-  --border-default:   var(--slate-800);
-  --border-strong:    var(--slate-700);
-  --text-primary:     var(--slate-100);
-  --text-secondary:   var(--slate-400);
-  --text-muted:       var(--slate-500);
-  --brand-600: #4C9FE0;   /* dinaikkan terangnya supaya AA-contrast di atas bg gelap */
-  --brand-500: #6BB2E8;
+  --bg-page:          #0c0c0e;
+  --bg-surface:       #161618;
+  --bg-surface-hover: #1c1c1f;
+  --bg-selected:      #222226;
+  --border-default:   rgba(255, 255, 255, 0.08);
+  --border-strong:    rgba(255, 255, 255, 0.14);
+  --text-primary:     #f5f5f7;
+  --text-secondary:   #aeaeb2;
+  --text-muted:       #8e8e93;
+  --brand-900: #f5f5f7;
+  --brand-700: #e8e8ed;
+  --brand-600: #f5f5f7;
+  --brand-500: #ffffff;
+  --brand-100: #2c2c2e;
+  --brand-50:  #1c1c1f;
   --success-600: #34D399;
+  --success-bg:  rgba(52, 211, 153, 0.12);
   --warning-700: #FBBF24;
-  --danger-600:  #F87171;
+  --warning-bg:  rgba(251, 191, 36, 0.12);
+  --danger-600:  #ff6961;
+  --danger-bg:   rgba(255, 105, 97, 0.12);
+  --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.45);
+
+  /* alias mundur-kompatibel */
+  --ink:   var(--text-primary);
+  --ink2:  var(--text-secondary);
+  --mut:   var(--text-muted);
+  --paper: var(--bg-page);
+  --card:  var(--bg-surface);
+  --line:  var(--border-default);
+  --line2: var(--border-default);
+  --navy:  #f5f5f7;
+  --blue:  #f5f5f7;
+  --green:    var(--success-600);
+  --green-d:  var(--success-600);
+  --green-bg: var(--success-bg);
+  --amber: var(--warning-700);
+  --red:   var(--danger-600);
 }
 
 /* ---------- Mode Profesional (gaya kantor: putih dominan + biru) ----------

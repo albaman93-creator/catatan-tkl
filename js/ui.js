@@ -321,8 +321,14 @@ const UI = (() => {
     const sidebar = document.getElementById('sidebar');
     if (sidebar) {
       sidebar.addEventListener('click', (e) => {
-        if (e.target.closest('button')) setSidebarOpen(false);
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        // Jangan tutup saat ganti tema / mode tab / mode warna (pill toggle)
+        if (btn.closest('.pill-group') || btn.hasAttribute('data-app-theme') || btn.hasAttribute('data-mode') || btn.hasAttribute('data-color-mode')) return;
+        setSidebarOpen(false);
       });
+      const closeBtn = document.getElementById('sidebarClose');
+      if (closeBtn) closeBtn.addEventListener('click', () => setSidebarOpen(false));
     }
   };
 
