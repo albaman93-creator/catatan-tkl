@@ -15,6 +15,7 @@ const Dashboard = (() => {
   let page = 1;
   const pageSize = 25;
   let zoomPoints = 14;
+  let activityDetailState = { code: null, scrollY: 0 };
 
   const el = (id) => State.el[id] || document.getElementById(id);
   const esc = (v) => (typeof Utils?.escapeHtml === 'function' ? Utils.escapeHtml(v) : String(v ?? ''));
@@ -291,15 +292,132 @@ const Dashboard = (() => {
     }));
   };
 
+  const activityCodeMeta = {
+    1: { label: 'Unplanned', cls: 'is-unplanned' },
+    2: { label: 'Produktif', cls: 'is-productive' },
+    3: { label: 'Unplanned', cls: 'is-unplanned' },
+    4: { label: 'Unplanned', cls: 'is-unplanned' },
+    5: { label: 'Planned', cls: 'is-planned' },
+    6: { label: 'Planned', cls: 'is-planned' },
+    7: { label: 'Planned', cls: 'is-planned' },
+    8: { label: 'Planned', cls: 'is-planned' },
+    9: { label: 'Unplanned', cls: 'is-unplanned' },
+  };
+
+  const getFilteredActivities = () => {
+    const activities = [];
+    filteredRows.forEach(r => {
+      rawActivities(r).forEach(a => {
+        activities.push({
+          ...a,
+          date: r.date,
+          shift: r.shift,
+          line: r.line,
+          stage: r.tahapan,
+          productName: a.batch || r.produk_batch || '',
+          operatorInitial: r.inisial_operator || '',
+        });
+      });
+    });
+    return activities;
+  };
+
+  const openActivityCodeDetail = (code) => {
+    const summary = el('dashCodeSummary');
+    const detail = el('activityCodeDetail');
+    if (!summary || !detail) return;
+    const activities = getFilteredActivities().filter(a => Number(a.kode) === Number(code));
+    const meta = activityCodeMeta[Number(code)] || { label: 'Aktivitas', cls: '' };
+    const summaryState = aggregate(filteredRows);
+    const codeSummary = summaryState.codes.find(c => Number(c.code) === Number(code));
+    const totalMinutes = activities.reduce((sum, a) => sum + Number(a.dur || 0), 0);
+    const totalTime = Number(summaryState.totalTime || 0);
+    const contribution = totalTime ? (totalMinutes / totalTime) * 100 : 0;
+    const activityGroups = {};
+    activities.forEach(a => {
+      const name = String(a.kegiatan || '—').trim() || '—';
+      if (!activityGroups[name]) activityGroups[name] = { minutes: 0, count: 0 };
+      activityGroups[name].minutes += Number(a.dur || 0);
+      activityGroups[name].count += 1;
+    });
+    const topActivities = Object.entries(activityGroups).sort((a,b) => b[1].minutes - a[1].minutes);
+
+    activityDetailState = { code: Number(code), scrollY: window.scrollY || window.pageYOffset || 0 };
+
+    const title = el('detailCodeTitle');
+    const stats = el('detailCodeStats');
+    const rows = el('activityCodeDetailRows');
+    if (title) title.textContent = `Kode ${code} — ${meta.label}`;
+    if (stats) {
+      stats.innerHTML = [
+        `<span><b>${fmt0(totalMinutes)} mnt</b> total waktu</span>`,
+        `<span><b>${fmt0(activities.length)}x</b> kejadian</span>`,
+        `<span><b>${fmt(contribution)}%</b> dari total waktu</span>`,
+      ].join('');
+    }
+    const topList = el('activityCodeTopActivities');
+    if (topList) {
+      topList.innerHTML = topActivities.length
+        ? topActivities.map(([name, v]) => `<div class="activity-top-item"><span>${esc(name)}</span><b>${fmt0(v.minutes)} mnt · ${fmt0(v.count)}x</b></div>`).join('')
+        : '<div class="activity-top-empty">Tidak ada kegiatan untuk kode ini.</div>';
+    }
+    if (rows) {
+      rows.innerHTML = activities.length ? activities.map(a => `<tr>
+        <td>${fmtDate(a.date)}</td>
+        <td>S${esc(a.shift ?? '—')}</td>
+        <td>Line ${esc(a.line ?? '—')}</td>
+        <td>${esc(String(a.stage || '').toUpperCase() || '—')}</td>
+        <td class="dash-td-wrap">${esc(a.productName || '—')}</td>
+        <td class="dash-td-wrap">${esc(a.kegiatan || '—')}</td>
+        <td>${fmt0(a.dur)} mnt</td>
+        <td>${esc(a.operatorInitial || '—')}</td>
+      </tr>`).join('') : `<tr><td colspan="8" class="empty-detail">Tidak ada kegiatan untuk Kode ${code} pada filter dashboard yang aktif.</td></tr>`;
+    }
+    summary.hidden = true;
+    detail.hidden = false;
+    detail.dataset.category = meta.cls;
+    requestAnimationFrame(() => { detail.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  };
+
+  const closeActivityCodeDetail = () => {
+    const summary = el('dashCodeSummary');
+    const detail = el('activityCodeDetail');
+    if (!summary || !detail) return;
+    detail.hidden = true;
+    summary.hidden = false;
+    const y = Number(activityDetailState.scrollY || 0);
+    requestAnimationFrame(() => window.scrollTo({ top: y, behavior: 'smooth' }));
+  };
+
+  const bindActivityCodeInteractions = () => {
+    const summary = el('dashCodeSummary');
+    if (!summary || summary.dataset.bound === '1') return;
+    summary.dataset.bound = '1';
+    summary.addEventListener('click', (event) => {
+      const row = event.target.closest('.activity-code-row');
+      if (!row) return;
+      openActivityCodeDetail(row.dataset.code);
+    });
+    summary.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const row = event.target.closest('.activity-code-row');
+      if (!row) return;
+      event.preventDefault();
+      openActivityCodeDetail(row.dataset.code);
+    });
+    el('backToCodeSummary')?.addEventListener('click', closeActivityCodeDetail);
+  };
+
   const renderCodeTable = (s) => {
-    const catLabel = { prod: 'Produktif', planned: 'Planned', unplanned: 'Unplanned' };
     const rows = s.codes.map(c => {
       const topAct = Object.entries(c.activities).sort((a, b) => b[1] - a[1])[0]?.[0] || '—';
       const contribution = s.totalTime ? (c.minutes / s.totalTime) * 100 : 0;
       const cat = c.cat || (c.code === 2 ? 'prod' : CONFIG.PLANNED_CODES.has(c.code) ? 'planned' : CONFIG.UNPLANNED_CODES.has(c.code) ? 'unplanned' : 'prod');
-      return `<tr class="code-${cat}"><td><b>${c.code}</b></td><td><span class="dash-cat-badge ${cat}">${catLabel[cat]}</span></td><td>${fmt0(c.minutes)} mnt</td><td>${fmt0(c.count)}x</td><td>${fmt(contribution)}%</td><td class="code-act">${esc(topAct)}</td></tr>`;
+      const meta = activityCodeMeta[c.code] || { label: cat === 'prod' ? 'Produktif' : cat === 'planned' ? 'Planned' : 'Unplanned', cls: cat === 'prod' ? 'is-productive' : cat === 'planned' ? 'is-planned' : 'is-unplanned' };
+      return `<tr class="activity-code-row ${meta.cls}" data-code="${c.code}" tabindex="0" role="button" aria-label="Buka detail Kode ${c.code}"><td><span class="code-number">${c.code}</span></td><td><span class="activity-category">${meta.label}</span></td><td>${fmt0(c.minutes)} mnt</td><td>${fmt0(c.count)}x</td><td>${fmt(contribution)}%</td><td class="code-act">${esc(topAct)}</td><td><span class="activity-detail-trigger">Detail <span aria-hidden="true">→</span></span></td></tr>`;
     }).join('');
-    el('dashCodeSummary').innerHTML = `<div class="dash-code-table-wrap"><table class="dash-code-table"><thead><tr><th>Kode</th><th>Kategori</th><th>Total Waktu</th><th>Frekuensi</th><th>Kontribusi</th><th>Kegiatan Terbanyak</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    el('dashCodeSummary').innerHTML = `<div class="dash-code-table-wrap"><table class="dash-code-table activity-code-table"><thead><tr><th>Kode</th><th>Kategori</th><th>Total Waktu</th><th>Frekuensi</th><th>Kontribusi</th><th>Kegiatan Terbanyak</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    bindActivityCodeInteractions();
   };
 
   const renderCodeDonut = (s) => {

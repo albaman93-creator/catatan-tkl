@@ -1,0 +1,2388 @@
+/* ================================================================
+   LOGSHEET.CSS
+   Tabel log sheet, mode form, mode cepat
+   Versi compact + horizontal slide product
+   ================================================================ */
+
+
+/* ================================================================
+   WRAPPER TABEL
+   ================================================================ */
+
+.tbl-wrap {
+  overflow: auto !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  max-height: 66vh;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* ================================================================
+   TABEL
+   ================================================================ */
+
+table.log {
+  table-layout: auto;
+  width: max-content;
+  min-width: 100%;
+}
+
+
+/* ================================================================
+   STICKY KOLOM NOMOR
+   ================================================================ */
+
+.log td.col-num,
+.log th.col-num {
+  position: sticky;
+  left: 0;
+  z-index: 6;
+  background: #fff;
+  min-width: 32px;
+}
+
+.log thead th.col-num {
+  z-index: 25;
+  background: #f4f7f9;
+}
+
+
+/* ================================================================
+   STICKY HEADER
+   ================================================================ */
+
+.log thead th {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: #f4f7f9;
+}
+
+.log thead tr:first-child th {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: #f4f7f9;
+}
+
+.log thead tr:nth-child(2) th {
+  position: sticky;
+  top: 24px;
+  z-index: 14;
+  background: #f4f7f9;
+}
+
+
+/* ================================================================
+   RESPONSIVE TABEL HP
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  .tbl-wrap {
+    max-height: 56vh;
+    border-radius: 6px;
+  }
+
+  table.log {
+    min-width: 700px;
+  }
+
+  .log th,
+  .log td {
+    padding: 4px 3px;
+    font-size: 11px;
+  }
+
+  .log th .th-bulk-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+}
+
+
+/* ================================================================
+   LEBAR KOLOM
+   ================================================================ */
+
+col.col-num       { width: 26px; }
+col.col-kode      { width: 38px; }
+col.col-op        { width: 32px; }
+col.col-mulai     { width: 48px; }
+col.col-panggil   { width: 52px; }
+col.col-teknik    { width: 52px; }
+col.col-selesai   { width: 48px; }
+col.col-durasi    { width: 38px; }
+
+/* DIPERLEBAR */
+col.col-kegiatan  {
+  width: 220px;
+  min-width: 180px;
+}
+
+col.col-masalah   { width: 120px; }
+col.col-disposisi { width: 120px; }
+
+/* DIPERLEBAR */
+col.col-wo {
+  width: 150px;
+  min-width: 120px;
+}
+
+/* DIPERLEBAR */
+col.col-batch {
+  width: 180px;
+  min-width: 150px;
+}
+
+col.col-good      { width: 38px; }
+col.col-defect    { width: 38px; }
+col.col-aksi      { width: 30px; }
+
+col.col-hide {
+  display: none;
+}
+
+
+/* ================================================================
+   HEADER TABEL
+   ================================================================ */
+
+.log th {
+  font: 600 9.5px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--mut);
+  text-align: center;
+  padding: 5px 3px;
+  background: #f4f7f9;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.log th.on {
+  color: var(--green-d);
+  background: var(--green-bg);
+}
+
+
+/* ================================================================
+   SEL DATA
+   ================================================================ */
+
+.log td {
+  padding: 2px 3px;
+  border-bottom: 1px solid var(--line2);
+  vertical-align: middle;
+}
+
+
+/* ================================================================
+   STICKY KOLOM NOMOR
+   ================================================================ */
+
+.log td.col-num,
+.log th.col-num {
+  position: sticky;
+  left: 0;
+  z-index: 6;
+  background: #fff;
+}
+
+.log thead th.col-num {
+  z-index: 25;
+  background: #f4f7f9;
+}
+
+
+/* ================================================================
+   WARNA KOLOM NOMOR BERDASARKAN KATEGORI
+   ================================================================ */
+
+tr.log-row[data-cat="planned"] td.col-num {
+  background: #fdf3e4;
+}
+
+tr.log-row[data-cat="unplanned"] td.col-num {
+  background: #fce8e8;
+}
+
+tr.log-row[data-cat="prod"] td.col-num {
+  background: #e6f7ed;
+}
+
+.log tbody tr:focus-within {
+  outline: 2px solid var(--green);
+  outline-offset: -2px;
+}
+
+.log tbody tr:focus-within td.col-num {
+  box-shadow: inset 3px 0 0 var(--green-d);
+}
+
+
+/* ================================================================
+   INPUT DALAM TABEL
+   ================================================================ */
+
+.log .in,
+.log select.in {
+  font-size: 12px;
+  padding: 4px 3px;
+}
+
+.log textarea.in {
+  min-height: 26px;
+}
+
+
+/* ================================================================
+   ANIMASI BARIS
+   ================================================================ */
+
+.log tbody tr {
+  transition:
+    background .2s,
+    opacity .19s,
+    transform .19s;
+
+  animation: rowin .25s ease both;
+}
+
+@keyframes rowin {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.log tbody tr:hover {
+  background: #f6faf8;
+}
+
+
+/* ================================================================
+   WARNA BARIS BERDASARKAN KATEGORI
+   ================================================================ */
+
+tr.log-row[data-cat="planned"] {
+  background-color: rgba(217, 119, 6, 0.18);
+}
+
+tr.log-row[data-cat="planned"]:hover {
+  background-color: rgba(217, 119, 6, 0.26);
+}
+
+tr.log-row[data-cat="unplanned"] {
+  background-color: rgba(220, 38, 38, 0.25);
+}
+
+tr.log-row[data-cat="unplanned"]:hover {
+  background-color: rgba(220, 38, 38, 0.33);
+}
+
+tr.log-row[data-cat="prod"] {
+  background-color: rgba(18, 161, 80, 0.25);
+}
+
+tr.log-row[data-cat="prod"]:hover {
+  background-color: rgba(18, 161, 80, 0.35);
+}
+
+tr.out {
+  opacity: 0;
+  transform: translateX(12px);
+}
+
+
+/* ================================================================
+   GARIS INDIKATOR KIRI
+   ================================================================ */
+
+tr.log-row td:first-child {
+  position: relative;
+}
+
+tr.log-row td:first-child::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 18%;
+  bottom: 18%;
+  width: 3px;
+  border-radius: 3px;
+  background: transparent;
+  transition: background .2s;
+}
+
+tr[data-cat="planned"] td:first-child::before {
+  background: var(--amber);
+}
+
+tr[data-cat="unplanned"] td:first-child::before {
+  background: var(--red);
+}
+
+tr[data-cat="prod"] td:first-child::before {
+  background: var(--green);
+}
+
+
+/* ================================================================
+   KODE & DOT
+   ================================================================ */
+
+.c-kode {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d7e0e7;
+  flex: none;
+
+  transition:
+    background .2s,
+    box-shadow .2s;
+}
+
+tr[data-cat="planned"] .dot {
+  background: var(--amber);
+  box-shadow: 0 0 0 3px rgba(217,119,6,.15);
+}
+
+tr[data-cat="unplanned"] .dot {
+  background: var(--red);
+  box-shadow: 0 0 0 3px rgba(220,38,38,.15);
+}
+
+tr[data-cat="prod"] .dot {
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(18,161,80,.15);
+}
+
+
+/* ================================================================
+   DURASI
+   ================================================================ */
+
+td.dur {
+  text-align: center;
+}
+
+.dur-v {
+  font: 600 13px var(--mono);
+  color: var(--ink2);
+}
+
+
+/* ================================================================
+   AKSI
+   ================================================================ */
+
+.c-aksi {
+  text-align: center;
+  width: 30px;
+}
+
+.del {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #a4b4c0;
+  cursor: pointer;
+  font-size: 12px;
+  transition: .15s;
+}
+
+.del:hover {
+  background: rgba(220,38,38,.1);
+  color: var(--red);
+  border-color: rgba(220,38,38,.3);
+  transform: scale(1.08);
+}
+
+
+/* ================================================================
+   PRESET KOLOM
+   ================================================================ */
+
+.col-preset-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.col-preset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  font: 700 11px var(--mono);
+  color: var(--ink2);
+
+  background: #fff;
+  border: 1px solid var(--line);
+
+  padding: 6px 10px;
+  border-radius: 7px;
+
+  cursor: pointer;
+  transition: .15s;
+}
+
+.col-preset-btn:hover {
+  border-color: #b8c6d0;
+  color: var(--ink);
+}
+
+.col-preset-btn.on {
+  color: var(--green-d);
+  border-color: rgba(18,161,80,.4);
+  background: var(--green-bg);
+}
+
+
+/* ================================================================
+   TOGGLE KOLOM
+   ================================================================ */
+
+.col-toggle-wrap {
+  margin-bottom: 10px;
+}
+
+.col-toggle-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  font: 600 11px var(--mono);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+
+  color: var(--mut);
+  background: #f4f7f9;
+
+  border: 1px solid var(--line);
+  border-radius: 7px;
+
+  padding: 5px 10px;
+
+  cursor: pointer;
+  transition: .15s;
+}
+
+.col-toggle-head:hover {
+  color: var(--ink);
+  border-color: #b8c6d0;
+}
+
+.col-toggle-head[aria-expanded="true"] {
+  color: var(--green-d);
+  border-color: rgba(18,161,80,.4);
+  background: var(--green-bg);
+}
+
+.col-toggle-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  background: #f4f7f9;
+
+  padding: 8px 12px;
+
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  border-top: none;
+
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+
+  margin-top: -1px;
+}
+
+.col-toggle-bar[hidden] {
+  display: none !important;
+}
+
+.col-toggle-bar label {
+  font: 500 12px var(--mono);
+  color: var(--ink2);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  cursor: pointer;
+  background: #fff;
+
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+
+  user-select: none;
+}
+
+.col-toggle-bar input[type="checkbox"] {
+  accent-color: var(--green-d);
+  cursor: pointer;
+}
+
+.col-kode {
+  min-width: 38px !important;
+  width: 38px !important;
+}
+
+
+/* ================================================================
+   MODE FORM RINGKAS
+   ================================================================ */
+
+.form-panel {
+  background: #fbfcfd;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+
+  padding: 16px;
+  margin-bottom: 4px;
+
+  border-left: 4px solid var(--line);
+}
+
+.form-panel[data-cat="planned"] {
+  border-left-color: var(--amber);
+  background: rgba(217,119,6,.06);
+}
+
+.form-panel[data-cat="unplanned"] {
+  border-left-color: var(--red);
+  background: rgba(220,38,38,.06);
+}
+
+.form-panel[data-cat="prod"] {
+  border-left-color: var(--green);
+  background: var(--green-bg);
+}
+
+.fp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.fp-nav-btn {
+  font: 700 13px var(--mono);
+  color: var(--ink2);
+
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  padding: 10px 16px;
+
+  cursor: pointer;
+  transition: .15s;
+}
+
+.fp-nav-btn:hover {
+  border-color: #b8c6d0;
+  color: var(--ink);
+}
+
+.fp-nav-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.fp-nav-label {
+  font: 700 13px var(--mono);
+  color: var(--ink);
+
+  letter-spacing: .4px;
+
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+
+  padding: 8px 16px;
+}
+
+.fp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.fp-span2 {
+  grid-column: 1 / -1;
+}
+
+.form-panel .field textarea {
+  width: 100%;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  padding: 12px 14px;
+
+  font: 600 15px var(--mono);
+  color: var(--ink);
+
+  background: #fbfcfd;
+
+  resize: vertical;
+  min-height: 46px;
+}
+
+.form-panel .field textarea:focus {
+  outline: none;
+  border-color: var(--green);
+  background: #fff;
+
+  box-shadow: 0 0 0 3px rgba(18,161,80,.16);
+}
+
+.fp-save {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  font-size: 15px;
+}
+
+
+/* ================================================================
+   MODE FORM LENGKAP
+   ================================================================ */
+
+.form-panel-full {
+  padding: 0;
+  overflow: hidden;
+}
+
+.form-panel-full .fp-nav {
+  margin: 0;
+  padding: 14px 16px;
+
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.form-panel-full .ff-scroll {
+  max-height: 52vh;
+  overflow-y: auto;
+
+  -webkit-overflow-scrolling: touch;
+
+  padding: 16px;
+
+  overscroll-behavior: contain;
+}
+
+.ff-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.ff-span2 {
+  grid-column: span 2;
+}
+
+.form-panel-full .field textarea {
+  width: 100%;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  padding: 10px 12px;
+
+  font: 600 14px var(--mono);
+  color: var(--ink);
+
+  background: #fbfcfd;
+
+  resize: vertical;
+  min-height: 42px;
+}
+
+.form-panel-full .field textarea:focus {
+  outline: none;
+  border-color: var(--green);
+  background: #fff;
+
+  box-shadow: 0 0 0 3px rgba(18,161,80,.16);
+}
+
+.form-panel-full .field select {
+  width: 100%;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  padding: 12px 14px;
+
+  font: 600 14px var(--mono);
+  color: var(--ink);
+
+  background: #fbfcfd;
+}
+
+.ff-actions {
+  display: flex;
+  gap: 10px;
+
+  padding: 14px 16px;
+
+  background: #fff;
+  border-top: 1px solid var(--line);
+
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+}
+
+.ff-actions .fp-save {
+  margin-top: 0;
+  flex: 3;
+}
+
+.ff-actions .btn-logout {
+  flex: 1;
+  white-space: nowrap;
+}
+
+
+/* ================================================================
+   MODE CEPAT
+   ================================================================ */
+
+table.log.qm-cepat1 .col-panggil,
+table.log.qm-cepat1 .col-teknik,
+table.log.qm-cepat1 .col-selesai,
+table.log.qm-cepat1 .col-masalah,
+table.log.qm-cepat1 .col-disposisi,
+table.log.qm-cepat1 .col-wo {
+  display: none !important;
+}
+
+table.log.qm-cepat2 .col-panggil,
+table.log.qm-cepat2 .col-teknik,
+table.log.qm-cepat2 .col-kegiatan,
+table.log.qm-cepat2 .col-masalah,
+table.log.qm-cepat2 .col-disposisi,
+table.log.qm-cepat2 .col-wo {
+  display: none !important;
+}
+
+table.log.qm-cepat1 .dur-v,
+table.log.qm-cepat2 .dur-v {
+  display: none !important;
+}
+
+table.log.qm-cepat1 .durasi-input,
+table.log.qm-cepat2 .durasi-input {
+  display: inline-block !important;
+  max-width: 46px;
+}
+
+.col-durasi {
+  white-space: nowrap;
+}
+
+.col-hide {
+  display: none !important;
+}
+
+.col-kegiatan,
+.col-masalah,
+.col-disposisi,
+.col-batch {
+  white-space: normal !important;
+}
+
+
+/* ================================================================
+   NO. WO
+   ================================================================ */
+
+.wo-wrap {
+  white-space: normal !important;
+  word-break: break-all;
+  overflow-wrap: break-word;
+
+  resize: none;
+  overflow: hidden;
+}
+
+
+/* ================================================================
+   FOOTER TOTAL DURASI
+   ================================================================ */
+
+.log tfoot tr {
+  background: #f4f7f9;
+  border-top: 1px solid var(--line);
+}
+
+.log tfoot td {
+  padding: 8px 4px;
+}
+
+.log tfoot td:first-child {
+  text-align: center;
+}
+
+.log tfoot td:first-child span {
+  font: 600 12px var(--mono);
+  color: var(--ink);
+}
+
+.log tfoot td:nth-child(2) {
+  text-align: center;
+}
+
+.log tfoot td:nth-child(2) b {
+  font: 700 15px var(--mono);
+  color: var(--green-d);
+}
+
+.log tfoot td:nth-child(2) span {
+  font: 11px var(--mono);
+  color: var(--mut);
+}
+
+.log tfoot td:last-child {
+  text-align: left;
+
+  font: 11px var(--mono);
+  color: var(--mut);
+
+  padding-left: 8px;
+}
+
+
+/* ================================================================
+   SHIFT / LINE
+   ================================================================ */
+
+.sheet-shift-control .sheet-mini-segment button,
+.sheet-line-control .sheet-mini-segment button {
+  min-width: 28px;
+  padding: 4px 6px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+
+/* ================================================================
+   SHEET INLINE CONTROLS
+   ================================================================ */
+
+.sheet-inline-controls {
+  display: flex !important;
+  flex-direction: column;
+  flex-wrap: nowrap !important;
+
+  overflow: visible !important;
+
+  gap: 6px !important;
+
+  align-items: stretch;
+
+  padding-bottom: 4px;
+
+  min-height: 40px;
+}
+
+.sheet-inline-controls > * {
+  flex: 0 0 auto !important;
+  white-space: nowrap;
+}
+
+
+/* ================================================================
+   BARIS ATAS SHEET
+   ================================================================ */
+
+.sheet-top-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  flex-wrap: nowrap;
+
+  overflow-x: auto;
+
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: none;
+}
+
+.sheet-top-row::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* ================================================================
+   OP CONTROL
+   ================================================================ */
+
+.sheet-op-control {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  flex-wrap: nowrap !important;
+
+  flex: 1 1 auto;
+
+  min-width: 0;
+}
+
+.sheet-op-control .sheet-control-label {
+  white-space: nowrap;
+  font-size: 8.5px;
+}
+
+
+/* ================================================================
+   BARIS OP
+   ================================================================ */
+
+.sheet-op-row {
+  display: flex;
+
+  align-items: center;
+
+  width: 100%;
+
+  flex-wrap: nowrap !important;
+
+  overflow-x: auto;
+
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: none;
+}
+
+.sheet-op-row::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* ================================================================
+   OP BOXES
+   ================================================================ */
+
+.sheet-op-boxes {
+  display: flex;
+
+  gap: 3px;
+
+  flex-wrap: nowrap !important;
+
+  flex: 1 1 auto;
+
+  justify-content: center !important;
+
+  overflow-x: auto;
+
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: none;
+}
+
+.sheet-op-boxes::-webkit-scrollbar {
+  display: none;
+}
+
+.sheet-op-box {
+  flex: 0 0 auto;
+
+  width: 32px;
+  min-width: 28px;
+
+  text-align: center;
+
+  text-transform: uppercase;
+
+  font: 700 10px var(--mono);
+
+  border: 1px solid #d6dee5;
+  border-radius: 5px;
+
+  padding: 4px 1px;
+
+  background: #fbfcfd;
+}
+
+.sheet-op-box::placeholder {
+  color: #b6c4cf;
+  font-size: 7.5px;
+  text-transform: none;
+}
+
+.sheet-op-box:hover {
+  background: #f4f8fa;
+}
+
+.sheet-op-box:focus {
+  outline: none;
+
+  border-color: #12a150;
+  background: #fff;
+
+  box-shadow: 0 0 0 3px rgba(18,161,80,.16);
+}
+
+.sheet-op-box.filled {
+  border-color: rgba(18,161,80,.5);
+  background: rgba(18,161,80,.06);
+}
+
+
+/* ================================================================
+   DATE
+   ================================================================ */
+
+.sheet-date-control {
+  margin-left: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+.sheet-date-trigger {
+  width: auto;
+  max-width: 100%;
+
+  min-height: 32px;
+
+  padding: 5px 8px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  gap: 5px;
+
+  border: 1px solid var(--line);
+
+  border-radius: 8px;
+
+  background: #fff;
+
+  color: var(--ink2);
+
+  font: 800 10.5px var(--mono);
+
+  letter-spacing: .35px;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    border-color .15s,
+    background .15s,
+    color .15s;
+}
+
+.sheet-date-trigger:hover,
+.sheet-date-trigger:focus-visible {
+  outline: none;
+
+  border-color: var(--sheet-accent);
+
+  background: var(--sheet-accent-soft);
+
+  color: var(--sheet-accent);
+}
+
+.sheet-date-icon {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.sheet-date-chevron {
+  font-size: 10px;
+  color: var(--mut);
+}
+
+
+/* ================================================================
+   UNIFIED SHEET CONTROL
+   ================================================================ */
+
+.sheet-unified-control {
+  --sheet-accent: var(--green-d);
+  --sheet-accent-soft: rgba(18, 161, 80, .10);
+
+  border: 1px solid var(--line);
+
+  border-radius: 12px;
+
+  background: linear-gradient(
+    180deg,
+    #ffffff,
+    #fbfcfd
+  );
+
+  box-shadow: 0 4px 16px -12px rgba(15, 36, 55, .28);
+
+  margin: -2px 0 14px;
+
+  padding: 8px 10px 7px;
+
+  transition:
+    border-color .18s,
+    box-shadow .18s;
+}
+
+.sheet-unified-control[data-stage="mixing"] {
+  --sheet-accent: #168a4a;
+  --sheet-accent-soft: rgba(22,138,74,.11);
+}
+
+.sheet-unified-control[data-stage="filling"] {
+  --sheet-accent: #2563eb;
+  --sheet-accent-soft: rgba(37,99,235,.10);
+}
+
+.sheet-unified-control[data-stage="steril"] {
+  --sheet-accent: #db2777;
+  --sheet-accent-soft: rgba(219,39,119,.10);
+}
+
+.sheet-unified-control[data-stage="visual"] {
+  --sheet-accent: #7e22ce;
+  --sheet-accent-soft: rgba(126,34,206,.10);
+}
+
+.sheet-unified-control[data-stage="kemas"] {
+  --sheet-accent: #ea580c;
+  --sheet-accent-soft: rgba(234,88,12,.10);
+}
+
+
+/* ================================================================
+   PROCESS TABS
+   ================================================================ */
+
+.sheet-process-tabs {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  overflow-x: auto;
+
+  overscroll-behavior-x: contain;
+
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: none;
+
+  padding: 0 0 7px;
+
+  margin: 0;
+}
+
+.sheet-process-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.sheet-stage-btn {
+  flex: 0 0 auto;
+
+  border: 1px solid #d6e0e6;
+
+  background: #fff;
+
+  color: var(--ink2);
+
+  border-radius: 999px;
+
+  padding: 6px 11px;
+
+  font: 800 11.5px var(--mono);
+
+  letter-spacing: .2px;
+
+  cursor: pointer;
+
+  transition:
+    background .16s,
+    color .16s,
+    border-color .16s,
+    box-shadow .16s,
+    transform .12s;
+}
+
+.sheet-stage-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--sheet-accent);
+}
+
+.sheet-stage-btn.on {
+  color: #fff;
+
+  background: var(--sheet-accent);
+
+  border-color: var(--sheet-accent);
+
+  box-shadow:
+    0 4px 10px -5px var(--sheet-accent);
+}
+
+
+/* ================================================================
+   CONTROL GROUP
+   ================================================================ */
+
+.sheet-control-group {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  flex: 0 0 auto;
+
+  min-width: 0;
+}
+
+.sheet-control-label {
+  font: 800 9px var(--mono);
+
+  letter-spacing: .75px;
+
+  text-transform: uppercase;
+
+  color: var(--mut);
+}
+
+.sheet-control-divider {
+  width: 1px;
+  height: 22px;
+
+  background: var(--line);
+
+  flex: 0 0 auto;
+}
+
+
+/* ================================================================
+   MINI SEGMENT
+   ================================================================ */
+
+.sheet-mini-segment {
+  display: inline-flex;
+
+  align-items: stretch;
+
+  gap: 2px;
+
+  padding: 2px;
+
+  border: 1px solid var(--line);
+
+  border-radius: 8px;
+
+  background: #f6f8fa;
+}
+
+.sheet-mini-segment button {
+  min-width: 25px;
+
+  height: 27px;
+
+  padding: 3px 7px;
+
+  border: 0;
+
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: var(--ink2);
+
+  font: 800 11.5px var(--mono);
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background .15s,
+    color .15s,
+    box-shadow .15s,
+    transform .12s;
+}
+
+.sheet-mini-segment button:hover {
+  background: #eaf0f4;
+}
+
+.sheet-mini-segment button.on {
+  box-shadow: 0 1px 5px -3px rgba(0,0,0,.45);
+}
+
+
+/* ================================================================
+   SHIFT COLORS
+   ================================================================ */
+
+#sheetShift button[data-shift="0"].on {
+  background: #fff;
+
+  color: #243746;
+
+  border: 1px solid #b9c7d1;
+}
+
+#sheetShift button[data-shift="1"].on {
+  background: #f97316;
+  color: #fff;
+}
+
+#sheetShift button[data-shift="2"].on {
+  background: #0d2135;
+  color: #fff;
+}
+
+
+/* ================================================================
+   LINE ACTIVE
+   ================================================================ */
+
+#sheetLine button.on {
+  background: var(--green-d);
+  color: #fff;
+}
+
+
+/* ================================================================
+   KPI
+   ================================================================ */
+
+.sheet-kpi-row {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 4px;
+
+  margin-top: 5px;
+
+  padding-top: 5px;
+
+  border-top: 1px solid var(--line2);
+}
+
+.sheet-kpi {
+  --kpi-color: #16a34a;
+
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 3px;
+
+  padding: 3px 4px;
+
+  min-height: 25px;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--kpi-color) 18%,
+      #dfe6eb
+    );
+
+  border-radius: 7px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--kpi-color) 8%,
+      #ffffff
+    );
+
+  color: var(--kpi-color);
+
+  font: 800 8.5px var(--mono);
+
+  letter-spacing: .25px;
+
+  box-sizing: border-box;
+}
+
+.sheet-kpi span {
+  flex: 0 0 auto;
+  opacity: .95;
+}
+
+.sheet-kpi b {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  color: var(--kpi-color);
+
+  font-size: 10px;
+
+  font-weight: 900;
+}
+
+.sheet-kpi:nth-child(1) {
+  --kpi-color: #16a34a;
+}
+
+.sheet-kpi:nth-child(2) {
+  --kpi-color: #2563eb;
+}
+
+.sheet-kpi:nth-child(3) {
+  --kpi-color: #7c3aed;
+}
+
+.sheet-kpi-oee {
+  --kpi-color: #ea580c;
+
+  color: #c2410c;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(234,88,12,.14),
+      rgba(234,88,12,.08)
+    );
+
+  border-color: rgba(234,88,12,.28);
+
+  box-shadow:
+    inset 0 -2px 0 rgba(234,88,12,.18);
+}
+
+.sheet-kpi-oee b {
+  color: #c2410c;
+}
+
+
+/* ================================================================
+   ================================================================
+   PRODUK — HORIZONTAL SLIDE / SWIPE
+   Produk 1 → Produk 2 → Produk 3
+   ================================================================
+   ================================================================ */
+
+.sheet-product-bar {
+  display: flex !important;
+
+  flex-direction: row !important;
+
+  flex-wrap: nowrap !important;
+
+  align-items: stretch;
+
+  gap: 10px;
+
+  width: 100%;
+
+  min-width: 0;
+
+  overflow-x: auto !important;
+
+  overflow-y: hidden !important;
+
+  padding: 10px 8px !important;
+
+  margin: 8px 0 6px !important;
+
+  box-sizing: border-box;
+
+  border-radius: 12px;
+
+  background:
+    rgba(255,255,255,.62);
+
+  border:
+    1px solid rgba(255,255,255,.75);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.85);
+
+  backdrop-filter: blur(8px);
+
+  -webkit-backdrop-filter: blur(8px);
+
+  -webkit-overflow-scrolling: touch;
+
+  overscroll-behavior-x: contain;
+
+  scroll-snap-type: x mandatory;
+
+  scrollbar-width: none;
+}
+
+.sheet-product-bar::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* Produk individual */
+.sheet-product-bar .field {
+  flex: 0 0 auto !important;
+
+  width: 300px !important;
+
+  min-width: 280px !important;
+
+  max-width: 300px;
+
+  margin: 0 !important;
+
+  scroll-snap-align: start;
+
+  box-sizing: border-box;
+}
+
+
+/* Label produk */
+.sheet-product-bar .field label {
+  display: block;
+
+  font-size: 11px;
+
+  margin-bottom: 4px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* Jika ada container input terpisah */
+.sheet-product-bar .split-input-3 {
+  display: flex;
+
+  gap: 4px;
+
+  width: 100%;
+}
+
+
+/* Input produk */
+.sheet-product-bar input,
+.sheet-product-bar select,
+.sheet-product-bar textarea {
+  box-sizing: border-box;
+}
+
+
+/* Input nama/rate/WO */
+.sheet-product-bar input {
+  min-width: 0;
+
+  font-size: 12px;
+
+  padding: 6px 7px;
+}
+
+
+/* Bila field memiliki class product-card */
+.sheet-product-bar .product-card {
+  flex: 0 0 auto !important;
+
+  width: 300px;
+
+  min-width: 280px;
+
+  scroll-snap-align: start;
+}
+
+
+/* Judul produk */
+.sheet-product-bar .product-title,
+.sheet-product-bar .product-label {
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* ================================================================
+   PRODUK — MOBILE
+   ================================================================ */
+
+@media (max-width: 720px) {
+
+  .sheet-product-bar {
+    gap: 9px;
+
+    padding: 8px 7px !important;
+
+    margin: 6px 0 4px !important;
+
+    border-radius: 10px;
+
+    scroll-padding-left: 7px;
+  }
+
+  .sheet-product-bar .field {
+    width: 82vw !important;
+
+    min-width: 82vw !important;
+
+    max-width: 320px;
+
+    scroll-snap-align: start;
+  }
+
+  .sheet-product-bar .product-card {
+    width: 82vw !important;
+
+    min-width: 82vw !important;
+
+    max-width: 320px;
+  }
+
+  .sheet-product-bar .field label {
+    font-size: 10px;
+  }
+
+  .sheet-product-bar input,
+  .sheet-product-bar select {
+    font-size: 11px;
+  }
+}
+
+
+/* ================================================================
+   PRODUK — HP SANGAT KECIL
+   ================================================================ */
+
+@media (max-width: 420px) {
+
+  .sheet-product-bar {
+    gap: 8px;
+
+    padding: 7px 6px !important;
+  }
+
+  .sheet-product-bar .field,
+  .sheet-product-bar .product-card {
+    width: 86vw !important;
+
+    min-width: 86vw !important;
+  }
+
+  .sheet-product-bar .field label {
+    font-size: 9px;
+  }
+
+  .sheet-product-bar input,
+  .sheet-product-bar select {
+    font-size: 10px;
+
+    padding: 5px 6px;
+  }
+}
+
+
+/* ================================================================
+   LOGSHEET TOPBAR
+   ================================================================ */
+
+.logsheet-topbar {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  min-width: 0;
+
+  margin: -2px 0 12px;
+
+  padding: 0;
+
+  overflow-x: auto;
+
+  overflow-y: visible;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    #cbd5dc
+    transparent;
+}
+
+.logsheet-topbar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.logsheet-topbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.logsheet-topbar::-webkit-scrollbar-thumb {
+  background: #cbd5dc;
+  border-radius: 99px;
+}
+
+.logsheet-topbar > * {
+  flex: 0 0 auto;
+}
+
+.logsheet-topbar .sec-h {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin: 0;
+
+  flex: 0 0 auto;
+
+  white-space: nowrap;
+}
+
+.logsheet-topbar .sec-h .no {
+  font-size: 15px;
+
+  padding: 3px 7px;
+
+  border-radius: 6px;
+}
+
+.logsheet-topbar .sec-h h2 {
+  font-size: 19px;
+
+  letter-spacing: .9px;
+
+  white-space: nowrap;
+}
+
+.logsheet-title {
+  display: flex;
+  align-items: center;
+}
+
+.logsheet-top-spacer {
+  flex: 1 1 auto !important;
+
+  min-width: 4px;
+}
+
+.logsheet-topbar .col-preset-bar {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  margin: 0;
+}
+
+.logsheet-topbar .col-preset-btn {
+  padding: 5px 8px;
+
+  font-size: 10px;
+
+  border-radius: 7px;
+
+  white-space: nowrap;
+}
+
+.logsheet-topbar .col-toggle-wrap {
+  position: relative;
+
+  margin: 0;
+}
+
+.logsheet-topbar .col-toggle-head {
+  white-space: nowrap;
+
+  padding: 5px 8px;
+
+  font-size: 10px;
+}
+
+.logsheet-topbar .col-toggle-bar {
+  position: absolute;
+
+  z-index: 30;
+
+  top: calc(100% + 2px);
+
+  right: 0;
+
+  min-width: 430px;
+
+  max-width: min(760px, 92vw);
+
+  box-shadow:
+    0 12px 28px rgba(18,39,54,.14);
+}
+
+.logsheet-topbar .help-btn {
+  padding: 5px 8px;
+
+  font-size: 10px;
+
+  white-space: nowrap;
+}
+
+.logsheet-topbar .view-toggle {
+  flex: 0 0 auto;
+}
+
+.logsheet-topbar .view-toggle button {
+  padding: 5px 7px;
+
+  font-size: 10px;
+}
+
+
+/* ================================================================
+   VIEW TOGGLE
+   ================================================================ */
+
+.view-toggle {
+  padding: 2px;
+
+  border-radius: 7px;
+
+  gap: 2px;
+}
+
+.view-toggle button {
+  padding: 5px 8px;
+
+  font-size: 11px;
+
+  border-radius: 5px;
+
+  white-space: nowrap;
+}
+
+
+/* ================================================================
+   HELP BUTTON
+   ================================================================ */
+
+.help-btn {
+  padding: 5px 9px;
+
+  font-size: 11px;
+
+  border-radius: 7px;
+}
+
+
+/* ================================================================
+   MOBILE TOPBAR
+   ================================================================ */
+
+@media (max-width: 640px) {
+
+  .logsheet-topbar {
+    gap: 5px;
+
+    margin-bottom: 9px;
+  }
+
+  .logsheet-topbar .sec-h {
+    gap: 6px;
+  }
+
+  .logsheet-topbar .sec-h .no {
+    font-size: 13px;
+
+    padding: 2px 6px;
+  }
+
+  .logsheet-topbar .sec-h h2 {
+    font-size: 16px;
+
+    letter-spacing: .65px;
+  }
+
+  .logsheet-topbar .col-preset-btn,
+  .logsheet-topbar .col-toggle-head,
+  .logsheet-topbar .help-btn,
+  .logsheet-topbar .view-toggle button {
+    padding: 4px 6px;
+
+    font-size: 9px;
+  }
+
+  .logsheet-topbar .col-toggle-bar {
+    left: 0;
+
+    right: auto;
+
+    min-width: 330px;
+
+    max-width: 88vw;
+  }
+}
+
+
+/* ================================================================
+   MOBILE UNIFIED CONTROL
+   ================================================================ */
+
+@media (max-width: 640px) {
+
+  .sheet-unified-control {
+    margin-bottom: 10px;
+
+    padding: 7px 7px 6px;
+
+    border-radius: 10px;
+  }
+
+  .sheet-process-tabs {
+    gap: 3px;
+
+    padding-bottom: 6px;
+  }
+
+  .sheet-stage-btn {
+    padding: 5px 9px;
+
+    font-size: 10.5px;
+  }
+
+  .sheet-inline-controls {
+    gap: 5px;
+  }
+
+  .sheet-control-label {
+    font-size: 8px;
+
+    letter-spacing: .55px;
+  }
+
+  .sheet-control-divider {
+    height: 20px;
+  }
+
+  .sheet-mini-segment {
+    gap: 1px;
+
+    padding: 1px;
+
+    border-radius: 7px;
+  }
+
+  .sheet-mini-segment button {
+    min-width: 23px;
+
+    height: 26px;
+
+    padding: 3px 6px;
+
+    font-size: 11px;
+
+    border-radius: 5px;
+  }
+
+  .sheet-date-trigger {
+    min-height: 29px;
+
+    padding: 4px 7px;
+
+    gap: 4px;
+
+    font-size: 9.5px;
+  }
+
+  .sheet-kpi-row {
+    gap: 3px;
+
+    margin-top: 4px;
+
+    padding-top: 4px;
+  }
+
+  .sheet-kpi {
+    min-height: 23px;
+
+    padding: 2px 3px;
+
+    font-size: 7.5px;
+
+    border-radius: 6px;
+  }
+
+  .sheet-kpi b {
+    font-size: 9px;
+  }
+}
+
+
+/* ================================================================
+   HP ≤ 420px
+   ================================================================ */
+
+@media (max-width: 420px) {
+
+  .sheet-mini-segment button {
+    min-width: 24px !important;
+
+    padding: 3px 4px !important;
+
+    font-size: 10px !important;
+  }
+
+  .sheet-date-trigger {
+    font-size: 9px !important;
+
+    padding: 4px 5px !important;
+  }
+
+  .sheet-op-control .sheet-control-label {
+    font-size: 7px;
+  }
+}
+
+
+/* ================================================================
+   HP ≤ 390px
+   ================================================================ */
+
+@media (max-width: 390px) {
+
+  .sheet-control-label {
+    display: none;
+  }
+
+  .sheet-control-divider {
+    margin: 0 1px;
+  }
+
+  .sheet-date-trigger {
+    max-width: 128px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+  }
+
+  .sheet-date-trigger #sheetDateText {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+  }
+
+  .sheet-kpi {
+    gap: 2px;
+
+    min-height: 22px;
+
+    padding: 2px;
+
+    font-size: 7.2px;
+  }
+
+  .sheet-kpi b {
+    font-size: 8.6px;
+  }
+
+  .sheet-op-box {
+    width: 24px;
+
+    min-width: 22px;
+
+    font-size: 8px;
+
+    padding: 2px 1px;
+  }
+}
+
+
+/* ================================================================
+   FORM RESPONSIVE
+   ================================================================ */
+
+@media (max-width: 640px) {
+
+  .fp-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+
+  .ff-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .ff-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ff-span2 {
+    grid-column: 1;
+  }
+
+  .ff-actions {
+    flex-direction: column;
+  }
+
+  .form-panel-full .ff-scroll {
+    max-height: 46vh;
+  }
+
+  .tbl-wrap {
+    max-height: 56vh;
+  }
+}
+
+
+/* ================================================================
+   TAMBAHAN COMPACT
+   ================================================================ */
+
+.col-toggle-head {
+  padding: 5px 10px;
+
+  font-size: 11px;
+
+  border-radius: 7px;
+}
+
+.col-preset-bar {
+  display: flex;
+
+  gap: 6px;
+
+  margin-bottom: 8px;
+}
+
+.col-preset-btn {
+  padding: 6px 10px;
+
+  font-size: 11px;
+
+  border-radius: 7px;
+
+  gap: 4px;
+}
+
+
+/* ================================================================
+   PERBAIKAN KHUSUS LEBAR KOLOM
+   Pastikan width tidak dipatahkan browser
+   ================================================================ */
+
+table.log .col-kegiatan {
+  min-width: 180px !important;
+  width: 220px !important;
+}
+
+table.log .col-batch {
+  min-width: 150px !important;
+  width: 180px !important;
+}
+
+table.log .col-wo {
+  min-width: 120px !important;
+  width: 150px !important;
+}
+
+
+/* ================================================================
+   BATCH / PRODUK
+   ================================================================ */
+
+.col-kegiatan,
+.col-masalah,
+.col-disposisi,
+.col-batch {
+  white-space: normal !important;
+
+  word-break: break-word;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* ================================================================
+   PRODUK BAR — SUPPORT PRODUCT GRID CLASS
+   ================================================================ */
+
+.sheet-product-bar.product-grid {
+  display: flex !important;
+
+  flex-direction: row !important;
+
+  flex-wrap: nowrap !important;
+
+  overflow-x: auto !important;
+
+  overflow-y: hidden !important;
+
+  scrollbar-width: none;
+
+  -webkit-overflow-scrolling: touch;
+
+  scroll-snap-type: x mandatory;
+}
+
+.sheet-product-bar.product-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.sheet-product-bar.product-grid > * {
+  flex: 0 0 auto !important;
+}
+
+
+/* ================================================================
+   SINGLE ROW CONTROL
+   ================================================================ */
+
+.sheet-inline-controls {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+/* ================================================================
+   JIKA ADA CONTAINER PRODUK 1/2/3
+   ================================================================ */
+
+#sheetProductBar {
+  width: 100%;
+
+  max-width: 100%;
+
+  box-sizing: border-box;
+
+  touch-action: pan-x;
+}
+
+
+/* ================================================================
+   PRODUK INPUT AGAR TIDAK MEMBUAT SLIDE RUSAK
+   ================================================================ */
+
+#sheetProductBar input,
+#sheetProductBar select,
+#sheetProductBar textarea {
+  max-width: 100%;
+
+  box-sizing: border-box;
+}
+
+
+/* ================================================================
+   MOBILE: TABEL TETAP BISA SWIPE
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  .tbl-wrap {
+    overflow-x: auto !important;
+
+    overflow-y: auto !important;
+
+    touch-action: pan-x pan-y;
+  }
+
+  table.log {
+    width: max-content;
+
+    min-width: 700px;
+  }
+}
+
+
+/* ================================================================
+   FINAL COMPACT MOBILE
+   ================================================================ */
+
+@media (max-width: 420px) {
+
+  .sheet-product-bar {
+    scroll-snap-type: x mandatory;
+
+    scroll-padding-left: 6px;
+  }
+
+  .sheet-product-bar .field {
+    flex-basis: 86vw !important;
+  }
+
+  .log th,
+  .log td {
+    padding-left: 3px;
+
+    padding-right: 3px;
+  }
+}
+
+/* Kolom OP — 1 karakter di antara Kode dan Mulai */
+.log td.col-op,
+.log th.col-op {
+  text-align: center;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+.log td.col-op .in {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 700;
+  max-width: 28px;
+  padding: 4px 2px;
+}

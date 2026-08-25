@@ -1,0 +1,65 @@
+/* ================================================
+   BASE.CSS — Reset, variabel, dan elemen dasar
+   ================================================ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --ink: #0f2437; --ink2: #41586c; --mut: #6b8093;
+  --paper: #e8edf1; --card: #fff; --line: #d6dee5; --line2: #e8eef2;
+  --green: #12a150; --green-d: #0c7c3d; --green-bg: rgba(18,161,80,.12);
+  --amber: #d97706; --red: #dc2626; --navy: #0d2135; --blue: #0c63a8;
+  --mono: 'IBM Plex Mono', monospace;
+  --disp: 'Barlow Condensed', sans-serif;
+  --body: 'IBM Plex Sans', sans-serif;
+  --page: 1360px;
+}
+
+/* ---------- Tema Profesional (gaya kantor: putih dominan + biru) ----------
+   Aktif saat <html data-theme="professional"> (lihat js/settings.js +
+   tombol "Tema Aplikasi" di sidebar). Warna status semantik (--green,
+   --green-d, --amber, --red) SENGAJA TIDAK diubah supaya makna hijau =
+   baik/tercapai, merah = bahaya, dsb tetap konsisten di seluruh data
+   (OEE, kategori downtime). Yang diubah hanya warna netral & aksen brand:
+   latar jadi putih/biru sangat muda, garis pinggir jadi biru muda,
+   teks & aksen utama jadi navy/biru kantor. */
+[data-theme="professional"] {
+  --ink: #0F2437; --ink2: #3A5872; --mut: #7B96AC;
+  --paper: #F2F7FC; --card: #FFFFFF; --line: #CBDEF0; --line2: #DCEBFA;
+  --navy: #0B2A47; --blue: #0B5FA5;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--body); font-size: 16px; color: var(--ink);
+  min-height: 100vh;
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  background:
+    radial-gradient(900px 420px at 50% -10%, rgba(18,161,80,.10), transparent 60%),
+    linear-gradient(rgba(15,36,55,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,36,55,.05) 1px, transparent 1px),
+    var(--paper);
+  background-size: auto, 26px 26px, 26px 26px, auto;
+  overflow-x: hidden;
+}
+::selection { background: rgba(18,161,80,.25); }
+button, input, select { touch-action: manipulation; }
+.spacer { flex: 1; }
+kbd {
+  font: 600 12px var(--mono); background: #fff;
+  border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: 4px; padding: 1px 6px; color: var(--ink2);
+}
+
+/* Mode gelap — latar SuperGrok, tanpa grid hijau */
+[data-theme="dark"] body {
+  color: var(--ink);
+  background: var(--paper);
+  background-image: none;
+}
+[data-theme="dark"] ::selection { background: rgba(255, 255, 255, 0.18); }
+[data-theme="dark"] kbd {
+  background: var(--card);
+  border-color: var(--line);
+  color: var(--ink2);
+}
