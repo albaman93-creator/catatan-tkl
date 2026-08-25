@@ -141,6 +141,26 @@
 .empty-state p { font: 13.5px var(--font-sans); line-height: 1.6; }
 .empty-state code { background: var(--slate-100); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
 
+/* ---------- LOGIN THEME SELECTOR ---------- */
+.login-theme-setting {
+  display: grid; gap: 8px; margin: 0 0 12px; padding: 10px;
+  background: var(--bg-surface); border: 1px solid var(--border-default);
+  border-radius: var(--radius-control);
+}
+.login-theme-setting-label strong { display: block; font: 600 12.5px var(--font-sans); color: var(--text-primary); }
+.login-theme-setting-label span { display: block; margin-top: 2px; font: 11px var(--font-sans); color: var(--text-muted); }
+.login-theme-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.login-theme-option {
+  min-width: 0; border: 1px solid var(--border-default); border-radius: 7px;
+  padding: 7px 6px; background: transparent; color: var(--text-secondary);
+  font: 600 11px var(--font-sans); cursor: pointer; transition: var(--transition-fast);
+}
+.login-theme-option:hover { background: var(--bg-surface-hover); color: var(--text-primary); }
+.login-theme-option.active {
+  background: var(--brand-50); border-color: var(--brand-200); color: var(--brand-600);
+}
+.login-theme-option:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 1px; }
+
 /* ---------- PENGATURAN ---------- */
 .settings-grid { display: grid; gap: 16px; max-width: 620px; }
 .settings-card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-card); padding: 18px 20px; }

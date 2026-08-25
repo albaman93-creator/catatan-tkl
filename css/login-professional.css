@@ -1,154 +1,286 @@
-/* ================================================
-   LOGIN-PROFESSIONAL.CSS — Tema profesional untuk overlay login
-   Independen dari login.css (tema santai). Semua selector di-scope
-   di bawah .login-theme-professional (class ini dipasang di
-   #loginOverlay oleh js/login-theme.js). Aktif ketika operator
-   memilih tema profesional lewat toggle (default tetap "santai").
-   ================================================ */
+/* =========================================================
+   LOGIN-PROFESSIONAL.CSS — Tema Profesional
+   Dark navy + glassmorphism. Aktif saat:
+   #loginOverlay.login-theme-professional
+   ========================================================= */
 
-/* ====== LAYOUT DASAR OVERLAY ======
-   Duplikasi properti posisi/centering dari login.css supaya file ini
-   berdiri sendiri (tidak bergantung pada login.css termuat lebih dulu). */
-.login-theme-professional#loginOverlay {
-  position: fixed; inset: 0; z-index: 1000;
-  display: flex; align-items: center; justify-content: center; padding: 16px;
+#loginOverlay.login-theme-professional {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
   overflow: hidden;
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(59,130,246,.18), transparent 32%),
+    radial-gradient(circle at 82% 76%, rgba(14,165,233,.14), transparent 34%),
+    linear-gradient(135deg, #0f172a 0%, #172554 52%, #0b1120 100%);
   transition: opacity .3s ease, visibility .3s ease;
-  background: linear-gradient(135deg, var(--slate-900, #0F172A) 0%, var(--slate-800, #1E293B) 100%);
-  font-family: 'Inter', var(--font-sans), sans-serif;
-}
-.login-theme-professional#loginOverlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-
-/* Matikan landscape SVG bawaan tema santai — tema profesional pakai
-   gradient + blob, bukan scene nature.css */
-.login-theme-professional #bgScene,
-.login-theme-professional #natureExtra,
-.login-theme-professional .preview-bar,
-.login-theme-professional .wx-chip {
-  display: none;
 }
 
-/* ====== BLOB DEKORATIF (CSS-only, tanpa markup tambahan) ====== */
-.login-theme-professional#loginOverlay::before,
-.login-theme-professional#loginOverlay::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(70px);
-  opacity: .35;
+/* FIX: aturan ini sebelumnya tidak ada, sehingga setelah login berhasil
+   (auth.js menambahkan class .hide) overlay tema Profesional tetap
+   full-screen menutupi aplikasi — terlihat seperti tombol "Masuk" tidak
+   merespons. Tema Santai punya aturan setara di nature.css. */
+#loginOverlay.login-theme-professional.hide {
+  opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  z-index: 0;
-}
-.login-theme-professional#loginOverlay::before {
-  width: 420px; height: 420px;
-  background: var(--brand-600, #0B5FA5);
-  top: -140px; left: -120px;
-  animation: proBlobFloat 14s ease-in-out infinite;
-}
-.login-theme-professional#loginOverlay::after {
-  width: 360px; height: 360px;
-  background: var(--brand-500, #1877C4);
-  bottom: -150px; right: -90px;
-  animation: proBlobFloat 18s ease-in-out infinite reverse;
-}
-@keyframes proBlobFloat {
-  0%, 100% { transform: translate(0,0) scale(1); }
-  50%      { transform: translate(28px, -18px) scale(1.08); }
 }
 
-/* ====== KARTU LOGIN — glassmorphism gelap ====== */
-.login-theme-professional .login-card {
+#loginOverlay.login-theme-professional::before,
+#loginOverlay.login-theme-professional::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(2px);
+  opacity: .75;
+}
+
+#loginOverlay.login-theme-professional::before {
+  width: 420px;
+  height: 420px;
+  left: -150px;
+  top: -130px;
+  background: radial-gradient(circle, rgba(37,99,235,.28), rgba(37,99,235,0));
+  animation: professionalBlobA 12s ease-in-out infinite alternate;
+}
+
+#loginOverlay.login-theme-professional::after {
+  width: 520px;
+  height: 520px;
+  right: -190px;
+  bottom: -210px;
+  background: radial-gradient(circle, rgba(6,182,212,.22), rgba(6,182,212,0));
+  animation: professionalBlobB 15s ease-in-out infinite alternate;
+}
+
+@keyframes professionalBlobA {
+  to { transform: translate(70px, 55px) scale(1.08); }
+}
+@keyframes professionalBlobB {
+  to { transform: translate(-60px, -45px) scale(1.1); }
+}
+
+/* Background landscape tidak dipakai pada tema profesional. */
+#loginOverlay.login-theme-professional #bgScene,
+#loginOverlay.login-theme-professional .fx-canvas,
+#loginOverlay.login-theme-professional .fx-flash,
+#loginOverlay.login-theme-professional .preview-bar,
+#loginOverlay.login-theme-professional .wx-chip {
+  display: none !important;
+}
+
+/* Card */
+#loginOverlay.login-theme-professional .login-card {
   position: relative;
   z-index: 2;
+  width: min(100%, 430px);
+  box-sizing: border-box;
+  padding: 38px 34px 32px;
   overflow: hidden;
-  width: 100%; max-width: 340px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 18px;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 25px 60px -15px rgba(0,0,0,0.55);
-  padding: 36px 30px;
-  animation: loginPop .4s cubic-bezier(.22,.8,.3,1) both; /* keyframes global dari login.css */
+  border: 1px solid rgba(148,163,184,.22);
+  border-radius: 24px;
+  background: rgba(15,23,42,.72);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.48),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  animation: professionalCardIn .45s cubic-bezier(.22,.8,.3,1) both;
 }
-.login-theme-professional .login-header { text-align: center; margin-bottom: 28px; position: relative; }
-.login-theme-professional .login-logo {
-  width: 64px; height: 64px; border-radius: 14px;
-  background: linear-gradient(160deg, var(--brand-500, #1877C4), var(--brand-700, #0B5FA5));
-  display: grid; place-items: center; font: 700 28px 'Inter', sans-serif;
-  color: #fff; margin: 0 auto 16px;
-  box-shadow: 0 8px 22px -6px rgba(11,95,165,0.5);
-}
-.login-theme-professional .login-header h2 {
-  font: 700 24px 'Inter', sans-serif; letter-spacing: 1px;
-  color: #F1F5F9; text-transform: uppercase;
-}
-.login-theme-professional .login-header p { font: 13px 'Inter', sans-serif; color: #94A3B8; margin-top: 4px; }
 
-.login-theme-professional .login-form .field { margin-bottom: 18px; position: relative; }
-.login-theme-professional .login-form .field label {
-  color: #94A3B8; font: 600 12px 'Inter', sans-serif;
-  text-transform: uppercase; margin-bottom: 6px; display: block; letter-spacing: .5px;
-}
-.login-theme-professional .login-form .field input {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px;
-  padding: 12px 14px; font: 600 18px 'Inter', sans-serif;
-  width: 100%; text-align: center; letter-spacing: 4px; color: #F1F5F9;
-  transition: .15s;
-}
-.login-theme-professional .login-form .field input::placeholder { color: rgba(241,245,249,.35); }
-.login-theme-professional .login-form .field input:hover { background: rgba(255,255,255,0.08); }
-.login-theme-professional .login-form .field input:focus {
-  outline: none; border-color: var(--brand-500, #1877C4);
-  background: rgba(255,255,255,0.09); box-shadow: 0 0 0 3px rgba(24,119,196,.25);
-}
-.login-theme-professional .login-remember { display: flex; align-items: center; gap: 8px; margin: 16px 0 20px; }
-.login-theme-professional .login-remember input { width: 16px; height: 16px; accent-color: var(--brand-500, #1877C4); cursor: pointer; }
-.login-theme-professional .login-remember label { font: 500 13px 'Inter', sans-serif; color: #CBD5E1; cursor: pointer; user-select: none; }
-.login-theme-professional .login-btn {
-  width: 100%; color: #fff; border: 0;
-  background: linear-gradient(135deg, var(--brand-500, #1877C4), var(--brand-700, #0B5FA5));
-  padding: 13px; font: 600 15px 'Inter', sans-serif; border-radius: 9px;
-  cursor: pointer; transition: .2s; box-shadow: 0 4px 16px rgba(11,95,165,0.4);
-}
-.login-theme-professional .login-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
-.login-theme-professional .login-error {
-  background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.35);
-  color: #f87171; padding: 10px 14px; border-radius: 8px;
-  font: 500 12.5px 'Inter', sans-serif; margin-bottom: 16px;
-  display: none; text-align: center;
-}
-.login-theme-professional .login-error.show { display: block; animation: shake .3s; }
-.login-theme-professional .login-hint { text-align: center; margin-top: 20px; font: 11.5px 'Inter', sans-serif; color: #64748B; }
-.login-theme-professional .login-hint b { color: #1877C4; }
-
-/* Toggle tema login — pill kaca gelap pojok kiri atas, senada tema profesional */
-.login-theme-professional .login-theme-toggle-btn {
+#loginOverlay.login-theme-professional .login-card::before {
+  content: "";
   position: absolute;
-  top: 18px; left: 18px;
-  z-index: 3;
-  font: 600 11px 'Inter', sans-serif;
-  letter-spacing: .3px;
-  color: #F1F5F9;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.18);
-  border-radius: 99px;
-  padding: 7px 14px;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  transition: .2s;
-  box-shadow: 0 4px 14px rgba(0,0,0,.3);
-  white-space: nowrap;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,255,255,.08), transparent 38%);
 }
-.login-theme-professional .login-theme-toggle-btn:hover { background: rgba(255,255,255,0.14); transform: translateY(-1px); }
-.login-theme-professional .login-theme-toggle-btn:active { transform: translateY(0); }
 
-/* fx-canvas/fx-flash (efek klik dari fx.js) tetap dipakai bersama, tidak perlu override */
+@keyframes professionalCardIn {
+  from { opacity: 0; transform: translateY(18px) scale(.975); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+#loginOverlay.login-theme-professional .login-header {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+#loginOverlay.login-theme-professional .login-logo {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 17px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(125,211,252,.25);
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(145deg, #2563eb, #0891b2);
+  box-shadow: 0 14px 35px rgba(37,99,235,.32);
+  font: 700 27px var(--disp);
+}
+
+#loginOverlay.login-theme-professional .login-header h2 {
+  margin: 0;
+  color: #f8fafc;
+  font: 700 25px var(--disp);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+#loginOverlay.login-theme-professional .login-header p {
+  margin-top: 7px;
+  color: #94a3b8;
+  font: 500 12px var(--mono);
+}
+
+#loginOverlay.login-theme-professional .login-form {
+  position: relative;
+  z-index: 1;
+}
+
+#loginOverlay.login-theme-professional .login-form .field {
+  margin-bottom: 18px;
+}
+
+#loginOverlay.login-theme-professional .login-form .field label {
+  display: block;
+  margin-bottom: 7px;
+  color: #cbd5e1;
+  font: 600 11px var(--mono);
+  letter-spacing: .55px;
+  text-transform: uppercase;
+}
+
+#loginOverlay.login-theme-professional .login-form .field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 1px solid rgba(148,163,184,.28);
+  border-radius: 11px;
+  color: #f8fafc;
+  background: rgba(15,23,42,.62);
+  font: 600 17px var(--mono);
+  text-align: center;
+  letter-spacing: 3px;
+  transition: border-color .18s, box-shadow .18s, background .18s;
+}
+
+#loginOverlay.login-theme-professional .login-form .field input::placeholder {
+  color: #64748b;
+}
+
+#loginOverlay.login-theme-professional .login-form .field input:hover {
+  background: rgba(30,41,59,.78);
+}
+
+#loginOverlay.login-theme-professional .login-form .field input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  background: rgba(15,23,42,.88);
+  box-shadow: 0 0 0 3px rgba(56,189,248,.13), 0 8px 24px rgba(0,0,0,.15);
+}
+
+#loginOverlay.login-theme-professional .login-btn {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 3px;
+  padding: 13px 16px;
+  border: 0;
+  border-radius: 11px;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #0891b2);
+  box-shadow: 0 10px 24px rgba(37,99,235,.28);
+  font: 600 14px var(--body);
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s, filter .2s;
+}
+
+#loginOverlay.login-theme-professional .login-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow: 0 14px 30px rgba(37,99,235,.34);
+}
+
+#loginOverlay.login-theme-professional .login-btn:active {
+  transform: translateY(0);
+}
+
+#loginOverlay.login-theme-professional .login-error {
+  background: rgba(239,68,68,.12);
+  border: 1px solid rgba(248,113,113,.28);
+  color: #fca5a5;
+}
+
+#loginOverlay.login-theme-professional .login-hint {
+  position: relative;
+  z-index: 1;
+  color: #64748b;
+}
+
+#loginOverlay.login-theme-professional .login-hint b {
+  color: #38bdf8;
+}
+
+@media (max-width: 520px) {
+  #loginOverlay.login-theme-professional {
+    padding: 14px;
+  }
+
+  #loginOverlay.login-theme-professional .login-card {
+    padding: 30px 22px 26px;
+    border-radius: 20px;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .login-theme-professional#loginOverlay::before,
-  .login-theme-professional#loginOverlay::after {
+  #loginOverlay.login-theme-professional::before,
+  #loginOverlay.login-theme-professional::after,
+  #loginOverlay.login-theme-professional .login-card {
     animation: none !important;
   }
+}
+
+#loginOverlay.login-theme-professional .login-theme-setting { margin: -8px 0 22px; position:relative; z-index:3; text-align:center; }
+#loginOverlay.login-theme-professional .login-theme-setting-label strong { color:#cbd5e1; }
+#loginOverlay.login-theme-professional .login-theme-setting-label span { color:#64748b; }
+#loginOverlay.login-theme-professional .login-theme-toggle { background:rgba(2,6,23,.38); border-color:rgba(148,163,184,.2); }
+#loginOverlay.login-theme-professional .login-theme-option { color:#94a3b8; }
+#loginOverlay.login-theme-professional .login-theme-option:hover { background:rgba(148,163,184,.08); color:#e2e8f0; }
+#loginOverlay.login-theme-professional .login-theme-option.active { background:rgba(37,99,235,.22); color:#7dd3fc; box-shadow:inset 0 0 0 1px rgba(56,189,248,.18); }
+
+/* Ensure the professional theme never blocks form interaction. */
+#loginOverlay.login-theme-professional .login-card,
+#loginOverlay.login-theme-professional .login-form,
+#loginOverlay.login-theme-professional .login-form .field,
+#loginOverlay.login-theme-professional .login-form input,
+#loginOverlay.login-theme-professional .login-form button {
+  pointer-events: auto;
+}
+
+#loginOverlay.login-theme-professional .login-card::before,
+#loginOverlay.login-theme-professional::before,
+#loginOverlay.login-theme-professional::after {
+  pointer-events: none !important;
+}
+
+#loginOverlay.login-theme-professional .login-btn {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#loginOverlay.login-theme-professional .login-btn:disabled {
+  opacity: .7;
+  cursor: wait;
+  transform: none;
 }

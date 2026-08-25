@@ -12,10 +12,17 @@ const UI = (() => {
   // ====== CLOCK ======
   const tick = () => {
     const n = new Date();
-    State.el.clock.textContent = n.toLocaleTimeString('id-ID', { hour12: false });
-    State.el.dateEl.textContent = n.toLocaleDateString('id-ID', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-    });
+
+    // Clock/date adalah elemen opsional pada layout utama.
+    // Jangan biarkan elemen yang tidak ada menghentikan startup aplikasi setelah login.
+    if (State.el.clock) {
+      State.el.clock.textContent = n.toLocaleTimeString('id-ID', { hour12: false });
+    }
+    if (State.el.dateEl) {
+      State.el.dateEl.textContent = n.toLocaleDateString('id-ID', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      });
+    }
   };
 
   const startClock = () => {

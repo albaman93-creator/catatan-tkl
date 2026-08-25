@@ -15,6 +15,20 @@
   --page: 1360px;
 }
 
+/* ---------- Tema Profesional (gaya kantor: putih dominan + biru) ----------
+   Aktif saat <html data-theme="professional"> (lihat js/settings.js +
+   tombol "Tema Aplikasi" di sidebar). Warna status semantik (--green,
+   --green-d, --amber, --red) SENGAJA TIDAK diubah supaya makna hijau =
+   baik/tercapai, merah = bahaya, dsb tetap konsisten di seluruh data
+   (OEE, kategori downtime). Yang diubah hanya warna netral & aksen brand:
+   latar jadi putih/biru sangat muda, garis pinggir jadi biru muda,
+   teks & aksen utama jadi navy/biru kantor. */
+[data-theme="professional"] {
+  --ink: #0F2437; --ink2: #3A5872; --mut: #7B96AC;
+  --paper: #F2F7FC; --card: #FFFFFF; --line: #CBDEF0; --line2: #DCEBFA;
+  --navy: #0B2A47; --blue: #0B5FA5;
+}
+
 html { scroll-behavior: smooth; }
 body {
   font-family: var(--body); font-size: 16px; color: var(--ink);

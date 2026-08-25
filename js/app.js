@@ -57,7 +57,11 @@ const App = (() => {
    */
   const bindEvents = () => {
     // Login
-    State.el.loginForm.addEventListener('submit', Auth.handleLogin);
+    // Dipasang di bindEvents setelah seluruh elemen DOM tersedia.
+    if (State.el.loginForm && typeof Auth !== 'undefined') {
+      // Satu handler submit untuk kedua tema; tema hanya mengubah tampilan.
+      State.el.loginForm.addEventListener('submit', Auth.handleLogin);
+    }
     State.el.btnLogout.addEventListener('click', Auth.handleLogout);
 
     // Shift & Mode
@@ -250,8 +254,66 @@ const App = (() => {
   /**
    * Entry point global.
    */
+  const bindLoginThemeToggle = () => {
+    const buttons = document.querySelectorAll('[data-login-theme]');
+    if (!buttons.length || typeof Settings === 'undefined') return;
+
+    const sync = () => {
+      const current = Settings.getLoginTheme();
+      buttons.forEach(btn => {
+        const active = btn.dataset.loginTheme === current;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    };
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.dataset.loginTheme;
+        Settings.setLoginTheme(theme);
+        sync();
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast(theme === 'professional' ? 'Tema login Profesional dipilih' : 'Tema login Santai dipilih');
+        }
+      });
+    });
+
+    sync();
+  };
+
+  /**
+   * Toggle Tema Aplikasi (Standar / Profesional) — dipakai di seluruh
+   * aplikasi (app bar, sidebar, bottom nav, tombol, dst), bukan cuma
+   * layar login. Nilainya independen dari tema login.
+   */
+  const bindAppThemeToggle = () => {
+    const buttons = document.querySelectorAll('[data-app-theme]');
+    if (!buttons.length || typeof Settings === 'undefined') return;
+
+    const sync = () => {
+      const current = Settings.getTheme();
+      buttons.forEach(btn => {
+        btn.classList.toggle('on', btn.dataset.appTheme === current);
+      });
+    };
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        Settings.setTheme(btn.dataset.appTheme);
+        sync();
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast(btn.dataset.appTheme === 'professional' ? 'Tema aplikasi Profesional aktif' : 'Tema aplikasi Standar aktif');
+        }
+      });
+    });
+
+    sync();
+  };
+
   const init = () => {
     State.initElements();
+    bindLoginThemeToggle();
+    bindAppThemeToggle();
 
     // Inisialisasi client Supabase (butuh CONFIG.SUPABASE_URL/ANON_KEY terisi benar)
     if (typeof SupabaseClient !== 'undefined') SupabaseClient.init();

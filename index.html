@@ -18,7 +18,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- CSS (dipecah) -->
   <link rel="stylesheet" href="./css/base.css">
@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="./css/apple-style.css">
   <link rel="stylesheet" href="./css/sidebar.css">
   <link rel="stylesheet" href="./css/modern-sheet.css">
+  <link rel="stylesheet" href="./css/theme-professional.css">
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -108,9 +109,6 @@
 
   <!-- ============ LOGIN OVERLAY ============ -->
   <div id="loginOverlay" class="login-theme-santai">
-    <!-- Tema login (santai/professional) diterapkan sesegera mungkin di sini,
-         sebelum children lain diparse, supaya tidak ada flash tema salah. -->
-    <script src="./js/login-theme.js"></script>
     <!-- 🎨 Cartoon landscape (auto day/night based on system clock) -->
     <div id="bgScene" class="scene scene--day">
       <svg class="bg-scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -564,17 +562,23 @@
       <button type="button" id="natureToggle" class="preview-btn" title="Preview kupu-kupu (paksa tampil, untuk cek tanpa menunggu pagi)">🦋 auto</button>
       </div>
     <span id="wxChip" class="wx-chip"></span>
-    <!-- Toggle tema login (santai/profesional) — sengaja di luar .preview-bar
-         supaya tetap terlihat di kedua tema (preview-bar disembunyikan saat
-         tema profesional aktif). Label & event listener dipasang oleh
-         js/login-theme.js. -->
-    <button type="button" id="loginThemeToggle" class="login-theme-toggle-btn" title="Ganti tampilan login">🌃 Tema Profesional</button>
 
     <div class="login-card">
       <div class="login-header">
         <div class="login-logo">TKL</div>
         <h2>OEE System Login</h2>
         <p>Masukan Email &amp; Password</p>
+      </div>
+
+      <div class="login-theme-setting" aria-label="Tema Login">
+        <div class="login-theme-setting-label">
+          <strong>Tema Login</strong>
+          <span>Pilih tampilan login</span>
+        </div>
+        <div class="login-theme-toggle" id="loginThemeToggle" role="group" aria-label="Pilih tema login">
+          <button type="button" class="login-theme-option active" data-login-theme="santai" aria-pressed="true">🌿 Santai</button>
+          <button type="button" class="login-theme-option" data-login-theme="professional" aria-pressed="false">◈ Profesional</button>
+        </div>
       </div>
       <div id="loginError" class="login-error">Email atau password salah. Silakan coba lagi.</div>
       <div id="loginOfflineNote" class="login-error" style="display:none;background:#5a4b00;">
@@ -634,11 +638,17 @@
       <span class="pos" id="pos"><span class="pos-dot"></span>SIAP · KLIK SEL / MULAI KETIK</span>
 
       <div class="sidebar-section-label">Tampilan</div>
-      <div class="navmode" title="Mode navigasi Tab">
+            <div class="navmode" title="Mode navigasi Tab">
         <span class="nm-cap">MODE TAB</span>
         <button type="button" data-mode="v" class="on">⇅ VERTIKAL</button>
         <button type="button" data-mode="h">⇄ HORIZONTAL</button>
             </div>
+
+      <div class="app-theme-toggle" id="appThemeToggle" title="Tema tampilan aplikasi">
+        <span class="nm-cap">TEMA APLIKASI</span>
+        <button type="button" data-app-theme="light" class="on">🌿 Standar</button>
+        <button type="button" data-app-theme="professional">◈ Profesional</button>
+      </div>
 
       <span class="hint" id="hint"></span>
           <span class="spacer"></span>
@@ -1278,6 +1288,7 @@
   <script src="./js/nature.js"></script>
   <script src="./js/fx.js"></script>
   <script src="./js/weather.js"></script>
+  <script src="./js/settings.js"></script>
   <script src="./js/app.js"></script>
   <script src="./js/sheet-op-sync.js"></script>
 </body>

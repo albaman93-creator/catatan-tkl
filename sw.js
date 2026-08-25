@@ -3,7 +3,7 @@
  * Cache semua aset aplikasi untuk mode offline.
  * Versi ditingkatkan untuk mencantumkan semua file JS modular.
  */
-const CACHE_NAME = 'tkl-oee-v6';
+const CACHE_NAME = 'tkl-oee-v8';
 
 const PRECACHE = [
   './',
@@ -16,27 +16,44 @@ const PRECACHE = [
   './css/oee.css',
   './css/dashboard.css',
   './css/login.css',
+  './css/login-professional.css',
   './css/nature.css',
   './css/print.css',
   './css/apple-style.css',
   './css/sidebar.css',
   './css/modern-sheet.css',
+  './css/theme-professional.css',
   './js/config.js',
   './js/utils.js',
+  './js/perf.js',
   './js/state.js',
+  './js/suggest.js',
+  './js/supabase-client.js',
   './js/auth.js',
   './js/ui.js',
   './js/rows.js',
   './js/navigation.js',
   './js/calculation.js',
+  './js/sync.js',
   './js/storage.js',
+  './js/dashboard.js',
+  './js/quickmode.js',
+  './js/formmode.js',
+  './js/formfull.js',
+  './js/bulkfill.js',
+  './js/wizard.js',
+  './js/printsheet.js',
   './js/scene.js',
+  './js/nature.js',
   './js/fx.js',
   './js/weather.js',
+  './js/settings.js',
   './js/app.js',
+  './js/sheet-op-sync.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/icon-maskable-512.png'
+  './icons/icon-maskable-512.png',
+  './icons/bg-login.jpg'
 ];
 
 self.addEventListener('install', (event) => {

@@ -173,6 +173,29 @@
   --danger-600:  #F87171;
 }
 
+/* ---------- Mode Profesional (gaya kantor: putih dominan + biru) ----------
+   Dipakai di seluruh aplikasi (bukan cuma layar login), lihat
+   css/theme-professional.css untuk override elemen chrome (app bar,
+   sidebar, bottom nav, tombol) yang masih pakai warna hex langsung. */
+[data-theme="professional"] {
+  --bg-page:          #F2F7FC;
+  --bg-surface:       #FFFFFF;
+  --bg-surface-hover: #EAF3FB;
+  --bg-selected:      #DCEBFA;
+  --border-default:   #CBDEF0;
+  --border-strong:    #8FBFE3;
+  --text-primary:     #0F2437;
+  --text-secondary:   #3A5872;
+  --text-muted:       #7B96AC;
+  --brand-900: #0B2A47;
+  --brand-700: #0B5FA5;
+  --brand-600: #0B5FA5;
+  --brand-500: #1877C4;
+  --brand-100: #CFE6F7;
+  --brand-50:  #EAF3FB;
+  --shadow-overlay: 0 4px 24px rgba(11, 95, 165, 0.12);
+}
+
 /* ---------- Ikon (Lucide, di-self-host dari icons/sprite.svg) ---------- */
 .icon {
   width: 18px;
