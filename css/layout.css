@@ -311,3 +311,149 @@ h1 { font: 700 clamp(24px,5vw,34px)/1 var(--disp); letter-spacing: .8px; text-tr
 .sheet .stripe {
   display: none !important;
 }
+
+/* =====================================================
+   MOBILE-FIRST NAV — bottom bar always (mudah di ponsel)
+   Desktop (≥1024px): bottom bar tetap di bawah, lebih lega
+   ===================================================== */
+
+/* Bottom nav: selalu di bawah, horizontal */
+.bottom-nav {
+  position: fixed !important;
+  left: 50% !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  max-width: var(--page, 960px) !important;
+  height: auto !important;
+  margin: 0 !important;
+  transform: translateX(-50%) !important;
+  flex-direction: row !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px)) !important;
+  border-top: 1px solid var(--line, #e8e8ed) !important;
+  border-right: none !important;
+  border-radius: 0 !important;
+  box-shadow: 0 -2px 12px -2px rgba(0, 0, 0, 0.08) !important;
+  z-index: 55 !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  display: flex !important;
+}
+
+.bottom-nav .bn-item {
+  flex: 1 1 0 !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  padding: 7px 2px 6px !important;
+  min-height: 0 !important;
+  border-radius: 10px !important;
+}
+
+.bottom-nav .bn-icon { font-size: 19px !important; }
+.bottom-nav .bn-label { font-size: 9.5px !important; }
+
+/* Ruang konten supaya tidak tertutup bottom nav */
+#appContainer {
+  margin-left: 0 !important;
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Sidebar mobile: overlay, jangan dorong konten */
+@media (max-width: 1023px) {
+  body.sidebar-open #appContainer {
+    margin-left: 0 !important;
+  }
+  .sidebar {
+    width: min(88vw, 340px);
+    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.25);
+  }
+  .app-bar-inner {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .app-bar-menu-btn {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* Desktop: konten lebih lega, nav tetap di bawah */
+@media (min-width: 1024px) {
+  body.sidebar-open #appContainer {
+    margin-left: 380px !important;
+  }
+  .sidebar {
+    width: 380px;
+    max-width: 380px;
+  }
+  .app-bar-inner {
+    max-width: none;
+    padding: 12px 24px;
+  }
+  .sheet {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .bottom-nav {
+    max-width: none !important;
+    left: 0 !important;
+    transform: none !important;
+  }
+}
+
+[data-theme="dark"] .bottom-nav {
+  background: rgba(12, 12, 14, 0.94) !important;
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+[data-theme="dark"] .bottom-nav .bn-item.on {
+  color: #f5f5f7 !important;
+}
+
+
+
+/* Screen-reader only (hidden selects kept for compatibility) */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Line & Stage toggle groups (same look as Shift) */
+.linesel button,
+.stagesel button {
+  flex: 1;
+  justify-content: center;
+  white-space: nowrap;
+}
+.stagesel {
+  flex-wrap: wrap;
+}
+.stagesel button {
+  flex: 1 1 auto;
+  min-width: 4.5em;
+  font-size: 12px;
+  padding: 9px 6px;
+}
+@media (max-width: 480px) {
+  .stagesel button {
+    font-size: 11px;
+    padding: 8px 4px;
+    min-width: 3.8em;
+  }
+}

@@ -337,3 +337,38 @@ textarea.in {
 .prod-suggest-item:active {
   background: rgba(18, 161, 80, 0.2);
 }
+
+/* Wizard confirm card */
+.wiz-confirm-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line, #e8e8ed);
+  background: var(--card, #fff);
+  margin-bottom: 12px;
+}
+.wiz-confirm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font: 500 13px var(--body, system-ui, sans-serif);
+}
+.wiz-confirm-label {
+  color: var(--mut, #6b8093);
+  flex: none;
+}
+.wiz-confirm-value {
+  color: var(--ink, #0f2437);
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+[data-theme="dark"] .wiz-confirm-card {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.1);
+}
+[data-theme="dark"] .wiz-confirm-value { color: #f5f5f7; }
+[data-theme="dark"] .wiz-confirm-label { color: #8e8e93; }

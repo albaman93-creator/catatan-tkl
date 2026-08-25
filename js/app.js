@@ -218,8 +218,9 @@ const App = (() => {
     });
     // Indikator Shift & Tanggal di toolbar atas ikut update tiap tanggal/tahapan diganti
     State.el.fDate.addEventListener('input', UI.updateShiftIndicator);
-    State.el.fStage.addEventListener('change', () => { UI.updateShiftIndicator(); });
-    State.el.fLine.addEventListener('change', () => { UI.updateUnifiedControl(); });
+    State.el.fStage.addEventListener('change', () => { UI.updateShiftIndicator(); if (UI.applyStageUI) UI.applyStageUI(); });
+    State.el.fLine.addEventListener('change', () => { UI.updateUnifiedControl(); if (UI.applyLineUI) UI.applyLineUI(); });
+    if (UI.bindFilterToggles) UI.bindFilterToggles();
 
     // ============================================================
     // BUTTONS

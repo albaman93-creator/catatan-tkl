@@ -84,7 +84,7 @@ const UI = (() => {
 
   // ====== SHIFT SELECTION ======
   const applyShiftUI = () => {
-    document.querySelectorAll('.shiftsel button').forEach(b => {
+    document.querySelectorAll('[data-shift]').forEach(b => {
       b.classList.toggle('on', parseInt(b.getAttribute('data-shift'), 10) === State.evalShift);
     });
     const maxMnt = CONFIG.SHIFT_A[State.evalShift];
@@ -92,6 +92,45 @@ const UI = (() => {
     State.el.maxShiftMnt.textContent = maxMnt;
     State.el.maxShiftMnt2.textContent = maxMnt;
     updateShiftIndicator();
+  };
+
+  // ====== LINE & STAGE TOGGLE (filter Data) ======
+  const applyLineUI = () => {
+    const val = State.el.fLine ? String(State.el.fLine.value) : '1';
+    document.querySelectorAll('#fLineSel [data-line]').forEach(b => {
+      b.classList.toggle('on', b.getAttribute('data-line') === val);
+    });
+  };
+  const applyStageUI = () => {
+    const val = State.el.fStage ? State.el.fStage.value : 'mixing';
+    document.querySelectorAll('#fStageSel [data-stage]').forEach(b => {
+      b.classList.toggle('on', b.getAttribute('data-stage') === val);
+    });
+  };
+  const bindFilterToggles = () => {
+    document.querySelectorAll('#fLineSel [data-line]').forEach(b => {
+      b.addEventListener('click', () => {
+        if (State.el.fLine) {
+          State.el.fLine.value = b.getAttribute('data-line');
+          State.el.fLine.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        applyLineUI();
+        if (typeof updateUnifiedControl === 'function') updateUnifiedControl();
+      });
+    });
+    document.querySelectorAll('#fStageSel [data-stage]').forEach(b => {
+      b.addEventListener('click', () => {
+        if (State.el.fStage) {
+          State.el.fStage.value = b.getAttribute('data-stage');
+          State.el.fStage.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        applyStageUI();
+        if (typeof updateShiftIndicator === 'function') updateShiftIndicator();
+        if (typeof updateUnifiedControl === 'function') updateUnifiedControl();
+      });
+    });
+    applyLineUI();
+    applyStageUI();
   };
 
   // ====== INDIKATOR SHIFT & TANGGAL AKTIF ======
@@ -251,8 +290,9 @@ const UI = (() => {
       if (stage && State.el.fStage) {
         e.preventDefault();
         State.el.fStage.value = stage;
+        applyStageUI();
         updateShiftIndicator();
-        // Load record untuk kombinasi filter baru.
+        updateUnifiedControl();
         if (typeof Storage !== 'undefined' && Storage.loadRecord) Storage.loadRecord();
         toast(`Tahapan: ${stage.charAt(0).toUpperCase() + stage.slice(1)}`);
         return;
@@ -262,6 +302,7 @@ const UI = (() => {
       if (line && State.el.fLine) {
         e.preventDefault();
         State.el.fLine.value = line;
+        applyLineUI();
         updateUnifiedControl();
         if (typeof Storage !== 'undefined' && Storage.loadRecord) Storage.loadRecord();
         toast(`Line ${line}`);
@@ -525,7 +566,7 @@ const UI = (() => {
   return {
     tick, startClock, toast, autoResizeTextarea,
     applyModeUI, bindModeButtons, loadNavMode,
-    applyShiftUI, bindShiftButtons, loadEvalShift,
+    applyShiftUI, applyLineUI, applyStageUI, bindFilterToggles, bindShiftButtons, loadEvalShift,
     updateShiftIndicator, updateUnifiedControl, bindUnifiedControls,
     bindToolbarToggle, loadToolbarCollapsed,
     bindScreenNav, loadActiveScreen, showScreen,

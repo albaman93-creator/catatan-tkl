@@ -2,8 +2,8 @@
  * WIZARD.JS
  * "Setup Awal" — alur tanya-jawab satu-per-satu di awal sebelum mulai isi
  * Log Sheet, supaya user tidak perlu bolak-balik antar screen dulu.
- * Urutan (sudah dikonfirmasi user): Shift → Tahapan Proses → Tanggal →
- * Inisial Operator → No. WO (opsional) → Produk & Rate per Menit.
+ * Urutan: Shift → Tahapan Proses → Line → Tanggal →
+ * Inisial Operator → Produk, Rate & No. WO.
  *
  * Semua input di wizard ini LANGSUNG tersinkron ke elemen asli di halaman
  * (State.el.fDate, fStage, op1..op6, prodName1..3, dst) — jadi wizard ini
@@ -17,7 +17,7 @@
 const Wizard = (() => {
   'use strict';
 
-  const STEPS = ['shift', 'stage', 'date', 'operator', 'produk'];
+  const STEPS = ['shift', 'stage', 'line', 'date', 'operator', 'produk'];
   let stepIndex = 0;
 
   const modalEl = () => document.getElementById('wizardModal');
@@ -129,7 +129,46 @@ const Wizard = (() => {
     bindNav();
   };
 
-  // ====== STEP 3: TANGGAL ======
+
+  // ====== STEP 3: LINE ======
+  const LINE_OPTIONS = [
+    { v: '1', l: 'Line 1' },
+    { v: '2', l: 'Line 2' },
+    { v: '4', l: 'Line 4' },
+  ];
+  const renderLineStep = () => {
+    const current = State.el.fLine ? String(State.el.fLine.value) : '1';
+    renderModal(`
+      ${progressHtml()}
+      <h3 class="qm-title">🏭 Pilih Line</h3>
+      <p class="qm-sub">Line produksi yang sedang Anda kerjakan.</p>
+      <div class="wiz-stage-grid">
+        ${LINE_OPTIONS.map(o => `
+          <button type="button" class="wiz-choice ${o.v === current ? 'on' : ''}" data-line="${o.v}">
+            ${o.l}
+          </button>`).join('')}
+      </div>
+      ${navHtml()}
+    `);
+    modalEl().querySelectorAll('[data-line]').forEach(b => {
+      b.addEventListener('click', () => {
+        if (State.el.fLine) {
+          State.el.fLine.value = b.getAttribute('data-line');
+          State.el.fLine.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        modalEl().querySelectorAll('[data-line]').forEach(x => x.classList.remove('on'));
+        b.classList.add('on');
+        if (typeof UI !== 'undefined') {
+          if (UI.applyLineUI) UI.applyLineUI();
+          if (UI.updateUnifiedControl) UI.updateUnifiedControl();
+        }
+      });
+    });
+    bindNav();
+  };
+
+  // ====== STEP 4: TANGGAL ======
+
   const renderDateStep = () => {
     const current = State.el.fDate ? State.el.fDate.value : '';
     renderModal(`
@@ -150,7 +189,7 @@ const Wizard = (() => {
     bindNav();
   };
 
-  // ====== STEP 4: INISIAL OPERATOR ======
+  // ====== STEP 5: INISIAL OPERATOR ======
   const renderOperatorStep = () => {
     let fieldsHtml = '';
     for (let i = 1; i <= 6; i++) {
@@ -180,7 +219,7 @@ const Wizard = (() => {
     bindNav();
   };
 
-  // ====== STEP 5: PRODUK, RATE PER MENIT & NO. WO (per produk) ======
+  // ====== STEP 6: PRODUK, RATE PER MENIT & NO. WO (per produk) ======
   const renderProdukStep = () => {
     const slots = [
       { name: State.el.prodName1, rate: State.el.prodRate1, wo: State.el.prodWo1, label: 'Produk 1' },
@@ -236,6 +275,7 @@ const Wizard = (() => {
   const STEP_RENDERERS = {
     shift: renderShiftStep,
     stage: renderStageStep,
+    line: renderLineStep,
     date: renderDateStep,
     operator: renderOperatorStep,
     produk: renderProdukStep,
@@ -273,4 +313,3 @@ const Wizard = (() => {
 
   return { init, open, closeModal };
 })();
-

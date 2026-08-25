@@ -106,7 +106,13 @@ body.sidebar-open .sidebar-backdrop {
 [data-theme="dark"] body.sidebar-open .sidebar-backdrop {
   background: rgba(0, 0, 0, 0.55);
 }
-body.sidebar-open #appContainer { margin-left: 360px; }
+/* Dorong konten hanya di desktop — mobile pakai overlay (lihat layout.css) */
+@media (min-width: 1024px) {
+  body.sidebar-open #appContainer { margin-left: 360px; }
+}
+@media (max-width: 1023px) {
+  body.sidebar-open #appContainer { margin-left: 0; }
+}
 
 /* Header */
 .sidebar-header {
@@ -366,9 +372,8 @@ body.sidebar-open #appContainer { margin-left: 360px; }
 .sidebar .btn-install:hover { background: var(--sb-row-hover); }
 
 /* Responsive */
-@media (max-width: 768px) {
-  .sidebar { width: 88%; max-width: 340px; }
-  body.sidebar-open #appContainer { margin-left: 0; }
+@media (max-width: 1023px) {
+  .sidebar { width: min(88vw, 340px); max-width: 340px; }
 }
 
 /* Scrollbar */

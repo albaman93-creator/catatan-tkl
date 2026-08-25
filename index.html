@@ -782,14 +782,31 @@
         </div>
                   </div>
           <div class="field"><label>Line <span class="unit">produksi</span></label>
-            <select id="fLine">
-              <option value="1">Line 1</option><option value="2">Line 2</option><option value="4">Line 4</option>
+            <div class="shiftsel linesel" id="fLineSel" title="Line produksi">
+              <button type="button" data-line="1" class="on">L1</button>
+              <button type="button" data-line="2">L2</button>
+              <button type="button" data-line="4">L4</button>
+            </div>
+            <select id="fLine" class="sr-only" aria-hidden="true" tabindex="-1">
+              <option value="1" selected>Line 1</option>
+              <option value="2">Line 2</option>
+              <option value="4">Line 4</option>
             </select>
           </div>
           <div class="field"><label>Tahapan Proses</label>
-            <select id="fStage">
-              <option value="mixing">Mixing</option><option value="filling">Filling</option>
-              <option value="steril">Steril</option><option value="visual">Visual</option><option value="kemas">Kemas</option>
+            <div class="shiftsel stagesel" id="fStageSel" title="Tahapan proses">
+              <button type="button" data-stage="mixing" class="on">Mixing</button>
+              <button type="button" data-stage="filling">Filling</button>
+              <button type="button" data-stage="steril">Steril</button>
+              <button type="button" data-stage="visual">Visual</button>
+              <button type="button" data-stage="kemas">Kemas</button>
+            </div>
+            <select id="fStage" class="sr-only" aria-hidden="true" tabindex="-1">
+              <option value="mixing" selected>Mixing</option>
+              <option value="filling">Filling</option>
+              <option value="steril">Steril</option>
+              <option value="visual">Visual</option>
+              <option value="kemas">Kemas</option>
             </select>
           </div>
         </div>

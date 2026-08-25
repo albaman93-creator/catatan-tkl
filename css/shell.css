@@ -201,14 +201,13 @@
   body.rail-collapsed .rail-item { justify-content: center; }
   body.rail-collapsed .nav-rail-brand { justify-content: center; }
 
-  #appContainer { padding-left: var(--rail-w); transition: padding-left var(--transition-base); }
-  body.rail-collapsed #appContainer { padding-left: var(--rail-w-collapsed); }
+  /* Nav-rail HTML belum dipakai — layout rail pakai .bottom-nav (layout.css).
+     Jangan padding-left di sini supaya tidak dobel dengan margin-left 88px. */
+  /* #appContainer { padding-left: var(--rail-w); } */
+  #appContainer > .toolbar.app-bar { /* margin-top: var(--topbar-h); */ }
 
-  .topbar { position: fixed; top: 0; left: var(--rail-w); right: 0; z-index: 70; transition: left var(--transition-base); }
-  body.rail-collapsed .topbar { left: var(--rail-w-collapsed); }
-  #appContainer > .toolbar.app-bar { margin-top: var(--topbar-h); }
-
-  .bottom-nav { display: none; }
+  /* bottom-nav tetap tampil sebagai rail kiri — lihat layout.css */
+  /* .bottom-nav { display: none; } */
   .cmdk-trigger span { display: inline; }
 }
 @media (max-width: 1023px) {
