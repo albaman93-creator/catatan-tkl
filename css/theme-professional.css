@@ -38,8 +38,8 @@
   border: 1px solid rgba(11, 42, 71, .10);
 }
 [data-theme="professional"] .menu-item:hover {
-  border-color: var(--pro-blue);
-  box-shadow: 0 4px 10px -2px rgba(11,95,165,.20);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 /* Badge shift di app bar dipakai sbg identitas brand (bukan status data),
@@ -57,7 +57,7 @@
 [data-theme="professional"] .sidebar-header-title { color: var(--navy); }
 [data-theme="professional"] .sidebar .menu-item:hover {
   background: var(--pro-blue-lt);
-  border-color: var(--pro-blue);
+  border-color: transparent;
 }
 [data-theme="professional"] .sidebar .pos,
 [data-theme="professional"] .sidebar .hint,
@@ -65,8 +65,17 @@
 [data-theme="professional"] .sidebar .pos-dot { background: var(--pro-blue); }
 [data-theme="professional"] .sidebar .navmode button.on,
 [data-theme="professional"] .app-theme-toggle button.on {
-  background: var(--pro-blue);
-  box-shadow: 0 2px 6px -2px rgba(11,95,165,.55);
+  background: #fff;
+  color: var(--pro-navy, #0b2a47);
+  box-shadow: 0 1px 3px rgba(11, 95, 165, 0.12);
+}
+[data-theme="professional"] .sidebar .btn-primary,
+[data-theme="professional"] .sidebar #btnSave {
+  background: var(--pro-blue, #0b5fa5);
+}
+[data-theme="professional"] .sidebar .btn-primary:hover,
+[data-theme="professional"] .sidebar #btnSave:hover {
+  background: var(--pro-navy, #0b2a47);
 }
 [data-theme="professional"] .sidebar-backdrop { background: rgba(11, 42, 71, .45); }
 

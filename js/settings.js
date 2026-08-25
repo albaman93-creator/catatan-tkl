@@ -65,6 +65,17 @@ const Settings = (() => {
     return setLoginTheme(next);
   };
 
+  /*
+   * Sinkronisasi tema aplikasi dengan tema yang dipakai saat login.
+   * Jika user masuk menggunakan Login Profesional, aplikasi langsung
+   * memakai tema Profesional tanpa perlu memilih tema lagi di dalam aplikasi.
+   */
+  const syncAppThemeWithLoginTheme = () => {
+    const appTheme = getLoginTheme() === 'professional' ? 'professional' : 'light';
+    setTheme(appTheme);
+    return appTheme;
+  };
+
   // Terapkan tema aplikasi tersimpan.
   applyTheme(getTheme());
 
@@ -86,6 +97,7 @@ const Settings = (() => {
     toggleTheme,
     getLoginTheme,
     setLoginTheme,
-    toggleLoginTheme
+    toggleLoginTheme,
+    syncAppThemeWithLoginTheme
   };
 })();
