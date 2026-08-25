@@ -97,6 +97,14 @@ const Auth = (() => {
 
   const onLoginSuccess = () => {
     hideError();
+
+    // Tema login menjadi sumber tema aplikasi:
+    // Login Profesional -> aplikasi otomatis Profesional.
+    // Login Santai -> aplikasi otomatis kembali ke tema Standar.
+    if (typeof Settings !== 'undefined' && Settings.syncAppThemeWithLoginTheme) {
+      Settings.syncAppThemeWithLoginTheme();
+    }
+
     State.el.loginOverlay.classList.add('hide');
     State.el.appContainer.classList.add('show');
     App.startMain();

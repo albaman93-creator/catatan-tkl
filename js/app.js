@@ -310,10 +310,39 @@ const App = (() => {
     sync();
   };
 
+  const bindDisplayModeToggle = () => {
+    const buttons = document.querySelectorAll('[data-display-mode]');
+    if (!buttons.length || typeof Settings === 'undefined') return;
+
+    const sync = () => {
+      const current = Settings.getDisplayMode();
+      buttons.forEach(btn => {
+        const active = btn.dataset.displayMode === current;
+        btn.classList.toggle('on', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        const indicator = btn.querySelector('i');
+        if (indicator) indicator.textContent = active ? '✓' : '○';
+      });
+    };
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = Settings.setDisplayMode(btn.dataset.displayMode);
+        sync();
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast(mode === 'dark' ? 'Mode gelap aktif' : 'Mode terang aktif');
+        }
+      });
+    });
+
+    sync();
+  };
+
   const init = () => {
     State.initElements();
     bindLoginThemeToggle();
     bindAppThemeToggle();
+    bindDisplayModeToggle();
 
     // Inisialisasi client Supabase (butuh CONFIG.SUPABASE_URL/ANON_KEY terisi benar)
     if (typeof SupabaseClient !== 'undefined') SupabaseClient.init();

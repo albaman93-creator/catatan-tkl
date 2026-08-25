@@ -9,6 +9,7 @@ const Settings = (() => {
   const KEY_DECOR = 'fima_decor_enabled';
   const KEY_THEME = 'fima_theme';
   const KEY_LOGIN_THEME = 'fima_login_theme';
+  const KEY_DISPLAY_MODE = 'fima_display_mode';
 
   const isDecorEnabled = () => localStorage.getItem(KEY_DECOR) === '1';
 
@@ -18,20 +19,37 @@ const Settings = (() => {
 
   const getTheme = () => localStorage.getItem(KEY_THEME) || 'light';
 
+  const getDisplayMode = () => localStorage.getItem(KEY_DISPLAY_MODE) === 'dark' ? 'dark' : 'light';
+
+  const applyDisplayMode = (mode) => {
+    const normalized = mode === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-display-mode', normalized);
+    return normalized;
+  };
+
   const applyTheme = (mode) => {
     document.documentElement.setAttribute('data-theme', mode);
+    applyDisplayMode(getDisplayMode());
   };
 
   const setTheme = (mode) => {
     localStorage.setItem(KEY_THEME, mode);
     applyTheme(mode);
+    return mode;
+  };
+
+  const setDisplayMode = (mode) => {
+    const normalized = mode === 'dark' ? 'dark' : 'light';
+    localStorage.setItem(KEY_DISPLAY_MODE, normalized);
+    applyDisplayMode(normalized);
+    return normalized;
   };
 
   const toggleTheme = () => {
-    const next = getTheme() === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    return next;
+    return setDisplayMode(getDisplayMode() === 'dark' ? 'light' : 'dark');
   };
+
+  applyDisplayMode(getDisplayMode());
 
   /* =========================
      LOGIN THEME
@@ -65,6 +83,17 @@ const Settings = (() => {
     return setLoginTheme(next);
   };
 
+  /*
+   * Sinkronisasi tema aplikasi dengan tema yang dipakai saat login.
+   * Jika user masuk menggunakan Login Profesional, aplikasi langsung
+   * memakai tema Profesional tanpa perlu memilih tema lagi di dalam aplikasi.
+   */
+  const syncAppThemeWithLoginTheme = () => {
+    const appTheme = getLoginTheme() === 'professional' ? 'professional' : 'light';
+    setTheme(appTheme);
+    return appTheme;
+  };
+
   // Terapkan tema aplikasi tersimpan.
   applyTheme(getTheme());
 
@@ -84,8 +113,12 @@ const Settings = (() => {
     getTheme,
     setTheme,
     toggleTheme,
+    getDisplayMode,
+    setDisplayMode,
+    applyDisplayMode,
     getLoginTheme,
     setLoginTheme,
-    toggleLoginTheme
+    toggleLoginTheme,
+    syncAppThemeWithLoginTheme
   };
 })();

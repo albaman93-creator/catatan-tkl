@@ -1,0 +1,114 @@
+/* =====================================================
+   DISPLAY-MODE.CSS — Mode Terang / Gelap independen dari
+   tema aplikasi Standar / Profesional.
+   ===================================================== */
+
+/* Tombol menu dipindahkan ke sisi kiri app bar */
+.app-bar-menu-btn { order: -1; }
+.app-bar-inner { padding-left: 10px; }
+
+/* Mode tampilan di sidebar */
+.display-mode-toggle {
+  display:grid; width:100%; box-sizing:border-box; gap:7px;
+  background:transparent; border:0; padding:0; margin-top:2px;
+}
+.display-mode-toggle .nm-cap {
+  padding:0 4px 1px;
+  font:700 10px var(--body, system-ui, sans-serif);
+  letter-spacing:1.2px; color:#82907f;
+}
+.display-mode-toggle button {
+  width:100%; display:grid; grid-template-columns:34px 1fr 22px; align-items:center; gap:10px;
+  border:1px solid #e8e9e4; border-radius:14px; background:#fffdfb; padding:9px 11px;
+  color:#65715e; text-align:left; cursor:pointer;
+  font:500 11px var(--body, system-ui, sans-serif);
+  box-shadow:0 2px 8px rgba(47,58,48,.035);
+  transition:.16s ease;
+}
+.display-mode-toggle button .theme-option-icon {
+  width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+  border-radius:11px; background:#f3f4ee; font-size:18px;
+}
+.display-mode-toggle button strong { display:block; font:650 13px var(--body, system-ui, sans-serif); color:#334238; }
+.display-mode-toggle button small { display:block; margin-top:2px; font:500 10px var(--body, system-ui, sans-serif); color:#8b958e; }
+.display-mode-toggle button i { font-style:normal; text-align:center; font-size:17px; color:#9aa39b; }
+.display-mode-toggle button.on { background:#f3f7ef; border-color:#d3dfce; color:#47724b; }
+.display-mode-toggle button.on .theme-option-icon { background:#5e9a62; color:#fff; }
+.display-mode-toggle button.on i { color:#5e9a62; font-weight:700; }
+.display-mode-toggle button:not(.on):hover { background:#fff; border-color:#dce6d8; }
+
+/* ===== MODE GELAP ===== */
+[data-display-mode="dark"] body {
+  background: #0f1724;
+  color: #e8eef5;
+}
+[data-display-mode="dark"] .toolbar {
+  background: rgba(15,23,36,.94);
+  border-bottom-color:#243246;
+  box-shadow:0 1px 8px rgba(0,0,0,.28);
+}
+[data-display-mode="dark"] .app-bar-menu-btn {
+  background:#172235; border-color:#304056; color:#dce6ef;
+}
+[data-display-mode="dark"] .sidebar {
+  background:linear-gradient(180deg,#121c2b 0%,#0f1724 100%);
+  border-right-color:#27364b;
+  box-shadow:8px 0 30px rgba(0,0,0,.32);
+}
+[data-display-mode="dark"] .sidebar-header,
+[data-display-mode="dark"] .sidebar-header { background:linear-gradient(180deg,rgba(18,28,43,.98) 72%,rgba(18,28,43,0)); }
+[data-display-mode="dark"] .sidebar-header-title,
+[data-display-mode="dark"] .menu-item-copy strong,
+[data-display-mode="dark"] .action-copy strong,
+[data-display-mode="dark"] .display-mode-toggle button strong { color:#e7eef5; }
+[data-display-mode="dark"] .sidebar-header-subtitle,
+[data-display-mode="dark"] .menu-item-copy small,
+[data-display-mode="dark"] .action-copy small,
+[data-display-mode="dark"] .display-mode-toggle button small,
+[data-display-mode="dark"] .sidebar-section-label { color:#8fa0b2; }
+[data-display-mode="dark"] .sidebar .menu-item,
+[data-display-mode="dark"] .sidebar .sidebar-action,
+[data-display-mode="dark"] .app-theme-toggle button,
+[data-display-mode="dark"] .display-mode-toggle button {
+  background:#172235; border-color:#2b3b50; color:#d5e0eb; box-shadow:0 2px 8px rgba(0,0,0,.12);
+}
+[data-display-mode="dark"] .sidebar .menu-item:hover,
+[data-display-mode="dark"] .sidebar .sidebar-action:hover,
+[data-display-mode="dark"] .app-theme-toggle button:not(.on):hover,
+[data-display-mode="dark"] .display-mode-toggle button:not(.on):hover { background:#1d2b40; border-color:#3b516a; }
+[data-display-mode="dark"] .app-theme-toggle button.on,
+[data-display-mode="dark"] .display-mode-toggle button.on { background:#1d3427; border-color:#3f704b; }
+[data-display-mode="dark"] .app-theme-toggle button strong,
+[data-display-mode="dark"] .display-mode-toggle button strong { color:#e7eef5; }
+[data-display-mode="dark"] .app-theme-toggle button small,
+[data-display-mode="dark"] .display-mode-toggle button small { color:#91a0af; }
+[data-display-mode="dark"] .sidebar-divider { background:#29384c; }
+[data-display-mode="dark"] .sidebar-close-btn { background:#182638; border-color:#33475e; color:#bcd0df; }
+[data-display-mode="dark"] .sidebar-footer { border-top-color:#29384c; color:#8fa0b2; }
+[data-display-mode="dark"] .sidebar-backdrop { background:rgba(0,0,0,.58); }
+
+/* Konten utama menggunakan token dark yang sudah tersedia */
+[data-display-mode="dark"] {
+  --bg-page: #0f1724;
+  --bg-surface: #172235;
+  --bg-surface-hover: #1d2b40;
+  --bg-selected: #1b3550;
+  --border-default: #2b3b50;
+  --border-strong: #3a5069;
+  --text-primary: #e8eef5;
+  --text-secondary: #a9b8c7;
+  --text-muted: #7f91a5;
+  --paper: #0f1724;
+  --card: #172235;
+  --line: #2b3b50;
+  --line2: #243246;
+  --ink: #e8eef5;
+  --ink2: #c3d0dc;
+  --mut: #8fa0b2;
+  --navy: #e8eef5;
+}
+
+@media (max-width:768px) {
+  .app-bar-inner { padding-left:8px; padding-right:8px; }
+  .app-bar-menu-btn { width:38px; height:38px; }
+}
