@@ -132,6 +132,8 @@
     });
 
     document.addEventListener('click', (e) => {
+      // Jangan tutup panel Produk saat user klik item sugesti nama produk
+      if (e.target.closest('.prod-suggest-drop') || e.target.closest('.prod-suggest-item')) return;
       if (!e.target.closest('.compact-control') && !e.target.closest('.compact-popover')) closeAll(null);
     });
 

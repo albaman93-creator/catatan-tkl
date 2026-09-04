@@ -304,8 +304,10 @@ textarea.in {
 #toast.warn { border-left-color: var(--amber); background: #713f12; color: #fef08a; }
 
 /* ===== Product code autocomplete dropdown ===== */
+/* z-index harus ≥ compact-popover (2147483647) agar muncul di atas panel Produk */
 .prod-suggest-drop {
-  z-index: 99999;
+  position: fixed;
+  z-index: 2147483647 !important;
   overflow-y: auto;
   padding: 4px;
   border-radius: 10px;
@@ -313,6 +315,7 @@ textarea.in {
   background: #fff;
   box-shadow: 0 10px 28px rgba(15, 36, 55, 0.14), 0 2px 8px rgba(15, 36, 55, 0.06);
   -webkit-overflow-scrolling: touch;
+  pointer-events: auto;
 }
 .prod-suggest-drop[hidden] { display: none !important; }
 .prod-suggest-item {

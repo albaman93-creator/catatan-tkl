@@ -16,6 +16,7 @@ const BulkFill = (() => {
     { key: 'selesai',  label: 'Selesai', type: 'time',   cls: 'bf-time' },
     { key: 'durasi',   label: 'Durasi',  type: 'number', cls: 'bf-num' },
     { key: 'kegiatan', label: 'Kegiatan',type: 'text',   cls: 'bf-kegiatan' },
+    { key: 'batch',    label: 'Produk',  type: 'select', cls: 'bf-batch' }, /* <-- DROPDOWN PRODUK */
     { key: 'good',     label: 'Good',    type: 'number', cls: 'bf-num bf-output', restrict: 'kode2' },
     { key: 'defect',   label: 'Defect',  type: 'number', cls: 'bf-num bf-output', restrict: 'kode2' }
   ];
@@ -125,7 +126,20 @@ const BulkFill = (() => {
         const disabled = col.restrict === 'kode2' && kode.trim() !== '2' ? ' disabled' : '';
         const placeholder = col.key === 'kegiatan' ? 'Kegiatan' : (col.key === 'kode' ? '•' : '');
         html += `<div class="bf-cell ${col.cls}">`;
-        html += `<input class="bf-input" data-bf-field="${col.key}" data-bf-row="${i}" ${inputAttrs(col)} value="${esc(value)}" placeholder="${placeholder}"${disabled} aria-label="${col.label} baris ${startRow + i}">`;
+
+        if (col.type === 'select') {
+          // Ambil daftar produk yang sedang aktif dari modul Rows
+          const prods = (typeof Rows !== 'undefined') ? Rows.getActiveProducts() : [];
+          let optionsHtml = '<option value="">-- Pilih --</option>';
+          prods.forEach(p => {
+            const isSelected = (p === value) ? ' selected' : '';
+            optionsHtml += `<option value="${esc(p)}"${isSelected}>${esc(p)}</option>`;
+          });
+          html += `<select class="bf-input" data-bf-field="${col.key}" data-bf-row="${i}" aria-label="${col.label} baris ${startRow + i}"${disabled}>${optionsHtml}</select>`;
+        } else {
+          html += `<input class="bf-input" data-bf-field="${col.key}" data-bf-row="${i}" ${inputAttrs(col)} value="${esc(value)}" placeholder="${placeholder}"${disabled} aria-label="${col.label} baris ${startRow + i}">`;
+        }
+
         html += `</div>`;
       }
       html += '</div>';
@@ -194,13 +208,13 @@ const BulkFill = (() => {
 
   const autoAdvance = (input) => {
     const field = input.dataset.bfField;
-    // Kode hanya 1 digit: begitu terisi langsung turun ke baris berikutnya.
+    // Kode 1 digit: pindah sesuai mode navigasi aktif
     if (field === 'kode' && input.value.length >= 1) {
-      return nextCell(input, 'vertical');
+      return nextCell(input, navMode);
     }
-    // Jam selesai pada HH:MM (5 karakter): langsung turun ke baris berikutnya.
+    // Jam pada HH:MM (5 karakter): pindah sesuai mode navigasi aktif
     if ((field === 'mulai' || field === 'selesai') && input.value.length >= 5) {
-      return nextCell(input, 'vertical');
+      return nextCell(input, navMode);
     }
     return false;
   };
@@ -292,39 +306,9 @@ const BulkFill = (() => {
   const bindEvents = () => {
     const modal = modalEl();
 
-    modal.querySelector('[data-act="suggest-toggle"]')?.addEventListener('click', () => {
-      const form = modal.querySelector('[data-suggest-form]');
-      if (!form) return;
-      form.hidden = !form.hidden;
-      if (!form.hidden) modal.querySelector('[data-suggest-new]')?.focus();
-    });
-
-    const addSuggestionFromUI = () => {
-      const input = modal.querySelector('[data-suggest-new]');
-      const value = input?.value.trim() || '';
-      if (!value) { input?.focus(); return; }
-      if (typeof Suggest === 'undefined' || !Suggest.addSuggestion) return;
-      const added = Suggest.addSuggestion(value);
-      UI.toast(added ? `Sugesti "${value}" ditambahkan ✓` : 'Sugesti sudah terdaftar.', !added, added ? 'ok' : 'warn');
-      if (added) {
-        input.value = '';
-        renderGrid(collect());
-        const form = modalEl().querySelector('[data-suggest-form]');
-        if (form) form.hidden = false;
-        modalEl().querySelector('[data-suggest-new]')?.focus();
-      }
-    };
-    modal.querySelector('[data-act="suggest-add"]')?.addEventListener('click', addSuggestionFromUI);
-    modal.querySelector('[data-suggest-new]')?.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { e.preventDefault(); addSuggestionFromUI(); }
-    });
-    modal.querySelectorAll('[data-suggest-remove]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const value = btn.getAttribute('data-suggest-remove') || '';
-        Suggest.removeSuggestion?.(value);
-        renderGrid(collect());
-      });
-    });
+    // Panel "Sugesti Kegiatan" dihapus dari UI agar halaman lebih bersih.
+    // Sugesti tambahan tetap disimpan ke Supabase lewat Suggest.addSuggestion()
+    // (ghost-text / autocomplete Kegiatan tetap aktif).
 
     modal.querySelectorAll('[data-nav-mode]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -368,6 +352,22 @@ const BulkFill = (() => {
         if (input.dataset.bfField === 'mulai' || input.dataset.bfField === 'selesai') normalizeInput(input);
       });
 
+      // Efek cascade (beruntun ke bawah) khusus untuk dropdown Produk (batch)
+      input.addEventListener('change', (e) => {
+        if (input.dataset.bfField === 'batch') {
+          const currentRowIdx = Number(input.dataset.bfRow);
+          const selectedProduct = input.value;
+          
+          // Loop baris-baris di bawahnya dan ubah nilainya
+          for (let r = currentRowIdx + 1; r < rowCount; r++) {
+            const targetSelect = modal.querySelector(`[data-bf-row="${r}"][data-bf-field="batch"]`);
+            if (targetSelect) {
+              targetSelect.value = selectedProduct;
+            }
+          }
+        }
+      });
+
       // Paste beberapa baris sekaligus ke satu kolom.
       input.addEventListener('paste', e => {
         const text = e.clipboardData?.getData('text') || '';
@@ -388,7 +388,7 @@ const BulkFill = (() => {
       });
     });
 
-    modal.querySelector('[data-act="cancel"]')?.addEventListener('click', closeModal);
+    modal.querySelectorAll('[data-act="cancel"]').forEach(btn => btn.addEventListener('click', closeModal));
     modal.querySelector('[data-act="save"]')?.addEventListener('click', applyToSheet);
     modal.querySelector('[data-act="clear"]')?.addEventListener('click', () => {
       modal.querySelectorAll('.bf-input').forEach(i => i.value = '');
@@ -417,27 +417,6 @@ const BulkFill = (() => {
           <button type="button" class="bf-nav-toggle ${navMode === 'horizontal' ? 'is-active' : ''}" data-nav-mode="horizontal">→ Horizontal</button>
           <button type="button" class="bf-nav-toggle ${navMode === 'vertical' ? 'is-active' : ''}" data-nav-mode="vertical">↓ Vertikal</button>
         </div>
-      </div>
-    `;
-  };
-
-  const renderSuggestionPanel = () => {
-    const custom = (typeof Suggest !== 'undefined' && Suggest.getCustomSuggestions)
-      ? Suggest.getCustomSuggestions() : [];
-    return `
-      <div class="bf-suggest-panel">
-        <div class="bf-suggest-head">
-          <div>
-            <strong>💡 Sugesti Kegiatan</strong>
-            <small>Ketik <b>L</b> setelah spasi → pilih kegiatan → spasi berikutnya siap untuk sugesti lagi.</small>
-          </div>
-          <button type="button" class="bf-suggest-add-toggle" data-act="suggest-toggle">＋ Tambah Sugesti</button>
-        </div>
-        <div class="bf-suggest-add-form" data-suggest-form hidden>
-          <input type="text" class="bf-suggest-new" data-suggest-new placeholder="Contoh: Loading Lot E" maxlength=80 autocomplete="off">
-          <button type="button" class="btn btn-primary" data-act="suggest-add">Simpan</button>
-        </div>
-        ${custom.length ? `<div class="bf-suggest-list">${custom.map(v => `<span class="bf-suggest-chip">${esc(v)} <button type="button" data-suggest-remove="${esc(v)}" title="Hapus sugesti">×</button></span>`).join('')}</div>` : '<div class="bf-suggest-empty">Belum ada sugesti tambahan. Daftar bawaan tetap tersedia.</div>'}
       </div>
     `;
   };
@@ -482,7 +461,6 @@ const BulkFill = (() => {
       </div>
       ${renderNavPicker()}
       ${renderColumnPicker()}
-      ${renderSuggestionPanel()}
       <div class="bf-grid-wrap">
         <div class="bf-grid bf-header-row" style="--bf-col-count:${selectedCols().length}">
           <div class="bf-row-no">#</div>
