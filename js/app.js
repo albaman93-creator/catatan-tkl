@@ -445,6 +445,7 @@ const App = (() => {
 
     // Inisialisasi client Supabase (butuh CONFIG.SUPABASE_URL/ANON_KEY terisi benar)
     if (typeof SupabaseClient !== 'undefined') SupabaseClient.init();
+    if (typeof Suggest !== 'undefined' && Suggest.initRemote) Suggest.initRemote();
 
     bindEvents();
 

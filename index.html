@@ -104,7 +104,9 @@
       .sheet-date-control { flex: 1 1 100%; }
       .sheet-op-box { width: 34px; }
     }
-  </style>
+  
+
+</style>
 </head>
 <body>
 
@@ -864,92 +866,107 @@
 
       <!-- Section: Log Sheet Harian -->
       <section class="sec" data-screen="logsheet">
-        <!-- Unified single-row control: proses → shift/line/tanggal → KPI -->
-        <div class="sheet-unified-control" id="sheetUnifiedControl" data-stage="mixing">
-          <div class="sheet-process-tabs" role="tablist" aria-label="Tahapan Proses">
-            <button type="button" class="sheet-stage-btn" data-sheet-stage="mixing" role="tab" aria-selected="true">Mixing</button>
-            <button type="button" class="sheet-stage-btn" data-sheet-stage="filling" role="tab" aria-selected="false">Filling</button>
-            <button type="button" class="sheet-stage-btn" data-sheet-stage="steril" role="tab" aria-selected="false">Steril</button>
-            <button type="button" class="sheet-stage-btn" data-sheet-stage="visual" role="tab" aria-selected="false">Visual</button>
-            <button type="button" class="sheet-stage-btn" data-sheet-stage="kemas" role="tab" aria-selected="false">Kemas</button>
-          </div>
+        <!-- HEADER SHEET KOMPAK: satu baris, semua pengaturan dapat digulung -->
+        <div class="sheet-unified-control compact-sheet-control" id="sheetUnifiedControl" data-stage="mixing">
+          <div class="compact-main-row">
+            <!-- Tanggal -->
+            <div class="compact-control compact-date-control">
+              <button type="button" class="compact-trigger compact-date-trigger" id="sheetDateTrigger" title="Pilih tanggal" aria-label="Pilih tanggal">
+                <span class="compact-icon">▣</span><span id="sheetDateText">04 SEP 2026</span>
+              </button>
+            </div>
 
- <div class="sheet-inline-controls">
-  <!-- ===== BARIS 1: Tanggal | Shift | Line ===== -->
-  <div class="sheet-top-row">
-    <!-- Tanggal -->
-    <div class="sheet-date-control">
-      <button type="button" class="sheet-date-trigger" id="sheetDateTrigger" title="Pilih tanggal">
-        <span class="sheet-date-icon">▣</span>
-        <span id="sheetDateText">21 AUG 2026</span>
-        <span class="sheet-date-chevron">▾</span>
-      </button>
-    </div>
+            <!-- Tahapan -->
+            <div class="compact-control">
+              <button type="button" class="compact-trigger" aria-expanded="false" aria-controls="compactStagePanel">
+                <span id="compactStageValue">Mixing</span><span class="compact-chevron">▾</span>
+              </button>
+              <div class="compact-popover compact-choice-panel" id="compactStagePanel">
+                <div class="compact-popover-head"><b>Tahapan Proses</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
+                <div class="compact-choice-list">
+                  <button type="button" class="compact-stage-option" data-sheet-stage="mixing">Mixing</button>
+                  <button type="button" class="compact-stage-option" data-sheet-stage="filling">Filling</button>
+                  <button type="button" class="compact-stage-option" data-sheet-stage="steril">Steril</button>
+                  <button type="button" class="compact-stage-option" data-sheet-stage="visual">Visual</button>
+                  <button type="button" class="compact-stage-option" data-sheet-stage="kemas">Kemas</button>
+                </div>
+              </div>
+            </div>
 
-    <div class="sheet-control-divider" aria-hidden="true"></div>
+            <!-- Line -->
+            <div class="compact-control">
+              <button type="button" class="compact-trigger" aria-expanded="false" aria-controls="compactLinePanel">
+                <span id="compactLineValue">Line 1</span><span class="compact-chevron">▾</span>
+              </button>
+              <div class="compact-popover compact-choice-panel" id="compactLinePanel">
+                <div class="compact-popover-head"><b>Line Produksi</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
+                <div class="compact-choice-list compact-choice-3">
+                  <button type="button" class="compact-line-option" data-sheet-line="1">Line 1</button>
+                  <button type="button" class="compact-line-option" data-sheet-line="2">Line 2</button>
+                  <button type="button" class="compact-line-option" data-sheet-line="4">Line 4</button>
+                </div>
+              </div>
+            </div>
 
-    <!-- Shift -->
-    <div class="sheet-control-group sheet-shift-control" role="group" aria-label="Shift">
-      <span class="sheet-control-label">Shift</span>
-      <div class="sheet-mini-segment" id="sheetShift" title="Shift evaluasi">
-        <button type="button" data-shift="0" data-sheet-shift="0">1</button>
-        <button type="button" data-shift="1" data-sheet-shift="1">2</button>
-        <button type="button" data-shift="2" data-sheet-shift="2">3</button>
-      </div>
-    </div>
+            <!-- Shift -->
+            <div class="compact-control">
+              <button type="button" class="compact-trigger" aria-expanded="false" aria-controls="compactShiftPanel">
+                <span id="compactShiftValue">Shift 1</span><span class="compact-chevron">▾</span>
+              </button>
+              <div class="compact-popover compact-choice-panel" id="compactShiftPanel">
+                <div class="compact-popover-head"><b>Shift</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
+                <div class="compact-choice-list compact-choice-3">
+                  <button type="button" class="compact-shift-option" data-sheet-shift="0">Shift 1</button>
+                  <button type="button" class="compact-shift-option" data-sheet-shift="1">Shift 2</button>
+                  <button type="button" class="compact-shift-option" data-sheet-shift="2">Shift 3</button>
+                </div>
+              </div>
+            </div>
 
-    <div class="sheet-control-divider" aria-hidden="true"></div>
+            <!-- Operator -->
+            <div class="compact-control compact-expand-control">
+              <button type="button" class="compact-trigger" aria-expanded="false" aria-controls="compactOpPanel">
+                <span id="compactOpValue">OPR</span><span class="compact-chevron">▾</span>
+              </button>
+              <div class="compact-popover compact-form-panel compact-op-panel" id="compactOpPanel">
+                <div class="compact-popover-head"><b>Operator (maks. 6)</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
+                <div class="compact-op-grid" id="sheetOpBoxes">
+                  <input type="text" class="sheet-op-box" data-sheet-op="1" maxlength="18" placeholder="OP1" autocomplete="off">
+                  <input type="text" class="sheet-op-box" data-sheet-op="2" maxlength="18" placeholder="OP2" autocomplete="off">
+                  <input type="text" class="sheet-op-box" data-sheet-op="3" maxlength="18" placeholder="OP3" autocomplete="off">
+                  <input type="text" class="sheet-op-box" data-sheet-op="4" maxlength="18" placeholder="OP4" autocomplete="off">
+                  <input type="text" class="sheet-op-box" data-sheet-op="5" maxlength="18" placeholder="OP5" autocomplete="off">
+                  <input type="text" class="sheet-op-box" data-sheet-op="6" maxlength="18" placeholder="OP6" autocomplete="off">
+                </div>
+              </div>
+            </div>
 
-    <!-- Line -->
-    <div class="sheet-control-group sheet-line-control" role="group" aria-label="Line">
-      <span class="sheet-control-label">Line</span>
-      <div class="sheet-mini-segment" id="sheetLine">
-        <button type="button" data-sheet-line="1">1</button>
-        <button type="button" data-sheet-line="2">2</button>
-        <button type="button" data-sheet-line="4">4</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- BARIS 2: 6 Kolom OP -->
-<div class="sheet-op-row">
-  <div class="sheet-control-group sheet-op-control" role="group" aria-label="Inisial Operator">
-    <span class="sheet-control-label">Inisial Operator</span>
-    <div class="sheet-op-boxes" id="sheetOpBoxes">
-      <input type="text" class="sheet-op-box" data-sheet-op="1" maxlength="18" placeholder="OP1" autocomplete="off">
-      <input type="text" class="sheet-op-box" data-sheet-op="2" maxlength="18" placeholder="OP2" autocomplete="off">
-      <input type="text" class="sheet-op-box" data-sheet-op="3" maxlength="18" placeholder="OP3" autocomplete="off">
-      <input type="text" class="sheet-op-box" data-sheet-op="4" maxlength="18" placeholder="OP4" autocomplete="off">
-      <input type="text" class="sheet-op-box" data-sheet-op="5" maxlength="18" placeholder="OP5" autocomplete="off">
-      <input type="text" class="sheet-op-box" data-sheet-op="6" maxlength="18" placeholder="OP6" autocomplete="off">
-    </div>
-  </div>
-</div>
-
-                    <!-- Produk aktif di halaman Sheet (dipindah ke atas, sebelum KPI) -->
-        <div class="product-grid sheet-product-bar" id="sheetProductBar" style="margin: 10px 0 6px; padding: 0 2px;">
-          <div class="field">
-            <label>Produk 1 (Nama, Kecepatan &amp; No. WO)</label>
-            <div class="split-input split-input-3">
-              <input type="text" id="prodName1" placeholder="Misal: VTTS1 L030001">
-              <input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal">
-              <input type="text" id="prodWo1" placeholder="No. WO" class="mono">
+            <!-- Produk -->
+            <div class="compact-control compact-expand-control">
+              <button type="button" class="compact-trigger" aria-expanded="false" aria-controls="compactProductPanel">
+                <span id="compactProductValue">Produk</span><span class="compact-chevron">▾</span>
+              </button>
+              <div class="compact-popover compact-form-panel compact-product-panel" id="compactProductPanel">
+                <div class="compact-popover-head"><b>Produk (maks. 3)</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
+                <div class="compact-product-list">
+                  <div class="compact-product-row"><span>1</span><input type="text" id="prodName1" placeholder="Nama produk"><input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal"><input type="text" id="prodWo1" placeholder="No. WO" class="mono"></div>
+                  <div class="compact-product-row"><span>2</span><input type="text" id="prodName2" placeholder="Nama produk"><input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal"><input type="text" id="prodWo2" placeholder="No. WO" class="mono"></div>
+                  <div class="compact-product-row"><span>3</span><input type="text" id="prodName3" placeholder="Nama produk"><input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal"><input type="text" id="prodWo3" placeholder="No. WO" class="mono"></div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="field">
-            <label>Produk 2 (Cadangan)</label>
-            <div class="split-input split-input-3">
-              <input type="text" id="prodName2" placeholder="Misal: VPEL1 L027001">
-              <input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal">
-              <input type="text" id="prodWo2" placeholder="No. WO" class="mono">
-            </div>
-          </div>
-          <div class="field">
-            <label>Produk 3 (Cadangan)</label>
-            <div class="split-input split-input-3">
-              <input type="text" id="prodName3" placeholder="Misal: PROD-C">
-              <input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal">
-              <input type="text" id="prodWo3" placeholder="No. WO" class="mono">
+
+          <!-- Elemen lama dipertahankan sebagai state/select tersembunyi agar modul aplikasi tetap kompatibel. -->
+          <div class="compact-legacy-state" aria-hidden="true">
+            <div id="sheetShift"><button type="button" data-shift="0" data-sheet-shift="0">1</button><button type="button" data-shift="1" data-sheet-shift="1">2</button><button type="button" data-shift="2" data-sheet-shift="2">3</button></div>
+            <div id="sheetLine"><button type="button" data-sheet-line="1">1</button><button type="button" data-sheet-line="2">2</button><button type="button" data-sheet-line="4">4</button></div>
+            <div class="sheet-process-tabs">
+              <button type="button" class="sheet-stage-btn" data-sheet-stage="mixing" aria-selected="true">Mixing</button>
+              <button type="button" class="sheet-stage-btn" data-sheet-stage="filling" aria-selected="false">Filling</button>
+              <button type="button" class="sheet-stage-btn" data-sheet-stage="steril" aria-selected="false">Steril</button>
+              <button type="button" class="sheet-stage-btn" data-sheet-stage="visual" aria-selected="false">Visual</button>
+              <button type="button" class="sheet-stage-btn" data-sheet-stage="kemas" aria-selected="false">Kemas</button>
             </div>
           </div>
         </div>
@@ -1478,5 +1495,6 @@
   <script src="./js/settings.js"></script>
   <script src="./js/app.js"></script>
   <script src="./js/sheet-op-sync.js"></script>
+  <script src="./js/compact-controls.js"></script>
 </body>
 </html>

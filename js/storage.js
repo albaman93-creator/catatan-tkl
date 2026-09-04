@@ -62,6 +62,7 @@ const Storage = (() => {
       op1: State.el.op1.value, op2: State.el.op2.value, op3: State.el.op3.value,
       op4: State.el.op4.value, op5: State.el.op5.value, op6: State.el.op6.value,
     },
+    // Jumlah TKL hasil input manual disimpan sebagai bagian dari record Sheet.
     summary: {
       availability: State.el.oF.textContent,
       performance:  State.el.oITotal.textContent,
@@ -122,6 +123,8 @@ const Storage = (() => {
       State.el.op1.value = ''; State.el.op2.value = ''; State.el.op3.value = '';
       State.el.op4.value = ''; State.el.op5.value = ''; State.el.op6.value = '';
     }
+
+    // Restore Jumlah TKL ke Sheet.
 
     // Rows
     State.el.tbody.innerHTML = '';

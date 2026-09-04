@@ -26,11 +26,109 @@ const Suggest = (() => {
   const SEGMENT_DELIMS = /[,;\n]/;
 
   // ====== DAFTAR SUGESTI SESUAI TAHAPAN PROSES AKTIF ======
+  const CUSTOM_KEY = 'TKL_KEGIATAN_SUGGESTIONS_CUSTOM_V2';
+  const REMOTE_TABLE = 'kegiatan_suggestions';
+  let remoteSuggestions = [];
+  let remoteReady = false;
+  let remoteLoading = false;
+
+  const loadCustomSuggestions = () => {
+    try {
+      const raw = localStorage.getItem(CUSTOM_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter(v => typeof v === 'string' && v.trim()) : [];
+    } catch (_) { return []; }
+  };
+
+  const saveCustomSuggestions = (list) => {
+    try { localStorage.setItem(CUSTOM_KEY, JSON.stringify([...new Set(list.map(v => v.trim()).filter(Boolean))])); } catch (_) {}
+  };
+
+  const getStage = () => (State.el.fStage && State.el.fStage.value) || 'common';
+
   const getSuggestions = () => {
-    const stage = (State.el.fStage && State.el.fStage.value) || '';
+    const stage = getStage();
     const list = (CONFIG.KEGIATAN_SUGGESTIONS && CONFIG.KEGIATAN_SUGGESTIONS[stage]) || [];
     const common = (CONFIG.KEGIATAN_SUGGESTIONS && CONFIG.KEGIATAN_SUGGESTIONS.common) || [];
-    return [...list, ...common];
+    const remote = remoteSuggestions
+      .filter(x => x.stage === 'common' || x.stage === stage)
+      .map(x => x.suggestion);
+    return [...new Set([...list, ...common, ...loadCustomSuggestions(), ...remote])];
+  };
+
+  const getClient = () => (typeof SupabaseClient !== 'undefined' && SupabaseClient.getClient)
+    ? SupabaseClient.getClient() : null;
+
+  const refreshRemoteSuggestions = async () => {
+    const client = getClient();
+    if (!client || remoteLoading) return remoteSuggestions;
+    remoteLoading = true;
+    try {
+      const { data, error } = await client
+        .from(REMOTE_TABLE)
+        .select('id,stage,suggestion,created_at')
+        .order('suggestion', { ascending: true });
+      if (error) throw error;
+      remoteSuggestions = Array.isArray(data) ? data : [];
+      remoteReady = true;
+      return remoteSuggestions;
+    } catch (err) {
+      console.warn('Sugesti Supabase tidak dapat dimuat:', err);
+      return remoteSuggestions;
+    } finally {
+      remoteLoading = false;
+    }
+  };
+
+  const initRemote = () => {
+    // Supabase diinisialisasi setelah suggest.js dimuat, jadi beri kesempatan
+    // satu tick dan retry singkat jika client belum siap.
+    const run = () => refreshRemoteSuggestions();
+    if (getClient()) run();
+    else setTimeout(run, 300);
+  };
+
+  const addSuggestion = (text) => {
+    const value = String(text || '').trim().replace(/\s+/g, ' ');
+    if (!value) return false;
+    const exists = getSuggestions().some(v => v.toLowerCase() === value.toLowerCase());
+    if (exists) return false;
+    const stage = getStage();
+    const list = loadCustomSuggestions();
+    list.push(value);
+    saveCustomSuggestions(list);
+    remoteSuggestions.push({ id: `local-${Date.now()}`, stage, suggestion: value, _local: true });
+
+    const client = getClient();
+    if (client) {
+      client.from(REMOTE_TABLE).insert({ stage, suggestion: value })
+        .then(({ error }) => {
+          if (error) console.warn('Gagal menyimpan sugesti ke Supabase:', error);
+          else refreshRemoteSuggestions();
+        });
+    }
+    return true;
+  };
+
+  const removeSuggestion = (text) => {
+    const value = String(text || '').trim();
+    const lower = value.toLowerCase();
+    saveCustomSuggestions(loadCustomSuggestions().filter(v => v.toLowerCase() !== lower));
+    remoteSuggestions = remoteSuggestions.filter(x => x.suggestion.toLowerCase() !== lower);
+    const client = getClient();
+    if (client) {
+      client.from(REMOTE_TABLE).delete().eq('suggestion', value)
+        .then(({ error }) => {
+          if (error) console.warn('Gagal menghapus sugesti Supabase:', error);
+          else refreshRemoteSuggestions();
+        });
+    }
+  };
+
+  const getCustomSuggestions = () => {
+    const stage = getStage();
+    const remote = remoteSuggestions.filter(x => x.stage === 'common' || x.stage === stage).map(x => x.suggestion);
+    return [...new Set([...loadCustomSuggestions(), ...remote])];
   };
 
   /**
@@ -49,6 +147,17 @@ const Suggest = (() => {
     const leadingWs = (rawSeg.match(/^\s*/) || [''])[0].length;
     segStart += leadingWs;
     return { segStart, segment: value.slice(segStart) };
+  };
+
+  // Mode cepat untuk HP: setelah spasi, kata berikutnya dianggap token baru.
+  // Jadi setelah memilih "Loading Lot A", aplikasi menambahkan spasi dan saat
+  // operator mengetik "L" lagi, daftar sugesti muncul lagi.
+  const getActiveToken = (value, caret = value.length) => {
+    const before = value.slice(0, caret);
+    const m = before.match(/(^|[\s,;\n])([^\s,;\n]*)$/);
+    const token = m ? m[2] : '';
+    const tokenStart = caret - token.length;
+    return { tokenStart, token };
   };
 
   // Cari sugesti pertama yang diawali oleh kata/frasa aktif (case-insensitive)
@@ -130,11 +239,14 @@ const Suggest = (() => {
     _actHighlight = -1;
   };
 
-  const selectActivity = (el, text, segStart) => {
+  const selectActivity = (el, text, tokenStart) => {
     if (!el || !text) return;
-    const before = el.value.slice(0, segStart);
-    el.value = before + text;
-    el.selectionStart = el.selectionEnd = el.value.length;
+    const before = el.value.slice(0, tokenStart);
+    const after = el.value.slice(el.selectionEnd || el.value.length);
+    // Tambahkan spasi otomatis: siap langsung ketik kegiatan berikutnya.
+    el.value = before + text.trim() + ' ' + after.replace(/^\s+/, '');
+    const pos = before.length + text.trim().length + 1;
+    el.selectionStart = el.selectionEnd = pos;
     el.focus();
     hideActDropdown();
     el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -219,7 +331,8 @@ const Suggest = (() => {
       // Dropdown tap-untuk-pilih — supaya bisa dipakai tanpa tombol Tab
       // (penting di HP, karena keyboard mobile tidak punya tombol Tab).
       if (document.activeElement === el && atEnd) {
-        renderActDropdown(el, filterActivities(segment), segStart);
+        const tokenInfo = getActiveToken(typed, typed.length);
+        renderActDropdown(el, filterActivities(tokenInfo.token), tokenInfo.tokenStart);
       } else {
         hideActDropdown();
       }
@@ -534,7 +647,7 @@ const Suggest = (() => {
   }
 
   return {
-    attachGhost, attachAll, getSuggestions,
-    attachProductAll,
+    attachGhost, attachAll, getSuggestions, addSuggestion, removeSuggestion, getCustomSuggestions,
+    initRemote, refreshRemoteSuggestions, attachProductAll,
   };
 })();

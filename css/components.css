@@ -372,3 +372,255 @@ textarea.in {
 }
 [data-theme="dark"] .wiz-confirm-value { color: #f5f5f7; }
 [data-theme="dark"] .wiz-confirm-label { color: #8e8e93; }
+
+/* =========================================================
+   ISI MASSAL — MINI SHEET / GRID CEPAT
+   ========================================================= */
+
+/* ===== ISI MASSAL — PEMILIHAN KOLOM RESPONSIF ===== */
+.bf-column-picker {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid var(--line2);
+  border-radius: 12px;
+  background: rgba(248,250,252,.92);
+}
+.bf-picker-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+  color:var(--ink2);
+}
+.bf-picker-head > div { display:flex; align-items:center; gap:7px; }
+.bf-picker-head strong { font-size:12px; }
+.bf-picker-head small { font:500 10px var(--mono); color:var(--mut); text-align:right; }
+.bf-picker-count {
+  min-width:34px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:var(--ink);
+  color:#fff;
+  font:800 10px var(--mono);
+  text-align:center;
+}
+.bf-picker-buttons {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.bf-col-toggle {
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink2);
+  border-radius:9px;
+  padding:7px 10px;
+  font:700 11px var(--mono);
+  cursor:pointer;
+  transition:.15s ease;
+}
+.bf-col-toggle:hover { border-color:var(--amber); }
+.bf-col-toggle.is-active {
+  background:var(--ink);
+  color:#fff;
+  border-color:var(--ink);
+  box-shadow:0 2px 7px rgba(15,23,42,.15);
+}
+.bf-empty-columns {
+  margin-top:8px;
+  padding:8px;
+  border-radius:8px;
+  background:#fff7ed;
+  color:#9a3412;
+  font:700 10px var(--mono);
+  text-align:center;
+}
+
+.bulk-modal-grid {
+  width: min(1180px, calc(100vw - 24px));
+  max-width: 1180px;
+  padding: 16px;
+}
+.bulk-modal-grid .qm-title { margin-bottom: 2px; }
+.bulk-modal-grid .qm-sub { margin-bottom: 0; }
+.bf-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.bf-x { border:0; background:transparent; font-size:28px; line-height:1; color:var(--mut); cursor:pointer; padding:2px 6px; border-radius:8px; }
+.bf-x:hover { background:var(--line2); color:var(--ink); }
+.bf-toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:12px 0 9px; }
+.bf-toolbar label { display:flex; align-items:center; gap:7px; font:700 12px var(--mono); color:var(--mut); }
+.bf-toolbar input { width:68px; padding:7px 8px; border:1px solid var(--line); border-radius:8px; font:700 13px var(--mono); text-align:center; background:#fff; color:var(--ink); }
+.bf-tip { flex:1; font:600 11px var(--mono); color:var(--mut); }
+.bf-clear { padding:7px 11px !important; }
+.bf-grid-wrap { overflow:auto; max-height:62vh; border:1px solid var(--line2); border-radius:10px; background:#fbfcfd; }
+.bf-grid { display:grid; grid-template-columns: 36px repeat(var(--bf-col-count, 3), minmax(86px, 1fr)); min-width:calc(36px + (var(--bf-col-count, 3) * 86px)); }
+.bf-header-row { position:sticky; top:0; z-index:4; background:var(--panel,#fff); border-bottom:1px solid var(--line); }
+.bf-th { padding:9px 6px; text-align:center; font:800 11px var(--mono); color:var(--ink2); border-right:1px solid var(--line2); display:flex; align-items:center; justify-content:center; gap:3px; }
+.bf-th small { display:block; font-size:8px; opacity:.65; }
+.bf-body .bf-row { display:grid; grid-template-columns:subgrid; grid-column:1 / -1; min-height:43px; border-bottom:1px solid var(--line2); transition:background .12s; }
+.bf-body .bf-row:last-child { border-bottom:0; }
+.bf-row-no { display:flex; align-items:center; justify-content:center; font:700 11px var(--mono); color:var(--mut); background:rgba(0,0,0,.025); border-right:1px solid var(--line2); }
+.bf-cell { padding:4px; border-right:1px solid var(--line2); min-width:0; }
+.bf-input { width:100%; height:34px; border:1px solid transparent; border-radius:7px; background:transparent; color:var(--ink); padding:5px 6px; font:700 13px var(--mono); text-align:center; outline:0; }
+.bf-kegiatan .bf-input { text-align:left; font-family:var(--body); font-weight:600; }
+.bf-input:hover { background:#fff; border-color:var(--line); }
+.bf-input:focus { background:#fff; border-color:var(--green); box-shadow:0 0 0 2px rgba(18,161,80,.13); }
+.bf-input:disabled { opacity:.28; background:rgba(0,0,0,.025); cursor:not-allowed; }
+.bf-row.bf-prod { background:rgba(18,161,80,.08); }
+.bf-row.bf-planned { background:rgba(217,119,6,.08); }
+.bf-row.bf-unplanned { background:rgba(220,38,38,.08); }
+.bf-footer { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; }
+.bf-hint { font:600 10.5px var(--mono); color:var(--mut); }
+.bf-footer .qm-actions { margin-top:0; }
+
+/* ===== SUGESTI KEGIATAN — tambah & autocomplete cepat ===== */
+.bf-suggest-panel {
+  margin: 8px 0 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--line2);
+  border-radius: 11px;
+  background: rgba(18,161,80,.045);
+}
+.bf-suggest-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.bf-suggest-head > div { min-width:0; }
+.bf-suggest-head strong { display:block; font-size:11.5px; color:var(--ink2); }
+.bf-suggest-head small { display:block; margin-top:2px; font:500 9.5px/1.35 var(--mono); color:var(--mut); }
+.bf-suggest-add-toggle {
+  flex:0 0 auto; border:1px solid var(--green); background:#fff; color:var(--green);
+  border-radius:8px; padding:6px 9px; font:800 10px var(--mono); cursor:pointer;
+}
+.bf-suggest-add-form { display:flex; gap:6px; margin-top:7px; }
+.bf-suggest-add-form[hidden] { display:none; }
+.bf-suggest-new { flex:1; min-width:0; height:34px; border:1px solid var(--line); border-radius:8px; padding:6px 9px; background:#fff; color:var(--ink); font:600 12px var(--body); outline:0; }
+.bf-suggest-new:focus { border-color:var(--green); box-shadow:0 0 0 2px rgba(18,161,80,.1); }
+.bf-suggest-add-form .btn { min-height:34px; padding:6px 10px !important; font-size:10px; }
+.bf-suggest-list { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+.bf-suggest-chip { display:inline-flex; align-items:center; gap:3px; max-width:100%; padding:4px 6px 4px 8px; border-radius:999px; background:#fff; border:1px solid var(--line2); color:var(--ink2); font:600 9.5px var(--body); }
+.bf-suggest-chip button { border:0; background:transparent; color:var(--mut); padding:0 2px; font-size:15px; line-height:1; cursor:pointer; }
+.bf-suggest-empty { margin-top:6px; font:500 9px var(--mono); color:var(--mut); }
+@media (max-width:760px) {
+  .bf-suggest-panel { padding:8px; }
+  .bf-suggest-head { align-items:flex-start; }
+  .bf-suggest-head small { font-size:8.5px; }
+  .bf-suggest-add-toggle { min-height:34px; }
+  .bf-suggest-new { height:38px; font-size:13px; }
+  .bf-suggest-add-form .btn { min-height:38px; }
+}
+@media (max-width: 760px) {
+  
+/* ===== ISI MASSAL — PEMILIHAN KOLOM RESPONSIF ===== */
+.bf-column-picker {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid var(--line2);
+  border-radius: 12px;
+  background: rgba(248,250,252,.92);
+}
+.bf-picker-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+  color:var(--ink2);
+}
+.bf-picker-head > div { display:flex; align-items:center; gap:7px; }
+.bf-picker-head strong { font-size:12px; }
+.bf-picker-head small { font:500 10px var(--mono); color:var(--mut); text-align:right; }
+.bf-picker-count {
+  min-width:34px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:var(--ink);
+  color:#fff;
+  font:800 10px var(--mono);
+  text-align:center;
+}
+.bf-picker-buttons {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.bf-col-toggle {
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink2);
+  border-radius:9px;
+  padding:7px 10px;
+  font:700 11px var(--mono);
+  cursor:pointer;
+  transition:.15s ease;
+}
+.bf-col-toggle:hover { border-color:var(--amber); }
+.bf-col-toggle.is-active {
+  background:var(--ink);
+  color:#fff;
+  border-color:var(--ink);
+  box-shadow:0 2px 7px rgba(15,23,42,.15);
+}
+.bf-empty-columns {
+  margin-top:8px;
+  padding:8px;
+  border-radius:8px;
+  background:#fff7ed;
+  color:#9a3412;
+  font:700 10px var(--mono);
+  text-align:center;
+}
+
+.bulk-modal-grid { width:calc(100vw - 10px); padding:10px; }
+  .bf-grid-wrap { max-height:66vh; }
+  .bf-footer { align-items:stretch; flex-direction:column; }
+  .bf-footer .qm-actions { justify-content:stretch; }
+  .bf-footer .qm-actions .btn { flex:1; }
+  .bf-tip { flex-basis:100%; }
+}
+
+/* Bulk Fill — navigasi cepat untuk layar ponsel */
+.bf-nav-picker {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 10px;
+  margin:0 0 8px;
+  border:1px solid var(--line2);
+  border-radius:10px;
+  background:rgba(0,0,0,.018);
+}
+.bf-nav-title { font:800 11px var(--mono); color:var(--ink2); }
+.bf-nav-title span { margin-left:5px; font-weight:600; color:var(--mut); }
+.bf-nav-buttons { display:flex; gap:5px; }
+.bf-nav-toggle {
+  min-height:32px;
+  padding:6px 10px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--panel,#fff);
+  color:var(--ink2);
+  font:800 10px var(--mono);
+  cursor:pointer;
+  touch-action:manipulation;
+}
+.bf-nav-toggle.is-active { border-color:var(--green); background:rgba(18,161,80,.10); color:var(--green); }
+@media (max-width:600px) {
+  .bulk-modal-grid { max-height:96vh; overflow:auto; }
+  .bf-head { gap:6px; }
+  .bf-head .qm-title { font-size:14px; }
+  .bf-head .qm-sub { font-size:10px; line-height:1.35; }
+  .bf-toolbar { gap:6px; margin:7px 0; }
+  .bf-nav-picker { align-items:stretch; flex-direction:column; gap:6px; padding:7px; }
+  .bf-nav-buttons { display:grid; grid-template-columns:1fr 1fr; }
+  .bf-nav-toggle { min-height:36px; font-size:10px; }
+  .bf-column-picker { padding:7px; }
+  .bf-picker-buttons { gap:5px; }
+  .bf-col-toggle { min-height:34px; padding:7px 8px; font-size:10px; }
+  .bf-grid-wrap { max-height:58vh; border-radius:8px; }
+  .bf-grid { grid-template-columns:30px repeat(var(--bf-col-count,3), minmax(82px,1fr)); min-width:calc(30px + (var(--bf-col-count,3) * 82px)); }
+  .bf-row-no { font-size:10px; }
+  .bf-cell { padding:3px; }
+  .bf-input { height:38px; min-height:38px; font-size:14px; border-radius:7px; }
+  .bf-th { padding:7px 4px; font-size:10px; }
+  .bf-footer { margin-top:7px; }
+  .bf-hint { font-size:9.5px; }
+}
