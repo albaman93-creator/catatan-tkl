@@ -250,9 +250,18 @@ const App = (() => {
     });
 
     // ============================================================
-    // HAPUS BARIS (tombol del)
+    // SISIP / HAPUS BARIS (tombol ➕ & del)
     // ============================================================
     State.el.tbody.addEventListener('click', (e) => {
+      const insertBtn = e.target.closest('.btn-insert');
+      if (insertBtn) {
+        const tr = insertBtn.closest('tr.log-row');
+        if (tr && typeof Rows.insertRowAfter === 'function') {
+          Rows.insertRowAfter(tr);
+        }
+        return;
+      }
+
       const btn = e.target.closest('.del');
       if (!btn) return;
       const tr = btn.closest('tr');

@@ -229,7 +229,10 @@ const Rows = (() => {
       <td class="col-batch"><select data-f="batch" data-nav class="in mono" aria-label="Produk & Batch">${optionsHtml}</select></td>
       <td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Good"></td>
       <td class="col-defect"><input data-f="defect" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Defect"></td>
-      <td class="col-aksi c-aksi"><button type="button" class="del" title="Hapus baris"> </button></td>
+      <td class="col-aksi c-aksi">
+        <button type="button" class="btn-icon btn-insert" title="Sisip baris di bawah">➕</button>
+        <button type="button" class="del" title="Hapus baris">✕</button>
+      </td>
     `;
 
     if (data) {
@@ -262,6 +265,50 @@ const Rows = (() => {
     if (!data) applyDefaultStartTimeForFirstRow(tr);
     return tr;
   };
+
+  /**
+   * Sisip baris baru tepat di bawah targetTr.
+   * Jam Mulai baris baru = Jam Selesai baris atas (targetTr).
+   */
+  const insertRowAfter = (targetTr) => {
+    if (!targetTr || !targetTr.parentNode) return null;
+
+    const newRow = makeRow(); // append di akhir, lalu dipindah
+    targetTr.after(newRow);
+
+    // Logika Jam Otomatis: Jam Selesai baris atas → Jam Mulai baris baru
+    const selesaiEl = targetTr.querySelector('[data-f="selesai"]');
+    const mulaiEl = newRow.querySelector('[data-f="mulai"]');
+    if (selesaiEl && mulaiEl && selesaiEl.value.trim()) {
+      mulaiEl.value = selesaiEl.value.trim();
+      mulaiEl.classList.remove('invalid');
+    }
+
+    // Alias sesuai instruksi: renumberRows → updateRowNumbers
+    updateRowNumbers();
+
+    if (typeof Calculation !== 'undefined' && Calculation.recalc) {
+      Calculation.recalc();
+    }
+    if (typeof Navigation !== 'undefined') {
+      if (Navigation.applyTabOrder) Navigation.applyTabOrder();
+      else if (Navigation.syncColumnVisibility) Navigation.syncColumnVisibility();
+    }
+    if (typeof UI !== 'undefined' && UI.toast) {
+      UI.toast('Baris disisipkan');
+    }
+
+    // Fokus ke Kode baris baru agar siap diisi
+    const kodeEl = newRow.querySelector('[data-f="kode"]');
+    if (kodeEl) {
+      try { kodeEl.focus(); } catch (e) { /* ignore */ }
+    }
+
+    return newRow;
+  };
+
+  /** Alias instruksi: renumberRows */
+  const renumberRows = updateRowNumbers;
 
   // ====== CASCADE PRODUK KE BAWAH ======
   /**
@@ -422,8 +469,10 @@ const Rows = (() => {
     applyWoFromBatch,
     rows,
     updateRowNumbers,
+    renumberRows,
     applyCat,
     makeRow,
+    insertRowAfter,
     updateAllDropdowns,
     updateMatrixProductHeaders,
     updateProductDetailTable,

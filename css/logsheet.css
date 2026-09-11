@@ -143,7 +143,7 @@ col.col-batch {
 
 col.col-good      { width: 38px; }
 col.col-defect    { width: 38px; }
-col.col-aksi      { width: 30px; }
+col.col-aksi      { width: 56px; }
 
 col.col-hide {
   display: none;
@@ -164,7 +164,7 @@ table.log.preset-quick col.col-batch {
 }
 table.log.preset-quick col.col-good     { width: 36px; }
 table.log.preset-quick col.col-defect   { width: 36px; }
-table.log.preset-quick col.col-aksi     { width: 28px; }
+table.log.preset-quick col.col-aksi     { width: 52px; }
 
 table.log.preset-quick th,
 table.log.preset-quick td {
@@ -431,18 +431,31 @@ td.dur {
   width: 30px;
 }
 
-.del {
-  width: 28px;
-  height: 28px;
+.c-aksi {
+  white-space: nowrap;
+  text-align: center;
+}
+.c-aksi .btn-icon,
+.c-aksi .del {
+  width: 26px;
+  height: 26px;
   border-radius: 6px;
   border: 1px solid transparent;
   background: transparent;
   color: #a4b4c0;
   cursor: pointer;
   font-size: 12px;
+  line-height: 1;
+  padding: 0;
+  vertical-align: middle;
   transition: .15s;
 }
-
+.btn-insert:hover {
+  background: rgba(18, 161, 80, 0.12);
+  color: var(--green-d, #0c7c3d);
+  border-color: rgba(18, 161, 80, 0.35);
+  transform: scale(1.08);
+}
 .del:hover {
   background: rgba(220,38,38,.1);
   color: var(--red);
