@@ -3,27 +3,17 @@
  * Cache semua aset aplikasi untuk mode offline.
  * Versi ditingkatkan untuk mencantumkan semua file JS modular.
  */
-const CACHE_NAME = 'tkl-oee-v22';
+const CACHE_NAME = 'tkl-oee-v23';
 
 const PRECACHE = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './css/variables.css',
   './css/base.css',
   './css/layout.css',
   './css/components.css',
-  './css/logsheet.css',
-  './css/oee.css',
-  './css/dashboard.css',
-  './css/login.css',
-  './css/login-professional.css',
-  './css/nature.css',
-  './css/print.css',
-  './css/apple-style.css',
-  './css/sidebar.css',
-  './css/modern-sheet.css',
-  './css/theme-professional.css',
-  './css/theme-dark.css',
+  './css/table.css',
   './js/config.js',
   './js/utils.js',
   './js/perf.js',

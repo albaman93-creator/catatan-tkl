@@ -1,4 +1,9 @@
 /* =====================================================
+   VARIABLES.CSS — Design tokens, :root, tema, font
+   Sumber: tokens.css + override tema dari base.css
+   ===================================================== */
+
+/* =====================================================
    TOKENS.CSS — Fima Farma OEE Design System
    Satu sumber kebenaran untuk warna, tipografi, spacing,
    radius, dan motion di seluruh aplikasi.
@@ -256,3 +261,13 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* --- Override tema Profesional (variabel warna) --- */
+[data-theme="professional"] {
+  --ink: #0F2437; --ink2: #3A5872; --mut: #7B96AC;
+  --paper: #F2F7FC; --card: #FFFFFF; --line: #CBDEF0; --line2: #DCEBFA;
+  --navy: #0B2A47; --blue: #0B5FA5;
+}
+
+/* --- Token ekstra tema profesional --- */
+:root { --pro-blue: #0B5FA5; --pro-blue-d: #084A82; --pro-blue-lt: #EAF3FB; --pro-navy: #0B2A47; }

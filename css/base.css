@@ -1,33 +1,8 @@
-/* ================================================
-   BASE.CSS — Reset, variabel, dan elemen dasar
-   ================================================ */
+/* =====================================================
+   BASE.CSS — Reset & styling dasar HTML
+   ===================================================== */
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-:root {
-  --ink: #0f2437; --ink2: #41586c; --mut: #6b8093;
-  --paper: #e8edf1; --card: #fff; --line: #d6dee5; --line2: #e8eef2;
-  --green: #12a150; --green-d: #0c7c3d; --green-bg: rgba(18,161,80,.12);
-  --amber: #d97706; --red: #dc2626; --navy: #0d2135; --blue: #0c63a8;
-  --mono: 'IBM Plex Mono', monospace;
-  --disp: 'Barlow Condensed', sans-serif;
-  --body: 'IBM Plex Sans', sans-serif;
-  --page: 1360px;
-}
-
-/* ---------- Tema Profesional (gaya kantor: putih dominan + biru) ----------
-   Aktif saat <html data-theme="professional"> (lihat js/settings.js +
-   tombol "Tema Aplikasi" di sidebar). Warna status semantik (--green,
-   --green-d, --amber, --red) SENGAJA TIDAK diubah supaya makna hijau =
-   baik/tercapai, merah = bahaya, dsb tetap konsisten di seluruh data
-   (OEE, kategori downtime). Yang diubah hanya warna netral & aksen brand:
-   latar jadi putih/biru sangat muda, garis pinggir jadi biru muda,
-   teks & aksen utama jadi navy/biru kantor. */
-[data-theme="professional"] {
-  --ink: #0F2437; --ink2: #3A5872; --mut: #7B96AC;
-  --paper: #F2F7FC; --card: #FFFFFF; --line: #CBDEF0; --line2: #DCEBFA;
-  --navy: #0B2A47; --blue: #0B5FA5;
-}
 
 html { scroll-behavior: smooth; }
 body {
@@ -42,16 +17,18 @@ body {
   background-size: auto, 26px 26px, 26px 26px, auto;
   overflow-x: hidden;
 }
+h1, h2, h3, h4, h5, h6 { font-family: var(--disp, inherit); font-weight: 700; line-height: 1.2; }
+p { line-height: 1.5; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
 ::selection { background: rgba(18,161,80,.25); }
-button, input, select { touch-action: manipulation; }
+button, input, select, textarea { touch-action: manipulation; font-family: inherit; }
 .spacer { flex: 1; }
 kbd {
   font: 600 12px var(--mono); background: #fff;
   border: 1px solid var(--line); border-bottom-width: 2px;
   border-radius: 4px; padding: 1px 6px; color: var(--ink2);
 }
-
-/* Mode gelap — latar SuperGrok, tanpa grid hijau */
 [data-theme="dark"] body {
   color: var(--ink);
   background: var(--paper);
