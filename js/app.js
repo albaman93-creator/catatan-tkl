@@ -250,6 +250,210 @@ const App = (() => {
     });
 
     // ============================================================
+    // PASTE multi-baris: Jam Mulai & Durasi
+    // Mulai:  1745 / 1940.918.4  → jam [. good [. defect]]
+    // Durasi: 10 / 35.918.4     → durasi [. good [. defect]]
+    // Titik (.) = pemisah
+    // ============================================================
+    const parseMulaiPasteLine = (line) => {
+      const raw = String(line || '').trim();
+      if (!raw) return null;
+
+      const parts = raw.split(/[.\t,]/).map(s => s.trim());
+      const timeRaw = (parts[0] || '').replace(/\s/g, '');
+      const goodRaw = parts.length > 1 ? parts[1].replace(/[^\d]/g, '') : '';
+      const defectRaw = parts.length > 2 ? parts[2].replace(/[^\d]/g, '') : '';
+
+      let digits = timeRaw.replace(/\D/g, '');
+      let mulai = '';
+      if (/^\d{1,2}:\d{1,2}$/.test(timeRaw)) {
+        const norm = Utils.normTime(timeRaw);
+        mulai = norm || Utils.maskTime(timeRaw);
+      } else if (digits.length >= 3 && digits.length <= 4) {
+        digits = digits.padStart(4, '0');
+        mulai = digits.slice(0, 2) + ':' + digits.slice(2);
+        const norm = Utils.normTime(mulai);
+        if (norm) mulai = norm;
+      } else if (digits.length > 0 && digits.length <= 2) {
+        mulai = Utils.normTime(digits) || (digits.padStart(2, '0') + ':00');
+      } else {
+        return null;
+      }
+
+      return {
+        mulai,
+        good: goodRaw !== '' ? goodRaw : null,
+        defect: defectRaw !== '' ? defectRaw : null,
+      };
+    };
+
+    /** Parse baris paste Durasi: "35" atau "35.918.4" → durasi / good / defect */
+    const parseDurasiPasteLine = (line) => {
+      const raw = String(line || '').trim();
+      if (!raw) return null;
+
+      const parts = raw.split(/[.\t,]/).map(s => s.trim());
+      const durRaw = (parts[0] || '').replace(/[^\d]/g, '');
+      const goodRaw = parts.length > 1 ? parts[1].replace(/[^\d]/g, '') : '';
+      const defectRaw = parts.length > 2 ? parts[2].replace(/[^\d]/g, '') : '';
+
+      if (durRaw === '') return null;
+      const durNum = parseInt(durRaw, 10);
+      if (!isFinite(durNum) || durNum < 0) return null;
+
+      return {
+        durasi: String(durNum),
+        good: goodRaw !== '' ? goodRaw : null,
+        defect: defectRaw !== '' ? defectRaw : null,
+      };
+    };
+
+    const ensureRowsFrom = (startIdx, needCount) => {
+      let all = Rows.rows();
+      while (all.length < startIdx + needCount) {
+        Rows.makeRow();
+        all = Rows.rows();
+      }
+      Rows.updateRowNumbers();
+      return all;
+    };
+
+    /** Setelah isi durasi: mulai + durasi → selesai */
+    const applyDurasiToSelesai = (row, durasiStr) => {
+      const mulaiEl = row.querySelector('[data-f="mulai"]');
+      const selesaiEl = row.querySelector('[data-f="selesai"]');
+      const mulaiMin = mulaiEl ? Utils.parseTime(mulaiEl.value) : null;
+      const durMin = parseFloat(String(durasiStr).replace(',', '.'));
+      if (mulaiMin != null && isFinite(durMin) && durMin >= 0 && selesaiEl) {
+        selesaiEl.value = Utils.minutesToHHMM(mulaiMin + durMin);
+        selesaiEl.classList.remove('invalid');
+        Calculation.validateTimeInput(selesaiEl);
+      }
+    };
+
+    State.el.tbody.addEventListener('paste', (e) => {
+      const t = e.target;
+      if (!(t instanceof HTMLElement)) return;
+      const field = t.getAttribute('data-f');
+      if (field !== 'mulai' && field !== 'durasi') return;
+
+      const cd = e.clipboardData || window.clipboardData;
+      const text = cd ? (cd.getData('text') || '') : '';
+      if (!text) return;
+
+      const lines = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      const isMulti = lines.length > 1;
+      const isPacked = lines.length === 1 && /[.\t,]/.test(lines[0]);
+      if (!isMulti && !isPacked) {
+        // Satu nilai polos → biarkan paste default + handler input biasa
+        return;
+      }
+
+      e.preventDefault();
+
+      const startTr = t.closest('tr.log-row');
+      if (!startTr) return;
+      let allRows = Rows.rows();
+      const startIdx = allRows.indexOf(startTr);
+      if (startIdx < 0) return;
+
+      // ---------- JAM MULAI ----------
+      if (field === 'mulai') {
+        const parsed = lines.map(parseMulaiPasteLine).filter(Boolean);
+        if (!parsed.length) return;
+
+        allRows = ensureRowsFrom(startIdx, parsed.length);
+        let lastEl = t;
+
+        parsed.forEach((item, offset) => {
+          const row = allRows[startIdx + offset];
+          if (!row) return;
+          const mulaiEl = row.querySelector('[data-f="mulai"]');
+          if (!mulaiEl) return;
+          mulaiEl.value = item.mulai;
+          mulaiEl.classList.remove('invalid');
+          Calculation.validateTimeInput(mulaiEl);
+
+          // Cascade: jam mulai baris ini → jam selesai baris sebelumnya
+          const prevRow = offset === 0
+            ? (() => {
+                let prev = row.previousElementSibling;
+                while (prev && !prev.classList.contains('log-row')) prev = prev.previousElementSibling;
+                return prev;
+              })()
+            : allRows[startIdx + offset - 1];
+          if (prevRow) {
+            const sv = prevRow.querySelector('[data-f="selesai"]');
+            if (sv) {
+              sv.value = item.mulai;
+              sv.classList.remove('invalid');
+              Calculation.validateTimeInput(sv);
+            }
+          }
+
+          if (item.good != null) {
+            const goodEl = row.querySelector('[data-f="good"]');
+            if (goodEl) goodEl.value = item.good;
+          }
+          if (item.defect != null) {
+            const defectEl = row.querySelector('[data-f="defect"]');
+            if (defectEl) defectEl.value = item.defect;
+          }
+          lastEl = mulaiEl;
+        });
+
+        Calculation.recalc();
+        if (Rows.scrollRowIntoView) {
+          const lastRow = lastEl.closest('tr.log-row');
+          if (lastRow) Rows.scrollRowIntoView(lastRow, { behavior: 'smooth' });
+        }
+        try { lastEl.focus(); lastEl.select(); } catch (_) { /* ignore */ }
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast(`Paste ${parsed.length} baris ke Jam Mulai ✓`);
+        }
+        return;
+      }
+
+      // ---------- DURASI ----------
+      if (field === 'durasi') {
+        const parsed = lines.map(parseDurasiPasteLine).filter(Boolean);
+        if (!parsed.length) return;
+
+        allRows = ensureRowsFrom(startIdx, parsed.length);
+        let lastEl = t;
+
+        parsed.forEach((item, offset) => {
+          const row = allRows[startIdx + offset];
+          if (!row) return;
+          const durEl = row.querySelector('[data-f="durasi"]');
+          if (!durEl) return;
+          durEl.value = item.durasi;
+          applyDurasiToSelesai(row, item.durasi);
+
+          if (item.good != null) {
+            const goodEl = row.querySelector('[data-f="good"]');
+            if (goodEl) goodEl.value = item.good;
+          }
+          if (item.defect != null) {
+            const defectEl = row.querySelector('[data-f="defect"]');
+            if (defectEl) defectEl.value = item.defect;
+          }
+          lastEl = durEl;
+        });
+
+        Calculation.recalc();
+        if (Rows.scrollRowIntoView) {
+          const lastRow = lastEl.closest('tr.log-row');
+          if (lastRow) Rows.scrollRowIntoView(lastRow, { behavior: 'smooth' });
+        }
+        try { lastEl.focus(); lastEl.select(); } catch (_) { /* ignore */ }
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast(`Paste ${parsed.length} baris ke Durasi ✓`);
+        }
+      }
+    });
+
+    // ============================================================
     // SISIP / HAPUS BARIS (tombol ➕ & del)
     // ============================================================
     State.el.tbody.addEventListener('click', (e) => {
