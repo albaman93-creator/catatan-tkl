@@ -334,8 +334,10 @@ const App = (() => {
     State.el.btnAdd.addEventListener('click', () => {
       const tr = Rows.makeRow();
       Rows.updateRowNumbers();
+      if (Rows.markRowEnter) Rows.markRowEnter(tr);
       Calculation.recalc();
-      tr.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      if (Rows.scrollRowIntoView) Rows.scrollRowIntoView(tr, { behavior: 'smooth' });
+      else tr.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       const cells = Navigation.navCells();
       const kodeCell = cells.find(c => c.f === 'kode' && c.ri === Rows.rows().length - 1);
       if (kodeCell) Navigation.focusCell(kodeCell);

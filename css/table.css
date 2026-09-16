@@ -18,11 +18,37 @@
   overflow-x: auto !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
-  max-height: 66vh;
+  /* Header sticky (~52px) + ~10 baris terlihat; sisa digulir (default 25 baris) */
+  max-height: calc(52px + 10 * 34px);
   border: 1px solid var(--line);
   border-radius: 8px;
   width: 100%;
   min-width: 0;
+  /* Optimasi scroll: cegah bounce ke page, percepat compositing */
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+  contain: layout paint style;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.45) transparent;
+}
+
+.tbl-wrap::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.tbl-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tbl-wrap::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.tbl-wrap::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.65);
+  background-clip: padding-box;
 }
 
 
@@ -34,6 +60,8 @@ table.log {
   table-layout: auto;
   width: max-content;
   min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 
@@ -48,6 +76,8 @@ table.log {
   z-index: 6;
   background: #fff;
   min-width: 32px;
+  /* Hindari flicker saat scroll horizontal */
+  background-clip: padding-box;
 }
 
 .log thead th.col-num {
@@ -65,6 +95,9 @@ table.log {
   top: 0;
   z-index: 15;
   background: #f4f7f9;
+  background-clip: padding-box;
+  /* Box-shadow tipis agar header “mengambang” di atas baris saat digulir */
+  box-shadow: 0 1px 0 var(--line, #d6dee5);
 }
 
 .log thead tr:first-child th {
@@ -79,6 +112,29 @@ table.log {
   top: 24px;
   z-index: 14;
   background: #f4f7f9;
+  box-shadow: 0 1px 0 var(--line, #d6dee5);
+}
+
+/* Sudut header + kolom nomor (paling atas-kiri) */
+.log thead tr:first-child th.col-num {
+  z-index: 26;
+  left: 0;
+  top: 0;
+}
+.log thead tr:nth-child(2) th.col-num {
+  z-index: 25;
+  left: 0;
+  top: 24px;
+}
+
+
+/* ================================================================
+   PERFORMA SCROLL: baris di luar viewport di-skip paint sebisa mungkin
+   ================================================================ */
+
+.log tbody tr.log-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 34px;
 }
 
 
@@ -89,7 +145,8 @@ table.log {
 @media (max-width: 768px) {
 
   .tbl-wrap {
-    max-height: 56vh;
+    /* Header + ~10 baris di layar kecil */
+    max-height: calc(48px + 10 * 32px);
     border-radius: 6px;
   }
 
@@ -107,6 +164,10 @@ table.log {
     width: 18px;
     height: 18px;
     font-size: 10px;
+  }
+
+  .log tbody tr.log-row {
+    contain-intrinsic-size: auto 32px;
   }
 }
 
@@ -287,18 +348,22 @@ tr.log-row[data-cat="prod"] td.col-num {
    ================================================================ */
 
 .log tbody tr {
-  transition:
-    background .2s,
-    opacity .19s,
-    transform .19s;
+  transition: background .15s ease;
+}
 
-  animation: rowin .25s ease both;
+/* Animasi masuk hanya untuk baris baru (bukan 25 baris awal) agar scroll tidak lag */
+.log tbody tr.log-row-enter {
+  animation: rowin .2s ease both;
 }
 
 @keyframes rowin {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -2236,7 +2301,8 @@ table.log.qm-cepat2 .col-wo {
   }
 
   .tbl-wrap {
-    max-height: 56vh;
+    /* Tetap ~10 baris terlihat di mobile; sisa digulir */
+    max-height: calc(48px + 10 * 32px);
   }
 }
 

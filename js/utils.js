@@ -99,14 +99,22 @@ const Utils = (() => {
 
   /**
    * Kategorisasi kode log: 'planned' | 'unplanned' | 'prod' | null.
+   * Hanya kode 1–9 yang valid:
+   *   2         → prod (produksi)
+   *   5,6,7,8   → planned
+   *   1,3,4,9   → unplanned
+   * Selain itu (kosong, non-angka, di luar 1–9) → null (tidak dihitung).
    */
   const catOf = (k) => {
     if (k === '' || k == null) return null;
     const n = parseInt(k, 10);
     if (isNaN(n)) return null;
+    if (CONFIG.VALID_CODES && !CONFIG.VALID_CODES.has(n)) return null;
+    if (n < 1 || n > 9) return null;
     if (CONFIG.PLANNED_CODES.has(n))   return 'planned';
     if (CONFIG.UNPLANNED_CODES.has(n)) return 'unplanned';
-    return 'prod';
+    if (CONFIG.PROD_CODES ? CONFIG.PROD_CODES.has(n) : n === 2) return 'prod';
+    return null;
   };
 
   // ====== KEAMANAN TAMPILAN ======

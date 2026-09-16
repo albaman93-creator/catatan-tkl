@@ -37,7 +37,9 @@ const CONFIG = Object.freeze({
   AUTO_SAVE_INTERVAL_MS: 60000, // 1 menit
 
   // ====== DEFAULTS ======
-  DEFAULT_ROWS: 10,
+  // Jumlah baris awal saat sheet kosong. Viewport tabel menampilkan ~10 baris;
+  // baris 11–25 (dan tambahan) digulir di dalam .tbl-wrap.
+  DEFAULT_ROWS: 25,
 
   // ====== SHIFT (menit) ======
   // S1=510, S2=480, S3=450
@@ -55,10 +57,15 @@ const CONFIG = Object.freeze({
     { from: 0,    to: 420,  index: 2 }, // S3 (setelah tengah malam)
   ],
 
-  // ====== KODE LOG SHEET ======
-  PLANNED_CODES:   new Set([5, 6, 7, 8]), // Planned Down Time (putih/amber)
-  UNPLANNED_CODES: new Set([1, 3, 4, 9]), // Unplanned Down Time (merah)
-  // Lainnya → produksi (hijau)
+  // ====== KODE LOG SHEET (hanya 1–9 yang valid) ======
+  // 2           → Produksi / produktif (hijau)
+  // 5, 6, 7, 8  → Planned Down Time (amber)
+  // 1, 3, 4, 9  → Unplanned Down Time (merah)
+  // selain 1–9 → tidak valid, tidak dihitung
+  PLANNED_CODES:   new Set([5, 6, 7, 8]),
+  UNPLANNED_CODES: new Set([1, 3, 4, 9]),
+  PROD_CODES:      new Set([2]),
+  VALID_CODES:     new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]),
 
   // ====== TARGET OEE ======
   TARGET: {

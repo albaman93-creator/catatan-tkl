@@ -267,6 +267,46 @@ const Rows = (() => {
   };
 
   /**
+   * Gulir baris agar terlihat di dalam #tblWrap (viewport ~10 baris).
+   * Memperhitungkan tinggi header sticky agar baris tidak tertutup header.
+   */
+  const scrollRowIntoView = (tr, opts = {}) => {
+    const wrap = (State.el && State.el.tblWrap) || document.getElementById('tblWrap');
+    if (!wrap || !tr) return;
+
+    const behavior = opts.behavior || 'smooth';
+    const wrapRect = wrap.getBoundingClientRect();
+    const rowRect = tr.getBoundingClientRect();
+
+    // Tinggi header sticky (1 atau 2 baris thead)
+    const thead = wrap.querySelector('table.log thead');
+    const headH = thead ? thead.offsetHeight : 48;
+    const pad = 4;
+
+    const topVisible = wrapRect.top + headH + pad;
+    const bottomVisible = wrapRect.bottom - pad;
+
+    if (rowRect.top < topVisible) {
+      const delta = rowRect.top - topVisible;
+      wrap.scrollBy({ top: delta, behavior });
+    } else if (rowRect.bottom > bottomVisible) {
+      const delta = rowRect.bottom - bottomVisible;
+      wrap.scrollBy({ top: delta, behavior });
+    }
+  };
+
+  /** Tandai baris baru untuk animasi masuk singkat (opsional). */
+  const markRowEnter = (tr) => {
+    if (!tr) return;
+    tr.classList.add('log-row-enter');
+    const done = () => {
+      tr.classList.remove('log-row-enter');
+      tr.removeEventListener('animationend', done);
+    };
+    tr.addEventListener('animationend', done);
+  };
+
+  /**
    * Sisip baris baru tepat di bawah targetTr.
    * Jam Mulai baris baru = Jam Selesai baris atas (targetTr).
    */
@@ -286,6 +326,7 @@ const Rows = (() => {
 
     // Alias sesuai instruksi: renumberRows → updateRowNumbers
     updateRowNumbers();
+    markRowEnter(newRow);
 
     if (typeof Calculation !== 'undefined' && Calculation.recalc) {
       Calculation.recalc();
@@ -297,6 +338,8 @@ const Rows = (() => {
     if (typeof UI !== 'undefined' && UI.toast) {
       UI.toast('Baris disisipkan');
     }
+
+    scrollRowIntoView(newRow, { behavior: 'smooth' });
 
     // Fokus ke Kode baris baru agar siap diisi
     const kodeEl = newRow.querySelector('[data-f="kode"]');
@@ -473,6 +516,8 @@ const Rows = (() => {
     applyCat,
     makeRow,
     insertRowAfter,
+    scrollRowIntoView,
+    markRowEnter,
     updateAllDropdowns,
     updateMatrixProductHeaders,
     updateProductDetailTable,
