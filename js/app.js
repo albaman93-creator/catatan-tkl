@@ -546,6 +546,12 @@ const App = (() => {
       const kodeCell = cells.find(c => c.f === 'kode' && c.ri === Rows.rows().length - 1);
       if (kodeCell) Navigation.focusCell(kodeCell);
     });
+    // Export CSV log sheet aktif (sidebar + tombol di bawah tabel)
+    const bindExportCsv = (el) => {
+      if (el) el.addEventListener('click', () => Storage.exportCsv());
+    };
+    bindExportCsv(State.el.btnExportCsv);
+    bindExportCsv(State.el.btnExportCsvSheet);
 
     // ============================================================
     // Ctrl+S SHORTCUT
