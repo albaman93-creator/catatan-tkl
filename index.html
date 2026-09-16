@@ -700,6 +700,15 @@
         <span class="menu-row-chevron">›</span>
       </button>
 
+      <button type="button" class="menu-row" id="btnExportCsv">
+        <span class="menu-row-icon">⇩</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Export CSV</span>
+          <span class="menu-row-sub">Unduh log sheet aktif</span>
+        </span>
+        <span class="menu-row-chevron">›</span>
+      </button>
+
       <button type="button" class="menu-row menu-row--primary" id="btnSave">
         <span class="menu-row-icon menu-row-icon--blue">💾</span>
         <span class="menu-row-body">
@@ -1193,7 +1202,10 @@
             </tfoot>
           </table>
         </div>
-        <button class="btn btn-add" id="btnAdd" type="button">+ Tambah Baris</button>
+        <div class="logsheet-row-actions">
+          <button class="btn btn-add" id="btnAdd" type="button">+ Tambah Baris</button>
+          <button class="btn btn-ghost" id="btnExportCsvSheet" type="button" title="Export log sheet ke CSV">⇩ Export CSV</button>
+        </div>
         <div class="sec-f">
           <span>Σ durasi: <b id="sumDur">0</b> / <span id="maxShiftMnt2">510</span> mnt</span>
           <span>·</span>
