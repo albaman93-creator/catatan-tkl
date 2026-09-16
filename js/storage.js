@@ -328,8 +328,73 @@ const Storage = (() => {
     }
   };
 
+  /**
+   * Export log sheet aktif ke CSV (UTF-8 BOM, cocok Excel Indonesia).
+   * Satu baris per aktivitas; header memuat meta filter + ringkasan OEE.
+   */
+  const exportCsv = () => {
+    const filter = activeFilter();
+    const rec = collect();
+    const rows = (rec.rows || []).filter(r =>
+      (r.kode && String(r.kode).trim()) ||
+      (r.mulai && String(r.mulai).trim()) ||
+      (r.selesai && String(r.selesai).trim()) ||
+      (r.durasi && String(r.durasi).trim()) ||
+      (r.kegiatan && String(r.kegiatan).trim()) ||
+      (r.good && String(r.good).trim()) ||
+      (r.defect && String(r.defect).trim())
+    );
+
+    if (!rows.length) {
+      if (typeof UI !== 'undefined' && UI.toast) {
+        UI.toast('Tidak ada data baris untuk diexport.', true, 'warn');
+      }
+      return;
+    }
+
+    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const head = [
+      'No', 'Tanggal', 'Shift', 'Line', 'Tahapan',
+      'Kode', 'OP', 'Mulai', 'Panggil', 'Teknik', 'Selesai', 'Durasi',
+      'Kegiatan', 'Masalah', 'Disposisi', 'WO', 'Produk', 'Good', 'Defect',
+      'Availability%', 'Performance%', 'Quality%', 'OEE%',
+    ];
+
+    const metaA = rec.summary?.availability ?? '';
+    const metaP = rec.summary?.performance ?? '';
+    const metaQ = rec.summary?.quality ?? '';
+    const metaO = rec.summary?.oee ?? '';
+
+    const body = rows.map((r, i) => [
+      i + 1,
+      filter.rawDate,
+      `S${filter.shift}`,
+      filter.line,
+      filter.stage,
+      r.kode, r.op, r.mulai, r.panggil, r.teknik, r.selesai, r.durasi,
+      r.kegiatan, r.masalah, r.disposisi, r.wo, r.batch, r.good, r.defect,
+      metaA, metaP, metaQ, metaO,
+    ]);
+
+    const csv = [head, ...body].map(row => row.map(esc).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const datePart = filter.rawDate || Utils.todayLocal();
+    a.href = url;
+    a.download = `logsheet-${datePart}-S${filter.shift}-L${filter.line}-${filter.stage}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    if (typeof UI !== 'undefined' && UI.toast) {
+      UI.toast(`CSV diexport (${rows.length} baris) ✓`);
+    }
+  };
+
   return {
     dbGet, dbSet, curKey, labelFilter, collect, applyRecord,
-    loadRecord, saveData, autoSaveLocal,
+    loadRecord, saveData, autoSaveLocal, exportCsv,
   };
 })();
