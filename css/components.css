@@ -25,6 +25,27 @@
 .btn-logout:hover { background: rgba(220,38,38,0.08); border-color: var(--red); }
 .btn-add { background: #fff; border: 1.5px dashed #9fc3ad; color: var(--green-d); padding: 10px 14px; width: 100%; margin-top: 12px; }
 .btn-add:hover { background: var(--green-bg); border-style: solid; }
+
+/* Tombol di bawah tabel log sheet: Tambah Baris + Export CSV */
+.logsheet-row-actions {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.logsheet-row-actions .btn-add {
+  flex: 1 1 180px;
+  margin-top: 0;
+  width: auto;
+}
+.logsheet-row-actions #btnExportCsvSheet {
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+
 .btn-install { background: #0d2135; color: #fff; border: 1px solid #1a3b5c; padding: 8px 14px; font-size: 13px; white-space: nowrap; border-radius: 8px; cursor: pointer; transition: .2s; display: none; }
 .btn-install.show { display: inline-flex; }
 
