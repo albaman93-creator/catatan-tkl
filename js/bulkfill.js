@@ -499,9 +499,595 @@ const BulkFill = (() => {
     focus?.select?.();
   };
 
+  // ====== NOTEPAD MASS FILL (Kode / Jam Mulai / Durasi) ======
+  // UI sederhana: textarea + copy / simpan / hapus — sesuai mockup operator.
+  const NOTEPAD_COLS = {
+    kode: {
+      title: 'Isi Kode masal',
+      hint: 'Satu digit = satu baris. Format: 2 atau 2.918.4 (kode.good.defect). Ketik 2542 → otomatis jadi 4 baris. Hapus baris = hapus kode+good+defect di sheet.',
+      inputmode: 'text',
+    },
+    mulai: {
+      title: 'Isi Jam Mulai',
+      hint: 'Format: 1630 atau 1630.918.4 (jam.good.defect). Hapus baris = hapus jam+good+defect di sheet.',
+      inputmode: 'text',
+    },
+    durasi: {
+      title: 'Isi Durasi masal',
+      hint: 'Format: 35 atau 35.918.4 (durasi.good.defect). Hapus baris = hapus durasi+good+defect di sheet.',
+      inputmode: 'text',
+    },
+  };
+
+  /**
+   * Prefill notepad: ambil SEMUA baris sheet yang sudah terisi kolom ini
+   * (dari baris 1), supaya bisa diedit / dicopy — bukan mulai dari baris kosong.
+   */
+  const buildNotepadPrefill = (col) => {
+    const rows = Rows.rows();
+    const lines = [];
+    for (let i = 0; i < rows.length; i++) {
+      const tr = rows[i];
+      if (!tr) continue;
+      if (col === 'kode') {
+        const v = (tr.querySelector('[data-f="kode"]')?.value || '').trim();
+        const good = (tr.querySelector('[data-f="good"]')?.value || '').trim();
+        const defect = (tr.querySelector('[data-f="defect"]')?.value || '').trim();
+        // Tampilkan jika ada kode atau good/defect
+        if (!v && !good && !defect) continue;
+        let packed = v || '0';
+        if (good || defect) {
+          packed += '.' + (good || '0') + '.' + (defect || '0');
+        }
+        lines.push(packed);
+      } else if (col === 'mulai') {
+        const mulai = (tr.querySelector('[data-f="mulai"]')?.value || '').trim();
+        const good = (tr.querySelector('[data-f="good"]')?.value || '').trim();
+        const defect = (tr.querySelector('[data-f="defect"]')?.value || '').trim();
+        // Tampilkan jika ada jam atau good/defect
+        if (!mulai && !good && !defect) continue;
+        let packed;
+        if (mulai) {
+          const digits = mulai.replace(/\D/g, '');
+          packed = digits.length >= 3
+            ? digits.padStart(4, '0').slice(0, 4)
+            : mulai.replace(':', '');
+        } else {
+          packed = '0000';
+        }
+        // Selalu tampilkan good & defect jika ada (format jam.good.defect)
+        if (good || defect) {
+          packed += '.' + (good || '0') + '.' + (defect || '0');
+        }
+        lines.push(packed);
+      } else if (col === 'durasi') {
+        const dur = (tr.querySelector('[data-f="durasi"]')?.value || '').trim();
+        const good = (tr.querySelector('[data-f="good"]')?.value || '').trim();
+        const defect = (tr.querySelector('[data-f="defect"]')?.value || '').trim();
+        if (!dur && !good && !defect) continue;
+        let packed = dur || '0';
+        if (good || defect) {
+          packed += '.' + (good || '0') + '.' + (defect || '0');
+        }
+        lines.push(packed);
+      }
+    }
+    // Prefill dengan nomor baris: "1. 2" / "1. 1540" / "1. 35.918.4"
+    if (!lines.length) return '1. ';
+    return lines.map((ln, i) => `${i + 1}. ${ln}`).join('\n');
+  };
+
+  const ensureRows = (startIdx0, count) => {
+    while (Rows.rows().length < startIdx0 + count) Rows.makeRow();
+    Rows.updateRowNumbers();
+    return Rows.rows();
+  };
+
+  /** Hapus prefix nomor baris: "4. 1630.918.6" → "1630.918.6" */
+  const stripLineNumber = (line) =>
+    String(line || '').replace(/^\s*\d+\.\s*/, '').trim();
+
+  /**
+   * Renumber semua baris jadi "1. …", "2. …".
+   * keepTrailingEmpty=true → selalu sisakan baris terakhir "N. " siap ketik (untuk Enter).
+   */
+  const renumberNotepadLines = (text, keepTrailingEmpty = false) => {
+    const rawLines = String(text || '').split(/\r?\n/);
+    const contents = rawLines.map(stripLineNumber);
+    const meaningful = contents.filter(s => s !== '');
+    const lastWasEmpty = contents.length > 0 && contents[contents.length - 1] === '';
+    if (!meaningful.length) return '1. ';
+    const lines = meaningful.map((s, i) => `${i + 1}. ${s}`);
+    if (keepTrailingEmpty || lastWasEmpty) {
+      lines.push(`${meaningful.length + 1}. `);
+    }
+    return lines.join('\n');
+  };
+
+  const parseMulaiLine = (line) => {
+    const raw = stripLineNumber(line);
+    if (!raw) return null;
+    const parts = raw.split(/[.\t,]/).map(s => s.trim());
+    const timeRaw = (parts[0] || '').replace(/\s/g, '');
+    const goodRaw = parts.length > 1 ? parts[1].replace(/[^\d]/g, '') : '';
+    const defectRaw = parts.length > 2 ? parts[2].replace(/[^\d]/g, '') : '';
+    let digits = timeRaw.replace(/\D/g, '');
+    let mulai = '';
+    if (/^\d{1,2}:\d{1,2}$/.test(timeRaw)) {
+      mulai = Utils.normTime(timeRaw) || Utils.maskTime(timeRaw);
+    } else if (digits.length >= 3 && digits.length <= 4) {
+      digits = digits.padStart(4, '0');
+      mulai = digits.slice(0, 2) + ':' + digits.slice(2);
+      const n = Utils.normTime(mulai);
+      if (n) mulai = n;
+    } else if (digits.length > 0 && digits.length <= 2) {
+      mulai = Utils.normTime(digits) || (digits.padStart(2, '0') + ':00');
+    } else return null;
+    return {
+      mulai,
+      good: goodRaw !== '' ? goodRaw : null,
+      defect: defectRaw !== '' ? defectRaw : null,
+    };
+  };
+
+  const parseDurasiLine = (line) => {
+    const raw = stripLineNumber(line);
+    if (!raw) return null;
+    const parts = raw.split(/[.\t,]/).map(s => s.trim());
+    const durRaw = (parts[0] || '').replace(/[^\d]/g, '');
+    const goodRaw = parts.length > 1 ? parts[1].replace(/[^\d]/g, '') : '';
+    const defectRaw = parts.length > 2 ? parts[2].replace(/[^\d]/g, '') : '';
+    if (durRaw === '') return null;
+    const n = parseInt(durRaw, 10);
+    if (!isFinite(n) || n < 0) return null;
+    return {
+      durasi: String(n),
+      good: goodRaw !== '' ? goodRaw : null,
+      defect: defectRaw !== '' ? defectRaw : null,
+    };
+  };
+
+  /** Parse baris kode: "2" atau "2.918.4" (kode.good.defect). Kode max 1 digit. */
+  const parseKodeLine = (line) => {
+    const raw = stripLineNumber(line);
+    if (!raw) return null;
+    const parts = raw.split(/[.\t,]/).map(s => s.trim());
+    const kodeRaw = (parts[0] || '').replace(/\D/g, '');
+    const goodRaw = parts.length > 1 ? parts[1].replace(/[^\d]/g, '') : '';
+    const defectRaw = parts.length > 2 ? parts[2].replace(/[^\d]/g, '') : '';
+    if (kodeRaw === '') return null;
+    // Ambil hanya digit pertama sebagai kode (1 digit)
+    const kode = kodeRaw.slice(0, 1);
+    return {
+      kode,
+      good: goodRaw !== '' ? goodRaw : null,
+      defect: defectRaw !== '' ? defectRaw : null,
+    };
+  };
+
+  /** Kosongkan field di baris; return true jika ada nilai yang dihapus. */
+  const clearRowField = (tr, field) => {
+    const el = tr.querySelector(`[data-f="${field}"]`);
+    if (!el) return false;
+    if (!String(el.value || '').trim()) return false;
+    el.value = '';
+    el.classList.remove('invalid');
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+  };
+
+  /**
+   * Apply 2 arah: tulis data baru + hapus sisa di baris berikutnya
+   * yang masih berisi field yang sama (agar edit/hapus di notepad = sheet).
+   */
+  const applyNotepadKode = (text, fromRow) => {
+    const lines = String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    const parsed = lines.map(parseKodeLine).filter(Boolean);
+    const startIdx = Math.max(0, (fromRow || 1) - 1);
+    let rows = Rows.rows();
+
+    if (parsed.length) {
+      rows = ensureRows(startIdx, parsed.length);
+    }
+
+    let written = 0;
+    parsed.forEach((item, offset) => {
+      const tr = rows[startIdx + offset];
+      if (!tr) return;
+      const el = tr.querySelector('[data-f="kode"]');
+      if (!el) return;
+      el.value = item.kode;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      try { Rows.applyCat(tr); } catch (_) {}
+
+      // Good/Defect 2 arah: ada di baris → set; tidak ada → hapus di sheet
+      if (item.good != null) {
+        const g = tr.querySelector('[data-f="good"]');
+        if (g) { g.value = item.good; g.dispatchEvent(new Event('input', { bubbles: true })); }
+      } else {
+        clearRowField(tr, 'good');
+      }
+      if (item.defect != null) {
+        const d = tr.querySelector('[data-f="defect"]');
+        if (d) { d.value = item.defect; d.dispatchEvent(new Event('input', { bubbles: true })); }
+      } else {
+        clearRowField(tr, 'defect');
+      }
+      written++;
+    });
+
+    // Hapus Kode + Good + Defect di baris sisa (2 arah penuh)
+    let cleared = 0;
+    rows = Rows.rows();
+    for (let i = startIdx + parsed.length; i < rows.length; i++) {
+      const tr = rows[i];
+      if (!tr) continue;
+      let any = false;
+      if (clearRowField(tr, 'kode')) {
+        try { Rows.applyCat(tr); } catch (_) {}
+        any = true;
+      }
+      if (clearRowField(tr, 'good')) any = true;
+      if (clearRowField(tr, 'defect')) any = true;
+      if (any) cleared++;
+    }
+
+    if (!written && !cleared) {
+      UI.toast('Belum ada kode untuk disimpan ⚠', true, 'warn');
+      return 0;
+    }
+    return written + cleared;
+  };
+
+  const applyNotepadMulai = (text, fromRow) => {
+    const lines = String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    const parsed = lines.map(parseMulaiLine).filter(Boolean);
+    const startIdx = Math.max(0, (fromRow || 1) - 1);
+    let rows = Rows.rows();
+
+    if (parsed.length) {
+      rows = ensureRows(startIdx, parsed.length);
+    }
+
+    let written = 0;
+    parsed.forEach((item, offset) => {
+      const tr = rows[startIdx + offset];
+      if (!tr) return;
+      const mulaiEl = tr.querySelector('[data-f="mulai"]');
+      if (!mulaiEl) return;
+      mulaiEl.value = item.mulai;
+      mulaiEl.classList.remove('invalid');
+      mulaiEl.dispatchEvent(new Event('input', { bubbles: true }));
+      mulaiEl.dispatchEvent(new Event('change', { bubbles: true }));
+      mulaiEl.dispatchEvent(new Event('focusout', { bubbles: true }));
+
+      // Cascade: jam mulai → selesai baris sebelumnya
+      const prev = offset === 0
+        ? (() => {
+            let p = tr.previousElementSibling;
+            while (p && !p.classList.contains('log-row')) p = p.previousElementSibling;
+            return p;
+          })()
+        : rows[startIdx + offset - 1];
+      if (prev) {
+        const sv = prev.querySelector('[data-f="selesai"]');
+        if (sv) {
+          sv.value = item.mulai;
+          sv.classList.remove('invalid');
+          sv.dispatchEvent(new Event('input', { bubbles: true }));
+          sv.dispatchEvent(new Event('focusout', { bubbles: true }));
+        }
+      }
+
+      // Good/Defect 2 arah: ada di baris → set; tidak ada → hapus di sheet
+      const g = tr.querySelector('[data-f="good"]');
+      const d = tr.querySelector('[data-f="defect"]');
+      if (item.good != null) {
+        if (g) { g.value = item.good; g.dispatchEvent(new Event('input', { bubbles: true })); }
+      } else {
+        clearRowField(tr, 'good');
+      }
+      if (item.defect != null) {
+        if (d) { d.value = item.defect; d.dispatchEvent(new Event('input', { bubbles: true })); }
+      } else {
+        clearRowField(tr, 'defect');
+      }
+      written++;
+    });
+
+    // Hapus Jam Mulai + Good + Defect di baris sisa (2 arah penuh)
+    let cleared = 0;
+    rows = Rows.rows();
+    for (let i = startIdx + parsed.length; i < rows.length; i++) {
+      const tr = rows[i];
+      if (!tr) continue;
+      let any = false;
+      if (clearRowField(tr, 'mulai')) any = true;
+      if (clearRowField(tr, 'good')) any = true;
+      if (clearRowField(tr, 'defect')) any = true;
+      if (any) cleared++;
+    }
+
+    if (!written && !cleared) {
+      UI.toast('Format jam tidak valid ⚠', true, 'warn');
+      return 0;
+    }
+    return written + cleared;
+  };
+
+  const applyNotepadDurasi = (text, fromRow) => {
+    const lines = String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    const parsed = lines.map(parseDurasiLine).filter(Boolean);
+    const startIdx = Math.max(0, (fromRow || 1) - 1);
+    let rows = Rows.rows();
+
+    if (parsed.length) {
+      rows = ensureRows(startIdx, parsed.length);
+    }
+
+    let written = 0;
+    parsed.forEach((item, offset) => {
+      const tr = rows[startIdx + offset];
+      if (!tr) return;
+      const durEl = tr.querySelector('[data-f="durasi"]');
+      if (!durEl) return;
+      durEl.value = item.durasi;
+      durEl.dispatchEvent(new Event('input', { bubbles: true }));
+
+      const mulaiEl = tr.querySelector('[data-f="mulai"]');
+      const selesaiEl = tr.querySelector('[data-f="selesai"]');
+      const mulaiMin = mulaiEl ? Utils.parseTime(mulaiEl.value) : null;
+      const durMin = parseFloat(item.durasi);
+      if (mulaiMin != null && isFinite(durMin) && selesaiEl) {
+        selesaiEl.value = Utils.minutesToHHMM(mulaiMin + durMin);
+        selesaiEl.classList.remove('invalid');
+        selesaiEl.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // Good/Defect 2 arah sama seperti Jam Mulai
+      if (item.good != null) {
+        const g = tr.querySelector('[data-f="good"]');
+        if (g) { g.value = item.good; g.dispatchEvent(new Event('input', { bubbles: true })); }
+      } else {
+        clearRowField(tr, 'good');
+      }
+      if (item.defect != null) {
+        const d = tr.querySelector('[data-f="defect"]');
+        if (d) { d.value = item.defect; d.dispatchEvent(new Event('input', { bubbles: true })); }
+      } else {
+        clearRowField(tr, 'defect');
+      }
+      written++;
+    });
+
+    // Hapus Durasi + Good + Defect di baris sisa
+    let cleared = 0;
+    rows = Rows.rows();
+    for (let i = startIdx + parsed.length; i < rows.length; i++) {
+      const tr = rows[i];
+      if (!tr) continue;
+      let any = false;
+      if (clearRowField(tr, 'durasi')) any = true;
+      if (clearRowField(tr, 'good')) any = true;
+      if (clearRowField(tr, 'defect')) any = true;
+      if (any) cleared++;
+    }
+
+    if (!written && !cleared) {
+      UI.toast('Format durasi tidak valid ⚠', true, 'warn');
+      return 0;
+    }
+    return written + cleared;
+  };
+
+  const bindNotepadEvents = (col, fromRow) => {
+    const modal = modalEl();
+    if (!modal) return;
+    const ta = modal.querySelector('#npText');
+    const btnCopy = modal.querySelector('[data-np="copy"]');
+    const btnSave = modal.querySelector('[data-np="save"]');
+    const btnClear = modal.querySelector('[data-np="clear"]');
+    const btnClose = modal.querySelector('[data-np="close"]');
+    const numbered = true; // kode, mulai, durasi semua pakai format bernomor + Enter
+
+    btnClose?.addEventListener('click', closeModal);
+    btnClear?.addEventListener('click', () => {
+      if (!ta) return;
+      ta.value = '1. ';
+      ta.focus();
+      // Kursor di akhir
+      const len = ta.value.length;
+      try { ta.setSelectionRange(len, len); } catch (_) {}
+    });
+    btnCopy?.addEventListener('click', async () => {
+      const text = ta ? ta.value : '';
+      try {
+        if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+        else {
+          ta?.select();
+          document.execCommand('copy');
+        }
+        UI.toast('Tersalin ke clipboard ✓');
+      } catch (_) {
+        UI.toast('Gagal menyalin ⚠', true, 'warn');
+      }
+    });
+    btnSave?.addEventListener('click', () => {
+      const text = ta ? ta.value : '';
+      let count = 0;
+      if (col === 'kode') count = applyNotepadKode(text, fromRow);
+      else if (col === 'mulai') count = applyNotepadMulai(text, fromRow);
+      else if (col === 'durasi') count = applyNotepadDurasi(text, fromRow);
+      if (!count) return;
+      try { Calculation.recalc(); } catch (_) {}
+      try {
+        if (Storage && typeof Storage.saveData === 'function') {
+          Storage.saveData({ silent: true }).catch(() => {});
+        } else if (Storage?.autoSaveLocal) Storage.autoSaveLocal();
+      } catch (_) {}
+      closeModal();
+      UI.toast(`${count} baris masuk ke Sheet ✓`);
+    });
+
+    if (ta && numbered) {
+      // Enter → baris baru otomatis berprefix "N. "
+      ta.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const val = ta.value;
+        const pos = ta.selectionStart ?? val.length;
+        const end = ta.selectionEnd ?? pos;
+        const before = val.slice(0, pos);
+        const after = val.slice(end);
+        // Sisip newline + nomor; keepTrailingEmpty agar baris baru tidak hilang
+        ta.value = renumberNotepadLines(before + '\n' + after, true);
+        // Kursor di akhir baris kosong terakhir (setelah "N. ")
+        const lines = ta.value.split('\n');
+        let caret = 0;
+        for (let i = 0; i < lines.length - 1; i++) caret += lines[i].length + 1;
+        caret += lines[lines.length - 1].length;
+        try { ta.setSelectionRange(caret, caret); } catch (_) {}
+      });
+
+      // Paste multi-baris → otomatis beri nomor
+      // Untuk kode: "2542" atau "2542\n3" → pecah jadi 1 digit per baris (kecuali yang punya .)
+      ta.addEventListener('paste', (e) => {
+        const cd = e.clipboardData || window.clipboardData;
+        const text = cd ? (cd.getData('text') || '') : '';
+        if (!text) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const pos = ta.selectionStart ?? ta.value.length;
+        const end = ta.selectionEnd ?? pos;
+        const before = ta.value.slice(0, pos);
+        const after = ta.value.slice(end);
+
+        let mid;
+        if (col === 'kode') {
+          // Expand: tiap digit murni jadi baris sendiri; yang ada separator (.) biarkan utuh
+          const chunks = [];
+          text.split(/\r?\n/).forEach(ln => {
+            const raw = stripLineNumber(ln).trim();
+            if (!raw) return;
+            if (/[.\t,]/.test(raw)) {
+              chunks.push(raw); // e.g. 2.918.4
+            } else {
+              // pure digits → 1 digit per line
+              raw.replace(/\D/g, '').split('').forEach(d => chunks.push(d));
+            }
+          });
+          mid = chunks.join('\n');
+        } else {
+          const pasted = text.split(/\r?\n/).map(stripLineNumber).filter(s => s !== '');
+          mid = pasted.length ? pasted.join('\n') : stripLineNumber(text);
+        }
+
+        let merged = before;
+        if (merged && !merged.endsWith('\n') && mid) merged += '\n';
+        merged += mid;
+        if (after) {
+          if (!merged.endsWith('\n') && after) merged += '\n';
+          merged += after;
+        }
+        ta.value = renumberNotepadLines(merged, false);
+        const caret = ta.value.length;
+        try { ta.setSelectionRange(caret, caret); } catch (_) {}
+      });
+
+      // Kode only: saat mengetik digit murni > 1 karakter di 1 baris → auto-split jadi baris baru
+      // Pengecualian: jika ada separator "." maka biarkan (format kode.good.defect)
+      if (col === 'kode') {
+        ta.addEventListener('input', () => {
+          const val = ta.value;
+          const lines = val.split(/\r?\n/);
+          let changed = false;
+          const expanded = [];
+          lines.forEach(ln => {
+            const numMatch = ln.match(/^(\s*\d+\.\s*)(.*)$/);
+            const prefix = numMatch ? numMatch[1] : '';
+            const content = numMatch ? numMatch[2] : ln;
+            if (!content) {
+              expanded.push(ln);
+              return;
+            }
+            // Ada separator → biarkan utuh (max length tidak dipotong)
+            if (/[.\t,]/.test(content)) {
+              expanded.push(ln);
+              return;
+            }
+            // Pure digits: pecah jadi 1 digit per baris
+            const digits = content.replace(/\D/g, '');
+            if (digits.length <= 1) {
+              expanded.push(ln);
+              return;
+            }
+            changed = true;
+            digits.split('').forEach((d, i) => {
+              if (i === 0) expanded.push(prefix + d);
+              else expanded.push(d); // akan di-renumber
+            });
+          });
+          if (!changed) return;
+          ta.value = renumberNotepadLines(expanded.join('\n'), true);
+          // Kursor di akhir
+          const len = ta.value.length;
+          try { ta.setSelectionRange(len, len); } catch (_) {}
+        });
+      }
+    }
+
+    setTimeout(() => {
+      if (!ta) return;
+      ta.focus();
+      const len = ta.value.length;
+      try { ta.setSelectionRange(len, len); } catch (_) {}
+    }, 50);
+  };
+
+  const renderNotepad = (col) => {
+    const meta = NOTEPAD_COLS[col];
+    if (!meta) return;
+    // Selalu apply dari baris 1: prefill menampilkan semua data yang sudah ada
+    const fromRow = 1;
+    startRow = fromRow;
+    const prefill = buildNotepadPrefill(col);
+    const modal = modalEl();
+    if (!modal) return;
+    modal.classList.remove('bulk-modal-grid', 'bulk-modal-wide');
+    modal.classList.add('bulk-modal', 'np-modal');
+    const filledHint = prefill && prefill !== '1. '
+      ? 'Data terisi ditampilkan — edit lalu simpan, atau tambah baris dengan Enter.'
+      : meta.hint;
+    modal.innerHTML = `
+      <div class="np-shell">
+        <div class="np-badge">${esc(meta.title)}</div>
+        <textarea id="npText" class="np-textarea" inputmode="${meta.inputmode}"
+          spellcheck="false" autocomplete="off" autocapitalize="off"
+          placeholder="${esc(meta.hint)}">${esc(prefill)}</textarea>
+        <div class="np-actions">
+          <button type="button" class="np-btn np-btn-copy" data-np="copy">copy</button>
+          <button type="button" class="np-btn np-btn-save" data-np="save">simpan</button>
+          <button type="button" class="np-btn np-btn-clear" data-np="clear">hapus</button>
+        </div>
+        <p class="np-hint">${esc(filledHint)}</p>
+        <button type="button" class="np-close" data-np="close" title="Tutup">✕</button>
+      </div>
+    `;
+    bindNotepadEvents(col, fromRow);
+  };
+
   const open = (requestedCol) => {
     focusCol = requestedCol || 'kode';
     draftData = [];
+    // Kode / Mulai / Durasi → mode notepad (mockup operator)
+    if (NOTEPAD_COLS[focusCol]) {
+      renderNotepad(focusCol);
+      overlayEl()?.classList.remove('hide');
+      return;
+    }
     const rows = Rows.rows();
     const idx = rows.findIndex(tr => {
       const el = tr.querySelector(`[data-f="${focusCol}"]`);

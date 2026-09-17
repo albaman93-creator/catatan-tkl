@@ -700,6 +700,15 @@
         <span class="menu-row-chevron">›</span>
       </button>
 
+      <button type="button" class="menu-row" id="btnExportCsv">
+        <span class="menu-row-icon">⇩</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Export CSV</span>
+          <span class="menu-row-sub">Unduh log sheet aktif</span>
+        </span>
+        <span class="menu-row-chevron">›</span>
+      </button>
+
       <button type="button" class="menu-row menu-row--primary" id="btnSave">
         <span class="menu-row-icon menu-row-icon--blue">💾</span>
         <span class="menu-row-body">
@@ -1144,12 +1153,12 @@
                 <th class="col-num" rowspan="2">#</th>
                 <th class="col-kode" rowspan="2">
                   Kode
-                  <button type="button" class="th-bulk-btn" data-bulk-col="kode" title="Isi massal Kode dari daftar">📥</button>
+                  <button type="button" class="th-bulk-btn" data-bulk-col="kode" title="Isi Kode masal (notepad)">📥</button>
                 </th>
                 <th class="col-op" rowspan="2">OP</th>
                 <th class="col-mulai" rowspan="2">
                   Mulai
-                  <button type="button" class="th-bulk-btn" data-bulk-col="mulai" title="Isi massal Jam Mulai dari daftar">📥</button>
+                  <button type="button" class="th-bulk-btn" data-bulk-col="mulai" title="Isi Jam Mulai masal (notepad)">📥</button>
                 </th>
                 <th class="col-panggil" rowspan="2">Panggil</th>
                 <th class="col-teknik" rowspan="2">Datang</th>
@@ -1159,7 +1168,7 @@
                 </th>
                 <th class="col-durasi" rowspan="2">
                   Durasi
-                  <button type="button" class="th-bulk-btn" data-bulk-col="durasi" title="Isi massal Durasi dari daftar">📥</button>
+                  <button type="button" class="th-bulk-btn" data-bulk-col="durasi" title="Isi Durasi masal (notepad)">📥</button>
                 </th>
                 <th class="col-kegiatan" rowspan="2">
                   Kegiatan
@@ -1193,7 +1202,10 @@
             </tfoot>
           </table>
         </div>
-        <button class="btn btn-add" id="btnAdd" type="button">+ Tambah Baris</button>
+        <div class="logsheet-row-actions">
+          <button class="btn btn-add" id="btnAdd" type="button">+ Tambah Baris</button>
+          <button class="btn btn-ghost" id="btnExportCsvSheet" type="button" title="Export log sheet ke CSV">⇩ Export CSV</button>
+        </div>
         <div class="sec-f">
           <span>Σ durasi: <b id="sumDur">0</b> / <span id="maxShiftMnt2">510</span> mnt</span>
           <span>·</span>

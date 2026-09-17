@@ -44,7 +44,7 @@ const State = (() => {
       'prodName1','prodRate1','prodWo1','prodName2','prodRate2','prodWo2','prodName3','prodRate3','prodWo3',
       'thProd1','thProd2','thProd3',
       'tbody', 'tbodyProdDetail', 'btnAdd', 'btnSave', 'btnReset', 'btnLogout',
-      'btnPrint', 'printArea', 'presetQuick', 'presetFull',
+      'btnPrint', 'btnExportCsv', 'btnExportCsvSheet', 'printArea', 'presetQuick', 'presetFull',
       'btnWizard', 'wizardOverlay', 'wizardModal',
       'dashFrom', 'dashTo', 'dashLine', 'dashShift', 'dashStage', 'dashProduct', 'dashOperator',
       'dashApply', 'dashReset', 'dashRefresh', 'dashExport', 'dashStatus', 'dashChart', 'dashTbody',
