@@ -51,7 +51,7 @@
   .sec[data-screen="oee"] .tbl-wrap,
   .tbl-wrap:has(.oee-matrix-tbl) {
     /* Di ponsel: tinggi terbatas agar sisa halaman & bottom nav tetap bisa digulir */
-    max-height: min(58vh, 420px) !important;
+    max-height: min(55vh, 400px) !important;
   }
 }
 
