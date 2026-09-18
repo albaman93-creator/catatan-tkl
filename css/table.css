@@ -33,14 +33,26 @@
   scrollbar-color: rgba(100, 116, 139, 0.45) transparent;
 }
 
-/* OEE Matrix: tampilkan semua baris penuh (tidak dipotong max-height log sheet)
-   Supaya di tablet/desktop seluruh perhitungan A-P-Q + OEE terlihat tanpa terpotong */
+/* OEE Matrix: lebih tinggi dari log sheet (~15–18 baris), tetap bisa di-scroll
+   di ponsel/tablet agar tidak menelan halaman dan teks lain tetap terjangkau */
 .sec[data-screen="oee"] .tbl-wrap,
 .tbl-wrap:has(.oee-matrix-tbl) {
-  max-height: none !important;
-  overflow: visible !important;
-  overflow-x: auto !important; /* tetap bisa scroll horizontal jika kolom sempit */
-  contain: none;
+  max-height: min(68vh, 560px) !important;
+  overflow: auto !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+  contain: layout paint style;
+}
+
+@media (max-width: 768px) {
+  .sec[data-screen="oee"] .tbl-wrap,
+  .tbl-wrap:has(.oee-matrix-tbl) {
+    /* Di ponsel: tinggi terbatas agar sisa halaman & bottom nav tetap bisa digulir */
+    max-height: min(58vh, 420px) !important;
+  }
 }
 
 .tbl-wrap::-webkit-scrollbar {
