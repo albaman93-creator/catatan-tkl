@@ -33,6 +33,16 @@
   scrollbar-color: rgba(100, 116, 139, 0.45) transparent;
 }
 
+/* OEE Matrix: tampilkan semua baris penuh (tidak dipotong max-height log sheet)
+   Supaya di tablet/desktop seluruh perhitungan A-P-Q + OEE terlihat tanpa terpotong */
+.sec[data-screen="oee"] .tbl-wrap,
+.tbl-wrap:has(.oee-matrix-tbl) {
+  max-height: none !important;
+  overflow: visible !important;
+  overflow-x: auto !important; /* tetap bisa scroll horizontal jika kolom sempit */
+  contain: none;
+}
+
 .tbl-wrap::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -3287,4 +3297,3 @@ tr.log-row[data-cat="prod"]:hover { background-color: rgba(34,197,94,.16); }
 .compact-control:nth-child(4) .compact-trigger { background: #fffbeb; border-color: #fde68a; color: #78350f; }
 .compact-control:nth-child(5) .compact-trigger { background: #fdf2f8; border-color: #fbcfe8; color: #831843; }
 .compact-control:nth-child(6) .compact-trigger { background: #f8fafc; border-color: #cbd5e1; color: #0f2437; }
-
