@@ -2621,3 +2621,40 @@ body > .compact-popover {
  -webkit-overflow-scrolling: touch;
  }
 }
+
+/* Penyesuaian agar tabel tampak ada garis bawah dan samping yang lebih rapi */
+.tbl-wrap {
+ border-color: rgba(203,216,225,.82);
+ border-radius: 14px;
+ box-shadow: 0 12px 30px rgba(15,36,55,.08);
+ background-color: rgba(255,255,255,.72);
+ /* Efek garis-garis baris untuk menyamarkan ruang kosong di bawah tabel */
+ background-image: repeating-linear-gradient(transparent, transparent 33px, rgba(195, 208, 218, 0.45) 33px, rgba(195, 208, 218, 0.45) 34px);
+ background-attachment: local;
+ backdrop-filter: blur(8px);
+ -webkit-backdrop-filter: blur(8px);
+}
+.log th {
+ background: linear-gradient(180deg, rgba(247,250,252,.97), rgba(237,244,248,.96));
+ color: #5f7486;
+ border-bottom-color: rgba(195,208,218,.9);
+ /* Garis vertikal agar terbentuk grid */
+ border-right: 1px solid rgba(210, 220, 228, 0.6);
+}
+.log thead tr:first-child th,
+.log thead tr:nth-child(2) th { background: rgba(245,249,251,.96); }
+.log td { 
+ border-bottom-color: rgba(225,232,237,.86); 
+ border-right: 1px solid rgba(210, 220, 228, 0.5); 
+}
+/* Hilangkan garis kanan di baris paling ujung */
+.log th:last-child, .log td:last-child { border-right: none; }
+
+[data-theme="dark"] .tbl-wrap {
+ background-color: rgba(22, 22, 24, 0.6) !important;
+ background-image: repeating-linear-gradient(transparent, transparent 33px, rgba(255, 255, 255, 0.08) 33px, rgba(255, 255, 255, 0.08) 34px) !important;
+}
+[data-theme="dark"] .log th,
+[data-theme="dark"] .log td {
+ border-right-color: rgba(255, 255, 255, 0.08) !important;
+}
