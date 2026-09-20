@@ -2300,9 +2300,15 @@ table.log.qm-cepat2 .col-wo {
     max-height: 46vh;
   }
 
+  /* Log Sheet tetap 10 baris */
   .tbl-wrap {
     /* Tetap ~10 baris terlihat di mobile; sisa digulir */
     max-height: calc(48px + 10 * 32px);
+  }
+
+  /* OEE Matrix: lebih tinggi (14 baris) */
+  [data-screen="oee"] .tbl-wrap {
+    max-height: calc(48px + 14 * 32px);
   }
 }
 

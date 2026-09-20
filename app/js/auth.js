@@ -17,7 +17,7 @@ const Auth = (() => {
   const getClient = () => (typeof SupabaseClient !== 'undefined' ? SupabaseClient.getClient() : null);
 
   const showError = (msg) => {
-    State.el.loginError.textContent = msg || 'Email atau password salah. Silakan coba lagi.';
+    State.el.loginError.textContent = msg || 'Inisial atau password salah. Silakan coba lagi.';
     State.el.loginError.classList.add('show');
   };
 
@@ -48,7 +48,7 @@ const Auth = (() => {
   };
 
   /**
-   * Submit form login (email + password).
+   * Submit form login (Inisial + password).
    */
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -65,12 +65,18 @@ const Auth = (() => {
       return;
     }
 
-    const email = State.el.loginEmail.value.trim();
+    const rawInput = State.el.loginEmail.value.trim();
     const password = State.el.loginPassword.value;
 
-    if (!email || !password) {
-      showError('Email dan password wajib diisi.');
+    if (!rawInput || !password) {
+      showError('Inisial dan password wajib diisi.');
       return;
+    }
+
+    // MODIFIKASI: Jika tidak mengandung '@', otomatis tambahkan '@pabrik.com'
+    let email = rawInput;
+    if (!email.includes('@')) {
+      email = email.toLowerCase() + '@pabrik.com';
     }
 
     setLoading(true);
@@ -80,7 +86,7 @@ const Auth = (() => {
     if (error) {
       showError(
         /invalid login credentials/i.test(error.message)
-          ? 'Email atau password salah.'
+          ? 'Inisial atau password salah.'
           : error.message
       );
       State.el.loginPassword.value = '';
