@@ -2300,14 +2300,14 @@ table.log.qm-cepat2 .col-wo {
     max-height: 46vh;
   }
 
-  /* Log Sheet tetap 10 baris */
+  /* Sheet (logsheet) — ~10 baris terlihat di mobile; sisa digulir */
+  .sec[data-screen="logsheet"] .tbl-wrap,
   .tbl-wrap {
-    /* Tetap ~10 baris terlihat di mobile; sisa digulir */
     max-height: calc(48px + 10 * 32px);
   }
 
-  /* OEE Matrix: lebih tinggi (14 baris) */
-  [data-screen="oee"] .tbl-wrap {
+  /* OEE — ~14 baris terlihat di mobile; lebih banyak baris matriks OEE */
+  .sec[data-screen="oee"] .tbl-wrap {
     max-height: calc(48px + 14 * 32px);
   }
 }
@@ -2613,20 +2613,11 @@ body > .compact-popover {
 
 /* Tabel matriks OEE */
 .oee-matrix-tbl {
-  width: max-content;
-  min-width: 100%;
-  border-collapse: collapse;
+  width: 100%; border-collapse: collapse;
   font-family: var(--mono); font-size: 13px;
   background: #fff; border: 1px solid var(--line);
   border-radius: 10px; overflow: hidden;
 }
-
-@media (max-width: 768px) {
-  .oee-matrix-tbl {
-    min-width: 800px;
-  }
-}
-
 .oee-matrix-tbl th, .oee-matrix-tbl td {
   border: 1px solid var(--line); padding: 8px 10px; vertical-align: middle;
 }
@@ -3302,3 +3293,4 @@ tr.log-row[data-cat="prod"]:hover { background-color: rgba(34,197,94,.16); }
 .compact-control:nth-child(4) .compact-trigger { background: #fffbeb; border-color: #fde68a; color: #78350f; }
 .compact-control:nth-child(5) .compact-trigger { background: #fdf2f8; border-color: #fbcfe8; color: #831843; }
 .compact-control:nth-child(6) .compact-trigger { background: #f8fafc; border-color: #cbd5e1; color: #0f2437; }
+
