@@ -2613,11 +2613,20 @@ body > .compact-popover {
 
 /* Tabel matriks OEE */
 .oee-matrix-tbl {
-  width: 100%; border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
   font-family: var(--mono); font-size: 13px;
   background: #fff; border: 1px solid var(--line);
   border-radius: 10px; overflow: hidden;
 }
+
+@media (max-width: 768px) {
+  .oee-matrix-tbl {
+    min-width: 800px;
+  }
+}
+
 .oee-matrix-tbl th, .oee-matrix-tbl td {
   border: 1px solid var(--line); padding: 8px 10px; vertical-align: middle;
 }
@@ -3293,4 +3302,3 @@ tr.log-row[data-cat="prod"]:hover { background-color: rgba(34,197,94,.16); }
 .compact-control:nth-child(4) .compact-trigger { background: #fffbeb; border-color: #fde68a; color: #78350f; }
 .compact-control:nth-child(5) .compact-trigger { background: #fdf2f8; border-color: #fbcfe8; color: #831843; }
 .compact-control:nth-child(6) .compact-trigger { background: #f8fafc; border-color: #cbd5e1; color: #0f2437; }
-
