@@ -499,7 +499,7 @@ const BulkFill = (() => {
     focus?.select?.();
   };
 
-  // ====== NOTEPAD MASS FILL (Kode / Jam Mulai / Durasi) ======
+  // ====== NOTEPAD MASS FILL (Kode / Mulai / Selesai / Durasi / Kegiatan / Good / Defect) ======
   // UI sederhana: textarea + copy / simpan / hapus — sesuai mockup operator.
   const NOTEPAD_COLS = {
     kode: {
@@ -512,10 +512,30 @@ const BulkFill = (() => {
       hint: 'Format: 1630 atau 1630.918.4 (jam.good.defect). Hapus baris = hapus jam+good+defect di sheet.',
       inputmode: 'text',
     },
+    selesai: {
+      title: 'Isi Jam Selesai masal',
+      hint: 'Format: 1630 atau 16:30. Satu baris = satu jam selesai. Hapus baris = hapus jam selesai di sheet.',
+      inputmode: 'text',
+    },
     durasi: {
       title: 'Isi Durasi masal',
       hint: 'Format: 35 atau 35.918.4 (durasi.good.defect). Hapus baris = hapus durasi+good+defect di sheet.',
       inputmode: 'text',
+    },
+    kegiatan: {
+      title: 'Isi Kegiatan masal',
+      hint: 'Satu baris = satu kegiatan. Bisa paste daftar dari Excel/Notepad. Hapus baris = hapus kegiatan di sheet.',
+      inputmode: 'text',
+    },
+    good: {
+      title: 'Isi Good masal',
+      hint: 'Satu angka = satu baris (khusus Kode 2). Contoh: 918. Hapus baris = hapus Good di sheet.',
+      inputmode: 'numeric',
+    },
+    defect: {
+      title: 'Isi Defect masal',
+      hint: 'Satu angka = satu baris (khusus Kode 2). Contoh: 4. Hapus baris = hapus Defect di sheet.',
+      inputmode: 'numeric',
     },
   };
 
@@ -560,6 +580,14 @@ const BulkFill = (() => {
           packed += '.' + (good || '0') + '.' + (defect || '0');
         }
         lines.push(packed);
+      } else if (col === 'selesai') {
+        const selesai = (tr.querySelector('[data-f="selesai"]')?.value || '').trim();
+        if (!selesai) continue;
+        const digits = selesai.replace(/\D/g, '');
+        const packed = digits.length >= 3
+          ? digits.padStart(4, '0').slice(0, 4)
+          : selesai.replace(':', '');
+        lines.push(packed);
       } else if (col === 'durasi') {
         const dur = (tr.querySelector('[data-f="durasi"]')?.value || '').trim();
         const good = (tr.querySelector('[data-f="good"]')?.value || '').trim();
@@ -570,6 +598,18 @@ const BulkFill = (() => {
           packed += '.' + (good || '0') + '.' + (defect || '0');
         }
         lines.push(packed);
+      } else if (col === 'kegiatan') {
+        const v = (tr.querySelector('[data-f="kegiatan"]')?.value || '').trim();
+        if (!v) continue;
+        lines.push(v);
+      } else if (col === 'good') {
+        const v = (tr.querySelector('[data-f="good"]')?.value || '').trim();
+        if (!v) continue;
+        lines.push(v);
+      } else if (col === 'defect') {
+        const v = (tr.querySelector('[data-f="defect"]')?.value || '').trim();
+        if (!v) continue;
+        lines.push(v);
       }
     }
     // Prefill dengan nomor baris: "1. 2" / "1. 1540" / "1. 35.918.4"
@@ -882,6 +922,151 @@ const BulkFill = (() => {
     return written + cleared;
   };
 
+  const parseSelesaiLine = (line) => {
+    const raw = stripLineNumber(line);
+    if (!raw) return null;
+    const timeRaw = raw.replace(/\s/g, '');
+    let digits = timeRaw.replace(/\D/g, '');
+    let selesai = '';
+    if (/^\d{1,2}:\d{1,2}$/.test(timeRaw)) {
+      selesai = Utils.normTime(timeRaw) || Utils.maskTime(timeRaw);
+    } else if (digits.length >= 3 && digits.length <= 4) {
+      digits = digits.padStart(4, '0');
+      selesai = digits.slice(0, 2) + ':' + digits.slice(2);
+      const n = Utils.normTime(selesai);
+      if (n) selesai = n;
+    } else if (digits.length > 0 && digits.length <= 2) {
+      selesai = Utils.normTime(digits) || (digits.padStart(2, '0') + ':00');
+    } else return null;
+    return { selesai };
+  };
+
+  const applyNotepadSelesai = (text, fromRow) => {
+    const lines = String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    const parsed = lines.map(parseSelesaiLine).filter(Boolean);
+    const startIdx = Math.max(0, (fromRow || 1) - 1);
+    let rows = Rows.rows();
+
+    if (parsed.length) {
+      rows = ensureRows(startIdx, parsed.length);
+    }
+
+    let written = 0;
+    parsed.forEach((item, offset) => {
+      const tr = rows[startIdx + offset];
+      if (!tr) return;
+      const el = tr.querySelector('[data-f="selesai"]');
+      if (!el) return;
+      el.value = item.selesai;
+      el.classList.remove('invalid');
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      el.dispatchEvent(new Event('focusout', { bubbles: true }));
+      written++;
+    });
+
+    let cleared = 0;
+    rows = Rows.rows();
+    for (let i = startIdx + parsed.length; i < rows.length; i++) {
+      const tr = rows[i];
+      if (!tr) continue;
+      if (clearRowField(tr, 'selesai')) cleared++;
+    }
+
+    if (!written && !cleared) {
+      UI.toast('Format jam tidak valid ⚠', true, 'warn');
+      return 0;
+    }
+    return written + cleared;
+  };
+
+  const applyNotepadKegiatan = (text, fromRow) => {
+    const lines = String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    const values = lines.map(stripLineNumber).filter(s => s !== '');
+    const startIdx = Math.max(0, (fromRow || 1) - 1);
+    let rows = Rows.rows();
+
+    if (values.length) {
+      rows = ensureRows(startIdx, values.length);
+    }
+
+    let written = 0;
+    values.forEach((val, offset) => {
+      const tr = rows[startIdx + offset];
+      if (!tr) return;
+      const el = tr.querySelector('[data-f="kegiatan"]');
+      if (!el) return;
+      el.value = val;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      written++;
+    });
+
+    let cleared = 0;
+    rows = Rows.rows();
+    for (let i = startIdx + values.length; i < rows.length; i++) {
+      const tr = rows[i];
+      if (!tr) continue;
+      if (clearRowField(tr, 'kegiatan')) cleared++;
+    }
+
+    if (!written && !cleared) {
+      UI.toast('Belum ada kegiatan untuk disimpan ⚠', true, 'warn');
+      return 0;
+    }
+    return written + cleared;
+  };
+
+  const applyNotepadNumberCol = (text, fromRow, field) => {
+    const lines = String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    const values = lines.map(ln => {
+      const raw = stripLineNumber(ln).replace(/[^\d.,]/g, '');
+      return raw === '' ? null : raw;
+    }).filter(v => v != null);
+    const startIdx = Math.max(0, (fromRow || 1) - 1);
+    let rows = Rows.rows();
+
+    if (values.length) {
+      rows = ensureRows(startIdx, values.length);
+    }
+
+    let written = 0;
+    let skipped = 0;
+    values.forEach((val, offset) => {
+      const tr = rows[startIdx + offset];
+      if (!tr) return;
+      const kode = (tr.querySelector('[data-f="kode"]')?.value || '').trim();
+      // Good/Defect hanya untuk Kode 2
+      if (kode !== '2') {
+        skipped++;
+        return;
+      }
+      const el = tr.querySelector(`[data-f="${field}"]`);
+      if (!el) return;
+      el.value = val;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      written++;
+    });
+
+    let cleared = 0;
+    rows = Rows.rows();
+    for (let i = startIdx + values.length; i < rows.length; i++) {
+      const tr = rows[i];
+      if (!tr) continue;
+      if (clearRowField(tr, field)) cleared++;
+    }
+
+    if (!written && !cleared) {
+      const msg = skipped
+        ? `Tidak ada yang disimpan — ${skipped} baris dilewati karena Kode bukan 2`
+        : `Belum ada ${field} untuk disimpan ⚠`;
+      UI.toast(msg, true, 'warn');
+      return 0;
+    }
+    return written + cleared;
+  };
+
   const bindNotepadEvents = (col, fromRow) => {
     const modal = modalEl();
     if (!modal) return;
@@ -919,7 +1104,11 @@ const BulkFill = (() => {
       let count = 0;
       if (col === 'kode') count = applyNotepadKode(text, fromRow);
       else if (col === 'mulai') count = applyNotepadMulai(text, fromRow);
+      else if (col === 'selesai') count = applyNotepadSelesai(text, fromRow);
       else if (col === 'durasi') count = applyNotepadDurasi(text, fromRow);
+      else if (col === 'kegiatan') count = applyNotepadKegiatan(text, fromRow);
+      else if (col === 'good') count = applyNotepadNumberCol(text, fromRow, 'good');
+      else if (col === 'defect') count = applyNotepadNumberCol(text, fromRow, 'defect');
       if (!count) return;
       try { Calculation.recalc(); } catch (_) {}
       try {
@@ -1082,7 +1271,7 @@ const BulkFill = (() => {
   const open = (requestedCol) => {
     focusCol = requestedCol || 'kode';
     draftData = [];
-    // Kode / Mulai / Durasi → mode notepad (mockup operator)
+    // Semua kolom yang terdaftar di NOTEPAD_COLS → mode notepad (mockup operator)
     if (NOTEPAD_COLS[focusCol]) {
       renderNotepad(focusCol);
       overlayEl()?.classList.remove('hide');
