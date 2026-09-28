@@ -747,7 +747,7 @@ Aturan:
           <div style="font-size:40px;margin-bottom:8px">📄</div>
           <div style="font-weight:600;margin-bottom:4px">Pilih atau ambil foto</div>
           <div style="font-size:12px;opacity:.7">JPG / PNG · cahaya terang · form utuh</div>
-          <input type="file" id="piFile" accept="image/*" capture="environment" style="display:none">
+          <input type="file" id="piFile" accept="image/*" style="display:none">
         </label>
         <p id="piStatus" style="margin-top:16px;font-size:13px;opacity:.8"></p>
         <div id="piSpinner" style="display:none;margin-top:12px">⏳ Membaca foto dengan AI…</div>
