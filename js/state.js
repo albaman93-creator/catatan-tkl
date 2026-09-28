@@ -37,7 +37,7 @@ const State = (() => {
       'formFullPanel', 'ffPrev', 'ffNext', 'ffNavLabel', 'ffSave', 'ffDelete',
       'ffKode', 'ffMulai', 'ffPanggil', 'ffTeknik', 'ffSelesai', 'ffDurasi',
       'ffKegiatan', 'ffMasalah', 'ffDisposisi', 'ffWo', 'ffBatch', 'ffGood', 'ffDefect',
-      'fDate', 'fLine', 'fStage', 'fMesinNama', 'fMesinKode',
+      'fDate', 'fLine', 'fStage',
       'sheetUnifiedControl', 'sheetShift', 'sheetLine', 'sheetDateTrigger', 'sheetDateText',
       'sheetKpiA', 'sheetKpiP', 'sheetKpiQ', 'sheetKpiOEE',
       'op1','op2','op3','op4','op5','op6',

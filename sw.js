@@ -34,8 +34,6 @@ const PRECACHE = [
   './js/bulkfill.js',
   './js/wizard.js',
   './js/printsheet.js',
-  './js/whatsapp.js',
-  './js/photo-import.js',
   './js/scene.js',
   './js/nature.js',
   './js/fx.js',

@@ -569,7 +569,7 @@
           <span>Pilih tampilan login</span>
         </div>
         <div class="login-theme-toggle" id="loginThemeToggle" role="group" aria-label="Pilih tema login">
-<button type="button" class="login-theme-option active" data-login-theme="santai" aria-pressed="true">🌿 Nature</button>
+          <button type="button" class="login-theme-option active" data-login-theme="santai" aria-pressed="true">🌿 Santai</button>
           <button type="button" class="login-theme-option" data-login-theme="professional" aria-pressed="false">◈ Profesional</button>
         </div>
       </div>
@@ -709,24 +709,6 @@
         <span class="menu-row-chevron">›</span>
       </button>
 
-      <button type="button" class="menu-row" id="btnWhatsApp">
-        <span class="menu-row-icon">💬</span>
-        <span class="menu-row-body">
-          <span class="menu-row-title">Kirim WhatsApp</span>
-          <span class="menu-row-sub">Laporan OEE gratis via wa.me</span>
-        </span>
-        <span class="menu-row-chevron">›</span>
-      </button>
-
-      <button type="button" class="menu-row" id="btnPhotoImport">
-        <span class="menu-row-icon">⚡</span>
-        <span class="menu-row-body">
-          <span class="menu-row-title">Input dari Foto </span>
-          <span class="menu-row-sub">Paste hasil Meta AI atau upload foto</span>
-        </span>
-        <span class="menu-row-chevron">›</span>
-      </button>
-
       <button type="button" class="menu-row menu-row--primary" id="btnSave">
         <span class="menu-row-icon menu-row-icon--blue">💾</span>
         <span class="menu-row-body">
@@ -764,7 +746,7 @@
       <button type="button" class="screen-tab bn-item on" data-screen="filter">
         <span class="bn-icon">📅</span><span class="bn-label">Shift</span>
       </button>
-      <button type="button" class="screen-tab bn-item" data-screen="filter">
+      <button type="button" class="screen-tab bn-item" data-screen="master-produk">
         <span class="bn-icon">🗞️</span><span class="bn-label">Produk</span>
       </button>
       <button type="button" class="screen-tab bn-item" data-screen="operator">
@@ -835,20 +817,30 @@
               <option value="kemas">Kemas</option>
             </select>
           </div>
-          <div class="field"><label>Nama Mesin</label>
-            <input type="text" id="fMesinNama" placeholder="Misal: MIXING OLSA" autocomplete="off">
-          </div>
-          <div class="field"><label>Kode / No. Mesin</label>
-            <input type="text" id="fMesinKode" placeholder="Misal: M3039" class="mono" autocomplete="off">
-          </div>
         </div>
+      </section>
 
-        <div class="sec-h" style="margin-top:18px">
+      <!-- Section: Operator -->
+      <section class="sec" data-screen="operator">
+        <div class="sec-h">
+          <span class="no">👤</span>
+          <div><h2>Inisial Operator</h2><div class="sub2">Masukkan inisial operator (maks. 3 huruf per kolom)</div></div>
+      </div>
+        <div class="operator-grid">
+          <div class="field"><label>Operator 1</label><input type="text" id="op1" maxlength="18" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 2</label><input type="text" id="op2" maxlength="18" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 3</label><input type="text" id="op3" maxlength="18" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 4</label><input type="text" id="op4" maxlength="18" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 5</label><input type="text" id="op5" maxlength="18" placeholder="---" class="mono"></div>
+          <div class="field"><label>Operator 6</label><input type="text" id="op6" maxlength="18" placeholder="---" class="mono"></div>
+    </div>
+      </section>
+
+      <!-- Section: Master Produk -->
+      <section class="sec" data-screen="master-produk">
+        <div class="sec-h">
           <span class="no">⚙️</span>
-          <div>
-            <h2>Master Produk &amp; Kecepatan Standar</h2>
-            <div class="sub2">Daftarkan produk &amp; kecepatan standarnya (unit/menit). Juga tersedia di halaman Sheet.</div>
-          </div>
+          <div><h2>Master Produk &amp; Kecepatan Standar</h2><div class="sub2">Daftarkan produk &amp; kecepatan standarnya (unit/menit). Pengisian juga tersedia di halaman Sheet.</div></div>
         </div>
         <div class="product-grid" id="masterProductGrid">
           <div class="field">
@@ -877,25 +869,6 @@
           </div>
         </div>
       </section>
-
-      <!-- Section: Operator -->
-      <section class="sec" data-screen="operator">
-        <div class="sec-h">
-          <span class="no">👤</span>
-          <div><h2>Inisial Operator</h2><div class="sub2">Masukkan inisial operator (maks. 3 huruf per kolom)</div></div>
-      </div>
-        <div class="operator-grid">
-          <div class="field"><label>Operator 1</label><input type="text" id="op1" maxlength="18" placeholder="---" class="mono"></div>
-          <div class="field"><label>Operator 2</label><input type="text" id="op2" maxlength="18" placeholder="---" class="mono"></div>
-          <div class="field"><label>Operator 3</label><input type="text" id="op3" maxlength="18" placeholder="---" class="mono"></div>
-          <div class="field"><label>Operator 4</label><input type="text" id="op4" maxlength="18" placeholder="---" class="mono"></div>
-          <div class="field"><label>Operator 5</label><input type="text" id="op5" maxlength="18" placeholder="---" class="mono"></div>
-          <div class="field"><label>Operator 6</label><input type="text" id="op6" maxlength="18" placeholder="---" class="mono"></div>
-    </div>
-      </section>
-
-      <!-- Section: Master Produk -->
-      <!-- master-produk digabung ke filter (Data & Penyimpanan) -->
 
       <!-- Section: Log Sheet Harian -->
       <section class="sec" data-screen="logsheet">
@@ -1191,7 +1164,7 @@
                 <th class="col-teknik" rowspan="2">Datang</th>
                 <th class="col-selesai" rowspan="2">
                   Selesai
-                  <button type="button" class="th-bulk-btn" data-bulk-col="selesai" title="Isi Jam Selesai masal (notepad)">📥</button>
+                  <button type="button" class="th-bulk-btn" data-bulk-col="selesai" title="Isi massal Jam Selesai dari daftar">📥</button>
                 </th>
                 <th class="col-durasi" rowspan="2">
                   Durasi
@@ -1199,7 +1172,7 @@
                 </th>
                 <th class="col-kegiatan" rowspan="2">
                   Kegiatan
-                  <button type="button" class="th-bulk-btn" data-bulk-col="kegiatan" title="Isi Kegiatan masal (notepad)">📥</button>
+                  <button type="button" class="th-bulk-btn" data-bulk-col="kegiatan" title="Isi massal Kegiatan dari daftar">📥</button>
                 </th>
                 <th class="col-masalah" rowspan="2">Masalah</th>
                 <th class="col-disposisi" rowspan="2">Disposisi</th>
@@ -1211,11 +1184,11 @@
               <tr>
                 <th class="col-good">
                   Good
-                  <button type="button" class="th-bulk-btn" data-bulk-col="good" title="Isi Good masal (notepad, khusus Kode 2)">📥</button>
+                  <button type="button" class="th-bulk-btn" data-bulk-col="good" title="Isi massal Good (khusus baris Kode 2) dari daftar">📥</button>
                 </th>
                 <th class="col-defect">
                   Defect
-                  <button type="button" class="th-bulk-btn" data-bulk-col="defect" title="Isi Defect masal (notepad, khusus Kode 2)">📥</button>
+                  <button type="button" class="th-bulk-btn" data-bulk-col="defect" title="Isi massal Defect (khusus baris Kode 2) dari daftar">📥</button>
                 </th>
               </tr>
             </thead>
@@ -1524,8 +1497,6 @@
   <script src="./js/bulkfill.js"></script>
   <script src="./js/wizard.js"></script>
   <script src="./js/printsheet.js"></script>
-  <script src="./js/whatsapp.js"></script>
-  <script src="./js/photo-import.js"></script>
   <script src="./js/scene.js"></script>
   <script src="./js/nature.js"></script>
   <script src="./js/fx.js"></script>
