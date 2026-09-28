@@ -62,6 +62,10 @@ const Storage = (() => {
       op1: State.el.op1.value, op2: State.el.op2.value, op3: State.el.op3.value,
       op4: State.el.op4.value, op5: State.el.op5.value, op6: State.el.op6.value,
     },
+    mesin: {
+      nama: (State.el.fMesinNama || document.getElementById('fMesinNama'))?.value || '',
+      kode: (State.el.fMesinKode || document.getElementById('fMesinKode'))?.value || '',
+    },
     // Jumlah TKL hasil input manual disimpan sebagai bagian dari record Sheet.
     summary: {
       availability: State.el.oF.textContent,
@@ -122,6 +126,17 @@ const Storage = (() => {
     } else {
       State.el.op1.value = ''; State.el.op2.value = ''; State.el.op3.value = '';
       State.el.op4.value = ''; State.el.op5.value = ''; State.el.op6.value = '';
+    }
+
+    // Mesin
+    const mn = State.el.fMesinNama || document.getElementById('fMesinNama');
+    const mk = State.el.fMesinKode || document.getElementById('fMesinKode');
+    if (d && d.mesin) {
+      if (mn) mn.value = d.mesin.nama || '';
+      if (mk) mk.value = d.mesin.kode || '';
+    } else {
+      if (mn) mn.value = '';
+      if (mk) mk.value = '';
     }
 
     // Restore Jumlah TKL ke Sheet.

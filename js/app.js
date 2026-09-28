@@ -702,6 +702,8 @@ const App = (() => {
     // Isi Massal (kotak input daftar bernomor untuk kolom Kode / Jam Mulai)
     if (typeof BulkFill !== 'undefined') BulkFill.init();
     if (typeof PrintSheet !== 'undefined') PrintSheet.bind();
+    if (typeof WhatsApp !== 'undefined') WhatsApp.bind();
+    if (typeof PhotoImport !== 'undefined') PhotoImport.bind();
 
     // Autocomplete kode produk di kolom Nama Produk (Sheet + Master)
     if (typeof Suggest !== 'undefined' && Suggest.attachProductAll) {
