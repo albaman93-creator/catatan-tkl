@@ -964,21 +964,6 @@ textarea.in {
 .login-theme-santai .hill-far { fill: var(--hill-far); }
 .login-theme-santai .hill-mid { fill: var(--hill-mid); }
 .login-theme-santai .hill-near { fill: var(--hill-near); }
-/* Padang rumput kiri — ikut tema siang/malam */
-.login-theme-santai .meadow-left {
-  fill: var(--hill-mid, #6fc46f);
-  opacity: 0.42;
-  transition: fill 2s ease, opacity 2s ease;
-}
-.login-theme-santai .meadow-left-soft {
-  fill: var(--hill-far, #a8dda6);
-  opacity: 0.28;
-  transition: fill 2s ease, opacity 2s ease;
-}
-.login-theme-santai #bgScene.scene--sunset .meadow-left,
-.login-theme-santai #bgScene.scene--night .meadow-left { opacity: 0.2; }
-.login-theme-santai #bgScene.scene--sunset .meadow-left-soft,
-.login-theme-santai #bgScene.scene--night .meadow-left-soft { opacity: 0.12; }
 .login-theme-santai .tree-leaf { fill: var(--tree-leaf);       transition: fill 2s ease; }
 .login-theme-santai .tree-leaf-front { fill: var(--tree-leaf-front); transition: fill 2s ease; }
 .login-theme-santai .trees-front .tree-leaf { fill: var(--tree-leaf-front); }
