@@ -64,6 +64,21 @@ Aturan:
   let draftRows = [];
   let draftMeta = {};
   let startRow = 1;
+  /** Mode pengisian: 'slow' (default) | 'fast' | 'instant' */
+  let fillSpeed = (() => {
+    try {
+      const v = localStorage.getItem('tkl_pi_fill_speed');
+      if (v === 'fast' || v === 'instant') return v;
+      return 'slow';
+    } catch (_) {
+      return 'slow';
+    }
+  })();
+
+  const setFillSpeed = (mode) => {
+    fillSpeed = (mode === 'fast' || mode === 'instant') ? mode : 'slow';
+    try { localStorage.setItem('tkl_pi_fill_speed', fillSpeed); } catch (_) {}
+  };
 
   const esc = (v) => {
     if (typeof Utils !== 'undefined' && Utils.escapeHtml) return Utils.escapeHtml(String(v ?? ''));
@@ -582,7 +597,7 @@ Aturan:
     }
   };
 
-  /** Ketik nilai sel per karakter — gaya smooth kiri → kanan */
+  /** Ketik nilai sel per karakter — gaya smooth kiri → kanan (mode lambat) */
   const typeIntoCell = async (el, value, charMs) => {
     if (!el || value == null || value === '') return false;
     const text = String(value);
@@ -599,6 +614,19 @@ Aturan:
     el.classList.remove('pi-type-flash');
     void el.offsetWidth;
     el.classList.add('pi-type-flash');
+    return true;
+  };
+
+  /** Isi sel sekaligus + flash (mode cepat) */
+  const fillCellFast = (el, value) => {
+    if (!el || value == null || value === '') return false;
+    el.value = String(value);
+    el.classList.remove('pi-type-flash');
+    void el.offsetWidth;
+    el.classList.add('pi-type-flash');
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    el.dispatchEvent(new Event('focusout', { bubbles: true }));
     return true;
   };
 
@@ -626,18 +654,30 @@ Aturan:
     startRow = start;
     const total = rowsData.length;
 
-    // Ritme ketik: per karakter konsisten, alur kiri → kanan lalu baris berikutnya
+    // Baca pilihan kecepatan dari UI preview (default: lambat)
+    const speedSel = document.querySelector('#photoImportModal [name="piFillSpeed"]:checked');
+    if (speedSel) setFillSpeed(speedSel.value);
+    const isInstant = fillSpeed === 'instant';
+    const isFast = fillSpeed === 'fast';
+    // slow = default (ketik per karakter)
+
     const CHAR_MS = 28;
-    const GAP_CELL_MS = 45;
-    const GAP_ROW_MS = 90;
+    const GAP_CELL_MS = isFast ? 28 : 45;
+    const GAP_ROW_MS = isFast ? 50 : 90;
     const fieldOrder = [
       'kode', 'op', 'mulai', 'panggil', 'teknik', 'selesai', 'durasi',
       'kegiatan', 'masalah', 'disposisi', 'wo', 'good', 'defect',
     ];
 
-    // Loading tetap tampil sejak awal
-    showApplyStatus(`Menyiapkan data… (${total} baris)`, 2);
-    await sleep(600);
+    showApplyStatus(
+      isInstant
+        ? `Memasukkan data… (${total} baris)`
+        : isFast
+          ? `Menyiapkan data (cepat)… (${total} baris)`
+          : `Menyiapkan data… (${total} baris)`,
+      2
+    );
+    await sleep(isInstant ? 180 : isFast ? 280 : 600);
 
     applyMetaToForm(draftMeta, rowsData);
 
@@ -655,79 +695,112 @@ Aturan:
     let changed = 0;
     let prevTr = null;
 
-    showApplyStatus(`Sedang memasukkan data ke sheet… (0/${total})`, 4);
+    // ===== INSTANT: isi semua sekaligus (seperti versi awal) =====
+    if (isInstant) {
+      showApplyStatus(`Memasukkan data… (${total} baris)`, 40);
+      for (let i = 0; i < rowsData.length; i++) {
+        const item = rowsData[i];
+        const tr = sheetRows[start - 1 + i];
+        if (!tr) continue;
+        const map = {
+          kode: item.kode, op: item.op, mulai: item.mulai, panggil: item.panggil,
+          teknik: item.teknik, selesai: item.selesai, durasi: item.durasi,
+          kegiatan: item.kegiatan, masalah: item.masalah, disposisi: item.disposisi,
+          wo: item.wo, good: item.good, defect: item.defect,
+        };
+        for (const key of fieldOrder) {
+          if (!map[key]) continue;
+          const el = tr.querySelector(`[data-f="${key}"]`);
+          if (fillCellFast(el, map[key])) changed++;
+        }
+        if (item.batch) {
+          setBatchValue(tr, item.batch);
+          changed++;
+        }
+        try {
+          if (item.kode && typeof Rows.applyCat === 'function') Rows.applyCat(tr);
+        } catch (_) {}
+      }
+      showApplyStatus(`Selesai — ${total} baris masuk ke Sheet ✓`, 100);
+    } else {
+      // ===== LAMBAT / CEPAT: animasi baris demi baris =====
+      showApplyStatus(
+        isFast
+          ? `Mengisi cepat… (0/${total})`
+          : `Sedang memasukkan data ke sheet… (0/${total})`,
+        4
+      );
 
-    for (let i = 0; i < rowsData.length; i++) {
-      const item = rowsData[i];
-      const tr = sheetRows[start - 1 + i];
-      if (!tr) continue;
+      for (let i = 0; i < rowsData.length; i++) {
+        const item = rowsData[i];
+        const tr = sheetRows[start - 1 + i];
+        if (!tr) continue;
+
+        if (prevTr) {
+          prevTr.classList.remove('pi-typing');
+          prevTr.classList.add('pi-done');
+          setTimeout(() => prevTr.classList.remove('pi-done'), 500);
+        }
+        tr.classList.add('pi-typing');
+        try {
+          tr.scrollIntoView({ behavior: isFast ? 'auto' : 'smooth', block: 'nearest' });
+        } catch (_) {}
+        prevTr = tr;
+
+        showApplyStatus(
+          (isFast ? 'Mengisi cepat…' : 'Sedang memasukkan data ke sheet…') +
+            ` (${i}/${total}) · baris ${start + i}`,
+          Math.round((i / total) * 100)
+        );
+
+        const map = {
+          kode: item.kode, op: item.op, mulai: item.mulai, panggil: item.panggil,
+          teknik: item.teknik, selesai: item.selesai, durasi: item.durasi,
+          kegiatan: item.kegiatan, masalah: item.masalah, disposisi: item.disposisi,
+          wo: item.wo, good: item.good, defect: item.defect,
+        };
+
+        for (const key of fieldOrder) {
+          const value = map[key];
+          if (!value) continue;
+          const el = tr.querySelector(`[data-f="${key}"]`);
+          if (isFast) {
+            if (fillCellFast(el, value)) changed++;
+          } else if (await typeIntoCell(el, value, CHAR_MS)) {
+            changed++;
+          }
+          await sleep(GAP_CELL_MS);
+        }
+
+        if (item.batch) {
+          const batchEl = tr.querySelector('[data-f="batch"]');
+          setBatchValue(tr, item.batch);
+          if (batchEl) {
+            batchEl.classList.remove('pi-type-flash');
+            void batchEl.offsetWidth;
+            batchEl.classList.add('pi-type-flash');
+          }
+          changed++;
+          await sleep(GAP_CELL_MS);
+        }
+
+        try {
+          if (item.kode && typeof Rows.applyCat === 'function') Rows.applyCat(tr);
+        } catch (_) {}
+
+        showApplyStatus(
+          (isFast ? 'Mengisi cepat…' : 'Sedang memasukkan data ke sheet…') +
+            ` (${i + 1}/${total})`,
+          Math.round(((i + 1) / total) * 100)
+        );
+        await sleep(GAP_ROW_MS);
+      }
 
       if (prevTr) {
         prevTr.classList.remove('pi-typing');
         prevTr.classList.add('pi-done');
         setTimeout(() => prevTr.classList.remove('pi-done'), 500);
       }
-      tr.classList.add('pi-typing');
-      try {
-        tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } catch (_) {}
-      prevTr = tr;
-
-      showApplyStatus(`Sedang memasukkan data ke sheet… (${i}/${total}) · baris ${start + i}`, Math.round((i / total) * 100));
-
-      // Kiri → kanan: isi setiap kolom yang ada nilainya
-      const map = {
-        kode: item.kode,
-        op: item.op,
-        mulai: item.mulai,
-        panggil: item.panggil,
-        teknik: item.teknik,
-        selesai: item.selesai,
-        durasi: item.durasi,
-        kegiatan: item.kegiatan,
-        masalah: item.masalah,
-        disposisi: item.disposisi,
-        wo: item.wo,
-        good: item.good,
-        defect: item.defect,
-      };
-
-      for (const key of fieldOrder) {
-        const value = map[key];
-        if (!value) continue;
-        const el = tr.querySelector(`[data-f="${key}"]`);
-        if (await typeIntoCell(el, value, CHAR_MS)) changed++;
-        await sleep(GAP_CELL_MS);
-      }
-
-      if (item.batch) {
-        const batchEl = tr.querySelector('[data-f="batch"]');
-        // Batch sering berupa <select> — set langsung + flash
-        setBatchValue(tr, item.batch);
-        if (batchEl) {
-          batchEl.classList.remove('pi-type-flash');
-          void batchEl.offsetWidth;
-          batchEl.classList.add('pi-type-flash');
-        }
-        changed++;
-        await sleep(GAP_CELL_MS);
-      }
-
-      try {
-        if (item.kode && typeof Rows.applyCat === 'function') Rows.applyCat(tr);
-      } catch (_) {}
-
-      showApplyStatus(
-        `Sedang memasukkan data ke sheet… (${i + 1}/${total})`,
-        Math.round(((i + 1) / total) * 100)
-      );
-      await sleep(GAP_ROW_MS);
-    }
-
-    if (prevTr) {
-      prevTr.classList.remove('pi-typing');
-      prevTr.classList.add('pi-done');
-      setTimeout(() => prevTr.classList.remove('pi-done'), 500);
     }
 
     try {
@@ -782,6 +855,21 @@ Aturan:
         <label style="font-size:13px">Mulai baris
           <input type="number" id="piStartRow" min="1" value="${startRow}" style="width:72px;margin-left:6px;padding:6px 8px;border-radius:8px;border:1px solid var(--border,#ccc)">
         </label>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;flex-wrap:wrap">
+          <span style="opacity:.75">Kecepatan:</span>
+          <label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:4px 8px;border-radius:8px;border:1px solid ${fillSpeed === 'slow' ? 'var(--blue,#3b82f6)' : 'var(--border,#ccc)'};background:${fillSpeed === 'slow' ? 'rgba(59,130,246,.08)' : 'transparent'}">
+            <input type="radio" name="piFillSpeed" value="slow" ${fillSpeed === 'slow' ? 'checked' : ''} style="accent-color:#3b82f6">
+            🐢 Lambat
+          </label>
+          <label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:4px 8px;border-radius:8px;border:1px solid ${fillSpeed === 'fast' ? 'var(--blue,#3b82f6)' : 'var(--border,#ccc)'};background:${fillSpeed === 'fast' ? 'rgba(59,130,246,.08)' : 'transparent'}">
+            <input type="radio" name="piFillSpeed" value="fast" ${fillSpeed === 'fast' ? 'checked' : ''} style="accent-color:#3b82f6">
+            ⚡ Cepat
+          </label>
+          <label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:4px 8px;border-radius:8px;border:1px solid ${fillSpeed === 'instant' ? 'var(--blue,#3b82f6)' : 'var(--border,#ccc)'};background:${fillSpeed === 'instant' ? 'rgba(59,130,246,.08)' : 'transparent'}">
+            <input type="radio" name="piFillSpeed" value="instant" ${fillSpeed === 'instant' ? 'checked' : ''} style="accent-color:#3b82f6">
+            💥 Instant
+          </label>
+        </div>
         <button type="button" class="btn btn-ghost" data-pi="home">← Kembali</button>
         <span style="font-size:12px;opacity:.7">${draftRows.length} baris · scroll horizontal jika perlu</span>
       </div>
@@ -829,6 +917,19 @@ Aturan:
     modal.querySelectorAll('[data-pi="close"]').forEach((b) => b.addEventListener('click', close));
     modal.querySelector('[data-pi="apply"]')?.addEventListener('click', applyToSheet);
     modal.querySelector('[data-pi="home"]')?.addEventListener('click', () => renderHome());
+    modal.querySelectorAll('[name="piFillSpeed"]').forEach((r) => {
+      r.addEventListener('change', () => {
+        setFillSpeed(r.value);
+        // refresh highlight border pada pilihan
+        modal.querySelectorAll('[name="piFillSpeed"]').forEach((x) => {
+          const lab = x.closest('label');
+          if (!lab) return;
+          const on = x.checked;
+          lab.style.borderColor = on ? 'var(--blue,#3b82f6)' : 'var(--border,#ccc)';
+          lab.style.background = on ? 'rgba(59,130,246,.08)' : 'transparent';
+        });
+      });
+    });
   };
 
   const renderPaste = () => {
