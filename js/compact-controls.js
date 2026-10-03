@@ -108,7 +108,7 @@
     const ops = $$('[data-sheet-op]').map(e => e.value.trim()).filter(Boolean);
     setText('compactOpValue', ops.length ? `OPR ${ops.length}/6` : 'OPR');
 
-    const products = [1,2,3].map(i => $('#prodName' + i)?.value.trim()).filter(Boolean);
+    const products = [1,2].map(i => $('#prodName' + i)?.value.trim()).filter(Boolean);
     setText('compactProductValue', products.length ? (products.length === 1 ? products[0] : `Produk ${products.length}`) : 'Produk');
   }
 
@@ -194,7 +194,7 @@
       forwardChoice(btn, 'data-sheet-shift');
     }));
 
-    $$('.sheet-op-box, #prodName1, #prodName2, #prodName3, #prodRate1, #prodRate2, #prodRate3, #prodWo1, #prodWo2, #prodWo3')
+    $$('.sheet-op-box, #prodName1, #prodName2, #prodRate1, #prodRate2, #prodWo1, #prodWo2')
       .forEach(input => {
         input.addEventListener('input', syncSummary);
         input.addEventListener('change', syncSummary);

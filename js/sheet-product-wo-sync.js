@@ -15,7 +15,6 @@
   const masterProducts = () => [
     { name: State.el.prodName1?.value?.trim() || '', wo: State.el.prodWo1?.value?.trim() || '' },
     { name: State.el.prodName2?.value?.trim() || '', wo: State.el.prodWo2?.value?.trim() || '' },
-    { name: State.el.prodName3?.value?.trim() || '', wo: State.el.prodWo3?.value?.trim() || '' },
   ].filter(p => p.name);
 
   const refreshList = () => {

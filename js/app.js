@@ -481,7 +481,7 @@ const App = (() => {
     // ============================================================
     // MASTER PRODUK & OPERATOR → recalc + sync ke Master
     // ============================================================
-    ['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3','prodWo1','prodWo2','prodWo3'].forEach(id => {
+    ['prodName1','prodName2','prodRate1','prodRate2','prodWo1','prodWo2'].forEach(id => {
       if (!State.el[id]) return;
       State.el[id].addEventListener('input', () => {
         if (id.startsWith('prodName') || id.startsWith('prodRate')) {
@@ -707,7 +707,7 @@ const App = (() => {
 
     // Autocomplete kode produk di kolom Nama Produk (Sheet + Master)
     if (typeof Suggest !== 'undefined' && Suggest.attachProductAll) {
-      Suggest.attachProductAll('#prodName1, #prodName2, #prodName3, #masterProdName1, #masterProdName2, #masterProdName3');
+      Suggest.attachProductAll('#prodName1, #prodName2, #masterProdName1, #masterProdName2');
     }
 
     Auth.initSession();

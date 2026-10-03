@@ -47,13 +47,11 @@ const Calculation = (() => {
 
     const pNames = [
       State.el.prodName1.value.trim(),
-      State.el.prodName2.value.trim(),
-      State.el.prodName3.value.trim()
+      State.el.prodName2.value.trim()
     ];
     const prodStats = [
       { dur:0, rate:parseFloat(State.el.prodRate1.value)||0, actual:0 },
       { dur:0, rate:parseFloat(State.el.prodRate2.value)||0, actual:0 },
-      { dur:0, rate:parseFloat(State.el.prodRate3.value)||0, actual:0 },
     ];
 
     Rows.rows().forEach(tr => {
@@ -112,7 +110,7 @@ const Calculation = (() => {
       else if (c === 'unplanned'){ D += dur; if (si != null) sh[si].D += dur; }
       else if (c === 'prod') {
         if (si === State.evalShift && prodName) {
-          for (let i = 0; i < 3; i++) {
+          for (let i = 0; i < 2; i++) {
             if (pNames[i] && pNames[i] === prodName) {
               prodStats[i].dur += dur;
               prodStats[i].actual += rowActual;
@@ -143,7 +141,7 @@ const Calculation = (() => {
 
     // === PERFORMANCE PER PRODUK ===
     let totalPerfSum = 0, activeCount = 0;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
       const gTarget = prodStats[i].dur * prodStats[i].rate;
       const hAct = prodStats[i].actual;
       const perfI = gTarget > 0 ? (hAct / gTarget) * 100 : 0;
@@ -158,6 +156,10 @@ const Calculation = (() => {
       elI.style.color = perfI >= CONFIG.TARGET.PERFORMANCE ? 'var(--green-d)' : 'var(--red)';
       elI.style.fontWeight = '700';
     }
+    // Produk 3 dinonaktifkan — kosongkan jika elemen masih ada
+    if (State.el.oG3) State.el.oG3.textContent = '0';
+    if (State.el.oH3) State.el.oH3.textContent = '0';
+    if (State.el.oI3) State.el.oI3.textContent = '0,00';
 
     const avgPerfI = activeCount > 0 ? (totalPerfSum / activeCount) : 0;
     State.el.oITotal.textContent = Utils.nf2(avgPerfI);
