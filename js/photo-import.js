@@ -504,7 +504,93 @@ Aturan:
     sel.dispatchEvent(new Event('input', { bubbles: true }));
   };
 
-  const applyToSheet = () => {
+  let isApplying = false;
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  /** Banner status di atas layar saat sedang mengisi sheet */
+  const showApplyStatus = (text, pct) => {
+    let bar = document.getElementById('piApplyStatus');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'piApplyStatus';
+      bar.setAttribute('role', 'status');
+      bar.style.cssText = [
+        'position:fixed', 'left:50%', 'top:14px', 'transform:translateX(-50%)',
+        'z-index:99999', 'min-width:260px', 'max-width:92vw',
+        'padding:12px 18px', 'border-radius:14px',
+        'background:rgba(15,23,42,.92)', 'color:#fff',
+        'box-shadow:0 8px 28px rgba(0,0,0,.28)',
+        'font:600 13px/1.35 system-ui,sans-serif',
+        'display:flex', 'align-items:center', 'gap:12px',
+        'backdrop-filter:blur(8px)',
+      ].join(';');
+      document.body.appendChild(bar);
+    }
+    const safePct = Math.max(0, Math.min(100, pct ?? 0));
+    bar.innerHTML = `
+      <span class="pi-spin" style="width:18px;height:18px;border:2.5px solid rgba(255,255,255,.25);border-top-color:#60a5fa;border-radius:50%;display:inline-block;animation:piSpin .7s linear infinite;flex-shrink:0"></span>
+      <div style="flex:1;min-width:0">
+        <div>${esc(text)}</div>
+        <div style="margin-top:6px;height:4px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${safePct}%;background:linear-gradient(90deg,#3b82f6,#22c55e);border-radius:99px;transition:width .25s ease"></div>
+        </div>
+      </div>`;
+    if (!document.getElementById('piSpinStyle')) {
+      const st = document.createElement('style');
+      st.id = 'piSpinStyle';
+      st.textContent = `
+        @keyframes piSpin { to { transform: rotate(360deg); } }
+        tr.log-row.pi-typing {
+          outline: 2px solid #3b82f6;
+          outline-offset: -2px;
+          background: rgba(59,130,246,.08) !important;
+          transition: background .2s ease;
+        }
+        tr.log-row.pi-done {
+          animation: piRowDone .55s ease;
+        }
+        @keyframes piRowDone {
+          0% { background: rgba(34,197,94,.22); }
+          100% { background: transparent; }
+        }
+        .in.pi-type-flash {
+          animation: piTypeFlash .45s ease;
+        }
+        @keyframes piTypeFlash {
+          0% { background: rgba(59,130,246,.35); }
+          100% { background: transparent; }
+        }
+      `;
+      document.head.appendChild(st);
+    }
+  };
+
+  const hideApplyStatus = () => {
+    const bar = document.getElementById('piApplyStatus');
+    if (bar) {
+      bar.style.opacity = '0';
+      bar.style.transition = 'opacity .3s';
+      setTimeout(() => bar.remove(), 320);
+    }
+  };
+
+  const fillCell = (el, value) => {
+    if (!el || value == null || value === '') return false;
+    el.value = value;
+    el.classList.remove('pi-type-flash');
+    // force reflow agar animasi bisa diputar ulang
+    void el.offsetWidth;
+    el.classList.add('pi-type-flash');
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    el.dispatchEvent(new Event('focusout', { bubbles: true }));
+    return true;
+  };
+
+  const applyToSheet = async () => {
+    if (isApplying) return;
+
     let rowsData = collectFromPreview();
     rowsData = realignGoodDefect(rowsData.map(normalizeRow));
     if (!rowsData.length) {
@@ -512,9 +598,22 @@ Aturan:
       return;
     }
 
+    isApplying = true;
+    const applyBtn = document.querySelector('#photoImportModal [data-pi="apply"]');
+    const cancelBtns = document.querySelectorAll('#photoImportModal [data-pi="close"], #photoImportModal [data-pi="home"]');
+    if (applyBtn) {
+      applyBtn.disabled = true;
+      applyBtn.innerHTML = '⏳ Sedang memasukkan data ke sheet…';
+    }
+    cancelBtns.forEach((b) => { b.disabled = true; });
+
     const startInput = document.getElementById('piStartRow');
     const start = Math.max(1, parseInt(startInput?.value || '1', 10) || 1);
     startRow = start;
+    const total = rowsData.length;
+
+    showApplyStatus(`Sedang memasukkan data ke sheet… (0/${total})`, 2);
+    await sleep(280);
 
     applyMetaToForm(draftMeta, rowsData);
 
@@ -523,12 +622,34 @@ Aturan:
     }
     Rows.updateRowNumbers();
 
+    // Tutup modal dulu supaya user melihat sheet terisi
+    close();
+    try {
+      if (typeof UI !== 'undefined' && UI.showScreen) UI.showScreen('logsheet', true);
+    } catch (_) {}
+
     const sheetRows = Rows.rows();
     let changed = 0;
 
-    rowsData.forEach((item, i) => {
+    // Urutan kolom diisi (mirip orang mengetik kiri → kanan)
+    const fieldOrder = [
+      'kode', 'op', 'mulai', 'panggil', 'teknik', 'selesai', 'durasi',
+      'kegiatan', 'masalah', 'disposisi', 'wo', 'good', 'defect',
+    ];
+
+    for (let i = 0; i < rowsData.length; i++) {
+      const item = rowsData[i];
       const tr = sheetRows[start - 1 + i];
-      if (!tr) return;
+      const pct = Math.round(((i) / total) * 100);
+      showApplyStatus(`Sedang memasukkan data ke sheet… (${i}/${total})`, pct);
+
+      if (!tr) continue;
+
+      tr.classList.add('pi-typing');
+      try {
+        tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (_) {}
+
       const map = {
         kode: item.kode,
         op: item.op,
@@ -544,24 +665,40 @@ Aturan:
         good: item.good,
         defect: item.defect,
       };
-      Object.entries(map).forEach(([key, value]) => {
-        if (!value) return;
+
+      for (const key of fieldOrder) {
+        const value = map[key];
+        if (!value) continue;
         const el = tr.querySelector(`[data-f="${key}"]`);
-        if (!el) return;
-        el.value = value;
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.dispatchEvent(new Event('change', { bubbles: true }));
-        el.dispatchEvent(new Event('focusout', { bubbles: true }));
-        changed++;
-      });
+        if (fillCell(el, value)) changed++;
+        // jeda kecil antar sel — terasa seperti mengetik
+        await sleep(35);
+      }
+
       if (item.batch) {
         setBatchValue(tr, item.batch);
+        const batchEl = tr.querySelector('[data-f="batch"]');
+        if (batchEl) {
+          batchEl.classList.remove('pi-type-flash');
+          void batchEl.offsetWidth;
+          batchEl.classList.add('pi-type-flash');
+        }
         changed++;
+        await sleep(40);
       }
+
       try {
         if (item.kode && typeof Rows.applyCat === 'function') Rows.applyCat(tr);
       } catch (_) {}
-    });
+
+      tr.classList.remove('pi-typing');
+      tr.classList.add('pi-done');
+      setTimeout(() => tr.classList.remove('pi-done'), 600);
+
+      // jeda antar baris agar terlihat jelas baris demi baris
+      await sleep(120);
+      showApplyStatus(`Sedang memasukkan data ke sheet… (${i + 1}/${total})`, Math.round(((i + 1) / total) * 100));
+    }
 
     try {
       Calculation.recalc();
@@ -571,8 +708,11 @@ Aturan:
       else Storage?.autoSaveLocal?.();
     } catch (_) {}
 
-    close();
-    UI?.toast?.(`${rowsData.length} baris masuk ke Sheet ✓ (${changed} isian)`);
+    showApplyStatus(`Selesai — ${total} baris masuk ke Sheet ✓`, 100);
+    await sleep(700);
+    hideApplyStatus();
+    UI?.toast?.(`${total} baris masuk ke Sheet ✓ (${changed} isian)`);
+    isApplying = false;
   };
 
   const renderPreview = (rows, meta, statusMsg) => {
