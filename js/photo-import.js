@@ -64,20 +64,6 @@ Aturan:
   let draftRows = [];
   let draftMeta = {};
   let startRow = 1;
-  /** Mode pengisian: 'slow' (default, ketik per karakter) | 'fast' (isi cepat) */
-  let fillSpeed = (() => {
-    try {
-      const v = localStorage.getItem('tkl_pi_fill_speed');
-      return v === 'fast' ? 'fast' : 'slow';
-    } catch (_) {
-      return 'slow';
-    }
-  })();
-
-  const setFillSpeed = (mode) => {
-    fillSpeed = mode === 'fast' ? 'fast' : 'slow';
-    try { localStorage.setItem('tkl_pi_fill_speed', fillSpeed); } catch (_) {}
-  };
 
   const esc = (v) => {
     if (typeof Utils !== 'undefined' && Utils.escapeHtml) return Utils.escapeHtml(String(v ?? ''));
@@ -596,7 +582,7 @@ Aturan:
     }
   };
 
-  /** Ketik nilai sel per karakter — gaya smooth kiri → kanan (mode lambat) */
+  /** Ketik nilai sel per karakter — gaya smooth kiri → kanan */
   const typeIntoCell = async (el, value, charMs) => {
     if (!el || value == null || value === '') return false;
     const text = String(value);
@@ -613,19 +599,6 @@ Aturan:
     el.classList.remove('pi-type-flash');
     void el.offsetWidth;
     el.classList.add('pi-type-flash');
-    return true;
-  };
-
-  /** Isi sel sekaligus + flash (mode cepat) */
-  const fillCellFast = (el, value) => {
-    if (!el || value == null || value === '') return false;
-    el.value = String(value);
-    el.classList.remove('pi-type-flash');
-    void el.offsetWidth;
-    el.classList.add('pi-type-flash');
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.dispatchEvent(new Event('change', { bubbles: true }));
-    el.dispatchEvent(new Event('focusout', { bubbles: true }));
     return true;
   };
 
@@ -653,28 +626,18 @@ Aturan:
     startRow = start;
     const total = rowsData.length;
 
-    // Baca pilihan kecepatan dari UI preview (default: lambat)
-    const speedSel = document.querySelector('#photoImportModal [name="piFillSpeed"]:checked');
-    if (speedSel) setFillSpeed(speedSel.value);
-    const isFast = fillSpeed === 'fast';
-
-    // Ritme: lambat = ketik per karakter; cepat = isi per sel dengan jeda singkat
-    const CHAR_MS = isFast ? 0 : 28;
-    const GAP_CELL_MS = isFast ? 28 : 45;
-    const GAP_ROW_MS = isFast ? 50 : 90;
+    // Ritme ketik: per karakter konsisten, alur kiri → kanan lalu baris berikutnya
+    const CHAR_MS = 28;
+    const GAP_CELL_MS = 45;
+    const GAP_ROW_MS = 90;
     const fieldOrder = [
       'kode', 'op', 'mulai', 'panggil', 'teknik', 'selesai', 'durasi',
       'kegiatan', 'masalah', 'disposisi', 'wo', 'good', 'defect',
     ];
 
     // Loading tetap tampil sejak awal
-    showApplyStatus(
-      isFast
-        ? `Menyiapkan data (cepat)… (${total} baris)`
-        : `Menyiapkan data… (${total} baris)`,
-      2
-    );
-    await sleep(isFast ? 280 : 600);
+    showApplyStatus(`Menyiapkan data… (${total} baris)`, 2);
+    await sleep(600);
 
     applyMetaToForm(draftMeta, rowsData);
 
@@ -692,12 +655,7 @@ Aturan:
     let changed = 0;
     let prevTr = null;
 
-    showApplyStatus(
-      isFast
-        ? `Mengisi cepat… (0/${total})`
-        : `Sedang memasukkan data ke sheet… (0/${total})`,
-      4
-    );
+    showApplyStatus(`Sedang memasukkan data ke sheet… (0/${total})`, 4);
 
     for (let i = 0; i < rowsData.length; i++) {
       const item = rowsData[i];
@@ -738,11 +696,7 @@ Aturan:
         const value = map[key];
         if (!value) continue;
         const el = tr.querySelector(`[data-f="${key}"]`);
-        if (isFast) {
-          if (fillCellFast(el, value)) changed++;
-        } else if (await typeIntoCell(el, value, CHAR_MS)) {
-          changed++;
-        }
+        if (await typeIntoCell(el, value, CHAR_MS)) changed++;
         await sleep(GAP_CELL_MS);
       }
 
@@ -828,17 +782,6 @@ Aturan:
         <label style="font-size:13px">Mulai baris
           <input type="number" id="piStartRow" min="1" value="${startRow}" style="width:72px;margin-left:6px;padding:6px 8px;border-radius:8px;border:1px solid var(--border,#ccc)">
         </label>
-        <div style="display:flex;align-items:center;gap:6px;font-size:13px;flex-wrap:wrap">
-          <span style="opacity:.75">Kecepatan:</span>
-          <label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:4px 8px;border-radius:8px;border:1px solid ${fillSpeed === 'slow' ? 'var(--blue,#3b82f6)' : 'var(--border,#ccc)'};background:${fillSpeed === 'slow' ? 'rgba(59,130,246,.08)' : 'transparent'}">
-            <input type="radio" name="piFillSpeed" value="slow" ${fillSpeed !== 'fast' ? 'checked' : ''} style="accent-color:#3b82f6">
-            🐢 Lambat
-          </label>
-          <label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:4px 8px;border-radius:8px;border:1px solid ${fillSpeed === 'fast' ? 'var(--blue,#3b82f6)' : 'var(--border,#ccc)'};background:${fillSpeed === 'fast' ? 'rgba(59,130,246,.08)' : 'transparent'}">
-            <input type="radio" name="piFillSpeed" value="fast" ${fillSpeed === 'fast' ? 'checked' : ''} style="accent-color:#3b82f6">
-            ⚡ Cepat
-          </label>
-        </div>
         <button type="button" class="btn btn-ghost" data-pi="home">← Kembali</button>
         <span style="font-size:12px;opacity:.7">${draftRows.length} baris · scroll horizontal jika perlu</span>
       </div>
@@ -886,19 +829,6 @@ Aturan:
     modal.querySelectorAll('[data-pi="close"]').forEach((b) => b.addEventListener('click', close));
     modal.querySelector('[data-pi="apply"]')?.addEventListener('click', applyToSheet);
     modal.querySelector('[data-pi="home"]')?.addEventListener('click', () => renderHome());
-    modal.querySelectorAll('[name="piFillSpeed"]').forEach((r) => {
-      r.addEventListener('change', () => {
-        setFillSpeed(r.value);
-        // refresh highlight border pada pilihan
-        modal.querySelectorAll('[name="piFillSpeed"]').forEach((x) => {
-          const lab = x.closest('label');
-          if (!lab) return;
-          const on = x.checked;
-          lab.style.borderColor = on ? 'var(--blue,#3b82f6)' : 'var(--border,#ccc)';
-          lab.style.background = on ? 'rgba(59,130,246,.08)' : 'transparent';
-        });
-      });
-    });
   };
 
   const renderPaste = () => {
