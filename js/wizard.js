@@ -2,11 +2,11 @@
  * WIZARD.JS
  * "Setup Awal" — alur tanya-jawab satu-per-satu di awal sebelum mulai isi
  * Log Sheet, supaya user tidak perlu bolak-balik antar screen dulu.
- * Urutan: Shift → Tahapan Proses → Line → Tanggal →
+ * Urutan: Shift → Tahapan Proses → Line → Nama & Kode Mesin → Tanggal →
  * Inisial Operator → Produk, Rate & No. WO.
  *
  * Semua input di wizard ini LANGSUNG tersinkron ke elemen asli di halaman
- * (State.el.fDate, fStage, op1..op6, prodName1..3, dst) — jadi wizard ini
+ * (State.el.fDate, fStage, op1..op6, prodName1..2, dst) — jadi wizard ini
  * cuma "jalan pintas tampilan", bukan sumber data terpisah.
  *
  * Muncul otomatis sekali di kunjungan pertama (localStorage), dan bisa
@@ -17,7 +17,7 @@
 const Wizard = (() => {
   'use strict';
 
-  const STEPS = ['shift', 'stage', 'line', 'date', 'operator', 'produk'];
+  const STEPS = ['shift', 'stage', 'line', 'mesin', 'date', 'operator', 'produk'];
   let stepIndex = 0;
 
   const modalEl = () => document.getElementById('wizardModal');
@@ -167,7 +167,50 @@ const Wizard = (() => {
     bindNav();
   };
 
-  // ====== STEP 4: TANGGAL ======
+  // ====== STEP 4: NAMA & KODE MESIN ======
+  const renderMesinStep = () => {
+    const namaEl = State.el.fMesinNama || document.getElementById('fMesinNama');
+    const kodeEl = State.el.fMesinKode || document.getElementById('fMesinKode');
+    const namaVal = namaEl ? namaEl.value : '';
+    const kodeVal = kodeEl ? kodeEl.value : '';
+    renderModal(`
+      ${progressHtml()}
+      <h3 class="qm-title">🔧 Nama &amp; Kode Mesin</h3>
+      <p class="qm-sub">Isi nama mesin dan kode mesin yang sedang digunakan. Boleh dilewati jika belum tahu.</p>
+      <div class="field" style="margin-bottom:12px">
+        <label>Nama Mesin</label>
+        <input type="text" id="wizMesinNama" class="in" placeholder="Misal: MIXING OLSA" autocomplete="off" value="${Utils.escapeHtml(namaVal)}">
+      </div>
+      <div class="field">
+        <label>Kode / No. Mesin</label>
+        <input type="text" id="wizMesinKode" class="in mono" placeholder="Misal: M3039" autocomplete="off" value="${Utils.escapeHtml(kodeVal)}">
+      </div>
+      ${navHtml({ showSkip: true })}
+    `);
+    const namaInput = modalEl().querySelector('#wizMesinNama');
+    const kodeInput = modalEl().querySelector('#wizMesinKode');
+    if (namaInput) {
+      namaInput.addEventListener('input', () => {
+        if (namaEl) {
+          namaEl.value = namaInput.value;
+          namaEl.dispatchEvent(new Event('input', { bubbles: true }));
+          namaEl.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      });
+    }
+    if (kodeInput) {
+      kodeInput.addEventListener('input', () => {
+        if (kodeEl) {
+          kodeEl.value = kodeInput.value;
+          kodeEl.dispatchEvent(new Event('input', { bubbles: true }));
+          kodeEl.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      });
+    }
+    bindNav();
+  };
+
+  // ====== STEP 5: TANGGAL ======
 
   const renderDateStep = () => {
     const current = State.el.fDate ? State.el.fDate.value : '';
@@ -189,7 +232,7 @@ const Wizard = (() => {
     bindNav();
   };
 
-  // ====== STEP 5: INISIAL OPERATOR ======
+  // ====== STEP 6: INISIAL OPERATOR ======
   const renderOperatorStep = () => {
     let fieldsHtml = '';
     for (let i = 1; i <= 6; i++) {
@@ -219,12 +262,11 @@ const Wizard = (() => {
     bindNav();
   };
 
-  // ====== STEP 6: PRODUK, RATE PER MENIT & NO. WO (per produk) ======
+  // ====== STEP 7: PRODUK, RATE PER MENIT & NO. WO (per produk) ======
   const renderProdukStep = () => {
     const slots = [
-      { name: State.el.prodName1, rate: State.el.prodRate1, wo: State.el.prodWo1, label: 'Produk 1' },
+      { name: State.el.prodName1, rate: State.el.prodRate1, wo: State.el.prodWo1, label: 'Produk 1 (Pokok)' },
       { name: State.el.prodName2, rate: State.el.prodRate2, wo: State.el.prodWo2, label: 'Produk 2 (Cadangan)' },
-      { name: State.el.prodName3, rate: State.el.prodRate3, wo: State.el.prodWo3, label: 'Produk 3 (Cadangan)' },
     ];
     const slotsHtml = slots.map((s, i) => `
       <div class="qm-slot">
@@ -280,6 +322,7 @@ const Wizard = (() => {
     shift: renderShiftStep,
     stage: renderStageStep,
     line: renderLineStep,
+    mesin: renderMesinStep,
     date: renderDateStep,
     operator: renderOperatorStep,
     produk: renderProdukStep,

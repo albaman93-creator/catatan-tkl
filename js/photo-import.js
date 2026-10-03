@@ -24,19 +24,13 @@ const PhotoImport = (() => {
     { key: 'defect', label: 'Defect', width: '56px' },
   ];
 
-  /** Prompt siap kirim ke Meta AI / Gemini bersama foto form TKL */
+  /** Prompt siap kirim ke Meta AI / Gemini bersama foto form TKL
+   * Fokus hanya pembacaan tabel (rows). Meta (tanggal/shift/mesin/dll) diisi manual user.
+   */
   const AI_PROMPT = `Baca foto FORM TKL (Formulir Catatan Pemakaian TKL) ini.
 Kembalikan HANYA JSON valid, tanpa markdown, tanpa penjelasan.
-
-HEADER (abaikan logo & tanda tangan approve):
-- tanggal → meta.tanggal
-- shift → meta.shift
-- Nama Mesin → meta.nama_mesin
-- No. Mesin → meta.no_mesin
-- Tahapan proses → meta.tahapan
-- Kec. standar PQ (output/menit) → meta.rate_standar
-- Kec. Actual → ABAIKAN
-- Inisial OP/Packer → meta.inisial
+ABAIKAN header (tanggal, shift, nama mesin, no mesin, tahapan, rate, inisial, logo, tanda tangan).
+Fokus HANYA pada baris-baris tabel.
 
 SETIAP BARIS TABEL:
 | Kolom form | Field JSON |
@@ -56,15 +50,16 @@ SETIAP BARIS TABEL:
 | Defect | defect |
 
 Format WAJIB:
-{"rows":[{"kode":"2","op":"","mulai":"07:00","panggil":"","teknik":"","selesai":"07:35","durasi":"35","kegiatan":"...","masalah":"","disposisi":"","wo":"","batch":"","good":"918","defect":"4"}],"meta":{"tanggal":"2026-09-28","shift":"1","nama_mesin":"","no_mesin":"","tahapan":"mixing","rate_standar":"26","inisial":"","catatan":""}}
+{"rows":[{"kode":"2","op":"","mulai":"07:00","panggil":"","teknik":"","selesai":"07:35","durasi":"35","kegiatan":"...","masalah":"","disposisi":"","wo":"","batch":"","good":"918","defect":"4"}],"meta":{}}
 
 Aturan:
 1. Jam format HH:MM (7.30 → 07:30).
-2. kode hanya 1 digit.
+2. kode hanya 1 digit (1-9).
 3. Jika durasi kosong tapi jam ada, hitung durasi dari mulai-selesai.
 4. good/defect utamanya di kode 2.
-5. Abaikan baris kosong. Urut atas ke bawah.
-6. Jangan bungkus dengan \`\`\`json.`;
+5. Abaikan baris kosong. Urut dari atas ke bawah.
+6. Jangan bungkus dengan \`\`\`json.
+7. meta biarkan kosong {} — tidak perlu diisi.`;
 
   let draftRows = [];
   let draftMeta = {};
