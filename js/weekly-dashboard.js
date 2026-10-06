@@ -486,6 +486,7 @@ const WeeklyDashboard = (() => {
     renderProdBarChips();
     loadProdBar();
     if (typeof Pica !== 'undefined') Pica.render(rows, meta, from, to);
+    if (typeof Shutdown !== 'undefined') Shutdown.render(rows, meta);
   };
 
   const loadMachine = async () => {

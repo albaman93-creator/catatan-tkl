@@ -1893,6 +1893,56 @@
                 <div class="mch-bar-scroll"><svg id="mchBarSvg" role="img" aria-label="Capaian OEE OPE dan OEE 365 per batch"></svg></div>
               </article>
 
+              <!-- SHUTDOWN ANALYSIS (Planned & Unplanned) — gaya Looker Studio -->
+              <div class="shutdown-wrap">
+                <div class="shutdown-row">
+                  <article class="shutdown-card">
+                    <div class="shutdown-title" id="sdPlanDonutTitle">Planned Shutdown</div>
+                    <div class="shutdown-donut-flex">
+                      <svg id="sdPlanDonut" class="shutdown-donut" viewBox="0 0 200 200" role="img" aria-label="Distribusi planned shutdown"></svg>
+                      <div id="sdPlanLegend" class="shutdown-legend"></div>
+                    </div>
+                  </article>
+                  <article class="shutdown-card">
+                    <div class="shutdown-title" id="sdPlanTableTitle">Planned Shutdown Activity</div>
+                    <div class="shutdown-table-wrap">
+                      <table class="shutdown-table">
+                        <thead><tr><th style="width:28px"></th><th>Aktivitas</th><th>Waktu Aktivitas (mnt)</th><th>Persentase</th></tr></thead>
+                        <tbody id="sdPlanBody"><tr><td colspan="4">Memuat…</td></tr></tbody>
+                      </table>
+                    </div>
+                    <div class="shutdown-pager">
+                      <span id="sdPlanPageInfo">0 / 0</span>
+                      <button type="button" class="shutdown-pager-btn" id="sdPlanPrev" aria-label="Halaman sebelumnya">‹</button>
+                      <button type="button" class="shutdown-pager-btn" id="sdPlanNext" aria-label="Halaman berikutnya">›</button>
+                    </div>
+                  </article>
+                </div>
+                <div class="shutdown-row">
+                  <article class="shutdown-card">
+                    <div class="shutdown-title" id="sdUnpDonutTitle">Unplanned Shutdown</div>
+                    <div class="shutdown-donut-flex">
+                      <svg id="sdUnpDonut" class="shutdown-donut" viewBox="0 0 200 200" role="img" aria-label="Distribusi unplanned shutdown"></svg>
+                      <div id="sdUnpLegend" class="shutdown-legend"></div>
+                    </div>
+                  </article>
+                  <article class="shutdown-card">
+                    <div class="shutdown-title" id="sdUnpTableTitle">Unplanned Shutdown Activity</div>
+                    <div class="shutdown-table-wrap">
+                      <table class="shutdown-table">
+                        <thead><tr><th style="width:28px"></th><th>Aktivitas</th><th>Waktu Aktivitas (mnt)</th><th>Persentase</th></tr></thead>
+                        <tbody id="sdUnpBody"><tr><td colspan="4">Memuat…</td></tr></tbody>
+                      </table>
+                    </div>
+                    <div class="shutdown-pager">
+                      <span id="sdUnpPageInfo">0 / 0</span>
+                      <button type="button" class="shutdown-pager-btn" id="sdUnpPrev" aria-label="Halaman sebelumnya">‹</button>
+                      <button type="button" class="shutdown-pager-btn" id="sdUnpNext" aria-label="Halaman berikutnya">›</button>
+                    </div>
+                  </article>
+                </div>
+              </div>
+
               <!-- PICA PROBLEM (Why-Why) -->
               <article class="oee-bar-card pica-card">
                 <div class="oee-bar-title" id="picaTitle">PICA Problem OEE</div>
@@ -2070,6 +2120,7 @@
   <script src="./js/dashboard.js"></script>
   <script src="./js/weekly-dashboard.js"></script>
   <script src="./js/pica.js"></script>
+  <script src="./js/shutdown.js"></script>
   <script src="./js/quickmode.js"></script>
   <script src="./js/formmode.js"></script>
   <script src="./js/formfull.js"></script>
