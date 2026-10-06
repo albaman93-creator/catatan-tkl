@@ -396,6 +396,7 @@ const UI = (() => {
     try { localStorage.setItem(CONFIG.ACTIVE_SCREEN_KEY, screenId); } catch(e){}
     // Dashboard baru menarik data dari Supabase saat tabnya benar-benar dibuka
     if (screenId === 'dashboard' && typeof Dashboard !== 'undefined') Dashboard.open();
+    if (screenId === 'weekly' && typeof WeeklyDashboard !== 'undefined') WeeklyDashboard.open();
     if (!silent) {
       const sheet = document.querySelector('.sheet');
       if (sheet) sheet.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -523,30 +524,121 @@ const UI = (() => {
 
   // ====== PWA INSTALL ======
   const setupPWA = () => {
-    const installBtn = State.el['pwa-install-btn'];
+    const installBtn = State.el['pwa-install-btn'] || document.getElementById('pwa-install-btn');
+    const installSub = document.getElementById('pwaInstallSub');
+    const banner = document.getElementById('installBanner');
+    const bannerBtn = document.getElementById('installBannerBtn');
+    const bannerDismiss = document.getElementById('installBannerDismiss');
+    const DISMISS_KEY = 'oee_install_banner_dismissed';
 
+    const isStandalone = () =>
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+
+    const wasDismissed = () => {
+      try { return localStorage.getItem(DISMISS_KEY) === '1'; } catch (e) { return false; }
+    };
+
+    const setSidebarState = (mode) => {
+      // mode: 'ready' | 'installed' | 'manual'
+      if (!installBtn) return;
+      installBtn.style.display = '';
+      installBtn.classList.remove('is-installed', 'is-ready');
+      if (mode === 'installed') {
+        installBtn.classList.add('is-installed');
+        if (installSub) installSub.textContent = 'Sudah terpasang di perangkat ini';
+        installBtn.title = 'Aplikasi sudah terinstall';
+      } else if (mode === 'ready') {
+        installBtn.classList.add('is-ready');
+        if (installSub) installSub.textContent = 'Siap diinstall · ketuk untuk pasang';
+        installBtn.title = 'Install aplikasi ke HP / komputer';
+      } else {
+        if (installSub) installSub.textContent = 'Pasang di perangkat · lebih cepat & offline';
+        installBtn.title = 'Install aplikasi ke HP / komputer';
+      }
+    };
+
+    const showBanner = () => {
+      if (isStandalone() || wasDismissed() || !banner) return;
+      banner.hidden = false;
+      requestAnimationFrame(() => banner.classList.add('is-visible'));
+    };
+
+    const hideBanner = () => {
+      if (!banner) return;
+      banner.classList.remove('is-visible');
+      setTimeout(() => { banner.hidden = true; }, 300);
+    };
+
+    const doInstall = async () => {
+      if (isStandalone()) {
+        toast('Aplikasi sudah terinstall ✓');
+        return;
+      }
+      if (!State.deferredPrompt) {
+        // Fallback petunjuk manual
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        if (isIOS) {
+          toast('iPhone: ketuk Share (□↑) → “Add to Home Screen”');
+        } else {
+          toast('Buka menu browser (⋮) → “Install app” / “Tambahkan ke layar utama”');
+        }
+        return;
+      }
+      State.deferredPrompt.prompt();
+      try {
+        const result = await State.deferredPrompt.userChoice;
+        if (result.outcome === 'accepted') {
+          toast('Aplikasi berhasil diinstall ✓');
+          setSidebarState('installed');
+          hideBanner();
+        } else {
+          toast('Installasi dibatalkan');
+        }
+      } catch (e) {
+        toast('Gagal memulai install');
+      }
+      State.deferredPrompt = null;
+    };
+
+    // Event native browser
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       State.deferredPrompt = e;
-      installBtn.classList.add('show');
-    });
-
-    installBtn.addEventListener('click', () => {
-      if (State.deferredPrompt) {
-        State.deferredPrompt.prompt();
-        State.deferredPrompt.userChoice.then((result) => {
-          if (result.outcome === 'accepted') toast('Aplikasi berhasil diinstall ✓');
-          else toast('Installasi dibatalkan');
-          State.deferredPrompt = null;
-          installBtn.classList.remove('show');
-        });
-      }
+      setSidebarState('ready');
+      setTimeout(showBanner, 1800);
     });
 
     window.addEventListener('appinstalled', () => {
-      installBtn.classList.remove('show');
-      toast('Aplikasi terinstall ✓');
+      setSidebarState('installed');
+      hideBanner();
+      toast('Aplikasi terinstall ✓ Siap dipakai offline');
+      try { localStorage.removeItem(DISMISS_KEY); } catch (e) {}
     });
+
+    // Tombol di sidebar — selalu terlihat
+    if (installBtn) {
+      installBtn.addEventListener('click', doInstall);
+    }
+
+    // Tombol di banner
+    if (bannerBtn) {
+      bannerBtn.addEventListener('click', doInstall);
+    }
+    if (bannerDismiss) {
+      bannerDismiss.addEventListener('click', () => {
+        hideBanner();
+        try { localStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
+      });
+    }
+
+    // State awal
+    if (isStandalone()) {
+      setSidebarState('installed');
+      hideBanner();
+    } else {
+      setSidebarState('manual');
+    }
   };
 
   // ====== REGISTER SERVICE WORKER ======

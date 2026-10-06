@@ -119,6 +119,7 @@ const QuickMode = (() => {
       <div class="qm-row qm-choices">
         <button type="button" data-count="1">Satu</button>
         <button type="button" data-count="2">Dua</button>
+        <button type="button" data-count="3">Tiga</button>
       </div>
 
       <div class="qm-actions">
@@ -154,6 +155,10 @@ const QuickMode = (() => {
       {
         name: State.el.prodName2,
         rate: State.el.prodRate2
+      },
+      {
+        name: State.el.prodName3,
+        rate: State.el.prodRate3
       }
     ];
 
@@ -166,7 +171,7 @@ const QuickMode = (() => {
       slotsHtml += `
         <div class="qm-slot" data-slot="${i}">
           <label class="qm-label">
-            Produk ${i + 1}${i === 0 ? ' (Pokok)' : ' (Cadangan)'} (Nama &amp; Kecepatan)
+            Produk ${i + 1} (Nama &amp; Kecepatan)
           </label>
 
           <input
@@ -196,7 +201,7 @@ const QuickMode = (() => {
       <p class="qm-sub">
         Isi Nama Produk &amp; Rate per Menit di sini — data akan otomatis
         tersinkron langsung ke Master Produk &amp; Kecepatan Standar
-        (Produk 1/2 sesuai urutan slot).
+        (Produk 1/2/3 sesuai urutan slot).
       </p>
 
       ${slotsHtml}
@@ -275,6 +280,10 @@ const QuickMode = (() => {
       {
         name: State.el.prodName2,
         rate: State.el.prodRate2
+      },
+      {
+        name: State.el.prodName3,
+        rate: State.el.prodRate3
       }
     ];
 

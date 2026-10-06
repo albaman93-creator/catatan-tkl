@@ -536,6 +536,13 @@ const Dashboard = (() => {
     el('dashRefresh')?.addEventListener('click', fetchAndRender);
     el('dashReset')?.addEventListener('click', () => { setDefaultFilters(); fetchAndRender(); });
     el('dashExport')?.addEventListener('click', exportCsv);
+    el('dashMeeting')?.addEventListener('click', () => {
+      if (typeof UI !== 'undefined' && UI.showScreen) {
+        UI.showScreen('weekly');
+      } else {
+        window.open('https://datastudio.google.com/u/2/reporting/6c7344aa-f59c-4913-a8bf-2876228e987f/page/p_cd3o6rdg7d', '_blank', 'noopener,noreferrer');
+      }
+    });
     el('dashZoom')?.addEventListener('input', () => { zoomPoints = Number(el('dashZoom').value) || 14; renderAll(filteredRows); });
     el('dashSearch')?.addEventListener('input', () => { page = 1; renderTable(filteredRows); });
     document.querySelectorAll('[data-dash-preset]').forEach(b => b.addEventListener('click', () => applyPreset(b.dataset.dashPreset)));

@@ -481,7 +481,7 @@ const App = (() => {
     // ============================================================
     // MASTER PRODUK & OPERATOR → recalc + sync ke Master
     // ============================================================
-    ['prodName1','prodName2','prodRate1','prodRate2','prodWo1','prodWo2'].forEach(id => {
+    ['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3','prodWo1','prodWo2','prodWo3'].forEach(id => {
       if (!State.el[id]) return;
       State.el[id].addEventListener('input', () => {
         if (id.startsWith('prodName') || id.startsWith('prodRate')) {
@@ -552,6 +552,97 @@ const App = (() => {
     };
     bindExportCsv(State.el.btnExportCsv);
     bindExportCsv(State.el.btnExportCsvSheet);
+
+    // ============================================================
+    // SALIN / PINDAH DATA
+    // ============================================================
+    const cmOverlay = document.getElementById('copyMoveOverlay');
+    const cmOpen = () => {
+      if (!cmOverlay) return;
+      // Isi label sumber & default target = filter aktif
+      const srcLabel = document.getElementById('cmSourceLabel');
+      if (srcLabel) srcLabel.textContent = Storage.labelFilter();
+      const f = Storage.activeFilter();
+      const d = document.getElementById('cmTargetDate');
+      const s = document.getElementById('cmTargetShift');
+      const l = document.getElementById('cmTargetLine');
+      const st = document.getElementById('cmTargetStage');
+      if (d) d.value = f.rawDate;
+      if (s) s.value = String(f.shift);
+      if (l) l.value = String(f.line);
+      if (st) st.value = f.stage;
+      updateCmWarn();
+      cmOverlay.classList.remove('hide');
+    };
+    const cmClose = () => {
+      if (cmOverlay) cmOverlay.classList.add('hide');
+    };
+    const readTargetFilter = () => ({
+      rawDate: document.getElementById('cmTargetDate')?.value || '',
+      shift: Number(document.getElementById('cmTargetShift')?.value || 1),
+      line: document.getElementById('cmTargetLine')?.value || '1',
+      stage: document.getElementById('cmTargetStage')?.value || 'mixing',
+    });
+    const updateCmWarn = () => {
+      const warn = document.getElementById('cmWarn');
+      if (!warn) return;
+      const t = readTargetFilter();
+      if (!t.rawDate) { warn.hidden = true; return; }
+      warn.hidden = !Storage.targetExists(t);
+    };
+    ['cmTargetDate', 'cmTargetShift', 'cmTargetLine', 'cmTargetStage'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', updateCmWarn);
+    });
+    if (State.el.btnCopyMove) {
+      State.el.btnCopyMove.addEventListener('click', cmOpen);
+    }
+    document.getElementById('copyMoveClose')?.addEventListener('click', cmClose);
+    document.getElementById('copyMoveCancel')?.addEventListener('click', cmClose);
+    cmOverlay?.addEventListener('click', (e) => {
+      if (e.target === cmOverlay) cmClose();
+    });
+    document.getElementById('copyMoveConfirm')?.addEventListener('click', async () => {
+      const target = readTargetFilter();
+      if (!target.rawDate) {
+        UI.toast('Pilih tanggal tujuan dulu', true);
+        return;
+      }
+      const mode = document.querySelector('input[name="cmMode"]:checked')?.value || 'copy';
+      const modeLabel = mode === 'move' ? 'pindahkan' : 'salin';
+      if (!confirm(`Yakin ${modeLabel} data ke ${target.rawDate} · S${target.shift} · L${target.line} · ${target.stage.toUpperCase()}?`)) return;
+
+      const btn = document.getElementById('copyMoveConfirm');
+      if (btn) { btn.disabled = true; btn.textContent = 'Memproses…'; }
+      try {
+        const result = await Storage.copyOrMoveRecord(target, mode);
+        if (!result.ok) {
+          UI.toast(result.message, true);
+          return;
+        }
+        UI.toast(result.message);
+        cmClose();
+
+        // Pindahkan filter UI ke tujuan, lalu load record tujuan
+        if (State.el.fDate) State.el.fDate.value = target.rawDate;
+        if (State.el.fLine) State.el.fLine.value = String(target.line);
+        if (State.el.fStage) State.el.fStage.value = target.stage;
+        State.evalShift = Number(target.shift) - 1;
+        if (typeof UI.updateShiftIndicator === 'function') UI.updateShiftIndicator();
+        if (typeof UI.updateUnifiedControl === 'function') UI.updateUnifiedControl();
+        // Sync shift buttons
+        document.querySelectorAll('[data-shift]').forEach(b => {
+          b.classList.toggle('on', parseInt(b.getAttribute('data-shift'), 10) === State.evalShift);
+        });
+        await Storage.loadRecord();
+        if (typeof Calculation !== 'undefined' && Calculation.recalc) Calculation.recalc();
+      } catch (err) {
+        console.error(err);
+        UI.toast('Gagal salin/pindah: ' + (err.message || err), true);
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Jalankan'; }
+      }
+    });
 
     // ============================================================
     // Ctrl+S SHORTCUT
@@ -707,7 +798,7 @@ const App = (() => {
 
     // Autocomplete kode produk di kolom Nama Produk (Sheet + Master)
     if (typeof Suggest !== 'undefined' && Suggest.attachProductAll) {
-      Suggest.attachProductAll('#prodName1, #prodName2, #masterProdName1, #masterProdName2');
+      Suggest.attachProductAll('#prodName1, #prodName2, #prodName3, #masterProdName1, #masterProdName2, #masterProdName3');
     }
 
     Auth.initSession();

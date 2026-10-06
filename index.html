@@ -709,6 +709,15 @@
         <span class="menu-row-chevron">›</span>
       </button>
 
+      <button type="button" class="menu-row" id="btnCopyMove" title="Salin atau pindahkan seluruh data sheet ke tanggal/shift lain">
+        <span class="menu-row-icon menu-row-icon--amber">📋</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Salin / Pindah Data</span>
+          <span class="menu-row-sub">Copy sheet ke tanggal atau shift lain</span>
+        </span>
+        <span class="menu-row-chevron">›</span>
+      </button>
+
       <button type="button" class="menu-row" id="btnWhatsApp">
         <span class="menu-row-icon">💬</span>
         <span class="menu-row-body">
@@ -745,6 +754,17 @@
         <span class="menu-row-chevron">›</span>
       </button>
 
+      <div class="sidebar-section-label">Aplikasi</div>
+
+      <button type="button" class="menu-row menu-row--install" id="pwa-install-btn" title="Install aplikasi ke HP / komputer">
+        <span class="menu-row-icon menu-row-icon--blue">📱</span>
+        <span class="menu-row-body">
+          <span class="menu-row-title">Install Aplikasi</span>
+          <span class="menu-row-sub" id="pwaInstallSub">Pasang di perangkat · lebih cepat &amp; offline</span>
+        </span>
+        <span class="menu-row-chevron">›</span>
+      </button>
+
       <button type="button" class="menu-row menu-row--danger" id="btnLogout" title="Keluar sesi">
         <span class="menu-row-icon menu-row-icon--red">⎋</span>
         <span class="menu-row-body">
@@ -753,8 +773,6 @@
         </span>
         <span class="menu-row-chevron">›</span>
       </button>
-
-      <button type="button" class="btn btn-install" id="pwa-install-btn" style="display:none">📱 Install Aplikasi</button>
 
       <div class="sidebar-footer" id="lastSaved"></div>
     </aside>
@@ -867,12 +885,14 @@
               <input type="text" id="masterProdWo2" placeholder="No. WO" class="mono" data-sync="prodWo2">
             </div>
           </div>
-        </div>
-        <!-- Produk 3 disembunyikan: sistem hanya 2 produk (pokok + 1 cadangan) -->
-        <div style="display:none" aria-hidden="true">
-          <input type="text" id="masterProdName3" data-sync="prodName3">
-          <input type="number" id="masterProdRate3" data-sync="prodRate3">
-          <input type="text" id="masterProdWo3" data-sync="prodWo3">
+          <div class="field">
+            <label>Produk 3 (Cadangan)</label>
+            <div class="split-input split-input-3">
+              <input type="text" id="masterProdName3" placeholder="Misal: PROD-C" data-sync="prodName3">
+              <input type="number" id="masterProdRate3" placeholder="Rate/mnt" inputmode="decimal" data-sync="prodRate3">
+              <input type="text" id="masterProdWo3" placeholder="No. WO" class="mono" data-sync="prodWo3">
+            </div>
+          </div>
         </div>
       </section>
 
@@ -978,11 +998,11 @@
                 <span id="compactProductValue">Produk</span><span class="compact-chevron">▾</span>
               </button>
               <div class="compact-popover compact-form-panel compact-product-panel" id="compactProductPanel">
-                <div class="compact-popover-head"><b>Produk (maks. 2)</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
+                <div class="compact-popover-head"><b>Produk (maks. 3)</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
                 <div class="compact-product-list">
                   <div class="compact-product-row"><span>1</span><input type="text" id="prodName1" placeholder="Nama produk"><input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal"><input type="text" id="prodWo1" placeholder="No. WO" class="mono"></div>
-                  <div class="compact-product-row"><span>2</span><input type="text" id="prodName2" placeholder="Nama produk (cadangan)"><input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal"><input type="text" id="prodWo2" placeholder="No. WO" class="mono"></div>
-                  <div class="compact-product-row" style="display:none" aria-hidden="true"><span>3</span><input type="text" id="prodName3" placeholder="Nama produk"><input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal"><input type="text" id="prodWo3" placeholder="No. WO" class="mono"></div>
+                  <div class="compact-product-row"><span>2</span><input type="text" id="prodName2" placeholder="Nama produk"><input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal"><input type="text" id="prodWo2" placeholder="No. WO" class="mono"></div>
+                  <div class="compact-product-row"><span>3</span><input type="text" id="prodName3" placeholder="Nama produk"><input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal"><input type="text" id="prodWo3" placeholder="No. WO" class="mono"></div>
                 </div>
               </div>
             </div>
@@ -1034,7 +1054,6 @@
           <div class="col-preset-bar">
             <button type="button" class="col-preset-btn" id="presetQuick" title="Kolom ringkas: Kode, Mulai, Selesai, Durasi, Kegiatan, Produk, Good, Defect">⚡ Mode Hitung Cepat</button>
             <button type="button" class="col-preset-btn" id="presetFull" title="Tampilkan semua kolom">📋 Mode Lengkap</button>
-            <button type="button" class="col-preset-btn" id="btnAddSuggestion" title="Tambah / kelola saran kegiatan untuk tahapan proses aktif">💡 Add Suggestion</button>
           </div>
 
           <div class="col-toggle-wrap">
@@ -1264,21 +1283,21 @@
                 <th colspan="2">% Availability, Performance, &amp; Quality</th>
                 <th id="thProd1">Produk 1</th>
                 <th id="thProd2">Produk 2</th>
-                <th id="thProd3" style="display:none">Produk 3</th>
+                <th id="thProd3">Produk 3</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="sec-header"><td colspan="4">% Availability</td></tr>
-              <tr><td class="code-col">A</td><td class="desc-col">Waktu Operasional Pabrik (menit)</td><td class="val-col" colspan="2"><span id="oA">510</span> mnt</td></tr>
-              <tr><td class="code-col">B</td><td class="desc-col">Waktu Berhenti Terencana (kode 5,6,7,8)</td><td class="val-col" colspan="2"><span id="oB">0</span> mnt</td></tr>
-              <tr><td class="code-col">C</td><td class="desc-col">Waktu Produksi Terencana (A − B)</td><td class="val-col" colspan="2"><span id="oC">510</span> mnt</td></tr>
-              <tr><td class="code-col">D</td><td class="desc-col">Waktu Berhenti Tidak Terencana (kode 1,3,4,9)</td><td class="val-col" colspan="2"><span id="oD">0</span> mnt</td></tr>
-              <tr><td class="code-col">E</td><td class="desc-col">Waktu Operasional (C − D)</td><td class="val-col" colspan="2"><span id="oE">510</span> mnt</td></tr>
-              <tr><td class="code-col">F</td><td class="desc-col"><b>% A</b> → (E ÷ C)<br><small>Target 90%</small></td><td class="val-col" colspan="2"><span id="oF">0,00</span> %</td></tr>
+              <tr class="sec-header"><td colspan="5">% Availability</td></tr>
+              <tr><td class="code-col">A</td><td class="desc-col">Waktu Operasional Pabrik (menit)</td><td class="val-col" colspan="3"><span id="oA">510</span> mnt</td></tr>
+              <tr><td class="code-col">B</td><td class="desc-col">Waktu Berhenti Terencana (kode 5,6,7,8)</td><td class="val-col" colspan="3"><span id="oB">0</span> mnt</td></tr>
+              <tr><td class="code-col">C</td><td class="desc-col">Waktu Produksi Terencana (A − B)</td><td class="val-col" colspan="3"><span id="oC">510</span> mnt</td></tr>
+              <tr><td class="code-col">D</td><td class="desc-col">Waktu Berhenti Tidak Terencana (kode 1,3,4,9)</td><td class="val-col" colspan="3"><span id="oD">0</span> mnt</td></tr>
+              <tr><td class="code-col">E</td><td class="desc-col">Waktu Operasional (C − D)</td><td class="val-col" colspan="3"><span id="oE">510</span> mnt</td></tr>
+              <tr><td class="code-col">F</td><td class="desc-col"><b>% A</b> → (E ÷ C)<br><small>Target 90%</small></td><td class="val-col" colspan="3"><span id="oF">0,00</span> %</td></tr>
 
-              <tr class="sec-header"><td colspan="4">% Performance</td></tr>
-              <tr><td class="code-col">G</td><td class="desc-col">Target output (Rate × Durasi)</td><td class="val-col"><span id="oG1">0</span> unit</td><td class="val-col"><span id="oG2">0</span> unit</td><td class="val-col" style="display:none"><span id="oG3">0</span> unit</td></tr>
-              <tr><td class="code-col">H</td><td class="desc-col">Output aktual (Good + Defect)</td><td class="val-col"><span id="oH1">0</span> unit</td><td class="val-col"><span id="oH2">0</span> unit</td><td class="val-col" style="display:none"><span id="oH3">0</span> unit</td></tr>
+              <tr class="sec-header"><td colspan="5">% Performance</td></tr>
+              <tr><td class="code-col">G</td><td class="desc-col">Target output (Rate × Durasi)</td><td class="val-col"><span id="oG1">0</span> unit</td><td class="val-col"><span id="oG2">0</span> unit</td><td class="val-col"><span id="oG3">0</span> unit</td></tr>
+              <tr><td class="code-col">H</td><td class="desc-col">Output aktual (Good + Defect)</td><td class="val-col"><span id="oH1">0</span> unit</td><td class="val-col"><span id="oH2">0</span> unit</td><td class="val-col"><span id="oH3">0</span> unit</td></tr>
               <tr>
                 <td class="code-col">I</td>
                 <td class="desc-col">
@@ -1290,18 +1309,18 @@
                 </td>
                 <td class="val-col" id="colI1"><span id="oI1">0,00</span> %</td>
                 <td class="val-col" id="colI2"><span id="oI2">0,00</span> %</td>
-                <td class="val-col" id="colI3" style="display:none"><span id="oI3">0,00</span> %</td>
+                <td class="val-col" id="colI3"><span id="oI3">0,00</span> %</td>
               </tr>
 
-              <tr class="sec-header"><td colspan="4">% Quality</td></tr>
-              <tr><td class="code-col">J</td><td class="desc-col">Total output (Good + Defect)</td><td class="val-col" colspan="2"><span id="oJ">0</span> unit</td></tr>
-              <tr><td class="code-col">K</td><td class="desc-col">Total Defect</td><td class="val-col" colspan="2"><span id="oK">0</span> unit</td></tr>
-              <tr><td class="code-col">L</td><td class="desc-col">Good Quality (J − K)</td><td class="val-col" colspan="2"><span id="oL">0</span> unit</td></tr>
-              <tr><td class="code-col">M</td><td class="desc-col"><b>% Q</b> → (L ÷ J)<br><small>Target 99,50%</small></td><td class="val-col" colspan="2"><span id="oM">0,00</span> %</td></tr>
+              <tr class="sec-header"><td colspan="5">% Quality</td></tr>
+              <tr><td class="code-col">J</td><td class="desc-col">Total output (Good + Defect)</td><td class="val-col" colspan="3"><span id="oJ">0</span> unit</td></tr>
+              <tr><td class="code-col">K</td><td class="desc-col">Total Defect</td><td class="val-col" colspan="3"><span id="oK">0</span> unit</td></tr>
+              <tr><td class="code-col">L</td><td class="desc-col">Good Quality (J − K)</td><td class="val-col" colspan="3"><span id="oL">0</span> unit</td></tr>
+              <tr><td class="code-col">M</td><td class="desc-col"><b>% Q</b> → (L ÷ J)<br><small>Target 99,50%</small></td><td class="val-col" colspan="3"><span id="oM">0,00</span> %</td></tr>
 
               <tr class="highlight-res">
                 <td colspan="2"><span class="oee-title">% OVERALL EQUIPMENT EFFECTIVENESS (OEE)</span><br><small>Target 88% · A × P × Q</small></td>
-                <td colspan="2" id="oee">0,00%</td>
+                <td colspan="3" id="oee">0,00%</td>
               </tr>
             </tbody>
           </table>
@@ -1318,6 +1337,7 @@
             <div class="sub2">Monitoring cepat hari ini, analisis rentang panjang, downtime, output, dan performa per record</div>
           </div>
           <div class="dash-head-actions">
+            <button type="button" id="dashMeeting" class="btn btn-ghost dash-action-btn" title="Buka Dashboard Yield Produksi (Weekly Meeting)">📝 Dashboard Meeting</button>
             <button type="button" id="dashExport" class="btn btn-ghost dash-action-btn">⇩ Export CSV</button>
             <button type="button" id="dashRefresh" class="btn btn-primary dash-action-btn">↻ Refresh</button>
           </div>
@@ -1473,6 +1493,298 @@
         </article>
       </section>
 
+      <!-- Section: Weekly Meeting Dashboard (mirip Looker Studio) -->
+      <section class="sec" data-screen="weekly">
+        <div class="weekly-layout">
+          <!-- Sidebar kiri -->
+          <aside class="weekly-sidebar" id="weeklySidebar">
+            <div class="weekly-sidebar-brand">
+              <span class="weekly-brand-icon">📊</span>
+              <div>
+                <div class="weekly-brand-title">Weekly Meeting</div>
+                <div class="weekly-brand-sub">OEE &amp; Yield</div>
+              </div>
+            </div>
+            <nav class="weekly-nav" id="weeklyNav">
+              <button type="button" class="weekly-nav-item is-active" data-weekly-page="yield">
+                <span class="wn-icon">📈</span>
+                <span class="wn-label">Capaian Yield Produksi</span>
+              </button>
+              <button type="button" class="weekly-nav-item" data-weekly-page="oee-prod">
+                <span class="wn-icon">🎯</span>
+                <span class="wn-label">OEE PRODUCTION</span>
+              </button>
+              <div class="weekly-nav-divider">Mesin Filling</div>
+              <button type="button" class="weekly-nav-item" data-weekly-page="filling-1">
+                <span class="wn-icon">⚙️</span>
+                <span class="wn-label">MESIN FILLING LINE 1</span>
+              </button>
+              <button type="button" class="weekly-nav-item" data-weekly-page="filling-2">
+                <span class="wn-icon">⚙️</span>
+                <span class="wn-label">MESIN FILLING LINE 2</span>
+              </button>
+              <button type="button" class="weekly-nav-item" data-weekly-page="filling-4">
+                <span class="wn-icon">⚙️</span>
+                <span class="wn-label">MESIN FILLING LINE 4</span>
+              </button>
+              <div class="weekly-nav-divider">Mesin Kemas</div>
+              <button type="button" class="weekly-nav-item" data-weekly-page="kemas-1">
+                <span class="wn-icon">📦</span>
+                <span class="wn-label">MESIN KEMAS LINE 1</span>
+              </button>
+              <button type="button" class="weekly-nav-item" data-weekly-page="kemas-2">
+                <span class="wn-icon">📦</span>
+                <span class="wn-label">MESIN KEMAS LINE 2</span>
+              </button>
+              <button type="button" class="weekly-nav-item" data-weekly-page="kemas-4">
+                <span class="wn-icon">📦</span>
+                <span class="wn-label">MESIN KEMAS LINE 4</span>
+              </button>
+            </nav>
+            <div class="weekly-sidebar-foot">
+              <button type="button" class="btn btn-ghost btn-sm" id="weeklyBackToOee">← Kembali ke Dashboard OEE</button>
+            </div>
+          </aside>
+
+          <!-- Konten utama -->
+          <div class="weekly-main" id="weeklyMain">
+            <!-- PAGE: Capaian Yield Produksi -->
+            <div class="weekly-page is-active" data-weekly-page="yield" id="weeklyPageYield">
+              <div class="weekly-hero">
+                <div class="weekly-hero-title">DASHBOARD YIELD</div>
+                <div class="weekly-hero-sub">PRODUCTION</div>
+                <div class="weekly-hero-badge">Capaian Yield Produksi</div>
+              </div>
+
+              <div class="weekly-yield-grid">
+                <!-- Gauge Rata-Rata -->
+                <article class="weekly-card weekly-gauge-card">
+                  <div class="weekly-card-title">Rata-Rata Yield Produksi</div>
+                  <div class="weekly-gauge-wrap">
+                    <svg class="weekly-gauge" viewBox="0 0 200 120" aria-hidden="true">
+                      <path class="gauge-track" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke-width="16" stroke-linecap="round"/>
+                      <path class="gauge-fill" id="weeklyGaugeFill" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke-width="16" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+                    </svg>
+                    <div class="weekly-gauge-value" id="weeklyGaugeValue">100,4%</div>
+                    <div class="weekly-gauge-label">YTD 2026</div>
+                  </div>
+                </article>
+
+                <!-- Bar per Line -->
+                <article class="weekly-card">
+                  <div class="weekly-card-title">Yield per Line (YTD 2026)</div>
+                  <div class="weekly-bar-list" id="weeklyBarList">
+                    <div class="weekly-bar-row">
+                      <span class="wb-label">Line 1</span>
+                      <div class="wb-track"><div class="wb-fill" style="width:92.85%"></div></div>
+                      <span class="wb-val">92,85%</span>
+                    </div>
+                    <div class="weekly-bar-row">
+                      <span class="wb-label">Line 2</span>
+                      <div class="wb-track"><div class="wb-fill" style="width:96.16%"></div></div>
+                      <span class="wb-val">96,16%</span>
+                    </div>
+                    <div class="weekly-bar-row">
+                      <span class="wb-label">Line 4</span>
+                      <div class="wb-track"><div class="wb-fill" style="width:96.59%"></div></div>
+                      <span class="wb-val">96,59%</span>
+                    </div>
+                  </div>
+                </article>
+
+                <!-- KPI ringkas -->
+                <article class="weekly-card weekly-kpi-card">
+                  <div class="weekly-kpi-item">
+                    <span class="wk-label">% Yield to Standar Teoritis PPI</span>
+                    <span class="wk-value" id="weeklyKpiPpi">94,78%</span>
+                  </div>
+                  <div class="weekly-kpi-item">
+                    <span class="wk-label">% Yield to Standar (Oracle)</span>
+                    <span class="wk-value good" id="weeklyKpiOracle">100,07%</span>
+                  </div>
+                  <div class="weekly-kpi-item">
+                    <span class="wk-label">Data Last Updated</span>
+                    <span class="wk-value small" id="weeklyLastUpdate">—</span>
+                  </div>
+                </article>
+              </div>
+
+              <div class="weekly-note">
+                <strong>Catatan:</strong> Data di halaman ini saat ini menggunakan contoh dari Looker Studio.
+                Nanti bisa dihubungkan ke data Oracle / Supabase agar real-time.
+                <button type="button" class="btn btn-ghost btn-sm" id="weeklyOpenExternal" style="margin-left:8px">Buka di Looker Studio ↗</button>
+              </div>
+            </div>
+
+            <!-- PAGE: OEE PRODUCTION -->
+            <div class="weekly-page" data-weekly-page="oee-prod" id="weeklyPageOee">
+              <div class="weekly-hero compact oee-prod-head">
+                <div class="oee-prod-head-main">
+                  <div class="weekly-hero-title">OEE PRODUCTION</div>
+                  <div class="weekly-hero-badge">Weekly OEE OPE · Speed Standar · Weekly OEE 365</div>
+                </div>
+                <div class="oee-filter" id="oeeFilter">
+                  <div class="field"><label for="oeeFrom">Dari Tanggal</label><input type="date" id="oeeFrom"></div>
+                  <div class="field"><label for="oeeTo">Sampai Tanggal</label><input type="date" id="oeeTo"></div>
+                  <button type="button" class="btn btn-primary btn-sm" id="oeeApply">Terapkan</button>
+                  <button type="button" class="btn btn-ghost btn-sm" id="oeeReset">Reset</button>
+                </div>
+                <div class="oee-filter-status" id="oeeStatus"></div>
+              </div>
+
+              <div class="oee-prod-grid">
+                <!-- KIRI: WEEKLY OEE OPE -->
+                <article class="oee-panel">
+                  <div class="oee-panel-head">WEEKLY OEE OPE</div>
+                  <div class="oee-gauge-block">
+                    <div class="oee-gauge-title">% OEE <span class="oee-target-label">(Target 88%)</span></div>
+                    <div class="oee-gauge-wrap">
+                      <svg class="oee-gauge-svg" viewBox="0 0 220 130" aria-hidden="true">
+                        <!-- track -->
+                        <path class="oee-track" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round"/>
+                        <!-- fill (86.78% of 266.9 ≈ 231.6) -->
+                        <path class="oee-fill oee-fill-blue" id="oeeOpeFill" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round" stroke-dasharray="266.9" stroke-dashoffset="266.9"/>
+                        <!-- target marker 88% -->
+                        <line class="oee-target-line" x1="185" y1="28" x2="200" y2="20" stroke="#f8fafc" stroke-width="2"/>
+                        <text class="oee-target-text" x="202" y="18" fill="#f8fafc" font-size="9">88%</text>
+                      </svg>
+                      <div class="oee-gauge-center">
+                        <div class="oee-actual" id="oeeOpeValue">—</div>
+                        <div class="oee-actual-sub">Aktual</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="oee-apq-row">
+                    <div class="oee-apq-item over">
+                      <div class="oee-apq-label">% A <span>(Target 90%)</span></div>
+                      <div class="oee-apq-val" id="oeeOpeA">—</div>
+                    </div>
+                    <div class="oee-apq-item under">
+                      <div class="oee-apq-label">% P <span>(Target 98%)</span></div>
+                      <div class="oee-apq-val" id="oeeOpeP">—</div>
+                    </div>
+                    <div class="oee-apq-item over">
+                      <div class="oee-apq-label">% Q <span>(Target 99,5%)</span></div>
+                      <div class="oee-apq-val" id="oeeOpeQ">—</div>
+                    </div>
+                  </div>
+                </article>
+
+                <!-- TENGAH: SPEED STANDAR -->
+                <article class="oee-panel oee-panel-table">
+                  <div class="oee-panel-head">SPEED STANDAR (BAG / MENIT)</div>
+                  <div class="speed-table-wrap">
+                    <table class="speed-table">
+                      <thead>
+                        <tr><th>Produk</th><th>Speed Standar</th></tr>
+                      </thead>
+                      <tbody id="oeeSpeedBody"><tr><td colspan="2">Memuat…</td></tr></tbody>
+                    </table>
+                  </div>
+                </article>
+
+                <!-- KANAN: WEEKLY OEE 365 -->
+                <article class="oee-panel">
+                  <div class="oee-panel-head">WEEKLY OEE 365</div>
+                  <div class="oee-gauge-block">
+                    <div class="oee-gauge-title">% OEE <span class="oee-target-label">(Target 55%)</span></div>
+                    <div class="oee-gauge-wrap">
+                      <svg class="oee-gauge-svg" viewBox="0 0 220 130" aria-hidden="true">
+                        <path class="oee-track" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round"/>
+                        <!-- fill 47.02% of 266.9 ≈ 125.5 → offset = 266.9 - 125.5 = 141.4 -->
+                        <path class="oee-fill oee-fill-green" id="oee365Fill" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round" stroke-dasharray="266.9" stroke-dashoffset="266.9"/>
+                        <line class="oee-target-line" x1="120" y1="22" x2="130" y2="12" stroke="#f8fafc" stroke-width="2"/>
+                        <text class="oee-target-text" x="132" y="12" fill="#f8fafc" font-size="9">55%</text>
+                      </svg>
+                      <div class="oee-gauge-center">
+                        <div class="oee-actual" id="oee365Value">—</div>
+                        <div class="oee-actual-sub">Aktual</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="oee-apq-row">
+                    <div class="oee-apq-item under">
+                      <div class="oee-apq-label">% A <span>(Target 56%)</span></div>
+                      <div class="oee-apq-val" id="oee365A">—</div>
+                    </div>
+                    <div class="oee-apq-item under">
+                      <div class="oee-apq-label">% P <span>(Target 98%)</span></div>
+                      <div class="oee-apq-val" id="oee365P">—</div>
+                    </div>
+                    <div class="oee-apq-item over">
+                      <div class="oee-apq-label">% Q <span>(Target 99,5%)</span></div>
+                      <div class="oee-apq-val" id="oee365Q">—</div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              <!-- Grafik tren bulanan OEE OPE & OEE 365 -->
+              <div class="oee-trend-grid">
+                <article class="oee-trend-card">
+                  <div class="oee-trend-legend">
+                    <span class="ot-dot ot-blue"></span>
+                    <span>Capaian OEE OPE</span>
+                  </div>
+                  <div class="oee-trend-chart-wrap">
+                    <svg class="oee-trend-svg" id="chartOeeOpe" viewBox="0 0 360 200" role="img" aria-label="Capaian OEE OPE per bulan"></svg>
+                  </div>
+                </article>
+
+                <article class="oee-trend-card">
+                  <div class="oee-trend-legend">
+                    <span class="ot-dot ot-green"></span>
+                    <span>Capaian OEE 365</span>
+                  </div>
+                  <div class="oee-trend-chart-wrap">
+                    <svg class="oee-trend-svg" id="chartOee365" viewBox="0 0 360 200" role="img" aria-label="Capaian OEE 365 per bulan"></svg>
+                  </div>
+                </article>
+              </div>
+
+              <!-- Clustered bar: OEE OPE vs OEE 365 per mesin -->
+              <div class="oee-bar-grid">
+                <!-- KIRI: Mesin FFS -->
+                <article class="oee-bar-card">
+                  <div class="oee-bar-title">Mesin Automatic Form Fill Seal (FFS)</div>
+                  <div class="oee-bar-legend">
+                    <span><i class="ob-swatch ob-green"></i> %OEE OPE</span>
+                    <span><i class="ob-swatch ob-amber"></i> %OEE 365</span>
+                  </div>
+                  <div class="oee-bar-chart-wrap">
+                    <svg class="oee-bar-svg" id="oeeBarFfs" viewBox="0 0 420 240" role="img" aria-label="OEE OPE vs 365 mesin FFS"></svg>
+                  </div>
+                </article>
+
+                <!-- KANAN: Mesin Overwrapping -->
+                <article class="oee-bar-card">
+                  <div class="oee-bar-title">Mesin Overwrapping</div>
+                  <div class="oee-bar-legend">
+                    <span><i class="ob-swatch ob-rose"></i> %OEE OPE</span>
+                    <span><i class="ob-swatch ob-cyan"></i> %OEE 365</span>
+                  </div>
+                  <div class="oee-bar-chart-wrap">
+                    <svg class="oee-bar-svg" id="oeeBarOw" viewBox="0 0 420 240" role="img" aria-label="OEE OPE vs 365 mesin Overwrapping"></svg>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <!-- PAGE: Mesin Filling / Kemas (placeholder generik) -->
+            <div class="weekly-page" data-weekly-page="machine" id="weeklyPageMachine">
+              <div class="weekly-hero compact">
+                <div class="weekly-hero-title" id="weeklyMachineTitle">MESIN</div>
+                <div class="weekly-hero-badge" id="weeklyMachineBadge">Detail performa mesin</div>
+              </div>
+              <div class="weekly-placeholder">
+                <p>Halaman detail mesin akan menampilkan OEE, downtime, dan yield spesifik untuk mesin yang dipilih.</p>
+                <p>Pilih mesin dari sidebar kiri.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Footer sheet -->
       <div class="sheet-f">
         <span><kbd>Ctrl</kbd>+<kbd>S</kbd> simpan cepat &amp; sinkron cloud</span>
@@ -1483,6 +1795,21 @@
   </div>
   <!-- Toast -->
   <div id="toast"></div>
+
+  <!-- Banner Install PWA -->
+  <div id="installBanner" class="install-banner" hidden>
+    <div class="install-banner-inner">
+      <div class="install-banner-icon">📱</div>
+      <div class="install-banner-text">
+        <strong>Install Aplikasi OEE</strong>
+        <span>Pasang di HP / komputer agar lebih cepat &amp; bisa dipakai offline</span>
+      </div>
+      <div class="install-banner-actions">
+        <button type="button" class="btn btn-primary btn-sm" id="installBannerBtn">Install</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="installBannerDismiss" title="Tutup">Nanti</button>
+      </div>
+    </div>
+  </div>
 
   <!-- MODE CEPAT -->
   <div id="qmOverlay" class="qm-overlay hide">
@@ -1497,6 +1824,74 @@
   <!-- WIZARD SETUP AWAL -->
   <div id="wizardOverlay" class="qm-overlay hide">
     <div class="qm-modal wizard-modal" id="wizardModal"></div>
+  </div>
+
+  <!-- SALIN / PINDAH DATA -->
+  <div id="copyMoveOverlay" class="qm-overlay hide">
+    <div class="qm-modal copy-move-modal" id="copyMoveModal" role="dialog" aria-labelledby="copyMoveTitle">
+      <div class="cm-header">
+        <h3 id="copyMoveTitle">📋 Salin / Pindah Data</h3>
+        <button type="button" class="cm-close" id="copyMoveClose" aria-label="Tutup">×</button>
+      </div>
+      <div class="cm-body">
+        <div class="cm-source">
+          <div class="cm-label">Sumber (data yang sedang aktif)</div>
+          <div class="cm-source-val" id="cmSourceLabel">—</div>
+        </div>
+
+        <div class="cm-fields">
+          <div class="field">
+            <label for="cmTargetDate">Tanggal Tujuan</label>
+            <input type="date" id="cmTargetDate">
+          </div>
+          <div class="field">
+            <label for="cmTargetShift">Shift Tujuan</label>
+            <select id="cmTargetShift">
+              <option value="1">Shift 1</option>
+              <option value="2">Shift 2</option>
+              <option value="3">Shift 3</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="cmTargetLine">Line Tujuan</label>
+            <select id="cmTargetLine">
+              <option value="1">Line 1</option>
+              <option value="2">Line 2</option>
+              <option value="4">Line 4</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="cmTargetStage">Tahapan Tujuan</label>
+            <select id="cmTargetStage">
+              <option value="mixing">Mixing</option>
+              <option value="filling">Filling</option>
+              <option value="steril">Steril</option>
+              <option value="visual">Visual</option>
+              <option value="kemas">Kemas</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="cm-mode">
+          <label class="cm-radio">
+            <input type="radio" name="cmMode" value="copy" checked>
+            <span><b>Salin</b> — data sumber tetap ada, salinan dibuat di tujuan</span>
+          </label>
+          <label class="cm-radio">
+            <input type="radio" name="cmMode" value="move">
+            <span><b>Pindah</b> — data sumber dihapus setelah berhasil disalin</span>
+          </label>
+        </div>
+
+        <div class="cm-warn" id="cmWarn" hidden>
+          ⚠ Slot tujuan sudah berisi data. Data lama akan <b>ditimpa</b>.
+        </div>
+      </div>
+      <div class="cm-footer">
+        <button type="button" class="btn btn-ghost" id="copyMoveCancel">Batal</button>
+        <button type="button" class="btn btn-primary" id="copyMoveConfirm">Jalankan</button>
+      </div>
+    </div>
   </div>
 
   <!-- AREA CETAK -->
@@ -1517,6 +1912,7 @@
   <script src="./js/sync.js"></script>
   <script src="./js/storage.js"></script>
   <script src="./js/dashboard.js"></script>
+  <script src="./js/weekly-dashboard.js"></script>
   <script src="./js/quickmode.js"></script>
   <script src="./js/formmode.js"></script>
   <script src="./js/formfull.js"></script>

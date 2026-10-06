@@ -10,7 +10,8 @@ const Rows = (() => {
   const getAllProducts = () => {
     const p1 = State.el.prodName1.value.trim();
     const p2 = State.el.prodName2.value.trim();
-    return [p1, p2].filter(Boolean);
+    const p3 = State.el.prodName3.value.trim();
+    return [p1, p2, p3].filter(Boolean);
   };
 
   /**
@@ -30,11 +31,13 @@ const Rows = (() => {
     if (!prodName) return 0;
     const names = [
       State.el.prodName1.value.trim(),
-      State.el.prodName2.value.trim()
+      State.el.prodName2.value.trim(),
+      State.el.prodName3.value.trim()
     ];
     const rates = [
       parseFloat(State.el.prodRate1.value) || 0,
       parseFloat(State.el.prodRate2.value) || 0,
+      parseFloat(State.el.prodRate3.value) || 0,
     ];
     const idx = names.indexOf(prodName);
     return idx >= 0 ? rates[idx] : 0;
@@ -59,7 +62,7 @@ const Rows = (() => {
   const getWoForProduct = (prodName) => {
     if (!prodName) return '';
     const needle = prodName.trim().toLowerCase();
-    const slots = [1, 2].map(readProdSlot);
+    const slots = [1, 2, 3].map(readProdSlot);
 
     // 1) Exact match
     let hit = slots.find(s => s.name && s.name.toLowerCase() === needle);
@@ -172,7 +175,7 @@ const Rows = (() => {
   const updateMatrixProductHeaders = () => {
     State.el.thProd1.textContent = State.el.prodName1.value.trim() || 'Produk 1';
     State.el.thProd2.textContent = State.el.prodName2.value.trim() || 'Produk 2';
-    if (State.el.thProd3) State.el.thProd3.textContent = 'Produk 3';
+    State.el.thProd3.textContent = State.el.prodName3.value.trim() || 'Produk 3';
   };
 
   // ====== MANIPULASI BARIS ======

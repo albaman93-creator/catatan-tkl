@@ -343,178 +343,31 @@ const Storage = (() => {
     }
   };
 
-  const rowHasData = (r) =>
-    (r.kode && String(r.kode).trim()) ||
-    (r.mulai && String(r.mulai).trim()) ||
-    (r.selesai && String(r.selesai).trim()) ||
-    (r.durasi && String(r.durasi).trim()) ||
-    (r.kegiatan && String(r.kegiatan).trim()) ||
-    (r.good && String(r.good).trim()) ||
-    (r.defect && String(r.defect).trim());
-
-  /** Parse key "YYYY-MM-DD|S1|L1|mixing" → meta */
-  const parseRecordKey = (key) => {
-    const parts = String(key || '').split('|');
-    if (parts.length < 4) return null;
-    const shiftM = parts[1].match(/S?(\d+)/i);
-    const lineM = parts[2].match(/L?(\d+)/i);
-    return {
-      date: parts[0],
-      shift: shiftM ? shiftM[1] : '',
-      line: lineM ? lineM[1] : parts[2].replace(/^L/i, ''),
-      stage: parts.slice(3).join('|'),
-    };
-  };
-
-  const collectProductOptions = () => {
-    const set = new Set();
-    [1, 2, 3].forEach((i) => {
-      const el = State.el['prodName' + i] || document.getElementById('prodName' + i);
-      const v = el ? String(el.value || '').trim() : '';
-      if (v) set.add(v);
-    });
-    const db = dbGet();
-    Object.values(db).forEach((rec) => {
-      if (!rec || typeof rec !== 'object') return;
-      if (rec.products) {
-        ['p1Name', 'p2Name', 'p3Name'].forEach((k) => {
-          const v = String(rec.products[k] || '').trim();
-          if (v) set.add(v);
-        });
-      }
-      (rec.rows || []).forEach((r) => {
-        const b = String(r.batch || '').trim();
-        if (b) set.add(b);
-      });
-    });
-    return [...set].sort((a, b) => a.localeCompare(b, 'id'));
-  };
-
-  const downloadCsvBlob = (filename, head, body) => {
-    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const csv = [head, ...body].map((row) => row.map(esc).join(',')).join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  };
-
   /**
-   * Kumpulkan baris dari local DB + sheet aktif sesuai filter export.
-   * stages/lines = array string; kosong = semua.
-   * date = YYYY-MM-DD opsional; month = YYYY-MM opsional; products = array nama produk.
+   * Export log sheet aktif ke CSV (UTF-8 BOM, cocok Excel Indonesia).
+   * Satu baris per aktivitas; header memuat meta filter + ringkasan OEE.
    */
-  const gatherExportRows = (opts) => {
-    const {
-      date = '',
-      month = '',
-      stages = [],
-      lines = [],
-      products = [],
-      shifts = [],
-    } = opts || {};
-
-    const stageSet = new Set((stages || []).map((s) => String(s).toLowerCase()).filter(Boolean));
-    const lineSet = new Set((lines || []).map((l) => String(l)).filter(Boolean));
-    const shiftSet = new Set((shifts || []).map((s) => String(s)).filter(Boolean));
-    const prodSet = new Set((products || []).map((p) => String(p).trim().toLowerCase()).filter(Boolean));
-
-    const matchMeta = (meta) => {
-      if (!meta) return false;
-      if (date && meta.date !== date) return false;
-      if (month && !(meta.date || '').startsWith(month)) return false;
-      if (stageSet.size && !stageSet.has(String(meta.stage || '').toLowerCase())) return false;
-      if (lineSet.size && !lineSet.has(String(meta.line || ''))) return false;
-      if (shiftSet.size && !shiftSet.has(String(meta.shift || ''))) return false;
-      return true;
-    };
-
-    const matchProduct = (batch) => {
-      if (!prodSet.size) return true;
-      const b = String(batch || '').trim().toLowerCase();
-      if (!b) return false;
-      for (const p of prodSet) {
-        if (b === p || b.includes(p) || p.includes(b)) return true;
-      }
-      return false;
-    };
-
-    const out = [];
-    const seen = new Set();
-
-    const pushRec = (meta, rec) => {
-      if (!matchMeta(meta) || !rec) return;
-      const metaA = rec.summary?.availability ?? '';
-      const metaP = rec.summary?.performance ?? '';
-      const metaQ = rec.summary?.quality ?? '';
-      const metaO = rec.summary?.oee ?? '';
-      (rec.rows || []).forEach((r) => {
-        if (!rowHasData(r)) return;
-        if (!matchProduct(r.batch)) return;
-        const sig = [meta.date, meta.shift, meta.line, meta.stage, r.kode, r.mulai, r.selesai, r.kegiatan, r.batch, r.good, r.defect].join('|');
-        if (seen.has(sig)) return;
-        seen.add(sig);
-        out.push({
-          date: meta.date,
-          shift: meta.shift,
-          line: meta.line,
-          stage: meta.stage,
-          ...r,
-          _a: metaA, _p: metaP, _q: metaQ, _o: metaO,
-        });
-      });
-    };
-
-    // Sheet aktif (data di form sekarang)
-    const active = activeFilter();
-    pushRec(
-      { date: active.rawDate, shift: String(active.shift), line: String(active.line), stage: active.stage },
-      collect()
+  const exportCsv = () => {
+    const filter = activeFilter();
+    const rec = collect();
+    const rows = (rec.rows || []).filter(r =>
+      (r.kode && String(r.kode).trim()) ||
+      (r.mulai && String(r.mulai).trim()) ||
+      (r.selesai && String(r.selesai).trim()) ||
+      (r.durasi && String(r.durasi).trim()) ||
+      (r.kegiatan && String(r.kegiatan).trim()) ||
+      (r.good && String(r.good).trim()) ||
+      (r.defect && String(r.defect).trim())
     );
 
-    // Semua record di localStorage
-    const db = dbGet();
-    Object.keys(db).forEach((key) => {
-      const meta = parseRecordKey(key);
-      if (!meta) return;
-      // Skip jika sama persis dengan active (sudah di-push dari collect)
-      if (
-        meta.date === active.rawDate &&
-        String(meta.shift) === String(active.shift) &&
-        String(meta.line) === String(active.line) &&
-        meta.stage === active.stage
-      ) return;
-      pushRec(meta, db[key]);
-    });
-
-    // Urut tanggal → shift → line → tahap → mulai
-    out.sort((a, b) => {
-      const c1 = String(a.date).localeCompare(String(b.date));
-      if (c1) return c1;
-      const c2 = String(a.shift).localeCompare(String(b.shift), undefined, { numeric: true });
-      if (c2) return c2;
-      const c3 = String(a.line).localeCompare(String(b.line), undefined, { numeric: true });
-      if (c3) return c3;
-      const c4 = String(a.stage).localeCompare(String(b.stage));
-      if (c4) return c4;
-      return String(a.mulai || '').localeCompare(String(b.mulai || ''));
-    });
-
-    return out;
-  };
-
-  const runExportWithFilter = (opts) => {
-    const rows = gatherExportRows(opts);
     if (!rows.length) {
-      UI?.toast?.('Tidak ada data sesuai filter ⚠', true, 'warn');
+      if (typeof UI !== 'undefined' && UI.toast) {
+        UI.toast('Tidak ada data baris untuk diexport.', true, 'warn');
+      }
       return;
     }
 
+    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
     const head = [
       'No', 'Tanggal', 'Shift', 'Line', 'Tahapan',
       'Kode', 'OP', 'Mulai', 'Panggil', 'Teknik', 'Selesai', 'Durasi',
@@ -522,157 +375,122 @@ const Storage = (() => {
       'Availability%', 'Performance%', 'Quality%', 'OEE%',
     ];
 
+    const metaA = rec.summary?.availability ?? '';
+    const metaP = rec.summary?.performance ?? '';
+    const metaQ = rec.summary?.quality ?? '';
+    const metaO = rec.summary?.oee ?? '';
+
     const body = rows.map((r, i) => [
       i + 1,
-      r.date,
-      r.shift ? `S${r.shift}` : '',
-      r.line,
-      r.stage,
+      filter.rawDate,
+      `S${filter.shift}`,
+      filter.line,
+      filter.stage,
       r.kode, r.op, r.mulai, r.panggil, r.teknik, r.selesai, r.durasi,
       r.kegiatan, r.masalah, r.disposisi, r.wo, r.batch, r.good, r.defect,
-      r._a, r._p, r._q, r._o,
+      metaA, metaP, metaQ, metaO,
     ]);
 
-    const datePart = opts.date || opts.month || 'all';
-    const stagePart = (opts.stages && opts.stages.length) ? opts.stages.join('+') : 'allstage';
-    const linePart = (opts.lines && opts.lines.length) ? 'L' + opts.lines.join('+') : 'allline';
-    const filename = `logsheet-${datePart}-${linePart}-${stagePart}.csv`;
+    const csv = [head, ...body].map(row => row.map(esc).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const datePart = filter.rawDate || Utils.todayLocal();
+    a.href = url;
+    a.download = `logsheet-${datePart}-S${filter.shift}-L${filter.line}-${filter.stage}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
 
-    downloadCsvBlob(filename, head, body);
-    UI?.toast?.(`CSV diexport (${rows.length} baris) ✓`);
+    if (typeof UI !== 'undefined' && UI.toast) {
+      UI.toast(`CSV diexport (${rows.length} baris) ✓`);
+    }
   };
 
   /**
-   * Export CSV dengan dialog filter:
-   * tanggal, bulan, produk, tahapan proses (multi), line (multi).
+   * Salin atau pindahkan record dari filter sumber ke filter tujuan.
+   * @param {object} targetFilter { rawDate, shift, line, stage }
+   * @param {'copy'|'move'} mode
+   * @returns {Promise<{ok:boolean, message:string, targetKey:string}>}
    */
-  const exportCsv = () => {
-    const active = activeFilter();
-    const products = collectProductOptions();
-    const stages = [
-      { v: 'mixing', l: 'Mixing' },
-      { v: 'filling', l: 'Filling' },
-      { v: 'steril', l: 'Steril' },
-      { v: 'visual', l: 'Visual' },
-      { v: 'kemas', l: 'Kemas' },
-    ];
-    const lines = [
-      { v: '1', l: 'Line 1' },
-      { v: '2', l: 'Line 2' },
-      { v: '4', l: 'Line 4' },
-    ];
-    const monthDefault = (active.rawDate || '').slice(0, 7);
+  const copyOrMoveRecord = async (targetFilter, mode = 'copy') => {
+    const srcFilter = activeFilter();
+    const srcKey = curKey();
+    const targetKey = `${targetFilter.rawDate}|S${targetFilter.shift}|L${targetFilter.line}|${targetFilter.stage}`;
 
-    let ov = document.getElementById('exportCsvOverlay');
-    if (!ov) {
-      ov = document.createElement('div');
-      ov.id = 'exportCsvOverlay';
-      ov.className = 'qm-overlay';
-      ov.innerHTML = `<div class="qm-modal" id="exportCsvModal" style="max-width:520px;width:96vw"></div>`;
-      document.body.appendChild(ov);
-      ov.addEventListener('click', (e) => {
-        if (e.target === ov) ov.classList.add('hide');
-      });
+    if (srcKey === targetKey) {
+      return { ok: false, message: 'Tujuan sama dengan sumber. Pilih tanggal/shift/line/tahapan lain.' };
     }
 
-    const modal = document.getElementById('exportCsvModal');
-    modal.innerHTML = `
-      <div class="bf-head" style="padding:14px 16px 8px">
-        <div>
-          <h3 class="qm-title"><span class="bolt">⇩</span> Export CSV</h3>
-          <p class="qm-sub">Pilih filter data yang akan diunduh. Kosongkan = semua.</p>
-        </div>
-        <button type="button" class="bf-x" data-ex="close" aria-label="Tutup">×</button>
-      </div>
-      <div style="padding:0 16px 12px;display:grid;gap:12px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div>
-            <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Tanggal</label>
-            <input type="date" id="exDate" class="in" value="${active.rawDate || ''}" style="width:100%">
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Bulan</label>
-            <input type="month" id="exMonth" class="in" value="${monthDefault}" style="width:100%">
-            <div style="font-size:10px;opacity:.6;margin-top:2px">Dipakai jika tanggal dikosongkan</div>
-          </div>
-        </div>
+    // Ambil data sumber: utamakan form yang sedang terbuka (paling up-to-date)
+    const rec = collect();
+    if (!rec) {
+      return { ok: false, message: 'Tidak ada data untuk disalin.' };
+    }
 
-        <div>
-          <label style="font-size:12px;font-weight:600;display:block;margin-bottom:6px">Tahapan proses <span style="font-weight:400;opacity:.7">(bisa lebih dari satu)</span></label>
-          <div style="display:flex;flex-wrap:wrap;gap:6px">
-            ${stages.map((s) => `
-              <label style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--border,#ccc);border-radius:8px;font-size:13px;cursor:pointer">
-                <input type="checkbox" name="exStage" value="${s.v}" ${s.v === active.stage ? 'checked' : ''}>
-                ${s.l}
-              </label>`).join('')}
-          </div>
-        </div>
+    // Tandai metadata salinan
+    const cloned = JSON.parse(JSON.stringify(rec));
+    cloned.copiedFrom = srcKey;
+    cloned.copiedAt = new Date().toISOString();
+    cloned.savedAt = new Date().toISOString();
 
-        <div>
-          <label style="font-size:12px;font-weight:600;display:block;margin-bottom:6px">Line <span style="font-weight:400;opacity:.7">(bisa lebih dari satu)</span></label>
-          <div style="display:flex;flex-wrap:wrap;gap:6px">
-            ${lines.map((l) => `
-              <label style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--border,#ccc);border-radius:8px;font-size:13px;cursor:pointer">
-                <input type="checkbox" name="exLine" value="${l.v}" ${String(l.v) === String(active.line) ? 'checked' : ''}>
-                ${l.l}
-              </label>`).join('')}
-          </div>
-        </div>
+    // Simpan ke localStorage di key tujuan
+    const db = dbGet();
+    const targetExisted = !!db[targetKey];
+    db[targetKey] = cloned;
 
-        <div>
-          <label style="font-size:12px;font-weight:600;display:block;margin-bottom:6px">Produk <span style="font-weight:400;opacity:.7">(opsional, multi)</span></label>
-          ${products.length
-            ? `<div style="display:flex;flex-direction:column;gap:4px;max-height:140px;overflow:auto;border:1px solid var(--border,#e2e8f0);border-radius:8px;padding:6px">
-                ${products.map((p) => `
-                  <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:2px 4px">
-                    <input type="checkbox" name="exProd" value="${String(p).replace(/"/g, '&quot;')}">
-                    <span style="word-break:break-word">${String(p).replace(/</g, '&lt;')}</span>
-                  </label>`).join('')}
-              </div>`
-            : `<p style="font-size:12px;opacity:.6;margin:0">Belum ada daftar produk tersimpan. Semua produk ikut diexport.</p>`}
-        </div>
-      </div>
-      <div class="bf-footer" style="padding:8px 16px 16px">
-        <div class="qm-actions" style="width:100%;justify-content:flex-end;gap:8px;flex-wrap:wrap">
-          <button type="button" class="btn btn-ghost" data-ex="close">Batal</button>
-          <button type="button" class="btn btn-ghost" data-ex="all">Export semua (tanpa filter)</button>
-          <button type="button" class="btn btn-primary" data-ex="go">⇩ Unduh CSV</button>
-        </div>
-      </div>
-    `;
+    // Jika mode pindah → hapus sumber lokal
+    if (mode === 'move') {
+      delete db[srcKey];
+    }
+    dbSet(db);
 
-    ov.classList.remove('hide');
+    // Sync ke Supabase (upsert tujuan; hapus sumber jika move)
+    const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
+    const row = buildSupabaseRow(cloned, targetFilter);
 
-    const close = () => ov.classList.add('hide');
-    modal.querySelectorAll('[data-ex="close"]').forEach((b) => b.addEventListener('click', close));
+    if (!offlineMode && isOnline() && typeof Sync !== 'undefined') {
+      try {
+        await Sync.pushRow(row);
+        if (mode === 'move') {
+          try {
+            const client = SupabaseClient.getClient();
+            if (client) {
+              await client.from('oee_data').delete().eq('key', srcKey);
+            }
+          } catch (delErr) {
+            console.warn('Gagal hapus sumber di Supabase:', delErr);
+          }
+        }
+      } catch (err) {
+        console.warn('Sync copy/move gagal, diantrekan:', err);
+        Sync.queuePush(row);
+      }
+    } else if (!offlineMode && !isOnline() && typeof Sync !== 'undefined') {
+      Sync.queuePush(row);
+    }
 
-    const readOpts = (ignoreFilters) => {
-      if (ignoreFilters) return { date: '', month: '', stages: [], lines: [], products: [] };
-      const dateVal = modal.querySelector('#exDate')?.value || '';
-      const monthVal = modal.querySelector('#exMonth')?.value || '';
-      // Jika tanggal diisi, prioritaskan tanggal (bulan diabaikan)
-      return {
-        date: dateVal,
-        month: dateVal ? '' : monthVal,
-        stages: [...modal.querySelectorAll('[name="exStage"]:checked')].map((x) => x.value),
-        lines: [...modal.querySelectorAll('[name="exLine"]:checked')].map((x) => x.value),
-        products: [...modal.querySelectorAll('[name="exProd"]:checked')].map((x) => x.value),
-      };
+    const action = mode === 'move' ? 'dipindahkan' : 'disalin';
+    const label = `${targetFilter.rawDate} · S${targetFilter.shift} · L${targetFilter.line} · ${String(targetFilter.stage).toUpperCase()}`;
+    return {
+      ok: true,
+      message: `Data berhasil ${action} ke ${label}${targetExisted ? ' (data lama ditimpa)' : ''}`,
+      targetKey,
+      targetFilter,
     };
+  };
 
-    modal.querySelector('[data-ex="go"]')?.addEventListener('click', () => {
-      const opts = readOpts(false);
-      close();
-      runExportWithFilter(opts);
-    });
-    modal.querySelector('[data-ex="all"]')?.addEventListener('click', () => {
-      close();
-      runExportWithFilter(readOpts(true));
-    });
+  /** Cek apakah slot tujuan sudah berisi data (lokal). */
+  const targetExists = (targetFilter) => {
+    const key = `${targetFilter.rawDate}|S${targetFilter.shift}|L${targetFilter.line}|${targetFilter.stage}`;
+    const db = dbGet();
+    return !!db[key];
   };
 
   return {
     dbGet, dbSet, curKey, labelFilter, collect, applyRecord,
     loadRecord, saveData, autoSaveLocal, exportCsv,
+    copyOrMoveRecord, targetExists, activeFilter,
   };
 })();
