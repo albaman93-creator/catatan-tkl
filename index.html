@@ -1874,11 +1874,39 @@
 
               <article class="oee-bar-card mch-bar-card">
                 <div class="oee-bar-title" id="mchBarTitle">Capaian OEE OPE &amp; OEE 365</div>
+                <!-- BARU: filter produk & pilihan multi mesin -->
+                <div class="prodbar-toolbar">
+                  <div class="prodbar-group">
+                    <span class="prodbar-label">Produk</span>
+                    <div id="prodBarProducts" class="prodbar-chips"></div>
+                  </div>
+                  <div class="prodbar-group">
+                    <span class="prodbar-label">Mesin (boleh pilih banyak)</span>
+                    <div id="prodBarMachines" class="prodbar-chips"></div>
+                  </div>
+                </div>
+                <div class="oee-filter-status" id="prodBarStatus"></div>
                 <div class="oee-bar-legend">
                   <span><i class="ob-swatch ob-lime"></i> OEE</span>
                   <span><i class="ob-swatch ob-teal"></i> OEE_365</span>
                 </div>
                 <div class="mch-bar-scroll"><svg id="mchBarSvg" role="img" aria-label="Capaian OEE OPE dan OEE 365 per batch"></svg></div>
+              </article>
+
+              <!-- PICA PROBLEM (Why-Why) -->
+              <article class="oee-bar-card pica-card">
+                <div class="oee-bar-title" id="picaTitle">PICA Problem OEE</div>
+                <div class="oee-filter-status" id="picaStatusMsg"></div>
+                <div class="pica-table-wrap">
+                  <table class="pica-table">
+                    <thead><tr>
+                      <th>No.</th><th>Produk</th><th>No. Batch</th><th>Problem</th><th>Durasi (min)</th>
+                      <th>Why 1</th><th>Why 2</th><th>Why 3</th>
+                      <th>Corrective Action</th><th>Preventive Action</th><th>PIC</th><th>Status</th><th></th>
+                    </tr></thead>
+                    <tbody id="picaBody"><tr><td colspan="13">Memuat…</td></tr></tbody>
+                  </table>
+                </div>
               </article>
             </div>
           </div>
@@ -1893,6 +1921,34 @@
       </div>
     </div>
   </div>
+  <!-- MODAL FORM WHY-WHY (PICA) -->
+  <div id="picaOverlay" class="qm-overlay hide">
+    <div class="qm-modal pica-modal" role="dialog" aria-labelledby="picaModalTitle">
+      <div class="cm-header">
+        <h3 id="picaModalTitle">✍️ Form Why-Why / PICA</h3>
+        <button type="button" class="cm-close" id="picaClose" aria-label="Tutup">×</button>
+      </div>
+      <div class="cm-body">
+        <div class="pica-ctx" id="picaCtx"></div>
+        <div class="pica-form-grid">
+          <label>Why 1<textarea id="picaWhy1" rows="2" placeholder="Akar masalah tingkat 1…"></textarea></label>
+          <label>Why 2<textarea id="picaWhy2" rows="2"></textarea></label>
+          <label>Why 3<textarea id="picaWhy3" rows="2"></textarea></label>
+          <label>Corrective Action<textarea id="picaCorrective" rows="2"></textarea></label>
+          <label>Preventive Action<textarea id="picaPreventive" rows="2"></textarea></label>
+          <label>PIC<input id="picaPic" type="text" placeholder="PROD / ENG / QA…"></label>
+          <label>Status<select id="picaStatus">
+            <option>Open</option><option>On Progress</option><option>Closed</option>
+          </select></label>
+        </div>
+      </div>
+      <div class="cm-footer">
+        <button type="button" class="btn btn-ghost" id="picaCancel">Batal</button>
+        <button type="button" class="btn btn-primary" id="picaSave">Simpan</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div id="toast"></div>
 
@@ -2013,6 +2069,7 @@
   <script src="./js/storage.js"></script>
   <script src="./js/dashboard.js"></script>
   <script src="./js/weekly-dashboard.js"></script>
+  <script src="./js/pica.js"></script>
   <script src="./js/quickmode.js"></script>
   <script src="./js/formmode.js"></script>
   <script src="./js/formfull.js"></script>

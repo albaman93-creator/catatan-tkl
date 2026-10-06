@@ -3966,3 +3966,48 @@ body {
 .ob-swatch.ob-teal { background: #22b8cf; }
 .oee-prod-head .oee-prod-head-main { flex: 1 1 260px; min-width: 0; }
 .oee-prod-head .oee-filter { flex: 0 1 auto; }
+
+/* ===== Menu konteks Speed Standar ===== */
+.speed-menu { position: fixed; z-index: 1200; min-width: 250px; background: #10243c; border: 1px solid #24466b; border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,.45); padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.speed-menu-item { text-align: left; font: 600 12.5px 'IBM Plex Sans', sans-serif; color: #e2e8f0; background: transparent; border: 0; border-radius: 7px; padding: 9px 10px; cursor: pointer; }
+.speed-menu-item:hover { background: #1b3a5c; }
+
+/* ===== Toolbar grafik produk multi-mesin ===== */
+.prodbar-toolbar { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 4px; }
+.prodbar-group { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.prodbar-label { font: 700 10.5px 'IBM Plex Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: #8fa3b8; margin-top: 5px; }
+.prodbar-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.prodbar-chip { border: 1px solid #2b4d74; background: #12293f; color: #cbd5e1; border-radius: 999px; padding: 5px 11px; font: 600 11.5px 'IBM Plex Sans', sans-serif; cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+.prodbar-chip:hover { background: #1b3a5c; }
+.prodbar-chip.is-on { background: #12a150; border-color: #12a150; color: #fff; }
+.prodbar-empty { font: italic 400 11.5px 'IBM Plex Sans', sans-serif; color: #64748b; }
+
+/* ===== TABEL PICA ===== */
+.pica-card { margin-top: 14px; }
+.pica-table-wrap { overflow: auto; max-height: 480px; border: 1px solid #24466b; border-radius: 10px; }
+.pica-table { width: 100%; border-collapse: collapse; font: 400 12px 'IBM Plex Sans', sans-serif; }
+.pica-table thead th { position: sticky; top: 0; z-index: 2; background: #10243c; color: #dbe7f3; font-weight: 700; font-size: 11px; text-align: left; padding: 9px 8px; border-bottom: 1px solid #24466b; white-space: nowrap; }
+.pica-table td { padding: 8px; border-bottom: 1px solid #1b3a5c; color: #cbd5e1; vertical-align: top; min-width: 90px; }
+.pica-table td.ctr { text-align: center; white-space: nowrap; }
+.pica-table td.mono { font-family: 'IBM Plex Mono', monospace; }
+.pica-problem { min-width: 160px; }
+.pica-null { color: #64748b; font-style: italic; }
+.pica-status { display: inline-block; padding: 3px 9px; border-radius: 999px; font-weight: 700; font-size: 10.5px; white-space: nowrap; }
+.st-open { background: rgba(244,63,94,.16); color: #fda4af; border: 1px solid rgba(244,63,94,.5); }
+.st-progress { background: rgba(245,158,11,.16); color: #fcd34d; border: 1px solid rgba(245,158,11,.5); }
+.st-closed { background: rgba(18,161,80,.16); color: #86efac; border: 1px solid rgba(18,161,80,.5); }
+
+/* ===== MODAL PICA ===== */
+.pica-modal { max-width: 640px; }
+.pica-ctx { background: #0d2135; border: 1px solid #24466b; border-radius: 9px; padding: 10px 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px; }
+.pica-ctx-row { font-size: 12px; color: #cbd5e1; }
+.pica-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pica-form-grid label { display: flex; flex-direction: column; gap: 5px; font: 700 10.5px 'IBM Plex Mono', monospace; letter-spacing: .6px; text-transform: uppercase; color: #8fa3b8; }
+.pica-form-grid textarea, .pica-form-grid input, .pica-form-grid select { background: #0d2135; border: 1px solid #2b4d74; border-radius: 8px; color: #e2e8f0; font: 400 12.5px 'IBM Plex Sans', sans-serif; padding: 8px 10px; }
+.pica-form-grid :focus { outline: none; border-color: #12a150; box-shadow: 0 0 0 3px rgba(18,161,80,.16); }
+@media (max-width: 560px) { .pica-form-grid { grid-template-columns: 1fr; } }
+
+/* Link produk di tabel PICA → buka log sheet */
+.pica-link { background: none; border: 0; padding: 0; color: #7dd3fc; font: 700 12px 'IBM Plex Sans', sans-serif; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
+.pica-link:hover { color: #e0f2fe; text-decoration-style: solid; }
+.pica-link:active { transform: translateY(1px); }

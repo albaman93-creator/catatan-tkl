@@ -74,6 +74,9 @@ const WeeklyDashboard = (() => {
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   let oeeSeq = 0;
 
+  // Kode produk = kata pertama nama produk ("VTTS1 L030207" → "VTTS1").
+  const prodCode = (n) => String(n || '').trim().split(/\s+/)[0].toUpperCase();
+
   const $ = (id) => document.getElementById(id);
   const f2 = (v) => (v == null ? '—' : fmtPct(v, 2));
   const fmtD = (iso) => iso.split('-').reverse().join('/');
@@ -187,6 +190,7 @@ const WeeklyDashboard = (() => {
       src: `${fmtD(s.date)} · S${s.shift} · L${s.line} · ${stg}`,
       attrs: `class="speed-row" tabindex="0" role="link" title="${tip}" aria-label="${Utils.escapeHtml(name)} — ${tip}"`
         + ` data-date="${s.date}" data-shift="${s.shift}" data-line="${s.line}" data-stage="${s.stage}"`
+        + ` data-code="${Utils.escapeHtml(prodCode(name))}"`
     };
   };
 
@@ -307,11 +311,11 @@ const WeeklyDashboard = (() => {
   const bindOee = () => {
     $('oeeApply')?.addEventListener('click', loadOee);
     const sb = $('oeeSpeedBody');
-    sb?.addEventListener('click', (e) => openSpeedRow(e.target.closest('tr.speed-row')));
+    sb?.addEventListener('click', (e) => { const tr = e.target.closest('tr.speed-row'); if (tr) openSpeedMenu(tr); });
     sb?.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       const tr = e.target.closest('tr.speed-row');
-      if (tr) { e.preventDefault(); openSpeedRow(tr); }
+      if (tr) { e.preventDefault(); openSpeedMenu(tr); }
     });
     $('oeeFrom')?.addEventListener('change', () => { syncMchRange(); loadOee(); });
     $('oeeTo')?.addEventListener('change', () => { syncMchRange(); loadOee(); });
@@ -320,11 +324,11 @@ const WeeklyDashboard = (() => {
     $('mchTo')?.addEventListener('change', () => { copyRange('mch', 'oee'); loadMachine(); });
     $('mchReset')?.addEventListener('click', () => { $('oeeFrom').value = ''; $('oeeTo').value = ''; initOeeFilter(); syncMchRange(); loadMachine(); });
     const mb = $('mchSpeedBody');
-    mb?.addEventListener('click', (e) => openSpeedRow(e.target.closest('tr.speed-row')));
+    mb?.addEventListener('click', (e) => { const tr = e.target.closest('tr.speed-row'); if (tr) openSpeedMenu(tr); });
     mb?.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       const tr = e.target.closest('tr.speed-row');
-      if (tr) { e.preventDefault(); openSpeedRow(tr); }
+      if (tr) { e.preventDefault(); openSpeedMenu(tr); }
     });
     $('oeeReset')?.addEventListener('click', () => { $('oeeFrom').value = ''; $('oeeTo').value = ''; initOeeFilter(); loadOee(); });
   };
@@ -339,8 +343,14 @@ const WeeklyDashboard = (() => {
   const C_OPE = '#a3c93a', C_365 = '#22b8cf';
   let curMachine = null, mchSeq = 0;
 
-  // Kode produk = kata pertama nama produk ("VTTS1 L030207" → "VTTS1").
-  const prodCode = (n) => String(n || '').trim().split(/\s+/)[0].toUpperCase();
+  // ===== GRAFIK OEE PER PRODUK (BAWAH TABEL) + MULTI-MESIN =====
+  const MACHINE_KEYS = ['filling-1', 'filling-2', 'filling-4', 'kemas-1', 'kemas-2', 'kemas-4'];
+  const machineKey = (stage, line) => stage + '-' + line;
+  const machineShort = (key) => { const [st, ln] = key.split('-'); return (st === 'filling' ? 'F' : 'K') + ln; };
+  let prodSel = new Set();   // kode produk terpilih
+  let machSel = new Set();   // mesin terpilih untuk grafik bawah
+  let pendingProd = null;
+  let barSeq = 0;
 
   // Baris produksi (kode kegiatan = produksi) beserta kode produk, nomor WO/batch, dan durasinya.
   // WO diambil dari kolom WO baris; bila kosong → WO produk di header record; bila kosong → kata ke-2 nama produk.
@@ -446,7 +456,8 @@ const WeeklyDashboard = (() => {
         s += `<rect x="${x}" y="${y}" width="16" height="${T + ph - y}" rx="2" fill="${c}"/>`
           + `<text x="${x + 8}" y="${y - 4}" fill="#e2e8f0" font-size="8" font-weight="600" transform="rotate(-90 ${x + 8} ${y - 4})">${fmtPct(v, 1)}</text>`;
       });
-      s += `<text x="${cx}" y="${T + ph + 13}" fill="#94a3b8" font-size="9" text-anchor="end" transform="rotate(-40 ${cx} ${T + ph + 13})">${Utils.escapeHtml(b.wo)}</text>`;
+      const lbl = (b.m ? machineShort(b.m) + '·' : '') + b.wo;
+      s += `<text x="${cx}" y="${T + ph + 13}" fill="#94a3b8" font-size="9" text-anchor="end" transform="rotate(-40 ${cx} ${T + ph + 13})">${Utils.escapeHtml(lbl)}</text>`;
     });
     svg.innerHTML = s;
   };
@@ -472,9 +483,9 @@ const WeeklyDashboard = (() => {
     batches.forEach((b) => { if (b.code) counts[b.code] = (counts[b.code] || 0) + 1; });
     renderMachineSpeed(rows, counts);
     countSvg('mchBatchSvg', Object.keys(counts).sort((a, b) => counts[b] - counts[a] || (a < b ? -1 : 1)).map((c) => ({ label: c, v: counts[c] })));
-    const t = $('mchBarTitle');
-    if (t) t.textContent = `Capaian OEE OPE & OEE 365 ${STAGE_LABEL[meta.stage]} Line ${meta.line} · ${rangeLabel(from, to)}`;
-    batchBarSvg('mchBarSvg', batches);
+    renderProdBarChips();
+    loadProdBar();
+    if (typeof Pica !== 'undefined') Pica.render(rows, meta, from, to);
   };
 
   const loadMachine = async () => {
@@ -505,6 +516,90 @@ const WeeklyDashboard = (() => {
     if (f2_ && t2) t2.value = f2_.value;
   };
 
+  const renderProdBarChips = () => {
+    const pw = $('prodBarProducts');
+    if (pw) pw.innerHTML = prodSel.size
+      ? [...prodSel].map((c) => `<button type="button" class="prodbar-chip is-on" data-code="${Utils.escapeHtml(c)}" title="Klik untuk menghapus filter">${Utils.escapeHtml(c)} ×</button>`).join('')
+      : '<span class="prodbar-empty">Semua produk — klik baris pada tabel Speed Standar untuk memfilter</span>';
+    const mw = $('prodBarMachines');
+    if (mw) mw.innerHTML = MACHINE_KEYS.map((k) => {
+      const [st, ln] = k.split('-');
+      const on = machSel.has(k);
+      return `<button type="button" class="prodbar-chip${on ? ' is-on' : ''}" data-mach="${k}" aria-pressed="${on}">${machineShort(k)} · ${STAGE_LABEL[st]} L${ln}</button>`;
+    }).join('');
+  };
+
+  const loadProdBar = async () => {
+    const from = $('mchFrom')?.value, to = $('mchTo')?.value, st = $('prodBarStatus');
+    const say = (m, err) => { if (st) { st.textContent = m; st.className = 'oee-filter-status' + (err ? ' err' : ''); } };
+    if (!from || !to || !machSel.size) return;
+    if (!navigator.onLine) return say('⚠ Tidak ada koneksi — data OEE diambil dari Supabase.', true);
+    const my = ++barSeq;
+    say('Memuat grafik Capaian OEE…');
+    try {
+      const batches = [];
+      for (const key of [...machSel]) {
+        const [stage, line] = key.split('-');
+        const rows = await fetchOeeRows(from, to, stage, line);
+        batches.push(...calcBatches(rows).map((b) => ({ ...b, m: key })));
+      }
+      if (my !== barSeq) return;
+      const list = (prodSel.size ? batches.filter((b) => prodSel.has(b.code)) : batches)
+        .sort((a, b) => (a.m < b.m ? -1 : a.m > b.m ? 1 : a.first < b.first ? -1 : a.first > b.first ? 1 : a.wo < b.wo ? -1 : 1));
+      const t = $('mchBarTitle');
+      if (t) {
+        const prods = prodSel.size ? [...prodSel].join(', ') : 'Semua Produk';
+        const machs = [...machSel].map((k) => { const [s2, l2] = k.split('-'); return `${STAGE_LABEL[s2]} Line ${l2}`; }).join(' + ');
+        t.textContent = `Capaian OEE OPE & OEE 365 · ${prods} · ${machs} · ${rangeLabel(from, to)}`;
+      }
+      batchBarSvg('mchBarSvg', list);
+      say(`✓ ${list.length} batch WO ditampilkan`);
+    } catch (e) {
+      console.warn('Grafik per produk error:', e);
+      say('⚠ Gagal memuat grafik: ' + (e.message || e), true);
+    }
+  };
+
+  // --- Menu konteks 2 opsi saat baris Speed Standar diklik ---
+  let menuEl = null;
+  const closeSpeedMenu = () => { if (menuEl) { menuEl.remove(); menuEl = null; } };
+  const openSpeedMenu = (tr) => {
+    const d = tr?.dataset;
+    if (!d || !d.date) return;
+    closeSpeedMenu();
+    menuEl = document.createElement('div');
+    menuEl.className = 'speed-menu';
+    menuEl.setAttribute('role', 'menu');
+    menuEl.innerHTML =
+      '<button type="button" class="speed-menu-item" data-act="sheet">📄 Lihat halaman sheet</button>' +
+      '<button type="button" class="speed-menu-item" data-act="chart">📊 Lihat grafik di dashboard per mesin</button>';
+    document.body.appendChild(menuEl);
+    const r = tr.getBoundingClientRect();
+    const mw = menuEl.offsetWidth, mh = menuEl.offsetHeight;
+    menuEl.style.left = Math.max(8, Math.min(r.left, window.innerWidth - mw - 8)) + 'px';
+    menuEl.style.top = (r.bottom + 4 + mh > window.innerHeight ? Math.max(8, r.top - mh - 4) : r.bottom + 4) + 'px';
+    menuEl.onclick = (e) => {
+      const btn = e.target.closest('.speed-menu-item');
+      if (!btn) return;
+      e.stopPropagation();
+      closeSpeedMenu();
+      if (btn.dataset.act === 'sheet') {
+        openSpeedRow(tr);
+      } else {
+        pendingProd = d.code || '';
+        machSel = new Set([machineKey(d.stage, d.line)]);
+        showPage(machineKey(d.stage, d.line));
+        setTimeout(() => document.querySelector('.mch-bar-card')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
+      }
+    };
+    setTimeout(() => {
+      const off = (ev) => { if (menuEl && !menuEl.contains(ev.target)) { closeSpeedMenu(); document.removeEventListener('mousedown', off, true); } };
+      document.addEventListener('mousedown', off, true);
+      const esc = (ev) => { if (ev.key === 'Escape') { closeSpeedMenu(); document.removeEventListener('keydown', esc); } };
+      document.addEventListener('keydown', esc);
+    }, 0);
+  };
+
   const showPage = (pageId) => {
     document.querySelectorAll('.weekly-nav-item').forEach(btn => {
       btn.classList.toggle('is-active', btn.dataset.weeklyPage === pageId);
@@ -529,6 +624,8 @@ const WeeklyDashboard = (() => {
         const mt = MACHINE_PAGES[pageId], mm = OEE_MACHINES[mt.stage].find((x) => x.line === mt.line);
         if (badge) badge.textContent = `Mesin ${STAGE_TYPE[mt.stage]} ${mm.name} ${mm.sub}`;
         curMachine = pageId;
+        if (pendingProd != null) { prodSel = new Set(pendingProd ? [pendingProd] : []); pendingProd = null; }
+        else machSel = new Set([pageId]);
         initOeeFilter(); syncMchRange(); loadMachine();
       }
     }
@@ -546,6 +643,20 @@ const WeeklyDashboard = (() => {
 
     document.getElementById('weeklyOpenExternal')?.addEventListener('click', () => {
       window.open(EXTERNAL_URL, '_blank', 'noopener,noreferrer');
+    });
+
+    $('prodBarProducts')?.addEventListener('click', (e) => {
+      const chip = e.target.closest('.prodbar-chip');
+      if (!chip?.dataset.code) return;
+      prodSel.delete(chip.dataset.code);
+      renderProdBarChips(); loadProdBar();
+    });
+    $('prodBarMachines')?.addEventListener('click', (e) => {
+      const chip = e.target.closest('.prodbar-chip');
+      if (!chip?.dataset.mach) return;
+      const k = chip.dataset.mach;
+      if (machSel.has(k)) { if (machSel.size > 1) machSel.delete(k); } else machSel.add(k);
+      renderProdBarChips(); loadProdBar();
     });
   };
 
