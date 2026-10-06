@@ -3940,3 +3940,29 @@ body {
 .oee-filter-status { flex-basis: 100%; font-size: 12px; color: #94a3b8; }
 .oee-filter-status.err { color: #fca5a5; }
 @media (max-width: 640px) { .oee-filter { width: 100%; } .oee-filter .field { flex: 1 1 130px; } .oee-filter input[type="date"] { width: 100%; } }
+
+/* ===== OEE PRODUCTION — baris Speed Standar bisa diklik ===== */
+.speed-table tbody tr.speed-row { cursor: pointer; }
+.speed-table tbody tr.speed-row:hover td { background: rgba(59, 130, 246, 0.22); }
+.speed-table tbody tr.speed-row:focus-visible { outline: 2px solid #60a5fa; outline-offset: -2px; }
+.speed-src { display: block; margin-top: 2px; font-size: 10px; font-weight: 500; color: #64748b; letter-spacing: 0.02em; }
+.speed-go { margin-left: 6px; font-size: 11px; opacity: 0.55; }
+.speed-row:hover .speed-go { opacity: 1; }
+
+/* ===== HALAMAN DETAIL MESIN ===== */
+.oee-panel-head small { font-size: 10px; font-weight: 500; color: #94a3b8; letter-spacing: 0.03em; }
+.mch-speed-panel { display: flex; flex-direction: column; }
+.mch-speed-wrap { max-height: 204px; }
+.mch-speed-table td:last-child { text-align: right; }
+.mch-speed-table td.speed-no { color: #64748b; font-weight: 600; width: 34px; text-align: left; font-variant-numeric: tabular-nums; }
+.mch-speed-table td:nth-child(2) { color: #e2e8f0; font-weight: 600; text-align: left; }
+.mch-speed-table th:last-child { text-align: right; }
+.mch-batch-chart { margin-top: 8px; background: rgba(15, 23, 42, 0.55); border: 1px solid #1e293b; border-radius: 10px; padding: 4px 6px; }
+.mch-batch-chart svg { display: block; width: 100%; height: auto; }
+.mch-bar-card { margin-top: 14px; }
+.mch-bar-scroll { overflow-x: auto; padding-bottom: 4px; }
+.mch-bar-scroll svg { display: block; height: auto; max-width: none; }
+.ob-swatch.ob-lime { background: #a3c93a; }
+.ob-swatch.ob-teal { background: #22b8cf; }
+.oee-prod-head .oee-prod-head-main { flex: 1 1 260px; min-width: 0; }
+.oee-prod-head .oee-filter { flex: 0 1 auto; }

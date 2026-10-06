@@ -403,6 +403,27 @@ const UI = (() => {
     }
   };
 
+  // ====== BUKA RECORD TERTENTU DI LOG SHEET (dipakai Weekly Dashboard) ======
+  // Mengisi filter tanggal / shift / line / tahapan lalu memuat data record itu
+  // dan pindah ke layar Log Sheet — sama seperti user mengganti filter manual.
+  const openRecord = async ({ date, shift, line, stage } = {}) => {
+    if (!date || !State.el.fDate || !State.el.fLine || !State.el.fStage) return false;
+    // Amankan isi sheet yang sedang terbuka (auto-save lokal) sebelum diganti.
+    try { if (typeof Storage !== 'undefined' && Storage.autoSaveLocal) Storage.autoSaveLocal(); } catch (e) {}
+    State.el.fDate.value = date;
+    if (line != null && line !== '') State.el.fLine.value = String(line);
+    if (stage) State.el.fStage.value = stage;
+    const sh = Math.max(0, Math.min(2, (parseInt(shift, 10) || 1) - 1));
+    State.evalShift = sh;
+    try { localStorage.setItem(CONFIG.EVAL_SHIFT_KEY, String(sh)); } catch (e) {}
+    applyShiftUI(); applyLineUI(); applyStageUI();
+    updateShiftIndicator(); updateUnifiedControl();
+    showScreen('logsheet');
+    if (typeof Storage !== 'undefined' && Storage.loadRecord) await Storage.loadRecord();
+    toast(`Log sheet ${formatSheetDate(date)} · Shift ${sh + 1} · Line ${State.el.fLine.value} · ${State.el.fStage.value}`);
+    return true;
+  };
+
   const bindScreenNav = () => {
     document.querySelectorAll('.screen-tab').forEach(tab => {
       tab.addEventListener('click', () => showScreen(tab.getAttribute('data-screen')));
@@ -661,7 +682,7 @@ const UI = (() => {
     applyShiftUI, applyLineUI, applyStageUI, bindFilterToggles, bindShiftButtons, loadEvalShift,
     updateShiftIndicator, updateUnifiedControl, bindUnifiedControls,
     bindToolbarToggle, loadToolbarCollapsed,
-    bindScreenNav, loadActiveScreen, showScreen,
+    bindScreenNav, loadActiveScreen, showScreen, openRecord,
     bindLogsheetHelp,
     setColToggleOpen, bindColToggleCollapse, loadColToggleState,
     setViewMode, bindViewModeToggle, loadViewMode,

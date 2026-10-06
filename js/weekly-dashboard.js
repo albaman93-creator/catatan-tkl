@@ -92,15 +92,15 @@ const WeeklyDashboard = (() => {
     return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null;
   };
 
-  const fetchOeeRows = async (from, to) => {
+  // stage+line diisi → satu mesin (halaman detail mesin); kosong → semua Filling & Kemas Line 1/2/4.
+  const fetchOeeRows = async (from, to, stage, line) => {
     const client = typeof SupabaseClient !== 'undefined' ? SupabaseClient.getClient() : null;
     if (!client) throw new Error('Supabase belum terhubung');
     const out = [];
     for (let i = 0; i < 30; i++) {
-      const { data, error } = await client.from(CONFIG.DB_TABLE)
-        .select('date,shift,line,tahapan,availability,performance,quality,oee,payload')
-        .in('tahapan', OEE_STAGES).in('line', OEE_LINES)
-        .gte('date', from).lte('date', to)
+      let q = client.from(CONFIG.DB_TABLE).select('date,shift,line,tahapan,availability,performance,quality,oee,payload');
+      q = stage ? q.eq('tahapan', stage).eq('line', String(line)) : q.in('tahapan', OEE_STAGES).in('line', OEE_LINES);
+      const { data, error } = await q.gte('date', from).lte('date', to)
         .order('date', { ascending: false }).order('key', { ascending: true })
         .range(i * 1000, i * 1000 + 999);
       if (error) throw error;
@@ -155,30 +155,60 @@ const WeeklyDashboard = (() => {
     if (box) { box.classList.toggle('over', val != null && val >= tgt); box.classList.toggle('under', val == null || val < tgt); }
   };
 
-  const setOeeGauges = (all) => {
-    setHalfGauge('oeeOpeFill', all.ope.oee ?? 0, OEE_GAUGE_LEN);
-    setHalfGauge('oee365Fill', all.o365.oee ?? 0, OEE_GAUGE_LEN);
-    $('oeeOpeValue').textContent = f2(all.ope.oee);
-    $('oee365Value').textContent = f2(all.o365.oee);
-    setApq('oeeOpeA', all.ope.a, TGT_OPE.a); setApq('oeeOpeP', all.ope.p, TGT_OPE.p); setApq('oeeOpeQ', all.ope.q, TGT_OPE.q);
-    setApq('oee365A', all.o365.a, TGT_365.a); setApq('oee365P', all.o365.p, TGT_365.p); setApq('oee365Q', all.o365.q, TGT_365.q);
+  const setOeeGauges = (all, pf = 'oee') => {
+    setHalfGauge(pf + 'OpeFill', all.ope.oee ?? 0, OEE_GAUGE_LEN);
+    setHalfGauge(pf + '365Fill', all.o365.oee ?? 0, OEE_GAUGE_LEN);
+    $(pf + 'OpeValue').textContent = f2(all.ope.oee);
+    $(pf + '365Value').textContent = f2(all.o365.oee);
+    setApq(pf + 'OpeA', all.ope.a, TGT_OPE.a); setApq(pf + 'OpeP', all.ope.p, TGT_OPE.p); setApq(pf + 'OpeQ', all.ope.q, TGT_OPE.q);
+    setApq(pf + '365A', all.o365.a, TGT_365.a); setApq(pf + '365P', all.o365.p, TGT_365.p); setApq(pf + '365Q', all.o365.q, TGT_365.q);
+  };
+
+  // Sumber tiap baris Speed Standar: record terbaru (tanggal, lalu shift) yang memuat produk itu.
+  // Klik baris → buka log sheet record tersebut.
+  const speedLatest = (rows, keyFn) => {
+    const latest = {};
+    rows.forEach((r) => {
+      const p = r.payload?.products || {};
+      [[p.p1Name, p.p1Rate], [p.p2Name, p.p2Rate], [p.p3Name, p.p3Rate]].forEach(([n, rt]) => {
+        const name = String(n || '').trim(), rate = toNum(rt), key = keyFn(name);
+        if (!name || !key || !(rate > 0)) return;
+        const cur = latest[key];
+        const newer = !cur || r.date > cur.date || (r.date === cur.date && Number(r.shift) > Number(cur.shift));
+        if (newer) latest[key] = { rate, date: String(r.date), shift: Number(r.shift) || 1, line: String(r.line), stage: r.tahapan };
+      });
+    });
+    return latest;
+  };
+  const speedRowAttrs = (name, s) => {
+    const stg = s.stage.charAt(0).toUpperCase() + s.stage.slice(1);
+    const tip = `Buka log sheet: ${fmtD(s.date)} · Shift ${s.shift} · Line ${s.line} · ${stg}`;
+    return {
+      src: `${fmtD(s.date)} · S${s.shift} · L${s.line} · ${stg}`,
+      attrs: `class="speed-row" tabindex="0" role="link" title="${tip}" aria-label="${Utils.escapeHtml(name)} — ${tip}"`
+        + ` data-date="${s.date}" data-shift="${s.shift}" data-line="${s.line}" data-stage="${s.stage}"`
+    };
   };
 
   const renderSpeed = (rows) => {
     const body = $('oeeSpeedBody');
     if (!body) return;
-    const latest = {};
-    rows.forEach((r) => { // rows terurut tanggal terbaru → rate pertama yang ditemui = terbaru
-      const p = r.payload?.products || {};
-      [[p.p1Name, p.p1Rate], [p.p2Name, p.p2Rate], [p.p3Name, p.p3Rate]].forEach(([n, rt]) => {
-        const name = String(n || '').trim(), rate = toNum(rt);
-        if (name && rate > 0 && !(name in latest)) latest[name] = rate;
-      });
-    });
+    const latest = speedLatest(rows, (n) => n);
     const names = Object.keys(latest).sort().reverse();
     body.innerHTML = names.length
-      ? names.map((n) => `<tr><td>${Utils.escapeHtml(n)}</td><td>${latest[n].toLocaleString('id-ID')}</td></tr>`).join('')
+      ? names.map((n) => {
+          const s = latest[n], t = speedRowAttrs(n, s);
+          return `<tr ${t.attrs}><td>${Utils.escapeHtml(n)}<small class="speed-src">${t.src}</small></td>`
+            + `<td>${s.rate.toLocaleString('id-ID')}<span class="speed-go" aria-hidden="true">↗</span></td></tr>`;
+        }).join('')
       : '<tr><td colspan="2">Tidak ada data pada rentang ini</td></tr>';
+  };
+
+  const openSpeedRow = (tr) => {
+    const d = tr?.dataset;
+    if (!d || !d.date) return;
+    if (typeof UI === 'undefined' || !UI.openRecord) return;
+    UI.openRecord({ date: d.date, shift: d.shift, line: d.line, stage: d.stage });
   };
 
   const trendSvg = (id, pts, color, light, ylabel, fixedMax) => {
@@ -272,12 +302,207 @@ const WeeklyDashboard = (() => {
     f.value = today.slice(0, 8) + '01';
     t.value = today;
   };
+  const syncMchRange = () => copyRange('oee', 'mch');
 
   const bindOee = () => {
     $('oeeApply')?.addEventListener('click', loadOee);
-    $('oeeFrom')?.addEventListener('change', loadOee);
-    $('oeeTo')?.addEventListener('change', loadOee);
+    const sb = $('oeeSpeedBody');
+    sb?.addEventListener('click', (e) => openSpeedRow(e.target.closest('tr.speed-row')));
+    sb?.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const tr = e.target.closest('tr.speed-row');
+      if (tr) { e.preventDefault(); openSpeedRow(tr); }
+    });
+    $('oeeFrom')?.addEventListener('change', () => { syncMchRange(); loadOee(); });
+    $('oeeTo')?.addEventListener('change', () => { syncMchRange(); loadOee(); });
+    $('mchApply')?.addEventListener('click', () => { copyRange('mch', 'oee'); loadMachine(); });
+    $('mchFrom')?.addEventListener('change', () => { copyRange('mch', 'oee'); loadMachine(); });
+    $('mchTo')?.addEventListener('change', () => { copyRange('mch', 'oee'); loadMachine(); });
+    $('mchReset')?.addEventListener('click', () => { $('oeeFrom').value = ''; $('oeeTo').value = ''; initOeeFilter(); syncMchRange(); loadMachine(); });
+    const mb = $('mchSpeedBody');
+    mb?.addEventListener('click', (e) => openSpeedRow(e.target.closest('tr.speed-row')));
+    mb?.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const tr = e.target.closest('tr.speed-row');
+      if (tr) { e.preventDefault(); openSpeedRow(tr); }
+    });
     $('oeeReset')?.addEventListener('click', () => { $('oeeFrom').value = ''; $('oeeTo').value = ''; initOeeFilter(); loadOee(); });
+  };
+
+  // ===== HALAMAN DETAIL MESIN (Filling / Kemas · Line 1, 2, 4) =====
+  const MACHINE_PAGES = {
+    'filling-1': { stage: 'filling', line: '1' }, 'filling-2': { stage: 'filling', line: '2' }, 'filling-4': { stage: 'filling', line: '4' },
+    'kemas-1': { stage: 'kemas', line: '1' }, 'kemas-2': { stage: 'kemas', line: '2' }, 'kemas-4': { stage: 'kemas', line: '4' }
+  };
+  const STAGE_LABEL = { filling: 'Filling', kemas: 'Kemas' };
+  const STAGE_TYPE = { filling: 'Automatic Form Fill Seal Machine', kemas: 'Overwrapping Machine' };
+  const C_OPE = '#a3c93a', C_365 = '#22b8cf';
+  let curMachine = null, mchSeq = 0;
+
+  // Kode produk = kata pertama nama produk ("VTTS1 L030207" → "VTTS1").
+  const prodCode = (n) => String(n || '').trim().split(/\s+/)[0].toUpperCase();
+
+  // Baris produksi (kode kegiatan = produksi) beserta kode produk, nomor WO/batch, dan durasinya.
+  // WO diambil dari kolom WO baris; bila kosong → WO produk di header record; bila kosong → kata ke-2 nama produk.
+  const prodRows = (r) => {
+    const rows = Array.isArray(r.payload?.rows) ? r.payload.rows : [];
+    const pr = r.payload?.products || {};
+    const list = [1, 2, 3].map((i) => ({ name: String(pr['p' + i + 'Name'] || '').trim(), wo: String(pr['p' + i + 'Wo'] || '').trim() }));
+    const out = [];
+    rows.forEach((x) => {
+      if (Utils.catOf(x.kode) !== 'prod') return;
+      const s = Utils.parseTime(x.mulai), e = Utils.parseTime(x.selesai);
+      const d = s != null && e != null ? (e - s + 1440) % 1440 : (toNum(x.durasi) || 0);
+      if (!(d > 0)) return;
+      const name = String(x.batch || '').trim();
+      const toks = name.split(/\s+/);
+      const wo = String(x.wo || '').trim() || list.find((l) => l.name && l.name === name)?.wo || (toks.length > 1 ? toks[1] : '');
+      out.push({ code: prodCode(name), wo: wo.toUpperCase(), d });
+    });
+    return out;
+  };
+
+  // Per batch (WO): OPE & 365 dari record-record yang memuat WO itu.
+  //  OPE  = rata-rata OEE tersimpan, dibobot menit produksi WO di tiap record.
+  //  365  = A365 × P × Q; A365 = waktu operasional yang dialokasikan ke WO ÷ (1440 mnt × jumlah hari WO berjalan).
+  const calcBatches = (rows) => {
+    const by = {};
+    rows.forEach((r) => {
+      const m = recMetrics(r), pr = prodRows(r);
+      const tAll = pr.reduce((s, x) => s + x.d, 0);
+      if (!tAll) return;
+      const mine = {};
+      pr.filter((x) => x.wo).forEach((x) => {
+        const b = (mine[x.wo] = mine[x.wo] || { t: 0, code: x.code });
+        b.t += x.d; if (!b.code) b.code = x.code;
+      });
+      Object.keys(mine).forEach((wo) => {
+        const t = mine[wo].t;
+        const b = (by[wo] = by[wo] || { wo, code: mine[wo].code, so: 0, wso: 0, sp: 0, wsp: 0, sq: 0, wsq: 0, en: 0, dates: new Set(), first: String(r.date) });
+        if (m.o != null) { b.so += m.o * t; b.wso += t; }
+        if (m.p != null) { b.sp += m.p * t; b.wsp += t; }
+        if (m.q != null) { b.sq += m.q * t; b.wsq += t; }
+        b.en += (m.en * t) / tAll;
+        b.dates.add(String(r.date));
+        if (String(r.date) < b.first) b.first = String(r.date);
+      });
+    });
+    return Object.values(by).map((b) => {
+      const p = b.wsp ? b.sp / b.wsp : null, q = b.wsq ? b.sq / b.wsq : null;
+      const a365 = Math.min(100, (b.en / (DAY_MIN * Math.max(1, b.dates.size))) * 100);
+      return { wo: b.wo, code: b.code, ope: b.wso ? b.so / b.wso : null, o365: p != null && q != null ? (a365 * p * q) / 10000 : null, first: b.first };
+    }).sort((x, y) => (x.first < y.first ? -1 : x.first > y.first ? 1 : x.wo < y.wo ? -1 : 1));
+  };
+
+  const rangeLabel = (from, to) => (from.slice(0, 7) === to.slice(0, 7) ? MON[Number(from.slice(5, 7)) - 1] + ' ' + from.slice(0, 4) : fmtD(from) + ' – ' + fmtD(to));
+
+  // Grafik garis kecil: jumlah batch per kode produk.
+  const countSvg = (id, items) => {
+    const svg = $(id);
+    if (!svg) return;
+    const L = 34, R = 14, T = 16, B = 26, W = 260, H = 130, ph = H - T - B;
+    const max = Math.max(1, ...items.map((i) => i.v));
+    const top = max <= 4 ? max : Math.ceil(max / 4) * 4;
+    const Y = (v) => T + ph - (v / top) * ph;
+    let s = '<g stroke="#334155" stroke-width="1">';
+    [0, 0.5, 1].forEach((f) => { const y = Y(top * f); s += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}"/>`; });
+    s += '</g><g fill="#64748b" font-size="9" text-anchor="end">';
+    [0, 0.5, 1].forEach((f) => { s += `<text x="${L - 5}" y="${Y(top * f) + 3}">${Math.round(top * f)}</text>`; });
+    s += `</g><text x="9" y="${T + ph / 2}" fill="#94a3b8" font-size="9" transform="rotate(-90 9 ${T + ph / 2})" text-anchor="middle">No.Batch</text>`;
+    if (!items.length) { svg.innerHTML = s + `<text x="${W / 2}" y="${H / 2}" fill="#64748b" font-size="11" text-anchor="middle">Tidak ada data batch</text>`; return; }
+    const X = (i) => (items.length === 1 ? (L + W - R) / 2 : L + 14 + (i * (W - R - L - 28)) / (items.length - 1));
+    const pts = items.map((it, i) => X(i) + ',' + Y(it.v));
+    if (items.length > 1) s += `<polyline points="${pts.join(' ')}" fill="none" stroke="#3b82f6" stroke-width="2"/>`;
+    items.forEach((it, i) => {
+      s += `<circle cx="${X(i)}" cy="${Y(it.v)}" r="3.5" fill="#3b82f6"/><text x="${X(i)}" y="${Y(it.v) - 7}" fill="#e2e8f0" font-size="10" font-weight="700" text-anchor="middle">${it.v}</text>`;
+      s += `<text x="${X(i)}" y="${H - 8}" fill="#94a3b8" font-size="${items.length > 5 ? 8 : 9}" text-anchor="middle">${Utils.escapeHtml(it.label)}</text>`;
+    });
+    svg.innerHTML = s;
+  };
+
+  // Batang berkelompok per batch: OEE (OPE) & OEE_365. Lebar menyesuaikan jumlah batch (scroll horizontal bila banyak).
+  const batchBarSvg = (id, list) => {
+    const svg = $(id);
+    if (!svg) return;
+    const slot = 46, L = 44, R = 10, T = 20, B = 58, H = 250, ph = H - T - B;
+    const W = Math.max(560, L + R + list.length * slot);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.removeAttribute('height');
+    svg.style.width = L + R + list.length * slot > 560 ? W + 'px' : '100%';
+    const top = Math.max(0, ...list.flatMap((b) => [b.ope, b.o365].map((v) => (Number.isFinite(v) ? v : 0))));
+    const max = Math.max(150, Math.ceil(top / 50) * 50);
+    const Y = (v) => T + ph - (Math.min(Math.max(v, 0), max) / max) * ph;
+    let s = '<g stroke="#334155" stroke-width="1">';
+    for (let v = 0; v <= max; v += 50) s += `<line x1="${L}" y1="${Y(v)}" x2="${W - R}" y2="${Y(v)}"/>`;
+    s += '</g><g fill="#64748b" font-size="10" text-anchor="end">';
+    for (let v = 0; v <= max; v += 50) s += `<text x="${L - 6}" y="${Y(v) + 3}">${v}%</text>`;
+    s += '</g>';
+    if (!list.length) { svg.innerHTML = s + `<text x="${W / 2}" y="${T + ph / 2}" fill="#64748b" font-size="12" text-anchor="middle">Tidak ada data batch (kolom WO produksi kosong) pada rentang ini</text>`; return; }
+    list.forEach((b, i) => {
+      const cx = L + i * slot + slot / 2;
+      [[b.ope, C_OPE, cx - 17], [b.o365, C_365, cx + 1]].forEach(([v, c, x]) => {
+        if (!Number.isFinite(v)) return;
+        const y = Y(v);
+        s += `<rect x="${x}" y="${y}" width="16" height="${T + ph - y}" rx="2" fill="${c}"/>`
+          + `<text x="${x + 8}" y="${y - 4}" fill="#e2e8f0" font-size="8" font-weight="600" transform="rotate(-90 ${x + 8} ${y - 4})">${fmtPct(v, 1)}</text>`;
+      });
+      s += `<text x="${cx}" y="${T + ph + 13}" fill="#94a3b8" font-size="9" text-anchor="end" transform="rotate(-40 ${cx} ${T + ph + 13})">${Utils.escapeHtml(b.wo)}</text>`;
+    });
+    svg.innerHTML = s;
+  };
+
+  const renderMachineSpeed = (rows, counts) => {
+    const body = $('mchSpeedBody');
+    if (!body) return;
+    const latest = speedLatest(rows, prodCode);
+    const codes = Object.keys(latest).sort((a, b) => (counts[b] || 0) - (counts[a] || 0) || (a < b ? -1 : 1));
+    body.innerHTML = codes.length
+      ? codes.map((c, i) => {
+          const s = latest[c], t = speedRowAttrs(c, s);
+          return `<tr ${t.attrs}><td class="speed-no">${i + 1}.</td><td>${Utils.escapeHtml(c)}<small class="speed-src">${t.src}</small></td>`
+            + `<td>${s.rate.toLocaleString('id-ID')}<span class="speed-go" aria-hidden="true">↗</span></td></tr>`;
+        }).join('')
+      : '<tr><td colspan="3">Tidak ada data pada rentang ini</td></tr>';
+  };
+
+  const renderMachine = (rows, from, to, meta) => {
+    setOeeGauges(calcSet(rows, dayDiff(from, to)), 'mch');
+    const batches = calcBatches(rows);
+    const counts = {};
+    batches.forEach((b) => { if (b.code) counts[b.code] = (counts[b.code] || 0) + 1; });
+    renderMachineSpeed(rows, counts);
+    countSvg('mchBatchSvg', Object.keys(counts).sort((a, b) => counts[b] - counts[a] || (a < b ? -1 : 1)).map((c) => ({ label: c, v: counts[c] })));
+    const t = $('mchBarTitle');
+    if (t) t.textContent = `Capaian OEE OPE & OEE 365 ${STAGE_LABEL[meta.stage]} Line ${meta.line} · ${rangeLabel(from, to)}`;
+    batchBarSvg('mchBarSvg', batches);
+  };
+
+  const loadMachine = async () => {
+    const meta = MACHINE_PAGES[curMachine];
+    if (!meta) return;
+    const from = $('mchFrom')?.value, to = $('mchTo')?.value, st = $('mchStatus');
+    const say = (m, err) => { if (st) { st.textContent = m; st.className = 'oee-filter-status' + (err ? ' err' : ''); } };
+    if (!from || !to) return say('Isi Dari Tanggal dan Sampai Tanggal.', true);
+    if (from > to) return say('Tanggal awal tidak boleh melebihi tanggal akhir.', true);
+    if (!navigator.onLine) return say('⚠ Tidak ada koneksi — data OEE diambil dari Supabase.', true);
+    const my = ++mchSeq;
+    say('Memuat data…');
+    try {
+      const rows = await fetchOeeRows(from, to, meta.stage, meta.line);
+      if (my !== mchSeq) return;
+      renderMachine(rows, from, to, meta);
+      say(`✓ ${rows.length} record · ${STAGE_LABEL[meta.stage]} Line ${meta.line} · ${fmtD(from)} – ${fmtD(to)}`);
+    } catch (e) {
+      console.warn('Detail mesin error:', e);
+      say('⚠ Gagal memuat data: ' + (e.message || e), true);
+    }
+  };
+
+  // Filter tanggal dipakai bersama halaman OEE Production & semua halaman mesin.
+  const copyRange = (fromPre, toPre) => {
+    const f = $(fromPre + 'From'), t = $(toPre + 'From'), f2_ = $(fromPre + 'To'), t2 = $(toPre + 'To');
+    if (f && t) t.value = f.value;
+    if (f2_ && t2) t2.value = f2_.value;
   };
 
   const showPage = (pageId) => {
@@ -293,7 +518,7 @@ const WeeklyDashboard = (() => {
       setTimeout(() => setYieldGauge(100.4), 50);
     } else if (pageId === 'oee-prod') {
       document.getElementById('weeklyPageOee')?.classList.add('is-active');
-      initOeeFilter(); loadOee();
+      initOeeFilter(); syncMchRange(); loadOee();
     } else if (MACHINE_TITLES[pageId]) {
       const page = document.getElementById('weeklyPageMachine');
       if (page) {
@@ -301,7 +526,10 @@ const WeeklyDashboard = (() => {
         const title = document.getElementById('weeklyMachineTitle');
         const badge = document.getElementById('weeklyMachineBadge');
         if (title) title.textContent = MACHINE_TITLES[pageId];
-        if (badge) badge.textContent = 'Detail performa ' + MACHINE_TITLES[pageId];
+        const mt = MACHINE_PAGES[pageId], mm = OEE_MACHINES[mt.stage].find((x) => x.line === mt.line);
+        if (badge) badge.textContent = `Mesin ${STAGE_TYPE[mt.stage]} ${mm.name} ${mm.sub}`;
+        curMachine = pageId;
+        initOeeFilter(); syncMchRange(); loadMachine();
       }
     }
   };
