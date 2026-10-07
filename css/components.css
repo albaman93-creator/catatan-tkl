@@ -4032,3 +4032,23 @@ body {
 .shutdown-pager { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 8px; color: #94a3b8; font: 500 11px 'IBM Plex Mono', monospace; }
 .shutdown-pager-btn { background: #12293f; border: 1px solid #2b4d74; color: #cbd5e1; border-radius: 6px; width: 24px; height: 22px; cursor: pointer; line-height: 1; }
 .shutdown-pager-btn:hover { background: #1b3a5c; }
+
+/* ===== SEMENTARA: sembunyikan KPI kartu & panel OEE Hari Ini / Distribusi Status
+   (data sedang dibersihkan — hapus blok CSS ini untuk menampilkan lagi) */
+.dash-main-grid,
+.dash-kpi-grid {
+  display: none !important;
+}
+
+/* ===== MODE 2 PRODUK: sembunyikan seluruh grup & kolom Produk 3 =====
+   (hapus blok ini bila kelak ingin kembali ke 3 produk) */
+/* Master Produk (Settings) — grup field Produk 3 */
+.field:has(#masterProdName3) { display: none !important; }
+/* Compact / Mode Cepat — baris produk ke-3 */
+.compact-product-row:has(#prodName3) { display: none !important; }
+/* Header kolom Produk 3 di tabel matriks OEE */
+#thProd3 { display: none !important; }
+/* Sel nilai per-produk ke-3 (Performance G/H/I) */
+td:has(#oG3),
+td:has(#oH3),
+#colI3 { display: none !important; }
