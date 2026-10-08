@@ -1,0 +1,1116 @@
+/* ============================================================================
+   WEEKLY-DASHBOARD.CSS
+   Auto-paired 1:1 with js/weekly-dashboard.js
+   - Mendukung Mode Gelap & Terang lewat CSS custom properties (--wd-*)
+   - Termasuk style untuk PICA (breakdown / minor stop) & Speed table
+   ============================================================================ */
+
+/* ============================================================================
+   1. THEME TOKENS
+   Dark = default. Light = :root[data-wd-theme="light"]
+   Dipasang di :root agar elemen portal (mis. .speed-menu, .pica-overlay)
+   yang di-append ke <body> tetap mewarisi variabel.
+   ============================================================================ */
+:root {
+  --wd-bg:            #0f172a;
+  --wd-bg-side:       #0b1220;
+  --wd-card:          #1e293b;
+  --wd-card-2:        #111827;
+  --wd-border:        #334155;
+  --wd-border-soft:   #1e293b;
+  --wd-text:          #e2e8f0;
+  --wd-text-strong:   #f8fafc;
+  --wd-text-mute:     #94a3b8;
+  --wd-text-dim:      #7c8ba1;
+  --wd-text-faint:    #64748b;
+  --wd-hover:         #1e293b;
+  --wd-hover-2:       #334155;
+  --wd-accent:        #1d4ed8;
+  --wd-accent-text:   #ffffff;
+  --wd-link:          #60a5fa;
+  --wd-grid:          #334155;
+  --wd-axis:          #94a3b8;
+  --wd-axis-soft:     #7c8ba1;
+  --wd-plot:          #0f172a;
+  --wd-stripe-a:      rgba(59, 130, 246, 0.08);
+  --wd-stripe-b:      rgba(15, 23, 42, 0.5);
+  --wd-row-hover:     rgba(59, 130, 246, 0.22);
+  --wd-hero-1:        #0f172a;
+  --wd-hero-2:        #1e293b;
+  --wd-hero-border:   #334155;
+  --wd-note-border:   #475569;
+  --wd-menu-bg:       #10243c;
+  --wd-menu-border:   #24466b;
+  --wd-menu-hover:    #1b3a5c;
+  --wd-chip-bg:       #12293f;
+  --wd-chip-border:   #2b4d74;
+  --wd-chip-text:     #cbd5e1;
+  --wd-chip-hover:    #1b3a5c;
+  --wd-chip-on:       #12a150;
+  --wd-chip-on-bd:    #12a150;
+  --wd-chart-line:    #3b82f6;
+  --wd-chart-line-lt: #93c5fd;
+  --wd-chart-green:   #22c55e;
+  --wd-chart-green-lt:#86efac;
+  --wd-chart-red:     #f43f5e;
+  --wd-chart-red-lt:  #fda4af;
+  --wd-chart-amber:   #f59e0b;
+  --wd-chart-amber-lt:#fcd34d;
+  --wd-chart-cyan:    #22d3ee;
+  --wd-chart-cyan-lt: #a5f3fc;
+  --wd-oee-ope:       #a3c93a;
+  --wd-oee-365:       #22b8cf;
+  --wd-shadow:        0 12px 32px rgba(0, 0, 0, .45);
+
+  /* PICA */
+  --wd-pica-open-bg:      #7f1d1d;
+  --wd-pica-open-bd:      #b91c1c;
+  --wd-pica-open-fg:      #fecaca;
+  --wd-pica-progress-bg:  #78350f;
+  --wd-pica-progress-bd:  #d97706;
+  --wd-pica-progress-fg:  #fde68a;
+  --wd-pica-closed-bg:    #14532d;
+  --wd-pica-closed-bd:    #16a34a;
+  --wd-pica-closed-fg:    #bbf7d0;
+  --wd-pica-null:         #475569;
+}
+
+:root[data-wd-theme="light"] {
+  --wd-bg:            #f8fafc;
+  --wd-bg-side:       #ffffff;
+  --wd-card:          #ffffff;
+  --wd-card-2:        #f1f5f9;
+  --wd-border:        #d8e0ea;
+  --wd-border-soft:   #e6ecf3;
+  --wd-text:          #1e293b;
+  --wd-text-strong:   #0f172a;
+  --wd-text-mute:     #526176;
+  --wd-text-dim:      #6b7a8f;
+  --wd-text-faint:    #8b99ab;
+  --wd-hover:         #eef2f7;
+  --wd-hover-2:       #e2e8f0;
+  --wd-accent:        #2563eb;
+  --wd-accent-text:   #ffffff;
+  --wd-link:          #2563eb;
+  --wd-grid:          #dde5ee;
+  --wd-axis:          #6b7a8f;
+  --wd-axis-soft:     #7a879a;
+  --wd-plot:          #f8fafc;
+  --wd-stripe-a:      rgba(37, 99, 235, 0.05);
+  --wd-stripe-b:      rgba(226, 232, 240, 0.55);
+  --wd-row-hover:     rgba(37, 99, 235, 0.10);
+  --wd-hero-1:        #ffffff;
+  --wd-hero-2:        #eef2f7;
+  --wd-hero-border:   #d8e0ea;
+  --wd-note-border:   #cbd5e1;
+  --wd-menu-bg:       #ffffff;
+  --wd-menu-border:   #d8e0ea;
+  --wd-menu-hover:    #eef2f7;
+  --wd-chip-bg:       #eef2f7;
+  --wd-chip-border:   #cbd5e1;
+  --wd-chip-text:     #334155;
+  --wd-chip-hover:    #e2e8f0;
+  --wd-chip-on:       #16a34a;
+  --wd-chip-on-bd:    #16a34a;
+  --wd-chart-line:    #2563eb;
+  --wd-chart-line-lt: #1d4ed8;
+  --wd-chart-green:   #16a34a;
+  --wd-chart-green-lt:#15803d;
+  --wd-chart-red:     #e11d48;
+  --wd-chart-red-lt:  #be123c;
+  --wd-chart-amber:   #d97706;
+  --wd-chart-amber-lt:#b45309;
+  --wd-chart-cyan:    #0891b2;
+  --wd-chart-cyan-lt: #0e7490;
+  --wd-oee-ope:       #65a30d;
+  --wd-oee-365:       #0e7490;
+  --wd-shadow:        0 10px 28px rgba(15, 23, 42, .14);
+
+  /* PICA */
+  --wd-pica-open-bg:      #fee2e2;
+  --wd-pica-open-bd:      #fca5a5;
+  --wd-pica-open-fg:      #991b1b;
+  --wd-pica-progress-bg:  #fef3c7;
+  --wd-pica-progress-bd:  #fcd34d;
+  --wd-pica-progress-fg:  #92400e;
+  --wd-pica-closed-bg:    #dcfce7;
+  --wd-pica-closed-bd:    #86efac;
+  --wd-pica-closed-fg:    #166534;
+  --wd-pica-null:         #94a3b8;
+}
+
+/* ============================================================================
+   2. LAYOUT
+   ============================================================================ */
+.weekly-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 70vh;
+  gap: 0;
+  margin: -8px -12px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--wd-bg);
+  color: var(--wd-text);
+  transition: background .22s ease, color .22s ease;
+}
+
+.weekly-sidebar {
+  background: var(--wd-bg-side);
+  border-right: 1px solid var(--wd-border-soft);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  transition: background .22s ease, border-color .22s ease;
+}
+
+.weekly-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 16px 18px;
+  border-bottom: 1px solid var(--wd-border-soft);
+  margin-bottom: 10px;
+}
+
+.weekly-brand-icon { font-size: 22px; }
+
+.weekly-brand-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--wd-text-strong);
+}
+
+.weekly-brand-sub {
+  font-size: 11px;
+  color: var(--wd-text-dim);
+}
+
+.weekly-nav { flex: 1; overflow-y: auto; padding: 0 8px; }
+
+.weekly-nav-divider {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wd-text-faint);
+  padding: 12px 12px 6px;
+  font-weight: 600;
+}
+
+.weekly-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  color: var(--wd-text-mute);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+
+.weekly-nav-item:hover {
+  background: var(--wd-hover);
+  color: var(--wd-text);
+}
+
+.weekly-nav-item.is-active {
+  background: var(--wd-accent);
+  color: var(--wd-accent-text);
+  font-weight: 600;
+}
+
+.wn-icon { font-size: 15px; width: 20px; text-align: center; }
+
+.wn-label { flex: 1; line-height: 1.3; }
+
+.wn-short { display: none; }
+
+.wn-full { display: inline; }
+
+.weekly-sidebar-foot {
+  padding: 12px 12px 4px;
+  border-top: 1px solid var(--wd-border-soft);
+  margin-top: 8px;
+}
+
+.weekly-sidebar-foot .btn { width: 100%; font-size: 12px; }
+
+/* --- Tombol toggle tema --- */
+.weekly-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--wd-border);
+  background: var(--wd-card-2);
+  color: var(--wd-text);
+  font: 600 12px 'IBM Plex Sans', sans-serif;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+
+.weekly-theme-toggle:hover {
+  background: var(--wd-hover);
+  border-color: var(--wd-accent);
+  color: var(--wd-text-strong);
+}
+
+.weekly-theme-toggle .wt-icon { font-size: 14px; line-height: 1; }
+
+/* ============================================================================
+   3. MAIN
+   ============================================================================ */
+.weekly-main {
+  padding: 20px 24px 28px;
+  overflow-y: auto;
+  background: var(--wd-bg);
+  transition: background .22s ease;
+}
+
+.weekly-page { display: none; }
+
+.weekly-page.is-active { display: block; }
+
+.weekly-hero {
+  background: linear-gradient(135deg, var(--wd-hero-1) 0%, var(--wd-hero-2) 100%);
+  border: 1px solid var(--wd-hero-border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.weekly-hero::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+}
+
+.weekly-hero.compact { padding: 14px 20px; }
+
+.weekly-hero-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--wd-text-strong);
+  line-height: 1.1;
+}
+
+.weekly-hero-sub {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--wd-text-mute);
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.weekly-hero-badge {
+  display: inline-block;
+  margin-top: 10px;
+  background: var(--wd-accent);
+  color: var(--wd-accent-text);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.weekly-yield-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 0.9fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.weekly-card {
+  background: var(--wd-card);
+  border: 1px solid var(--wd-border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  transition: background .22s ease, border-color .22s ease;
+}
+
+.weekly-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--wd-text-mute);
+  margin-bottom: 12px;
+}
+
+.weekly-gauge-card { text-align: center; }
+
+.weekly-gauge-wrap {
+  position: relative;
+  max-width: 220px;
+  margin: 0 auto;
+}
+
+.weekly-gauge { width: 100%; height: auto; }
+
+.weekly-gauge-value {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--wd-text-strong);
+}
+
+.weekly-gauge-label {
+  font-size: 11px;
+  color: var(--wd-text-dim);
+  margin-top: 4px;
+}
+
+.weekly-bar-list { display: flex; flex-direction: column; gap: 12px; }
+
+.weekly-bar-row {
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  align-items: center;
+  gap: 10px;
+}
+
+.weekly-kpi-card { display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+
+.weekly-kpi-item { display: flex; flex-direction: column; gap: 2px; }
+
+.weekly-note {
+  background: var(--wd-card);
+  border: 1px dashed var(--wd-note-border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--wd-text-mute);
+  line-height: 1.5;
+}
+
+.weekly-note strong { color: var(--wd-text); }
+
+.weekly-placeholder {
+  background: var(--wd-card);
+  border: 1px solid var(--wd-border);
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--wd-text-mute);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.weekly-back-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--wd-border);
+  background: var(--wd-card);
+  color: var(--wd-text);
+  font: 600 12.5px 'IBM Plex Sans', sans-serif;
+  cursor: pointer;
+  text-align: center;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.weekly-back-btn:hover {
+  background: var(--wd-hover-2);
+  color: var(--wd-text-strong);
+}
+
+/* ============================================================================
+   4. RESPONSIVE
+   ============================================================================ */
+@media (max-width: 960px) {
+  .weekly-layout {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .weekly-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--wd-border-soft);
+    max-height: none;
+    padding: 8px 0 6px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--wd-bg-side);
+  }
+  .weekly-sidebar-brand {
+    padding: 2px 12px 8px;
+    margin-bottom: 2px;
+  }
+  .weekly-brand-title { font-size: 13px; }
+  .weekly-brand-sub { font-size: 10px; }
+
+  .wn-full { display: none !important; }
+  .wn-short { display: inline !important; }
+
+  .weekly-nav {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    overflow: visible;
+    padding: 4px 10px 8px;
+  }
+  .weekly-nav-divider {
+    grid-column: 1 / -1;
+    padding: 4px 2px 0;
+    font-size: 9px;
+    border-left: none;
+    margin: 2px 0 0;
+    color: var(--wd-text-dim);
+  }
+  .weekly-nav-item {
+    width: 100%;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
+    padding: 8px 4px;
+    font-size: 11px;
+    border-radius: 10px;
+    background: var(--wd-card-2);
+    border: 1px solid var(--wd-border-soft);
+    color: var(--wd-text);
+  }
+  .weekly-nav-item .wn-icon { width: auto; font-size: 13px; }
+  .weekly-nav-item .wn-label { flex: none; text-align: center; }
+  .weekly-nav-item.is-active {
+    background: var(--wd-accent);
+    border-color: var(--wd-accent);
+    color: var(--wd-accent-text);
+  }
+
+  .weekly-sidebar-foot {
+    padding: 6px 10px 8px;
+    margin-top: 0;
+    border-top: 1px solid var(--wd-border-soft);
+  }
+
+  .weekly-yield-grid { grid-template-columns: 1fr; }
+  .weekly-hero-title { font-size: 20px; }
+  .weekly-hero-sub { font-size: 14px; }
+}
+
+@media (max-width: 600px) {
+  .weekly-main { padding: 12px 10px 18px; }
+  .weekly-layout { margin: -4px -8px 0; }
+  .weekly-nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+  }
+  .weekly-nav-item {
+    padding: 7px 2px;
+    font-size: 10.5px;
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+/* ============================================================================
+   5. TABEL SPEED
+   ============================================================================ */
+.speed-table-wrap { overflow: auto; max-height: 320px; }
+
+.speed-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.speed-table th {
+  text-align: left;
+  padding: 8px 10px;
+  background: var(--wd-plot);
+  color: var(--wd-text-mute);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  position: sticky;
+  top: 0;
+}
+
+.speed-table td {
+  padding: 7px 10px;
+  color: var(--wd-text);
+  border-bottom: 1px solid var(--wd-border-soft);
+}
+
+.speed-table tbody tr:nth-child(odd) td { background: var(--wd-stripe-a); }
+
+.speed-table tbody tr:nth-child(even) td { background: var(--wd-stripe-b); }
+
+.speed-table td:last-child {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--wd-link);
+}
+
+.speed-table tbody tr.speed-row { cursor: pointer; }
+
+.speed-table tbody tr.speed-row:hover td { background: var(--wd-row-hover); }
+
+.speed-table tbody tr.speed-row:focus-visible {
+  outline: 2px solid var(--wd-link);
+  outline-offset: -2px;
+}
+
+.speed-src {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--wd-text-dim);
+  letter-spacing: 0.02em;
+}
+
+.speed-go {
+  margin-left: 6px;
+  font-size: 11px;
+  opacity: 0.55;
+}
+
+.speed-row:hover .speed-go { opacity: 1; }
+
+.mch-speed-table td.speed-no {
+  color: var(--wd-text-dim);
+  font-weight: 600;
+  width: 34px;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+.mch-bar-card { margin-top: 14px; }
+
+.mch-bar-scroll { overflow-x: auto; padding-bottom: 4px; }
+
+.mch-bar-scroll svg { display: block; height: auto; max-width: none; }
+
+/* ============================================================================
+   6. OEE BAR GRID
+   ============================================================================ */
+.oee-bar-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.oee-bar-card {
+  background: var(--wd-card);
+  border: 1px solid var(--wd-border);
+  border-radius: 12px;
+  padding: 14px 12px 10px;
+}
+
+.oee-bar-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wd-text);
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+.oee-bar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--wd-text-mute);
+  margin-bottom: 6px;
+  padding-left: 4px;
+}
+
+.oee-bar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.oee-bar-chart-wrap { width: 100%; overflow: hidden; }
+
+.oee-bar-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .oee-bar-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================================
+   7. MISC HEADERS
+   ============================================================================ */
+.weekly-hero.oee-prod-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+
+/* ============================================================================
+   8. SPEED CONTEXT MENU
+   ============================================================================ */
+.speed-menu {
+  position: fixed;
+  z-index: 1200;
+  min-width: 250px;
+  background: var(--wd-menu-bg);
+  border: 1px solid var(--wd-menu-border);
+  border-radius: 10px;
+  box-shadow: var(--wd-shadow);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--wd-text);
+}
+
+.speed-menu-item {
+  text-align: left;
+  font: 600 12.5px 'IBM Plex Sans', sans-serif;
+  color: var(--wd-text);
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  padding: 9px 10px;
+  cursor: pointer;
+}
+
+.speed-menu-item:hover { background: var(--wd-menu-hover); }
+
+/* ============================================================================
+   9. PROD BAR TOOLBAR
+   ============================================================================ */
+.prodbar-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+
+.prodbar-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.prodbar-label {
+  font: 700 10.5px 'IBM Plex Mono', monospace;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--wd-text-mute);
+  margin-top: 5px;
+}
+
+.prodbar-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.prodbar-chip {
+  border: 1px solid var(--wd-chip-border);
+  background: var(--wd-chip-bg);
+  color: var(--wd-chip-text);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font: 600 11.5px 'IBM Plex Sans', sans-serif;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+
+.prodbar-chip:hover { background: var(--wd-chip-hover); }
+
+.prodbar-chip.is-on {
+  background: var(--wd-chip-on);
+  border-color: var(--wd-chip-on-bd);
+  color: #fff;
+}
+
+.prodbar-empty {
+  font: italic 400 11.5px 'IBM Plex Sans', sans-serif;
+  color: var(--wd-text-dim);
+}
+
+.pica-charts-row .opl-chart-wrap { min-height: 180px; }
+
+/* ============================================================================
+   10. PICA — Breakdown & Minor Stoppage
+   ============================================================================ */
+
+/* --- Kartu pembungkus (pakai .weekly-card bila perlu) --- */
+.pica-block {
+  margin-top: 18px;
+}
+
+/* --- Link Produk → buka log sheet --- */
+.pica-link {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: 700 12.5px 'IBM Plex Sans', sans-serif;
+  color: var(--wd-link);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color .15s;
+}
+.pica-link:hover { color: var(--wd-text-strong); }
+.pica-link:focus-visible {
+  outline: 2px solid var(--wd-link);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* --- Kolom Date --- */
+.pica-date {
+  width: 56px;
+  text-align: center;
+  color: var(--wd-text-mute);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* --- Sel kosong (belum diisi) --- */
+td.pica-null {
+  color: var(--wd-pica-null);
+  text-align: center;
+}
+
+/* --- Kolom Problem --- */
+.pica-problem {
+  color: var(--wd-text);
+  max-width: 260px;
+}
+
+/* --- Badge status --- */
+.pica-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.pica-status.st-open {
+  background: var(--wd-pica-open-bg);
+  border-color: var(--wd-pica-open-bd);
+  color: var(--wd-pica-open-fg);
+}
+.pica-status.st-progress {
+  background: var(--wd-pica-progress-bg);
+  border-color: var(--wd-pica-progress-bd);
+  color: var(--wd-pica-progress-fg);
+}
+.pica-status.st-closed {
+  background: var(--wd-pica-closed-bg);
+  border-color: var(--wd-pica-closed-bd);
+  color: var(--wd-pica-closed-fg);
+}
+
+/* --- Tombol aksi (edit / tambah) --- */
+.pica-edit,
+.ms-edit {
+  /* sudah pakai .btn .btn-ghost .btn-sm — style di bawah hanya penegas */
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* --- Baris konteks di modal --- */
+.pica-ctx-row {
+  padding: 4px 0;
+  font-size: 12px;
+  color: var(--wd-text);
+}
+.pica-ctx-row b { color: var(--wd-text-strong); }
+
+/* --- Overlay modal --- */
+.pica-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, .72);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(2px);
+}
+.pica-overlay.hide { display: none; }
+
+:root[data-wd-theme="light"] .pica-overlay {
+  background: rgba(15, 23, 42, .35);
+}
+
+/* --- Modal dialog --- */
+.pica-modal {
+  background: var(--wd-card);
+  color: var(--wd-text);
+  border: 1px solid var(--wd-border);
+  border-radius: 14px;
+  box-shadow: var(--wd-shadow);
+  width: min(720px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 20px 22px;
+}
+
+.pica-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--wd-text-strong);
+  margin-bottom: 12px;
+}
+
+.pica-modal label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--wd-text-mute);
+  margin: 10px 0 4px;
+}
+
+.pica-modal input[type="text"],
+.pica-modal input[type="number"],
+.pica-modal textarea,
+.pica-modal select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--wd-border);
+  background: var(--wd-card-2);
+  color: var(--wd-text);
+  font: 500 13px 'IBM Plex Sans', sans-serif;
+  outline: none;
+  transition: border-color .15s, background .15s;
+}
+.pica-modal input:focus,
+.pica-modal textarea:focus,
+.pica-modal select:focus {
+  border-color: var(--wd-accent);
+}
+.pica-modal textarea {
+  min-height: 62px;
+  resize: vertical;
+}
+
+.pica-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* --- Tabel PICA (override bila tabel memakai .speed-table) --- */
+#picaBody .bd-link { font-family: 'IBM Plex Sans', sans-serif; }
+
+#picaBody td.ctr,
+#msBody td.ctr { text-align: center; }
+
+#picaBody td.mono,
+#msBody td.mono {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--wd-text);
+}
+
+/* Scrollable wrapper tabel PICA */
+.pica-table-wrap {
+  overflow: auto;
+  max-height: 420px;
+  border-radius: 10px;
+  border: 1px solid var(--wd-border-soft);
+}
+.pica-table-wrap .speed-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* ============================================================================
+   11. TOMBOL GENERIK (ghost / small) — bila belum ada di app.css
+   ============================================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 9px;
+  border: 1px solid var(--wd-border);
+  background: var(--wd-card);
+  color: var(--wd-text);
+  font: 600 12.5px 'IBM Plex Sans', sans-serif;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.btn:hover { background: var(--wd-hover); color: var(--wd-text-strong); }
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--wd-text-mute);
+}
+.btn-ghost:hover {
+  background: var(--wd-hover);
+  border-color: var(--wd-border);
+  color: var(--wd-text-strong);
+}
+
+.btn-sm {
+  padding: 5px 9px;
+  font-size: 11.5px;
+  border-radius: 7px;
+}
+
+/* Tombol hijau (+ Tambah Minor Stop) */
+.btn-green,
+#msAddBtn {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #fff;
+}
+.btn-green:hover,
+#msAddBtn:hover {
+  background: #15803d;
+  border-color: #15803d;
+  color: #fff;
+}
+
+/* ============================================================================
+   SIDEBAR RESIZE + COLLAPSE (Weekly Meeting)
+   - Drag tepi kanan sidebar untuk ubah lebar
+   - Tombol ◀/▶ untuk sembunyikan / tampilkan sidebar
+   ============================================================================ */
+.weekly-layout {
+  --wd-side-w: 260px;
+  position: relative;
+  grid-template-columns: var(--wd-side-w) 1fr;
+  transition: grid-template-columns .22s ease;
+}
+.weekly-layout.is-dragging {
+  transition: none;   /* jangan animasi saat drag */
+}
+.weekly-layout.is-dragging,
+body.wd-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+/* --- Handle drag (di tepi kanan sidebar) --- */
+.weekly-sidebar { position: relative; }
+.weekly-sidebar-resizer {
+  position: absolute;
+  top: 0;
+  right: -4px;
+  width: 8px;
+  height: 100%;
+  z-index: 30;
+  cursor: col-resize;
+  background: transparent;
+  touch-action: none;
+}
+.weekly-sidebar-resizer::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 42px;
+  border-radius: 3px;
+  background: var(--wd-border);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity .15s ease, background .15s ease;
+}
+.weekly-sidebar-resizer:hover::before,
+.weekly-sidebar-resizer:focus-visible::before,
+.weekly-sidebar-resizer.is-dragging::before {
+  opacity: 1;
+  background: var(--wd-accent);
+}
+.weekly-sidebar-resizer:focus-visible { outline: none; }
+
+/* --- Toggle collapse (tombol bulat di boundary sidebar/main) --- */
+.weekly-side-toggle {
+  position: absolute;
+  top: 16px;
+  left: calc(var(--wd-side-w) - 30px);
+  width: 24px;
+  height: 24px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--wd-border);
+  border-radius: 6px;
+  background: var(--wd-card-2);
+  color: var(--wd-text-mute);
+  cursor: pointer;
+  font: 700 10px 'IBM Plex Sans', sans-serif;
+  transition: left .22s ease, background .15s, color .15s, border-color .15s;
+}
+.weekly-side-toggle:hover {
+  background: var(--wd-accent);
+  border-color: var(--wd-accent);
+  color: #fff;
+}
+.weekly-side-toggle:focus-visible {
+  outline: 2px solid var(--wd-link);
+  outline-offset: 2px;
+}
+.weekly-layout.is-side-collapsed .weekly-side-toggle {
+  left: 6px;
+}
+
+/* --- State: sidebar disembunyikan --- */
+.weekly-layout.is-side-collapsed {
+  grid-template-columns: 0 1fr;
+}
+.weekly-layout.is-side-collapsed .weekly-sidebar {
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  border-right: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.weekly-layout.is-side-collapsed .weekly-sidebar-resizer { display: none; }
+
+/* --- Mobile: matikan fitur (layout sudah 1 kolom) --- */
+@media (max-width: 960px) {
+  .weekly-layout {
+    grid-template-columns: 1fr;
+    transition: none;
+  }
+  .weekly-layout.is-side-collapsed { grid-template-columns: 1fr; }
+  .weekly-layout.is-side-collapsed .weekly-sidebar {
+    width: auto;
+    padding: 8px 0 6px;
+    border-bottom: 1px solid var(--wd-border-soft);
+    overflow: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .weekly-sidebar-resizer,
+  .weekly-side-toggle { display: none; }
+}

@@ -82,7 +82,7 @@ const Storage = (() => {
     rows: Rows.rows().map(tr => {
       const g = (f) => { const el = tr.querySelector(`[data-f="${f}"]`); return el ? el.value : ''; };
       return {
-        kode: g('kode'), op: g('op'), mulai: g('mulai'), panggil: g('panggil'),
+        kode: g('kode'), op: g('op'), ms: g('ms'), mulai: g('mulai'), panggil: g('panggil'),
         teknik: g('teknik'), selesai: g('selesai'), durasi: g('durasi'),
         kegiatan: g('kegiatan'), masalah: g('masalah'), disposisi: g('disposisi'),
         description: g('description'),

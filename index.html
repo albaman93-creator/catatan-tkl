@@ -21,11 +21,32 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- CSS (5 file: variables → base → layout → components → table) -->
+  <!-- Global tokens & base -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/ui.css">
   <link rel="stylesheet" href="./css/components.css">
-  <link rel="stylesheet" href="./css/table.css">
+  <!-- Shell / nav / app frame (1:1 js) -->
+  <link rel="stylesheet" href="./css/app.css">
+  <link rel="stylesheet" href="./css/shell.css">
+  <link rel="stylesheet" href="./css/navigation.css">
+  <link rel="stylesheet" href="./css/industrial-toolbar.css">
+  <link rel="stylesheet" href="./css/compact-controls.css">
+  <!-- Sheet & rows (1:1 rows.js) -->
+  <link rel="stylesheet" href="./css/rows.css">
+  <!-- Feature modules 1:1 dengan js/*.js -->
+  <link rel="stylesheet" href="./css/login.css">
+  <link rel="stylesheet" href="./css/suggest.css">
+  <link rel="stylesheet" href="./css/quickmode.css">
+  <link rel="stylesheet" href="./css/formmode.css">
+  <link rel="stylesheet" href="./css/bulkfill.css">
+  <link rel="stylesheet" href="./css/wizard.css">
+  <link rel="stylesheet" href="./css/dashboard.css">
+  <link rel="stylesheet" href="./css/weekly-dashboard.css">
+  <link rel="stylesheet" href="./css/pica.css">
+  <link rel="stylesheet" href="./css/shutdown.css">
+  <link rel="stylesheet" href="./css/printsheet.css">
+  <link rel="stylesheet" href="./css/settings.css">
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1082,6 +1103,7 @@
           <div class="col-preset-bar">
             <button type="button" class="col-preset-btn" id="presetQuick" title="Kolom ringkas: Kode, Mulai, Selesai, Durasi, Kegiatan, Produk, Good, Defect">⚡ Mode Hitung Cepat</button>
             <button type="button" class="col-preset-btn" id="presetFull" title="Tampilkan semua kolom">📋 Mode Lengkap</button>
+            <button type="button" class="col-preset-btn" id="btnSuggestKegiatan" title="Tambah / kelola sugesti kolom Kegiatan">💡 Sugesti Kegiatan</button>
           </div>
 
           <div class="col-toggle-wrap">
@@ -1099,6 +1121,7 @@
               <label><input type="checkbox" data-col="col-durasi" checked> Durasi</label>
               <label><input type="checkbox" data-col="col-kegiatan" checked> Kegiatan</label>
               <label><input type="checkbox" data-col="col-masalah" checked> Masalah</label>
+              <label><input type="checkbox" data-col="col-ms" checked> MS</label>
               <label><input type="checkbox" data-col="col-disposisi" checked> Disposisi</label>
               <label><input type="checkbox" data-col="col-desc" checked> Description</label>
               <label><input type="checkbox" data-col="col-wo" checked> No. WO</label>
@@ -1216,6 +1239,7 @@
               <col class="col-durasi">
               <col class="col-kegiatan">
               <col class="col-masalah">
+              <col class="col-ms">
               <col class="col-disposisi">
               <col class="col-desc">
               <col class="col-wo">
@@ -1251,6 +1275,7 @@
                   <button type="button" class="th-bulk-btn" data-bulk-col="kegiatan" title="Isi Kegiatan masal (notepad)">📥</button>
                 </th>
                 <th class="col-masalah" rowspan="2">Masalah</th>
+                <th class="col-ms" rowspan="2" title="Minor Stop — isi angka frekuensi (kali) pada baris ini">MS</th>
                 <th class="col-disposisi" rowspan="2">Disposisi</th>
                 <th class="col-desc" rowspan="2" title="Keterangan bebas operator (downtime, trial, catatan acak)">Description</th>
                 <th class="col-wo" rowspan="2">WO</th>
@@ -1974,30 +1999,29 @@
                   <button type="button" class="btn btn-primary btn-sm" id="msAddBtn">➕ Tambah Minor Stop</button>
                 </div>
                 <div class="pica-table-wrap">
-                  <table class="pica-table">
-                    <thead><tr>
-                      <th></th><th>No.</th><th>Produk</th><th>No. Batch</th><th>Problem</th><th>Frekuensi</th>
-                      <th>Why 1</th><th>Why 2</th><th>Why 3</th>
-                      <th>Corrective Action</th><th>Preventive Action</th><th>PIC</th><th>Status</th>
-                    </tr></thead>
-                    <tbody id="msBody"><tr><td colspan="13">Belum ada data — klik ➕ Tambah Minor Stop</td></tr></tbody>
-                  </table>
-                </div>
-              </article>
+  <table class="pica-table">
+    <thead><tr>
+      <th></th><th>No.</th><th>Date</th><th>Produk</th><th>No. Batch</th><th>Problem</th><th>Frekuensi</th>
+      <th>Why 1</th><th>Why 2</th><th>Why 3</th>
+      <th>Corrective Action</th><th>Preventive Action</th><th>PIC</th><th>Status</th>
+    </tr></thead>
+    <tbody id="msBody"><tr><td colspan="14">Belum ada data — klik ➕ Tambah Minor Stop</td></tr></tbody>
+  </table>
+</div>
 
               <article class="oee-bar-card pica-card">
                 <div class="oee-bar-title" id="picaTitle">PICA Problem OEE (Breakdown &gt;10 mnt)</div>
                 <div class="oee-filter-status" id="picaStatusMsg"></div>
                 <div class="pica-table-wrap">
-                  <table class="pica-table">
-                    <thead><tr>
-                      <th></th><th>No.</th><th>Produk</th><th>No. Batch</th><th>Problem</th><th>Durasi (min)</th>
-                      <th>Why 1</th><th>Why 2</th><th>Why 3</th>
-                      <th>Corrective Action</th><th>Preventive Action</th><th>PIC</th><th>Status</th>
-                    </tr></thead>
-                    <tbody id="picaBody"><tr><td colspan="13">Memuat…</td></tr></tbody>
-                  </table>
-                </div>
+  <table class="pica-table">
+    <thead><tr>
+      <th></th><th>No.</th><th>Date</th><th>Produk</th><th>No. Batch</th><th>Problem</th><th>Durasi (min)</th>
+      <th>Why 1</th><th>Why 2</th><th>Why 3</th>
+      <th>Corrective Action</th><th>Preventive Action</th><th>PIC</th><th>Status</th>
+    </tr></thead>
+    <tbody id="picaBody"><tr><td colspan="14">Memuat…</td></tr></tbody>
+  </table>
+</div>
               </article>
 
               <article class="oee-bar-card mch-bar-card">
@@ -2034,6 +2058,36 @@
       </div>
     </div>
   </div>
+
+  <!-- MODAL KELOLA SUGESTI KEGIATAN -->
+  <div id="suggestOverlay" class="qm-overlay hide">
+    <div class="qm-modal bulk-modal" role="dialog" aria-labelledby="suggestModalTitle" style="max-width:480px;width:94vw">
+      <div class="cm-header">
+        <h3 id="suggestModalTitle">💡 Sugesti Kegiatan</h3>
+        <button type="button" class="cm-close" id="suggestClose" aria-label="Tutup">×</button>
+      </div>
+      <div class="cm-body" style="display:flex;flex-direction:column;gap:12px">
+        <p style="margin:0;font-size:12.5px;color:#94a3b8;line-height:1.45">
+          Tambah teks yang sering dipakai di kolom <b>Kegiatan</b>. Sugesti muncul otomatis saat mengetik (ghost text). Mengikuti <b>tahapan proses</b> yang sedang aktif.
+        </p>
+        <div class="field">
+          <label for="suggestInput">Kegiatan baru</label>
+          <div style="display:flex;gap:8px;align-items:stretch">
+            <input type="text" id="suggestInput" placeholder="Mis. Line Clearance / Tunggu Visual…" style="flex:1">
+            <button type="button" class="btn btn-primary" id="suggestAddBtn">Tambah</button>
+          </div>
+        </div>
+        <div>
+          <div style="font:600 11px 'IBM Plex Mono',monospace;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Daftar khusus (bisa dihapus)</div>
+          <ul id="suggestCustomList" style="list-style:none;margin:0;padding:0;max-height:220px;overflow:auto;border:1px solid #1e3a5f;border-radius:8px"></ul>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button type="button" class="btn btn-ghost" id="suggestDoneBtn">Selesai</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL FORM WHY-WHY (PICA) -->
   <div id="picaOverlay" class="qm-overlay hide">
     <div class="qm-modal pica-modal" role="dialog" aria-labelledby="picaModalTitle">

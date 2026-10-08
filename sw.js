@@ -3,17 +3,35 @@
  * Cache semua aset aplikasi untuk mode offline.
  * Versi ditingkatkan untuk mencantumkan semua file JS modular.
  */
-const CACHE_NAME = 'tkl-oee-v49';
+const CACHE_NAME = 'tkl-oee-v54';
 
 const PRECACHE = [
+  './css/variables.css',
+  './css/base.css',
+  './css/ui.css',
+  './css/components.css',
+  './css/app.css',
+  './css/shell.css',
+  './css/navigation.css',
+  './css/industrial-toolbar.css',
+  './css/compact-controls.css',
+  './css/rows.css',
+  './css/login.css',
+  './css/suggest.css',
+  './css/quickmode.css',
+  './css/formmode.css',
+  './css/bulkfill.css',
+  './css/wizard.css',
+  './css/dashboard.css',
+  './css/weekly-dashboard.css',
+  './css/pica.css',
+  './css/shutdown.css',
+  './css/printsheet.css',
+  './css/settings.css',
+
   './',
   './index.html',
   './manifest.webmanifest',
-  './css/variables.css',
-  './css/base.css',
-  './css/layout.css',
-  './css/components.css',
-  './css/table.css',
   './js/config.js',
   './js/utils.js',
   './js/perf.js',
@@ -50,8 +68,7 @@ const PRECACHE = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
-  './icons/bg-login.jpg'
-];
+  './icons/bg-login.jpg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

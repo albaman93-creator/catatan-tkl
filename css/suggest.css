@@ -1,0 +1,43 @@
+/* Auto-paired 1:1 with js/suggest.js — edit styles for that module here */
+
+.ghost-wrap { position: relative; display: block; width: 100%; }
+
+.ghost-layer {
+  position: absolute; top: 0; left: 0; z-index: 3;
+  pointer-events: none; overflow: hidden;
+  white-space: pre-wrap; word-wrap: break-word; word-break: break-word;
+  background: transparent;
+}
+
+.ghost-layer .ghost-typed { color: transparent; }
+
+.ghost-layer .ghost-suggest { color: #a3aeb6; }
+
+.log .ghost-wrap { height: 100%; }
+
+.prod-suggest-drop[hidden] { display: none !important; }
+
+.prod-suggest-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #0f2437;
+  font: 700 12.5px 'IBM Plex Mono', ui-monospace, monospace;
+  letter-spacing: 0.4px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.prod-suggest-item:hover,
+.prod-suggest-item.on {
+  background: rgba(18, 161, 80, 0.12);
+  color: #0b7a3b;
+}
+
+.prod-suggest-item:active {
+  background: rgba(18, 161, 80, 0.2);
+}

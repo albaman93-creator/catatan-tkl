@@ -3,13 +3,20 @@
  *
  *  - Minor Stoppage: INPUT MANUAL (Produk, Batch, Problem, Frekuensi + Why-Why)
  *  - Breakdown: baris UNPLANNED kode 1,3,4,9 dengan durasi > 10 menit → Why-Why
+ *  - Klik Produk pada tabel Breakdown → buka log sheet record sumbernya
+ *  - Kolom "Date" ditambahkan di antara No. dan Produk
  */
 const Pica = (() => {
   'use strict';
   const $ = (id) => document.getElementById(id);
   const sb = () => (typeof SupabaseClient !== 'undefined' ? SupabaseClient.getClient() : null);
   const esc = (s) => Utils.escapeHtml(String(s ?? ''));
-  const fmtD = (iso) => String(iso).split('-').reverse().join('/');
+  const fmtD = (iso) => String(iso || '').split('-').reverse().join('/');
+  const fmtShort = (iso) => {
+    // 'YYYY-MM-DD' → 'DD/MM' (ringkas untuk kolom Date)
+    const s = String(iso || '');
+    return s.length >= 10 ? `${s.slice(8, 10)}/${s.slice(5, 7)}` : (s || '—');
+  };
   const toNum = (v) => {
     if (typeof v === 'number') return Number.isFinite(v) ? v : null;
     if (v == null || v === '') return null;
@@ -24,6 +31,7 @@ const Pica = (() => {
 
   const rowKey = (x) => [x.kode, x.mulai, x.selesai].map((v) => String(v ?? '').trim()).join('|');
   const fullKey = (p) => [p.date, p.shift, p.line, p.stage, p.key].join('|');
+
   // ===== Breakdown saja dari log sheet (durasi > 10 mnt, unplanned) =====
   const collectBreakdown = (records) => {
     const out = [];
@@ -52,9 +60,14 @@ const Pica = (() => {
         }
         const produk = toks[0] || prodName || '—';
         out.push({
-          date: r.rec_date, shift: r.shift, line: String(r.line), stage: String(r.tahapan || r.stage || ''),
-          key: rowKey(x), produk, batch, problem, dur: d, freq: 1,
-          sebab: masalah, tindakan: String(x.disposisi || '').trim(),
+          date: String(r.date || r.rec_date || ''),
+          shift: r.shift,
+          line: String(r.line),
+          stage: String(r.tahapan || r.stage || ''),
+          key: rowKey(x),
+          produk, batch, problem, dur: d, freq: 1,
+          sebab: masalah,
+          tindakan: String(x.disposisi || '').trim(),
           kind: 'breakdown',
         });
       });
@@ -62,7 +75,47 @@ const Pica = (() => {
     return out;
   };
 
-  // ===== Minor: localStorage per mesin (line + tahapan) =====
+  // ===== Minor dari kolom MS di log sheet (angka frekuensi per baris) =====
+  const collectMinorFromSheet = (records) => {
+    const map = new Map(); // key = produk|batch|problem
+    records.forEach((r) => {
+      const rows = Array.isArray(r.payload?.rows) ? r.payload.rows : [];
+      const pr = r.payload?.products || {};
+      rows.forEach((x) => {
+        const freq = parseInt(String(x.ms ?? '').trim(), 10);
+        if (!(freq > 0)) return;
+        const prodName = String(x.batch || '').trim();
+        const toks = prodName.split(/\s+/);
+        const kegiatan = String(x.kegiatan || '').trim();
+        const masalah = String(x.masalah || '').trim();
+        const problem = masalah || kegiatan || '(minor stop)';
+        let batch = '';
+        if (toks.length >= 2) batch = toks.slice(1).join(' ');
+        else {
+          for (const h of [1, 2, 3]) {
+            const nm = String(pr['p' + h + 'Name'] || '').trim();
+            const wo = String(pr['p' + h + 'Wo'] || '').trim();
+            if (nm && (prodName === nm || prodName.startsWith(nm))) { batch = wo; break; }
+          }
+        }
+        const produk = toks[0] || prodName || '—';
+        const k = [produk, batch, problem].join('|');
+        if (!map.has(k)) {
+          map.set(k, {
+            id: 'ms_' + k,
+            produk, batch, problem, freq: 0,
+            date: String(r.date || r.rec_date || ''),
+            why1: '', why2: '', why3: '', corrective: '', preventive: '', pic: '', status: 'Open',
+            kind: 'minor', line: String(r.line), stage: String(r.tahapan || r.stage || ''),
+          });
+        }
+        map.get(k).freq += freq;
+      });
+    });
+    return Array.from(map.values()).sort((a, b) => b.freq - a.freq);
+  };
+
+  // ===== Why-Why minor (opsional) di localStorage, digabung ke data sheet =====
   const msStoreKey = (line, stage) => `tkl_minor_v1_${line}_${stage}`;
   const loadMinorLocal = (line, stage) => {
     try {
@@ -129,13 +182,14 @@ const Pica = (() => {
     const body = $('msBody');
     if (!body) return;
     if (!listMs.length) {
-      body.innerHTML = '<tr><td colspan="13">Belum ada minor stop — klik ➕ Tambah Minor Stop (input manual).</td></tr>';
+      body.innerHTML = '<tr><td colspan="14">Belum ada minor stop — isi kolom <b>MS</b> (angka) di log sheet, lalu buka lagi halaman ini.</td></tr>';
       return;
     }
     body.innerHTML = listMs.map((p, i) => {
       return `<tr>`
         + `<td class="ctr"><button type="button" class="btn btn-ghost btn-sm ms-edit" data-i="${i}" title="Edit minor stop">✍️</button></td>`
         + `<td class="ctr">${i + 1}.</td>`
+        + `<td class="mono pica-date">${esc(fmtShort(p.date))}</td>`
         + `<td><b>${esc(p.produk)}</b></td>`
         + `<td class="mono">${esc(p.batch || '—')}</td><td class="pica-problem">${esc(p.problem)}</td>`
         + `<td class="ctr"><b>${p.freq || 1}</b></td>`
@@ -148,15 +202,25 @@ const Pica = (() => {
     const body = $('picaBody');
     if (!body) return;
     if (!listBd.length) {
-      body.innerHTML = '<tr><td colspan="13">Tidak ada breakdown (&gt;10 mnt) pada rentang ini.</td></tr>';
+      body.innerHTML = '<tr><td colspan="14">Tidak ada breakdown (&gt;10 mnt) pada rentang ini.</td></tr>';
       return;
     }
     body.innerHTML = listBd.map((p, i) => {
       const a = analysis[fullKey(p)];
+      const tip = `Buka log sheet: ${fmtD(p.date)} · S${p.shift} · Line ${p.line} · ${p.stage} — ${p.problem} (${p.dur || 0}m)`;
       return `<tr>`
         + `<td class="ctr"><button type="button" class="btn btn-ghost btn-sm pica-edit" data-i="${i}" title="Isi / ubah Why-Why">✍️</button></td>`
         + `<td class="ctr">${i + 1}.</td>`
-        + `<td><button type="button" class="pica-link bd-link" data-i="${i}" title="Buka log sheet">${esc(p.produk)}</button></td>`
+        + `<td class="mono pica-date" title="${esc(fmtD(p.date))}">${esc(fmtShort(p.date))}</td>`
+        + `<td><button type="button" class="pica-link bd-link"`
+        +   ` data-i="${i}"`
+        +   ` data-date="${esc(p.date)}"`
+        +   ` data-shift="${esc(p.shift)}"`
+        +   ` data-line="${esc(p.line)}"`
+        +   ` data-stage="${esc(p.stage)}"`
+        +   ` data-key="${esc(p.key)}"`
+        +   ` title="${esc(tip)}"`
+        +   ` aria-label="Buka log sheet ${esc(p.produk)} tanggal ${fmtD(p.date)} shift ${p.shift}">${esc(p.produk)}</button></td>`
         + `<td class="mono">${esc(p.batch || '—')}</td><td class="pica-problem">${esc(p.problem)}</td>`
         + `<td class="ctr">${p.dur || 0}</td>`
         + cell(a?.why1) + cell(a?.why2) + cell(a?.why3) + cell(a?.corrective) + cell(a?.preventive) + cell(a?.pic)
@@ -196,7 +260,7 @@ const Pica = (() => {
     const isNew = i == null || i < 0;
     const p = isNew ? null : listMs[i];
     current = isNew
-      ? { id: 'ms_' + Date.now(), produk: '', batch: '', problem: '', freq: 1, status: 'Open', kind: 'minor' }
+      ? { id: 'ms_' + Date.now(), produk: '', batch: '', problem: '', freq: 1, status: 'Open', kind: 'minor', date: '' }
       : p;
     const mf = $('picaMinorFields');
     if (mf) mf.hidden = false;
@@ -236,6 +300,7 @@ const Pica = (() => {
         batch: ($('msBatch')?.value || '').trim(),
         problem,
         freq,
+        date: current?.date || '',
         why1: $('picaWhy1').value.trim(),
         why2: $('picaWhy2').value.trim(),
         why3: $('picaWhy3').value.trim(),
@@ -255,7 +320,6 @@ const Pica = (() => {
       updateMsStatus();
       closeForm();
       if (typeof UI !== 'undefined' && UI.toast) UI.toast('✓ Minor stop disimpan');
-      // chart
       const byProd = {};
       listMs.forEach((p) => { byProd[p.produk] = (byProd[p.produk] || 0) + (p.freq || 1); });
       barChart('msChartSvg', Object.entries(byProd).map(([label, v]) => ({ label, v })).sort((a, b) => b.v - a.v), 'kali', '#f59e0b');
@@ -294,14 +358,28 @@ const Pica = (() => {
     if (!st) return;
     const n = listMs.length;
     const f = listMs.reduce((s, p) => s + (p.freq || 1), 0);
-    st.textContent = n ? `✓ ${n} problem minor · total frekuensi ${f} (input manual)` : 'Belum ada minor stop — klik ➕ untuk menambah';
+    st.textContent = n ? `✓ ${n} problem minor · total frekuensi ${f} (dari kolom MS di sheet)` : 'Belum ada minor — isi kolom MS (angka) di log sheet';
     st.className = 'oee-filter-status';
   };
 
+  // ===== Buka log sheet dari baris Breakdown =====
   const openSheet = (p) => {
-    if (p && typeof UI !== 'undefined' && UI.openRecord) {
-      UI.openRecord({ date: p.date, shift: p.shift, line: p.line, stage: p.stage });
+    if (!p) return;
+    if (typeof UI === 'undefined' || !UI.openRecord) {
+      console.warn('PICA: UI.openRecord tidak tersedia');
+      return;
     }
+    if (!p.date) {
+      console.warn('PICA: record tidak punya tanggal — cek collectBreakdown', p);
+      return;
+    }
+    UI.openRecord({
+      date:  String(p.date),
+      shift: String(p.shift || 1),
+      line:  String(p.line || ''),
+      stage: String(p.stage || ''),
+      rowKey: p.key || ''
+    });
   };
 
   // ===== Dipanggil weekly-dashboard setiap halaman mesin dirender =====
@@ -315,7 +393,28 @@ const Pica = (() => {
 
     metaCtx = { line: String(meta.line), stage: String(meta.stage) };
     listBd = collectBreakdown(records);
-    listMs = loadMinorLocal(metaCtx.line, metaCtx.stage);
+    // Minor: dari kolom MS di sheet, Why-Why dari localStorage (jika pernah diisi)
+    const fromSheet = collectMinorFromSheet(records);
+    const saved = loadMinorLocal(metaCtx.line, metaCtx.stage);
+    const byId = Object.fromEntries(saved.map((x) => [x.id || (x.produk + '|' + x.batch + '|' + x.problem), x]));
+    listMs = fromSheet.map((p) => {
+      const s = byId[p.id] || byId[[p.produk, p.batch, p.problem].join('|')];
+      if (!s) return p;
+      return {
+        ...p,
+        date: p.date || s.date || '',
+        why1: s.why1 || '', why2: s.why2 || '', why3: s.why3 || '',
+        corrective: s.corrective || '', preventive: s.preventive || '',
+        pic: s.pic || '', status: s.status || 'Open',
+      };
+    });
+    // Entri manual lama yang tidak ada di sheet tetap tampil
+    saved.forEach((s) => {
+      const id = s.id || [s.produk, s.batch, s.problem].join('|');
+      if (!listMs.some((p) => (p.id || [p.produk, p.batch, p.problem].join('|')) === id)) {
+        listMs.push(s);
+      }
+    });
 
     // Chart: minor = frekuensi per produk; breakdown = total menit per produk
     const msByProd = {};
@@ -359,7 +458,25 @@ const Pica = (() => {
       const btn = e.target.closest('.pica-edit');
       if (btn) { openFormBreakdown(Number(btn.dataset.i)); return; }
       const lk = e.target.closest('.bd-link');
-      if (lk) openSheet(listBd[Number(lk.dataset.i)]);
+      if (lk) {
+        const i = Number(lk.dataset.i);
+        const p = listBd[i] || {
+          date:  lk.dataset.date,
+          shift: lk.dataset.shift,
+          line:  lk.dataset.line,
+          stage: lk.dataset.stage,
+          key:   lk.dataset.key
+        };
+        openSheet(p);
+      }
+    });
+    // Keyboard: Enter / Space pada tombol produk
+    $('picaBody')?.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const lk = e.target.closest('.bd-link');
+      if (!lk) return;
+      e.preventDefault();
+      lk.click();
     });
     $('picaClose')?.addEventListener('click', closeForm);
     $('picaCancel')?.addEventListener('click', closeForm);

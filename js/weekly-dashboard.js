@@ -5,15 +5,13 @@
  * - Halaman Capaian Yield Produksi (gauge + bar + KPI)
  * - Halaman OEE PRODUCTION (dual half-circle gauge + speed table)
  * - Placeholder detail mesin
+ * - Mode Gelap / Terang adaptif (warna chart ikut menyesuaikan)
  */
 const WeeklyDashboard = (() => {
   'use strict';
 
   const EXTERNAL_URL = 'https://datastudio.google.com/u/2/reporting/6c7344aa-f59c-4913-a8bf-2876228e987f/page/p_cd3o6rdg7d';
 
-  // Panjang path setengah lingkaran: π * radius
-  // Yield gauge: r=80 → 251.2
-  // OEE gauges: r=85 → 266.9
   const YIELD_GAUGE_LEN = 251.2;
   const OEE_GAUGE_LEN = 266.9;
 
@@ -26,21 +24,238 @@ const WeeklyDashboard = (() => {
     'kemas-4': 'MESIN KEMAS LINE 4'
   };
 
+  // ============================================================
+  // TEMA (Gelap / Terang)
+  // ============================================================
+  const THEME_KEY = 'weeklyDashTheme';
+  const THEME_ATTR = 'data-wd-theme';
+  let theme = 'dark';
+
+  const rootEl = () => document.documentElement;
+  const layoutEl = () => document.querySelector('.weekly-layout');
+  const isLight = () => theme === 'light';
+
+  /** Baca nilai CSS custom-property yang aktif (agar SVG ikut tema). */
+  const readVar = (name, fallback) => {
+    const el = layoutEl() || rootEl();
+    const v = getComputedStyle(el).getPropertyValue(name).trim();
+    return v || fallback;
+  };
+
+  /** Palet chart yang otomatis menyesuaikan tema. */
+  const C = {
+    grid:     () => readVar('--wd-grid',          isLight() ? '#dde5ee' : '#334155'),
+    axis:     () => readVar('--wd-axis',          isLight() ? '#6b7a8f' : '#94a3b8'),
+    axisSoft: () => readVar('--wd-axis-soft',     isLight() ? '#7a879a' : '#7c8ba1'),
+    text:     () => readVar('--wd-text',          isLight() ? '#1e293b' : '#e2e8f0'),
+    mute:     () => readVar('--wd-text-mute',     isLight() ? '#526176' : '#94a3b8'),
+    dim:      () => readVar('--wd-text-dim',      isLight() ? '#6b7a8f' : '#7c8ba1'),
+    line:     () => readVar('--wd-chart-line',    isLight() ? '#2563eb' : '#3b82f6'),
+    lineLt:   () => readVar('--wd-chart-line-lt', isLight() ? '#1d4ed8' : '#93c5fd'),
+    green:    () => readVar('--wd-chart-green',   isLight() ? '#16a34a' : '#22c55e'),
+    greenLt:  () => readVar('--wd-chart-green-lt',isLight() ? '#15803d' : '#86efac'),
+    red:      () => readVar('--wd-chart-red',     isLight() ? '#e11d48' : '#f43f5e'),
+    redLt:    () => readVar('--wd-chart-red-lt',  isLight() ? '#be123c' : '#fda4af'),
+    amber:    () => readVar('--wd-chart-amber',   isLight() ? '#d97706' : '#f59e0b'),
+    amberLt:  () => readVar('--wd-chart-amber-lt',isLight() ? '#b45309' : '#fcd34d'),
+    cyan:     () => readVar('--wd-chart-cyan',    isLight() ? '#0891b2' : '#22d3ee'),
+    cyanLt:   () => readVar('--wd-chart-cyan-lt', isLight() ? '#0e7490' : '#a5f3fc'),
+    ope:      () => readVar('--wd-oee-ope',       isLight() ? '#65a30d' : '#a3c93a'),
+    o365:     () => readVar('--wd-oee-365',       isLight() ? '#0e7490' : '#22b8cf')
+  };
+
+  const updateToggleButton = () => {
+    const btn = document.querySelector('.weekly-theme-toggle');
+    if (!btn) return;
+    const next = isLight() ? 'gelap' : 'terang';
+    btn.innerHTML = isLight()
+      ? '<span class="wt-icon">🌙</span><span>Mode Gelap</span>'
+      : '<span class="wt-icon">☀️</span><span>Mode Terang</span>';
+    btn.title = `Ganti ke mode ${next}`;
+    btn.setAttribute('aria-label', `Ganti ke mode ${next}`);
+    btn.setAttribute('aria-pressed', String(isLight()));
+  };
+
+  const applyTheme = (t) => {
+    theme = (t === 'light') ? 'light' : 'dark';
+    rootEl().setAttribute(THEME_ATTR, theme);
+    try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* ignore */ }
+    updateToggleButton();
+  };
+
+  const initTheme = () => {
+    let saved = '';
+    try { saved = localStorage.getItem(THEME_KEY) || ''; } catch (e) { /* ignore */ }
+    if (saved === 'light' || saved === 'dark') return applyTheme(saved);
+    // Belum pernah dipilih → ikuti preferensi sistem
+    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    applyTheme(prefersLight ? 'light' : 'dark');
+  };
+
+  const toggleTheme = () => {
+    applyTheme(isLight() ? 'dark' : 'light');
+    // Re-render chart agar warna SVG ikut berubah.
+    if (currentPage === 'oee-prod') loadOee();
+    else if (MACHINE_PAGES[currentPage]) loadMachine();
+  };
+
+  const ensureThemeToggle = () => {
+    const foot = document.querySelector('.weekly-sidebar-foot');
+    if (!foot) return;
+    if (foot.querySelector('.weekly-theme-toggle')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'weekly-theme-toggle';
+    btn.addEventListener('click', toggleTheme);
+    foot.appendChild(btn);
+    updateToggleButton();
+  };
+
+    // ============================================================
+  // SIDEBAR RESIZE + COLLAPSE (Weekly Meeting)
+  // ============================================================
+  const SIDE_W_KEY = 'weeklyDashSideW';
+  const SIDE_COLLAPSED_KEY = 'weeklyDashSideCollapsed';
+  const SIDE_MIN = 140;
+  const SIDE_MAX = 480;
+  const SIDE_DEFAULT = 260;
+  const SIDE_COLLAPSE_TRIGGER = 110;   // drag di bawah ini → auto-collapse
+
+  const applySideW = (w, persist = true) => {
+    const layout = layoutEl();
+    if (!layout) return;
+    const v = Math.max(SIDE_MIN, Math.min(SIDE_MAX, Math.round(w)));
+    layout.style.setProperty('--wd-side-w', v + 'px');
+    if (persist) { try { localStorage.setItem(SIDE_W_KEY, String(v)); } catch (_) {} }
+  };
+
+  const applySideCollapsed = (collapsed) => {
+    const layout = layoutEl();
+    if (!layout) return;
+    layout.classList.toggle('is-side-collapsed', !!collapsed);
+    try { localStorage.setItem(SIDE_COLLAPSED_KEY, collapsed ? '1' : '0'); } catch (_) {}
+    const btn = layout.querySelector('.weekly-side-toggle');
+    if (btn) {
+      btn.textContent = collapsed ? '▶' : '◀';
+      const tip = collapsed ? 'Tampilkan sidebar' : 'Sembunyikan sidebar';
+      btn.title = tip;
+      btn.setAttribute('aria-label', tip);
+      btn.setAttribute('aria-expanded', String(!collapsed));
+    }
+  };
+
+  const ensureSideResize = () => {
+    const layout = layoutEl();
+    if (!layout) return;
+    const sidebar = layout.querySelector('.weekly-sidebar');
+
+    // 1) Restore state tersimpan
+    let w = SIDE_DEFAULT;
+    try {
+      const s = parseInt(localStorage.getItem(SIDE_W_KEY) || '', 10);
+      if (Number.isFinite(s)) w = s;
+    } catch (_) {}
+    applySideW(w, false);
+    let col = false;
+    try { col = localStorage.getItem(SIDE_COLLAPSED_KEY) === '1'; } catch (_) {}
+    applySideCollapsed(col);
+
+    // 2) Handle drag resize — sekali saja
+    if (sidebar && !sidebar.querySelector('.weekly-sidebar-resizer')) {
+      const rz = document.createElement('div');
+      rz.className = 'weekly-sidebar-resizer';
+      rz.setAttribute('role', 'separator');
+      rz.setAttribute('aria-orientation', 'vertical');
+      rz.setAttribute('aria-label', 'Tarik untuk mengubah lebar sidebar');
+      rz.title = 'Tarik untuk mengubah lebar sidebar · klik-2× reset';
+      rz.tabIndex = 0;
+      sidebar.appendChild(rz);
+
+      let dragging = false, startX = 0, startW = 0;
+
+      const onDown = (e) => {
+        if (layout.classList.contains('is-side-collapsed')) return;
+        dragging = true;
+        startX = (e.clientX ?? e.touches?.[0]?.clientX ?? 0);
+        startW = parseFloat(getComputedStyle(layout).getPropertyValue('--wd-side-w')) || SIDE_DEFAULT;
+        rz.classList.add('is-dragging');
+        layout.classList.add('is-dragging');
+        document.body.classList.add('wd-resizing');
+        e.preventDefault();
+      };
+      const onMove = (e) => {
+        if (!dragging) return;
+        const x = (e.clientX ?? e.touches?.[0]?.clientX ?? 0);
+        const next = startW + (x - startX);
+        // Seret jauh ke kiri → auto-collapse
+        if (next < SIDE_COLLAPSE_TRIGGER) {
+          applySideW(SIDE_MIN);
+          applySideCollapsed(true);
+          onUp();
+          return;
+        }
+        applySideW(next, false);
+        e.preventDefault();
+      };
+      const onUp = () => {
+        if (!dragging) return;
+        dragging = false;
+        rz.classList.remove('is-dragging');
+        layout.classList.remove('is-dragging');
+        document.body.classList.remove('wd-resizing');
+        const cur = parseFloat(getComputedStyle(layout).getPropertyValue('--wd-side-w')) || SIDE_DEFAULT;
+        try { localStorage.setItem(SIDE_W_KEY, String(Math.round(cur))); } catch (_) {}
+      };
+
+      rz.addEventListener('mousedown', onDown);
+      rz.addEventListener('touchstart', onDown, { passive: false });
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('mouseup', onUp);
+      document.addEventListener('touchend', onUp);
+      document.addEventListener('touchcancel', onUp);
+
+      rz.addEventListener('dblclick', () => {
+        applySideW(SIDE_DEFAULT);
+        applySideCollapsed(false);
+      });
+      rz.addEventListener('keydown', (e) => {
+        const cur = parseFloat(getComputedStyle(layout).getPropertyValue('--wd-side-w')) || SIDE_DEFAULT;
+        if (e.key === 'ArrowLeft')  { applySideW(cur - 16); e.preventDefault(); }
+        if (e.key === 'ArrowRight') { applySideW(cur + 16); e.preventDefault(); }
+        if (e.key === 'Home')       { applySideW(SIDE_DEFAULT); e.preventDefault(); }
+      });
+    }
+
+    // 3) Toggle collapse — sekali saja
+    if (!layout.querySelector('.weekly-side-toggle')) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'weekly-side-toggle';
+      btn.addEventListener('click', () => {
+        applySideCollapsed(!layout.classList.contains('is-side-collapsed'));
+      });
+      layout.appendChild(btn);
+      applySideCollapsed(layout.classList.contains('is-side-collapsed'));
+    }
+  };
+
+  // ============================================================
+  // UTIL
+  // ============================================================
   let inited = false;
+  let currentPage = 'yield';
 
   const fmtPct = (v, d = 2) =>
     Number(v).toLocaleString('id-ID', { minimumFractionDigits: d, maximumFractionDigits: d }) + '%';
 
-  /** Set stroke-dashoffset untuk gauge setengah lingkaran (0% = kosong, 100% = penuh) */
   const setHalfGauge = (elId, pct, len) => {
     const fill = document.getElementById(elId);
     if (!fill) return;
     const clamped = Math.max(0, Math.min(100, Number(pct) || 0));
     const offset = len * (1 - clamped / 100);
-    // Reset dulu biar animasi jalan setiap kali
     fill.style.transition = 'none';
     fill.style.strokeDashoffset = String(len);
-    // Force reflow
     void fill.getBoundingClientRect();
     fill.style.transition = 'stroke-dashoffset 0.9s ease';
     fill.style.strokeDashoffset = String(offset);
@@ -52,10 +267,9 @@ const WeeklyDashboard = (() => {
     if (val) val.textContent = fmtPct(pct, 1);
   };
 
-  // ===== OEE PRODUCTION: data nyata Supabase (Filling & Kemas, Line 1/2/4) =====
+  // ===== OEE PRODUCTION =====
   const OEE_LINES = ['1', '2', '4'];
   const OEE_STAGES = ['filling', 'kemas'];
-  // Pemetaan mesin per line — ubah di sini bila nama mesin berbeda.
   const OEE_MACHINES = {
     filling: [
       { line: '1', name: 'Shinva', sub: 'RSYG2-1-23005' },
@@ -74,7 +288,6 @@ const WeeklyDashboard = (() => {
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   let oeeSeq = 0;
 
-  // Kode produk = kata pertama nama produk ("VTTS1 L030207" → "VTTS1").
   const prodCode = (n) => String(n || '').trim().split(/\s+/)[0].toUpperCase();
 
   const $ = (id) => document.getElementById(id);
@@ -95,7 +308,6 @@ const WeeklyDashboard = (() => {
     return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null;
   };
 
-  // stage+line diisi → satu mesin (halaman detail mesin); kosong → semua Filling & Kemas Line 1/2/4.
   const fetchOeeRows = async (from, to, stage, line) => {
     const client = typeof SupabaseClient !== 'undefined' ? SupabaseClient.getClient() : null;
     if (!client) throw new Error('Supabase belum terhubung');
@@ -113,7 +325,6 @@ const WeeklyDashboard = (() => {
     return out;
   };
 
-  // Metrik per record. en = waktu operasional (menit) = (shift − planned) − unplanned.
   const recMetrics = (r) => {
     const sm = CONFIG.SHIFT_A[(Number(r.shift) || 1) - 1] || 0;
     const rows = Array.isArray(r.payload?.rows) ? r.payload.rows : [];
@@ -131,8 +342,6 @@ const WeeklyDashboard = (() => {
     return { a, p: toNum(r.performance), q: toNum(r.quality), o: toNum(r.oee), en };
   };
 
-  // OPE : rata-rata A/P/Q/OEE tersimpan per record (sama dengan Dashboard 360°).
-  // 365 : A365 = Σ waktu operasional ÷ (1440 mnt × hari kalender) per mesin; P & Q sama dengan OPE.
   const calcSet = (rows, days) => {
     const m = rows.map(recMetrics);
     const ope = { a: avg(m.map((x) => x.a)), p: avg(m.map((x) => x.p)), q: avg(m.map((x) => x.q)), oee: avg(m.map((x) => x.o)) };
@@ -167,8 +376,6 @@ const WeeklyDashboard = (() => {
     setApq(pf + '365A', all.o365.a, TGT_365.a); setApq(pf + '365P', all.o365.p, TGT_365.p); setApq(pf + '365Q', all.o365.q, TGT_365.q);
   };
 
-  // Sumber tiap baris Speed Standar: record terbaru (tanggal, lalu shift) yang memuat produk itu.
-  // Klik baris → buka log sheet record tersebut.
   const speedLatest = (rows, keyFn) => {
     const latest = {};
     rows.forEach((r) => {
@@ -215,47 +422,51 @@ const WeeklyDashboard = (() => {
     UI.openRecord({ date: d.date, shift: d.shift, line: d.line, stage: d.stage });
   };
 
-  const trendSvg = (id, pts, color, light, ylabel, fixedMax) => {
+  // ---------- SVG: Trend Line ----------
+  const trendSvg = (id, pts, color, lightColor, ylabel, fixedMax) => {
     const svg = $(id);
     if (!svg) return;
+    const grid = C.grid(), axis = C.axis(), mute = C.mute(), dim = C.dim();
     const top = Math.max(0, ...pts.map((p) => (Number.isFinite(p.v) ? p.v : 0)));
     const max = fixedMax || Math.max(50, Math.ceil(top / 10) * 10);
     const Y = (v) => 180 - (Math.min(v, max) / max) * 160;
-    let s = '<g stroke="#334155" stroke-width="1">';
+    let s = `<g stroke="${grid}" stroke-width="1">`;
     for (let i = 0; i <= 5; i++) s += `<line x1="48" y1="${20 + i * 32}" x2="340" y2="${20 + i * 32}"/>`;
-    s += '</g><g fill="#64748b" font-size="10" text-anchor="end">';
+    s += `</g><g fill="${axis}" font-size="10" text-anchor="end">`;
     for (let i = 0; i <= 5; i++) s += `<text x="42" y="${24 + i * 32}">${Math.round(max - (i * max) / 5)}%</text>`;
-    s += `</g><text x="12" y="100" fill="#94a3b8" font-size="9" transform="rotate(-90 12 100)" text-anchor="middle">${ylabel}</text>`;
-    if (!pts.length) { svg.innerHTML = s + '<text x="194" y="104" fill="#64748b" font-size="12" text-anchor="middle">Tidak ada data</text>'; return; }
+    s += `</g><text x="12" y="100" fill="${mute}" font-size="9" transform="rotate(-90 12 100)" text-anchor="middle">${ylabel}</text>`;
+    if (!pts.length) { svg.innerHTML = s + `<text x="194" y="104" fill="${dim}" font-size="12" text-anchor="middle">Tidak ada data</text>`; return; }
     const X = (i) => (pts.length === 1 ? 194 : 74 + i * (240 / (pts.length - 1)));
     const line = pts.map((p, i) => (p.v == null ? null : X(i) + ',' + Y(p.v))).filter(Boolean);
     if (line.length > 1) s += `<polyline points="${line.join(' ')}" fill="none" stroke="${color}" stroke-width="2"/>`;
     pts.forEach((p, i) => {
       const x = X(i);
-      if (p.v != null) s += `<circle cx="${x}" cy="${Y(p.v)}" r="5" fill="${color}"/><text x="${x}" y="${Y(p.v) - 9}" fill="${light}" font-size="11" font-weight="700" text-anchor="middle">${fmtPct(p.v, pts.length > 6 ? 1 : 2)}</text>`;
-      s += `<text x="${x}" y="194" fill="#94a3b8" font-size="${pts.length > 6 ? 9 : 11}" text-anchor="middle">${p.label}</text>`;
+      if (p.v != null) s += `<circle cx="${x}" cy="${Y(p.v)}" r="5" fill="${color}"/><text x="${x}" y="${Y(p.v) - 9}" fill="${lightColor}" font-size="11" font-weight="700" text-anchor="middle">${fmtPct(p.v, pts.length > 6 ? 1 : 2)}</text>`;
+      s += `<text x="${x}" y="194" fill="${mute}" font-size="${pts.length > 6 ? 9 : 11}" text-anchor="middle">${p.label}</text>`;
     });
     svg.innerHTML = s;
   };
 
+  // ---------- SVG: Bar Chart (OEE per mesin) ----------
   const barSvg = (id, items, c1, t1, c2, t2, caption) => {
     const svg = $(id);
     if (!svg) return;
-    let s = '<g stroke="#334155" stroke-width="1">';
+    const grid = C.grid(), axis = C.axis(), mute = C.mute(), dim = C.dim();
+    let s = `<g stroke="${grid}" stroke-width="1">`;
     for (let i = 0; i <= 5; i++) s += `<line x1="56" y1="${20 + i * 32}" x2="400" y2="${20 + i * 32}"/>`;
-    s += '</g><g fill="#64748b" font-size="10" text-anchor="end">';
+    s += `</g><g fill="${axis}" font-size="10" text-anchor="end">`;
     for (let i = 0; i <= 5; i++) s += `<text x="50" y="${24 + i * 32}">${100 - i * 20}%</text>`;
     s += '</g>';
     items.forEach((m, i) => {
       const x = 78 + i * 110;
       [[m.ope, c1, t1, x], [m.o365, c2, t2, x + 32]].forEach(([v, c, t, bx]) => {
-        if (v == null) { s += `<text x="${bx + 14}" y="176" fill="#64748b" font-size="9" text-anchor="middle">—</text>`; return; }
+        if (v == null) { s += `<text x="${bx + 14}" y="176" fill="${dim}" font-size="9" text-anchor="middle">—</text>`; return; }
         const h = Math.min(Math.max(v, 0), 100) * 1.6, y = 180 - h;
         s += `<rect x="${bx}" y="${y}" width="28" height="${h}" rx="3" fill="${c}"/><text x="${bx + 14}" y="${y - 5}" fill="${t}" font-size="9" font-weight="700" text-anchor="middle">${fmtPct(v, 2)}</text>`;
       });
-      s += `<text x="${x + 30}" y="198" fill="#94a3b8" font-size="8" text-anchor="middle">${m.name}</text><text x="${x + 30}" y="210" fill="#64748b" font-size="7" text-anchor="middle">${m.sub}</text>`;
+      s += `<text x="${x + 30}" y="198" fill="${mute}" font-size="8" text-anchor="middle">${m.name}</text><text x="${x + 30}" y="210" fill="${dim}" font-size="7" text-anchor="middle">${m.sub}</text>`;
     });
-    svg.innerHTML = s + `<text x="228" y="232" fill="#64748b" font-size="9" text-anchor="middle">${caption}</text>`;
+    svg.innerHTML = s + `<text x="228" y="232" fill="${dim}" font-size="9" text-anchor="middle">${caption}</text>`;
   };
 
   const monthSpan = (k, from, to) => {
@@ -273,11 +484,11 @@ const WeeklyDashboard = (() => {
       const c = calcSet(byMonth[k], monthSpan(k, from, to));
       return { label: monthLabel(k), ope: c.ope.oee, o365: c.o365.oee };
     });
-    trendSvg('chartOeeOpe', series.map((s) => ({ label: s.label, v: s.ope })), '#3b82f6', '#93c5fd', 'Capaian OEE OPE', 100);
-    trendSvg('chartOee365', series.map((s) => ({ label: s.label, v: s.o365 })), '#22c55e', '#86efac', 'Capaian OEE 365', 0);
+    trendSvg('chartOeeOpe', series.map((s) => ({ label: s.label, v: s.ope })), C.line(), C.lineLt(), 'Capaian OEE OPE', 100);
+    trendSvg('chartOee365', series.map((s) => ({ label: s.label, v: s.o365 })), C.green(), C.greenLt(), 'Capaian OEE 365', 0);
     const items = (st) => OEE_MACHINES[st].map((m) => { const p = all.per[st + '|' + m.line]; return { ...m, ope: p?.ope ?? null, o365: p?.o365 ?? null }; });
-    barSvg('oeeBarFfs', items('filling'), '#22c55e', '#86efac', '#f59e0b', '#fcd34d', 'Automatic Form Fill Seal Machine');
-    barSvg('oeeBarOw', items('kemas'), '#f43f5e', '#fda4af', '#22d3ee', '#a5f3fc', 'Overwrapping Machine');
+    barSvg('oeeBarFfs', items('filling'), C.green(), C.greenLt(), C.amber(), C.amberLt(), 'Automatic Form Fill Seal Machine');
+    barSvg('oeeBarOw', items('kemas'), C.red(), C.redLt(), C.cyan(), C.cyanLt(), 'Overwrapping Machine');
   };
 
   const loadOee = async () => {
@@ -333,27 +544,24 @@ const WeeklyDashboard = (() => {
     $('oeeReset')?.addEventListener('click', () => { $('oeeFrom').value = ''; $('oeeTo').value = ''; initOeeFilter(); loadOee(); });
   };
 
-  // ===== HALAMAN DETAIL MESIN (Filling / Kemas · Line 1, 2, 4) =====
+  // ===== HALAMAN DETAIL MESIN =====
   const MACHINE_PAGES = {
     'filling-1': { stage: 'filling', line: '1' }, 'filling-2': { stage: 'filling', line: '2' }, 'filling-4': { stage: 'filling', line: '4' },
     'kemas-1': { stage: 'kemas', line: '1' }, 'kemas-2': { stage: 'kemas', line: '2' }, 'kemas-4': { stage: 'kemas', line: '4' }
   };
   const STAGE_LABEL = { filling: 'Filling', kemas: 'Kemas' };
   const STAGE_TYPE = { filling: 'Automatic Form Fill Seal Machine', kemas: 'Overwrapping Machine' };
-  const C_OPE = '#a3c93a', C_365 = '#22b8cf';
   let curMachine = null, mchSeq = 0;
 
-  // ===== GRAFIK OEE PER PRODUK (BAWAH TABEL) + MULTI-MESIN =====
+  // ===== GRAFIK OEE PER PRODUK =====
   const MACHINE_KEYS = ['filling-1', 'filling-2', 'filling-4', 'kemas-1', 'kemas-2', 'kemas-4'];
   const machineKey = (stage, line) => stage + '-' + line;
   const machineShort = (key) => { const [st, ln] = key.split('-'); return (st === 'filling' ? 'F' : 'K') + ln; };
-  let prodSel = new Set();   // kode produk terpilih
-  let machSel = new Set();   // mesin terpilih untuk grafik bawah
+  let prodSel = new Set();
+  let machSel = new Set();
   let pendingProd = null;
   let barSeq = 0;
 
-  // Baris produksi (kode kegiatan = produksi) beserta kode produk, nomor WO/batch, dan durasinya.
-  // WO diambil dari kolom WO baris; bila kosong → WO produk di header record; bila kosong → kata ke-2 nama produk.
   const prodRows = (r) => {
     const rows = Array.isArray(r.payload?.rows) ? r.payload.rows : [];
     const pr = r.payload?.products || {};
@@ -372,9 +580,6 @@ const WeeklyDashboard = (() => {
     return out;
   };
 
-  // Per batch (WO): OPE & 365 dari record-record yang memuat WO itu.
-  //  OPE  = rata-rata OEE tersimpan, dibobot menit produksi WO di tiap record.
-  //  365  = A365 × P × Q; A365 = waktu operasional yang dialokasikan ke WO ÷ (1440 mnt × jumlah hari WO berjalan).
   const calcBatches = (rows) => {
     const by = {};
     rows.forEach((r) => {
@@ -406,34 +611,37 @@ const WeeklyDashboard = (() => {
 
   const rangeLabel = (from, to) => (from.slice(0, 7) === to.slice(0, 7) ? MON[Number(from.slice(5, 7)) - 1] + ' ' + from.slice(0, 4) : fmtD(from) + ' – ' + fmtD(to));
 
-  // Grafik garis kecil: jumlah batch per kode produk.
+  // ---------- SVG: Jumlah Batch per Produk ----------
   const countSvg = (id, items) => {
     const svg = $(id);
     if (!svg) return;
+    const grid = C.grid(), axis = C.axis(), mute = C.mute(), dim = C.dim(), txt = C.text(), line = C.line();
     const L = 34, R = 14, T = 16, B = 26, W = 260, H = 130, ph = H - T - B;
     const max = Math.max(1, ...items.map((i) => i.v));
     const top = max <= 4 ? max : Math.ceil(max / 4) * 4;
     const Y = (v) => T + ph - (v / top) * ph;
-    let s = '<g stroke="#334155" stroke-width="1">';
+    let s = `<g stroke="${grid}" stroke-width="1">`;
     [0, 0.5, 1].forEach((f) => { const y = Y(top * f); s += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}"/>`; });
-    s += '</g><g fill="#64748b" font-size="9" text-anchor="end">';
+    s += `</g><g fill="${axis}" font-size="9" text-anchor="end">`;
     [0, 0.5, 1].forEach((f) => { s += `<text x="${L - 5}" y="${Y(top * f) + 3}">${Math.round(top * f)}</text>`; });
-    s += `</g><text x="9" y="${T + ph / 2}" fill="#94a3b8" font-size="9" transform="rotate(-90 9 ${T + ph / 2})" text-anchor="middle">No.Batch</text>`;
-    if (!items.length) { svg.innerHTML = s + `<text x="${W / 2}" y="${H / 2}" fill="#64748b" font-size="11" text-anchor="middle">Tidak ada data batch</text>`; return; }
+    s += `</g><text x="9" y="${T + ph / 2}" fill="${mute}" font-size="9" transform="rotate(-90 9 ${T + ph / 2})" text-anchor="middle">No.Batch</text>`;
+    if (!items.length) { svg.innerHTML = s + `<text x="${W / 2}" y="${H / 2}" fill="${dim}" font-size="11" text-anchor="middle">Tidak ada data batch</text>`; return; }
     const X = (i) => (items.length === 1 ? (L + W - R) / 2 : L + 14 + (i * (W - R - L - 28)) / (items.length - 1));
     const pts = items.map((it, i) => X(i) + ',' + Y(it.v));
-    if (items.length > 1) s += `<polyline points="${pts.join(' ')}" fill="none" stroke="#3b82f6" stroke-width="2"/>`;
+    if (items.length > 1) s += `<polyline points="${pts.join(' ')}" fill="none" stroke="${line}" stroke-width="2"/>`;
     items.forEach((it, i) => {
-      s += `<circle cx="${X(i)}" cy="${Y(it.v)}" r="3.5" fill="#3b82f6"/><text x="${X(i)}" y="${Y(it.v) - 7}" fill="#e2e8f0" font-size="10" font-weight="700" text-anchor="middle">${it.v}</text>`;
-      s += `<text x="${X(i)}" y="${H - 8}" fill="#94a3b8" font-size="${items.length > 5 ? 8 : 9}" text-anchor="middle">${Utils.escapeHtml(it.label)}</text>`;
+      s += `<circle cx="${X(i)}" cy="${Y(it.v)}" r="3.5" fill="${line}"/><text x="${X(i)}" y="${Y(it.v) - 7}" fill="${txt}" font-size="10" font-weight="700" text-anchor="middle">${it.v}</text>`;
+      s += `<text x="${X(i)}" y="${H - 8}" fill="${mute}" font-size="${items.length > 5 ? 8 : 9}" text-anchor="middle">${Utils.escapeHtml(it.label)}</text>`;
     });
     svg.innerHTML = s;
   };
 
-  // Batang berkelompok per batch: OEE (OPE) & OEE_365. Lebar menyesuaikan jumlah batch (scroll horizontal bila banyak).
+  // ---------- SVG: Bar per Batch (OPE & 365) ----------
   const batchBarSvg = (id, list) => {
     const svg = $(id);
     if (!svg) return;
+    const grid = C.grid(), axis = C.axis(), mute = C.mute(), dim = C.dim(), txt = C.text();
+    const opeColor = C.ope(), o365Color = C.o365();
     const slot = 46, L = 44, R = 10, T = 20, B = 58, H = 250, ph = H - T - B;
     const W = Math.max(560, L + R + list.length * slot);
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
@@ -442,22 +650,22 @@ const WeeklyDashboard = (() => {
     const top = Math.max(0, ...list.flatMap((b) => [b.ope, b.o365].map((v) => (Number.isFinite(v) ? v : 0))));
     const max = Math.max(150, Math.ceil(top / 50) * 50);
     const Y = (v) => T + ph - (Math.min(Math.max(v, 0), max) / max) * ph;
-    let s = '<g stroke="#334155" stroke-width="1">';
+    let s = `<g stroke="${grid}" stroke-width="1">`;
     for (let v = 0; v <= max; v += 50) s += `<line x1="${L}" y1="${Y(v)}" x2="${W - R}" y2="${Y(v)}"/>`;
-    s += '</g><g fill="#64748b" font-size="10" text-anchor="end">';
+    s += `</g><g fill="${axis}" font-size="10" text-anchor="end">`;
     for (let v = 0; v <= max; v += 50) s += `<text x="${L - 6}" y="${Y(v) + 3}">${v}%</text>`;
     s += '</g>';
-    if (!list.length) { svg.innerHTML = s + `<text x="${W / 2}" y="${T + ph / 2}" fill="#64748b" font-size="12" text-anchor="middle">Tidak ada data batch (kolom WO produksi kosong) pada rentang ini</text>`; return; }
+    if (!list.length) { svg.innerHTML = s + `<text x="${W / 2}" y="${T + ph / 2}" fill="${dim}" font-size="12" text-anchor="middle">Tidak ada data batch (kolom WO produksi kosong) pada rentang ini</text>`; return; }
     list.forEach((b, i) => {
       const cx = L + i * slot + slot / 2;
-      [[b.ope, C_OPE, cx - 17], [b.o365, C_365, cx + 1]].forEach(([v, c, x]) => {
+      [[b.ope, opeColor, cx - 17], [b.o365, o365Color, cx + 1]].forEach(([v, c, x]) => {
         if (!Number.isFinite(v)) return;
         const y = Y(v);
         s += `<rect x="${x}" y="${y}" width="16" height="${T + ph - y}" rx="2" fill="${c}"/>`
-          + `<text x="${x + 8}" y="${y - 4}" fill="#e2e8f0" font-size="8" font-weight="600" transform="rotate(-90 ${x + 8} ${y - 4})">${fmtPct(v, 1)}</text>`;
+          + `<text x="${x + 8}" y="${y - 4}" fill="${txt}" font-size="8" font-weight="600" transform="rotate(-90 ${x + 8} ${y - 4})">${fmtPct(v, 1)}</text>`;
       });
       const lbl = (b.m ? machineShort(b.m) + '·' : '') + b.wo;
-      s += `<text x="${cx}" y="${T + ph + 13}" fill="#94a3b8" font-size="9" text-anchor="end" transform="rotate(-40 ${cx} ${T + ph + 13})">${Utils.escapeHtml(lbl)}</text>`;
+      s += `<text x="${cx}" y="${T + ph + 13}" fill="${mute}" font-size="9" text-anchor="end" transform="rotate(-40 ${cx} ${T + ph + 13})">${Utils.escapeHtml(lbl)}</text>`;
     });
     svg.innerHTML = s;
   };
@@ -510,7 +718,6 @@ const WeeklyDashboard = (() => {
     }
   };
 
-  // Filter tanggal dipakai bersama halaman OEE Production & semua halaman mesin.
   const copyRange = (fromPre, toPre) => {
     const f = $(fromPre + 'From'), t = $(toPre + 'From'), f2_ = $(fromPre + 'To'), t2 = $(toPre + 'To');
     if (f && t) t.value = f.value;
@@ -561,7 +768,7 @@ const WeeklyDashboard = (() => {
     }
   };
 
-  // --- Menu konteks 2 opsi saat baris Speed Standar diklik ---
+  // --- Menu konteks ---
   let menuEl = null;
   const closeSpeedMenu = () => { if (menuEl) { menuEl.remove(); menuEl = null; } };
   const openSpeedMenu = (tr) => {
@@ -602,6 +809,7 @@ const WeeklyDashboard = (() => {
   };
 
   const showPage = (pageId) => {
+    currentPage = pageId;
     document.querySelectorAll('.weekly-nav-item').forEach(btn => {
       btn.classList.toggle('is-active', btn.dataset.weeklyPage === pageId);
     });
@@ -610,7 +818,6 @@ const WeeklyDashboard = (() => {
 
     if (pageId === 'yield') {
       document.getElementById('weeklyPageYield')?.classList.add('is-active');
-      // re-animate
       setTimeout(() => setYieldGauge(100.4), 50);
     } else if (pageId === 'oee-prod') {
       document.getElementById('weeklyPageOee')?.classList.add('is-active');
@@ -661,8 +868,11 @@ const WeeklyDashboard = (() => {
     });
   };
 
-  const open = () => {
+    const open = () => {
     if (!inited) {
+      initTheme();
+      ensureThemeToggle();
+      ensureSideResize();     // ← TAMBAHKAN BARIS INI
       bind();
       setYieldGauge(100.4);
       const last = document.getElementById('weeklyLastUpdate');
@@ -674,5 +884,5 @@ const WeeklyDashboard = (() => {
     showPage('yield');
   };
 
-  return { open, showPage };
+  return { open, showPage, setTheme: applyTheme, getTheme: () => theme };
 })();

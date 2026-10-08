@@ -1,0 +1,99 @@
+/* Auto-paired 1:1 with js/industrial-toolbar.js — edit styles for that module here */
+
+.it-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 2px 0 10px;
+}
+
+.it-top {
+  color: #86efac;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.it-sub {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 3px;
+}
+
+.it-zigzag {
+  height: 7px;
+  margin-top: 4px;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      #22c55e 0px,
+      #22c55e 7px,
+      transparent 7px,
+      transparent 14px
+    );
+  opacity: 0.9;
+}
+
+.industrial-toolbar .btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+.industrial-toolbar .btn:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+.dashboard-hero,
+.hero,
+.oee-hero,
+.industrial-hero,
+.dashboard-header,
+.header-live,
+.clock-header,
+.oee-header-hero,
+.banner-live,
+.industrial-banner,
+
+[class*="dashboard-hero" i],
+[class*="industrial-hero" i],
+[class*="hero-live" i],
+[class*="live-hero" i],
+[class*="clock-header" i],
+[class*="header-clock" i],
+[class*="banner-live" i] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 768px) {
+  .it-inner {
+    gap: 10px;
+  }
+
+  .it-logo {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .it-title {
+    font-size: 15px;
+  }
+
+  .it-top {
+    font-size: 10px;
+  }
+
+  .it-sub {
+    font-size: 10px;
+  }
+}

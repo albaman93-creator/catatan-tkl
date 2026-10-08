@@ -646,8 +646,85 @@ const Suggest = (() => {
     bindProductDelegation();
   }
 
+
+  // ====== UI: kelola sugesti dari tombol di sheet =====
+  const refreshCustomList = () => {
+    const ul = document.getElementById('suggestCustomList');
+    if (!ul) return;
+    const customs = getCustomSuggestions();
+    if (!customs.length) {
+      ul.innerHTML = '<li style="padding:12px;color:#64748b;font-size:12.5px;font-style:italic">Belum ada sugesti tambahan.</li>';
+      return;
+    }
+    ul.innerHTML = customs.map((txt) => {
+      const safe = String(txt).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+      return `<li style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid #16324c;font-size:13px;color:#e2e8f0">`
+        + `<span style="flex:1;word-break:break-word">${safe}</span>`
+        + `<button type="button" class="btn btn-ghost btn-sm suggest-del" data-text="${safe}" title="Hapus">✕</button></li>`;
+    }).join('');
+  };
+
+  const openManage = () => {
+    const ov = document.getElementById('suggestOverlay');
+    if (!ov) return;
+    const inp = document.getElementById('suggestInput');
+    if (inp) inp.value = '';
+    refreshCustomList();
+    ov.classList.remove('hide');
+    setTimeout(() => inp?.focus(), 40);
+  };
+
+  const closeManage = () => {
+    document.getElementById('suggestOverlay')?.classList.add('hide');
+  };
+
+  const bindManageUI = () => {
+    document.getElementById('btnSuggestKegiatan')?.addEventListener('click', openManage);
+    document.getElementById('suggestClose')?.addEventListener('click', closeManage);
+    document.getElementById('suggestDoneBtn')?.addEventListener('click', closeManage);
+    document.getElementById('suggestOverlay')?.addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'suggestOverlay') closeManage();
+    });
+    document.getElementById('suggestAddBtn')?.addEventListener('click', () => {
+      const inp = document.getElementById('suggestInput');
+      const val = (inp?.value || '').trim();
+      if (!val) {
+        if (typeof UI !== 'undefined' && UI.toast) UI.toast('Isi teks kegiatan dulu', true);
+        return;
+      }
+      const ok = addSuggestion(val);
+      if (ok) {
+        if (typeof UI !== 'undefined' && UI.toast) UI.toast('✓ Sugesti ditambahkan');
+        if (inp) inp.value = '';
+        refreshCustomList();
+      } else {
+        if (typeof UI !== 'undefined' && UI.toast) UI.toast('Sudah ada di daftar sugesti', true);
+      }
+    });
+    document.getElementById('suggestInput')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('suggestAddBtn')?.click();
+      }
+    });
+    document.getElementById('suggestCustomList')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('.suggest-del');
+      if (!btn) return;
+      const text = btn.getAttribute('data-text') || '';
+      removeSuggestion(text);
+      refreshCustomList();
+      if (typeof UI !== 'undefined' && UI.toast) UI.toast('Sugesti dihapus');
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindManageUI);
+  } else {
+    bindManageUI();
+  }
+
   return {
     attachGhost, attachAll, getSuggestions, addSuggestion, removeSuggestion, getCustomSuggestions,
-    initRemote, refreshRemoteSuggestions, attachProductAll,
+    initRemote, refreshRemoteSuggestions, attachProductAll, openManage,
   };
 })();

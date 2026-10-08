@@ -41,6 +41,9 @@
 }
 
 :root {
+  /* Lebar konten halaman — desktop full hampir full layar */
+  --page: min(100vw - 24px, 1680px);
+
   /* ---------- 1. Skala netral (slate) ---------- */
   --slate-50:  #F8FAFC;
   --slate-100: #F1F5F9;

@@ -1,0 +1,33 @@
+/* Auto-paired 1:1 with js/shutdown.js — edit styles for that module here */
+
+.shutdown-wrap { margin-top: 12px; }
+
+.shutdown-row { display: grid; grid-template-columns: 1fr 1.45fr; gap: 12px; margin-top: 12px; }
+
+@media (max-width: 900px) { .shutdown-row { grid-template-columns: 1fr; } }
+
+.shutdown-card { background: #0e1e30; border: 1px solid #1e3a56; border-radius: 12px; padding: 12px; min-width: 0; }
+
+.shutdown-title { font: 700 13px 'Barlow Condensed', 'IBM Plex Sans', sans-serif; letter-spacing: .4px; color: #e2e8f0; margin-bottom: 10px; }
+
+.shutdown-donut-flex { display: flex; gap: 14px; align-items: center; }
+
+.shutdown-donut { width: 190px; height: 190px; flex: none; }
+
+.shutdown-legend { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+
+.shutdown-table-wrap { overflow: auto; max-height: 260px; border: 1px solid #1e3a56; border-radius: 8px; }
+
+.shutdown-table { width: 100%; border-collapse: collapse; font: 400 11.5px 'IBM Plex Sans', sans-serif; }
+
+.shutdown-table thead th { position: sticky; top: 0; background: #10243c; color: #dbe7f3; font-size: 10.5px; text-align: left; padding: 7px 8px; border-bottom: 1px solid #24466b; white-space: nowrap; }
+
+.shutdown-table td { padding: 6px 8px; border-bottom: 1px solid #16324c; color: #cbd5e1; vertical-align: top; }
+
+.shutdown-table td.ctr { text-align: center; white-space: nowrap; }
+
+.shutdown-pager { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 8px; color: #94a3b8; font: 500 11px 'IBM Plex Mono', monospace; }
+
+.shutdown-pager-btn { background: #12293f; border: 1px solid #2b4d74; color: #cbd5e1; border-radius: 6px; width: 24px; height: 22px; cursor: pointer; line-height: 1; }
+
+.shutdown-pager-btn:hover { background: #1b3a5c; }
