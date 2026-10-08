@@ -4052,3 +4052,7 @@ body {
 td:has(#oG3),
 td:has(#oH3),
 #colI3 { display: none !important; }
+
+/* ===== Minor / Breakdown charts di weekly mesin ===== */
+.pica-charts-row { margin-top: 14px; }
+.pica-charts-row .opl-chart-wrap { min-height: 180px; }

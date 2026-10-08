@@ -278,6 +278,13 @@ h1 { font: 700 clamp(24px,5vw,34px)/1 var(--disp); letter-spacing: .8px; text-tr
 .split-input-3 input:first-child { flex: 2; }
 .split-input-3 input:nth-child(2) { flex: 1; }
 .split-input-3 input:last-child { flex: 1.2; }
+.split-input-4 { display: flex; gap: 8px; flex-wrap: wrap; }
+.split-input-4 input:nth-child(1) { flex: 2.2; min-width: 120px; }
+.split-input-4 input:nth-child(2) { flex: 1; min-width: 72px; }
+.split-input-4 input:nth-child(3) { flex: 0.85; min-width: 64px; }
+.split-input-4 input:nth-child(4) { flex: 1.1; min-width: 80px; }
+.field-hint { display: block; margin-top: 6px; font-size: 11px; color: #64748b; line-height: 1.35; }
+
 
 /* Footer sheet */
 .sheet-f {

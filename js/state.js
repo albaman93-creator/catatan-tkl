@@ -41,7 +41,7 @@ const State = (() => {
       'sheetUnifiedControl', 'sheetShift', 'sheetLine', 'sheetDateTrigger', 'sheetDateText',
       'sheetKpiA', 'sheetKpiP', 'sheetKpiQ', 'sheetKpiOEE',
       'op1','op2','op3','op4','op5','op6',
-      'prodName1','prodRate1','prodWo1','prodName2','prodRate2','prodWo2','prodName3','prodRate3','prodWo3',
+      'prodName1','prodRate1','prodBaseOp1','prodWo1','prodName2','prodRate2','prodBaseOp2','prodWo2','prodName3','prodRate3','prodBaseOp3','prodWo3',
       'thProd1','thProd2','thProd3',
       'tbody', 'tbodyProdDetail', 'btnAdd', 'btnSave', 'btnReset', 'btnLogout',
       'btnPrint', 'btnExportCsv', 'btnExportCsvSheet', 'btnCopyMove', 'printArea', 'presetQuick', 'presetFull',

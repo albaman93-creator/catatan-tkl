@@ -43,6 +43,47 @@ const Rows = (() => {
     return idx >= 0 ? rates[idx] : 0;
   };
 
+  /** Base man power (orang) untuk rate master — default 4 jika kosong. */
+  const getBaseOpForProduct = (prodName) => {
+    if (!prodName) return 4;
+    const names = [
+      State.el.prodName1?.value.trim() || '',
+      State.el.prodName2?.value.trim() || '',
+      State.el.prodName3?.value.trim() || ''
+    ];
+    const ops = [
+      parseFloat(State.el.prodBaseOp1?.value) || 0,
+      parseFloat(State.el.prodBaseOp2?.value) || 0,
+      parseFloat(State.el.prodBaseOp3?.value) || 0,
+    ];
+    const idx = names.indexOf(prodName);
+    const v = idx >= 0 ? ops[idx] : 0;
+    return v > 0 ? v : 4;
+  };
+
+  /** Kemas Line 1 & 2 memakai rate proporsional man power; L4 & tahapan lain = rate mesin. */
+  const usesManpowerRate = () => {
+    const stage = String(State.el.fStage?.value || '').toLowerCase();
+    const line = String(State.el.fLine?.value || '');
+    return stage === 'kemas' && (line === '1' || line === '2');
+  };
+
+  /**
+   * Rate efektif (unit/mnt).
+   * Kemas L1/L2: (OP baris / Base OP) × Rate master.
+   * OP kosong → anggap = Base OP (full team).
+   * Selain itu: Rate master apa adanya.
+   */
+  const getEffectiveRate = (prodName, opValue) => {
+    const baseRate = getRateForProduct(prodName);
+    if (!(baseRate > 0)) return 0;
+    if (!usesManpowerRate()) return baseRate;
+    const baseOp = getBaseOpForProduct(prodName);
+    const op = parseFloat(String(opValue ?? '').replace(',', '.'));
+    const orang = (Number.isFinite(op) && op > 0) ? op : baseOp;
+    return (orang / baseOp) * baseRate;
+  };
+
   /** Baca nilai produk/WO langsung dari DOM (lebih andal dari cache State). */
   const readProdSlot = (i) => {
     const nameEl = (State.el['prodName' + i]) || document.getElementById('prodName' + i)
@@ -216,7 +257,7 @@ const Rows = (() => {
       <td class="col-kode"><div class="c-kode"><span class="dot"></span>
         <input data-f="kode" data-nav class="in mono ctr" type="tel" inputmode="numeric" maxlength="1" placeholder=" " aria-label="Kode">
       </div></td>
-      <td class="col-op"><input data-f="op" data-nav class="in mono ctr" type="text" inputmode="numeric" maxlength="12" placeholder=" " aria-label="OP"></td>
+      <td class="col-op"><input data-f="op" data-nav class="in mono ctr" type="text" inputmode="numeric" maxlength="12" placeholder="org" aria-label="Jumlah orang (OP)" title="Jumlah orang — Kemas L1/L2: rate efektif = (OP÷Base OP)×Rate"></td>
       <td class="col-mulai"><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>
       <td class="col-panggil"><input data-f="panggil" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Panggil Teknik"></td>
       <td class="col-teknik"><input data-f="teknik" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Teknik Datang"></td>
@@ -394,12 +435,14 @@ const Rows = (() => {
     const summary = {};
     prods.forEach(p => {
       summary[p] = {
-        durasiValid: 0,       // Waktu produktif valid (Kode produksi dengan Good >= 1) untuk target
-        durasiTotal: 0,       // Total waktu keseluruhan aktivitas dengan batch ini (kode apapun)
-        durasiProdAll: 0,     // Total waktu seluruh kode produksi (baik ada good maupun kosong)
-        durasiPlannedDT: 0,   // Total waktu Planned Down Time (Kode 5, 6, 7, 8)
-        durasiUnplannedDT: 0, // Total waktu Unplanned Down Time (Kode 1, 3, 4, 9)
+        durasiValid: 0,
+        durasiTotal: 0,
+        durasiProdAll: 0,
+        durasiPlannedDT: 0,
+        durasiUnplannedDT: 0,
         rate: getRateForProduct(p),
+        baseOp: getBaseOpForProduct(p),
+        target: 0,       // Σ (durasi × rate efektif) — penting untuk Kemas L1/L2
         actual: 0
       };
     });
@@ -423,21 +466,20 @@ const Rows = (() => {
       const si = Utils.shiftOf(mulai);
 
       if (si === State.evalShift) {
-        // 1. Total waktu keseluruhan aktivitas (kode apapun)
         summary[prodName].durasiTotal += dur;
 
-        // Kategori Down Time & Produksi
         if (CONFIG.PLANNED_CODES.has(kodeNum)) {
           summary[prodName].durasiPlannedDT += dur;
         } else if (CONFIG.UNPLANNED_CODES.has(kodeNum)) {
           summary[prodName].durasiUnplannedDT += dur;
         } else if (Utils.catOf(kodeStr) === 'prod') {
-          summary[prodName].durasiProdAll += dur; // Total waktu kategori produksi
+          summary[prodName].durasiProdAll += dur;
 
-          // Syarat valid untuk target: Kode produksi DAN kolom Good terisi >= 1
           if (goodVal >= 1) {
             summary[prodName].durasiValid += dur;
             summary[prodName].actual += rowActual;
+            const eff = getEffectiveRate(prodName, g('op'));
+            summary[prodName].target += dur * eff;
           }
         }
       }
@@ -445,7 +487,7 @@ const Rows = (() => {
 
     prods.forEach((p, index) => {
       const item = summary[p];
-      const targetG = item.durasiValid * item.rate;
+      const targetG = item.target > 0 ? item.target : (item.durasiValid * item.rate);
       const perfP = targetG > 0 ? (item.actual / targetG) * 100 : 0;
 
       const perfColor = perfP >= CONFIG.TARGET.PERFORMANCE
@@ -508,6 +550,9 @@ const Rows = (() => {
   return {
     getActiveProducts,
     getRateForProduct,
+    getBaseOpForProduct,
+    getEffectiveRate,
+    usesManpowerRate,
     getWoForProduct,
     applyWoFromBatch,
     rows,

@@ -481,10 +481,10 @@ const App = (() => {
     // ============================================================
     // MASTER PRODUK & OPERATOR → recalc + sync ke Master
     // ============================================================
-    ['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3','prodWo1','prodWo2','prodWo3'].forEach(id => {
+    ['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3','prodBaseOp1','prodBaseOp2','prodBaseOp3','prodWo1','prodWo2','prodWo3'].forEach(id => {
       if (!State.el[id]) return;
       State.el[id].addEventListener('input', () => {
-        if (id.startsWith('prodName') || id.startsWith('prodRate')) {
+        if (id.startsWith('prodName') || id.startsWith('prodRate') || id.startsWith('prodBaseOp')) {
           Rows.updateAllDropdowns();
           Rows.updateMatrixProductHeaders();
           Calculation.recalc();

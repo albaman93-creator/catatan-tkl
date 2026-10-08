@@ -870,26 +870,30 @@
         </div>
         <div class="product-grid" id="masterProductGrid">
           <div class="field">
-            <label>Produk 1 (Nama, Kecepatan &amp; No. WO)</label>
-            <div class="split-input split-input-3">
+            <label>Produk 1 (Nama · Rate/mnt · Base OP · No. WO)</label>
+            <div class="split-input split-input-4">
               <input type="text" id="masterProdName1" placeholder="Misal: VTTS1 L030001" data-sync="prodName1">
-              <input type="number" id="masterProdRate1" placeholder="Rate/mnt" inputmode="decimal" data-sync="prodRate1">
+              <input type="number" id="masterProdRate1" placeholder="Rate/mnt" inputmode="decimal" data-sync="prodRate1" title="Output standar per menit (untuk Base OP orang)">
+              <input type="number" id="masterProdBaseOp1" placeholder="Base OP" inputmode="numeric" data-sync="prodBaseOp1" title="Jumlah orang standar untuk rate di atas (mis. 4)" min="1" step="1">
               <input type="text" id="masterProdWo1" placeholder="No. WO" class="mono" data-sync="prodWo1">
             </div>
+            <small class="field-hint">Kemas L1/L2: rate efektif = (OP baris ÷ Base OP) × Rate. Contoh: 12/mnt @ 4 orang → OP 3 = 9/mnt.</small>
           </div>
           <div class="field">
             <label>Produk 2 (Cadangan)</label>
-            <div class="split-input split-input-3">
+            <div class="split-input split-input-4">
               <input type="text" id="masterProdName2" placeholder="Misal: VPEL1 L027001" data-sync="prodName2">
               <input type="number" id="masterProdRate2" placeholder="Rate/mnt" inputmode="decimal" data-sync="prodRate2">
+              <input type="number" id="masterProdBaseOp2" placeholder="Base OP" inputmode="numeric" data-sync="prodBaseOp2" min="1" step="1">
               <input type="text" id="masterProdWo2" placeholder="No. WO" class="mono" data-sync="prodWo2">
             </div>
           </div>
           <div class="field">
             <label>Produk 3 (Cadangan)</label>
-            <div class="split-input split-input-3">
+            <div class="split-input split-input-4">
               <input type="text" id="masterProdName3" placeholder="Misal: PROD-C" data-sync="prodName3">
               <input type="number" id="masterProdRate3" placeholder="Rate/mnt" inputmode="decimal" data-sync="prodRate3">
+              <input type="number" id="masterProdBaseOp3" placeholder="Base OP" inputmode="numeric" data-sync="prodBaseOp3" min="1" step="1">
               <input type="text" id="masterProdWo3" placeholder="No. WO" class="mono" data-sync="prodWo3">
             </div>
           </div>
@@ -1000,9 +1004,9 @@
               <div class="compact-popover compact-form-panel compact-product-panel" id="compactProductPanel">
                 <div class="compact-popover-head"><b>Produk (maks. 3)</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
                 <div class="compact-product-list">
-                  <div class="compact-product-row"><span>1</span><input type="text" id="prodName1" placeholder="Nama produk"><input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal"><input type="text" id="prodWo1" placeholder="No. WO" class="mono"></div>
-                  <div class="compact-product-row"><span>2</span><input type="text" id="prodName2" placeholder="Nama produk"><input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal"><input type="text" id="prodWo2" placeholder="No. WO" class="mono"></div>
-                  <div class="compact-product-row"><span>3</span><input type="text" id="prodName3" placeholder="Nama produk"><input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal"><input type="text" id="prodWo3" placeholder="No. WO" class="mono"></div>
+                  <div class="compact-product-row"><span>1</span><input type="text" id="prodName1" placeholder="Nama produk"><input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal" title="Rate standar"><input type="number" id="prodBaseOp1" placeholder="Base OP" inputmode="numeric" min="1" step="1" title="Orang standar untuk rate"><input type="text" id="prodWo1" placeholder="No. WO" class="mono"></div>
+                  <div class="compact-product-row"><span>2</span><input type="text" id="prodName2" placeholder="Nama produk"><input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal"><input type="number" id="prodBaseOp2" placeholder="Base OP" inputmode="numeric" min="1" step="1"><input type="text" id="prodWo2" placeholder="No. WO" class="mono"></div>
+                  <div class="compact-product-row"><span>3</span><input type="text" id="prodName3" placeholder="Nama produk"><input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal"><input type="number" id="prodBaseOp3" placeholder="Base OP" inputmode="numeric" min="1" step="1"><input type="text" id="prodWo3" placeholder="No. WO" class="mono"></div>
                 </div>
               </div>
             </div>
@@ -1200,7 +1204,7 @@
                   Kode
                   <button type="button" class="th-bulk-btn" data-bulk-col="kode" title="Isi Kode masal (notepad)">📥</button>
                 </th>
-                <th class="col-op" rowspan="2">OP</th>
+                <th class="col-op" rowspan="2" title="Jumlah orang (man power) per baris — dipakai hitung rate Kemas L1/L2">OP</th>
                 <th class="col-mulai" rowspan="2">
                   Mulai
                   <button type="button" class="th-bulk-btn" data-bulk-col="mulai" title="Isi Jam Mulai masal (notepad)">📥</button>
@@ -1872,27 +1876,6 @@
                 </article>
               </div>
 
-              <article class="oee-bar-card mch-bar-card">
-                <div class="oee-bar-title" id="mchBarTitle">Capaian OEE OPE &amp; OEE 365</div>
-                <!-- BARU: filter produk & pilihan multi mesin -->
-                <div class="prodbar-toolbar">
-                  <div class="prodbar-group">
-                    <span class="prodbar-label">Produk</span>
-                    <div id="prodBarProducts" class="prodbar-chips"></div>
-                  </div>
-                  <div class="prodbar-group">
-                    <span class="prodbar-label">Mesin (boleh pilih banyak)</span>
-                    <div id="prodBarMachines" class="prodbar-chips"></div>
-                  </div>
-                </div>
-                <div class="oee-filter-status" id="prodBarStatus"></div>
-                <div class="oee-bar-legend">
-                  <span><i class="ob-swatch ob-lime"></i> OEE</span>
-                  <span><i class="ob-swatch ob-teal"></i> OEE_365</span>
-                </div>
-                <div class="mch-bar-scroll"><svg id="mchBarSvg" role="img" aria-label="Capaian OEE OPE dan OEE 365 per batch"></svg></div>
-              </article>
-
               <!-- SHUTDOWN ANALYSIS (Planned & Unplanned) — gaya Looker Studio -->
               <div class="shutdown-wrap">
                 <div class="shutdown-row">
@@ -1943,9 +1926,35 @@
                 </div>
               </div>
 
-              <!-- PICA PROBLEM (Why-Why) -->
+              <!-- MINOR STOPPAGE + BREAKDOWN (PICA) -->
+              <div class="shutdown-row pica-charts-row">
+                <article class="shutdown-card">
+                  <div class="shutdown-title" id="msChartTitle">Minor Stoppage — Frekuensi per Produk</div>
+                  <div class="opl-chart-wrap"><svg id="msChartSvg" role="img" aria-label="Frekuensi minor stoppage per produk"></svg></div>
+                  <div class="oee-filter-status" id="msChartStatus"></div>
+                </article>
+                <article class="shutdown-card">
+                  <div class="shutdown-title" id="bdChartTitle">Breakdown — Durasi per Produk (mnt)</div>
+                  <div class="opl-chart-wrap"><svg id="bdChartSvg" role="img" aria-label="Durasi breakdown per produk"></svg></div>
+                  <div class="oee-filter-status" id="bdChartStatus"></div>
+                </article>
+              </div>
+
               <article class="oee-bar-card pica-card">
-                <div class="oee-bar-title" id="picaTitle">PICA Problem OEE</div>
+                <div class="oee-bar-title" id="msTitle">Minor Stoppage OEE</div>
+                <div class="oee-filter-status" id="msStatusMsg"></div>
+                <div class="pica-table-wrap">
+                  <table class="pica-table">
+                    <thead><tr>
+                      <th>No.</th><th>Produk</th><th>No. Batch</th><th>Problem</th><th>Durasi (min)</th><th>Frekuensi</th>
+                    </tr></thead>
+                    <tbody id="msBody"><tr><td colspan="6">Memuat…</td></tr></tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="oee-bar-card pica-card">
+                <div class="oee-bar-title" id="picaTitle">PICA Problem OEE (Breakdown &gt;10 mnt)</div>
                 <div class="oee-filter-status" id="picaStatusMsg"></div>
                 <div class="pica-table-wrap">
                   <table class="pica-table">
@@ -1958,6 +1967,28 @@
                   </table>
                 </div>
               </article>
+
+              <article class="oee-bar-card mch-bar-card">
+                <div class="oee-bar-title" id="mchBarTitle">Capaian OEE OPE &amp; OEE 365</div>
+                <!-- BARU: filter produk & pilihan multi mesin -->
+                <div class="prodbar-toolbar">
+                  <div class="prodbar-group">
+                    <span class="prodbar-label">Produk</span>
+                    <div id="prodBarProducts" class="prodbar-chips"></div>
+                  </div>
+                  <div class="prodbar-group">
+                    <span class="prodbar-label">Mesin (boleh pilih banyak)</span>
+                    <div id="prodBarMachines" class="prodbar-chips"></div>
+                  </div>
+                </div>
+                <div class="oee-filter-status" id="prodBarStatus"></div>
+                <div class="oee-bar-legend">
+                  <span><i class="ob-swatch ob-lime"></i> OEE</span>
+                  <span><i class="ob-swatch ob-teal"></i> OEE_365</span>
+                </div>
+                <div class="mch-bar-scroll"><svg id="mchBarSvg" role="img" aria-label="Capaian OEE OPE dan OEE 365 per batch"></svg></div>
+              </article>
+
             </div>
           </div>
         </div>

@@ -51,9 +51,9 @@ const Calculation = (() => {
       State.el.prodName3.value.trim()
     ];
     const prodStats = [
-      { dur:0, rate:parseFloat(State.el.prodRate1.value)||0, actual:0 },
-      { dur:0, rate:parseFloat(State.el.prodRate2.value)||0, actual:0 },
-      { dur:0, rate:parseFloat(State.el.prodRate3.value)||0, actual:0 },
+      { dur:0, rate:parseFloat(State.el.prodRate1.value)||0, target:0, actual:0 },
+      { dur:0, rate:parseFloat(State.el.prodRate2.value)||0, target:0, actual:0 },
+      { dur:0, rate:parseFloat(State.el.prodRate3.value)||0, target:0, actual:0 },
     ];
 
     Rows.rows().forEach(tr => {
@@ -116,6 +116,11 @@ const Calculation = (() => {
             if (pNames[i] && pNames[i] === prodName) {
               prodStats[i].dur += dur;
               prodStats[i].actual += rowActual;
+              // Rate efektif: Kemas L1/L2 proporsional OP baris; selain itu rate master
+              const eff = (Rows.getEffectiveRate)
+                ? Rows.getEffectiveRate(prodName, g('op'))
+                : (prodStats[i].rate || 0);
+              prodStats[i].target += dur * (eff || 0);
             }
           }
         }
@@ -142,14 +147,18 @@ const Calculation = (() => {
     oFEl.style.fontWeight = '700';
 
     // === PERFORMANCE PER PRODUK ===
+    // Target (G) = Σ (durasi × rate efektif baris). Kemas L1/L2: rate mengikuti OP.
     let totalPerfSum = 0, activeCount = 0;
     for (let i = 0; i < 3; i++) {
-      const gTarget = prodStats[i].dur * prodStats[i].rate;
+      const gTarget = prodStats[i].target > 0
+        ? prodStats[i].target
+        : (prodStats[i].dur * prodStats[i].rate);
       const hAct = prodStats[i].actual;
       const perfI = gTarget > 0 ? (hAct / gTarget) * 100 : 0;
 
-      // Hanya hitung produk sebagai "aktif" untuk rata-rata jika nama ada DAN rate > 0
-      if (pNames[i] && prodStats[i].rate > 0) { activeCount++; totalPerfSum += perfI; }
+      if (pNames[i] && (prodStats[i].rate > 0 || prodStats[i].target > 0)) {
+        activeCount++; totalPerfSum += perfI;
+      }
 
       State.el['oG' + (i+1)].textContent = Utils.nf0(gTarget);
       State.el['oH' + (i+1)].textContent = Utils.nf0(hAct);
