@@ -798,6 +798,7 @@ const App = (() => {
     if (typeof PrintSheet !== 'undefined') PrintSheet.bind();
     if (typeof WhatsApp !== 'undefined') WhatsApp.bind();
     if (typeof PhotoImport !== 'undefined') PhotoImport.bind();
+    if (typeof CsvImport !== 'undefined') CsvImport.bind();
 
     // Autocomplete kode produk di kolom Nama Produk (Sheet + Master)
     if (typeof Suggest !== 'undefined' && Suggest.attachProductAll) {
