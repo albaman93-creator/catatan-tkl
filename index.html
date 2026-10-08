@@ -1205,6 +1205,7 @@
         <div class="tbl-wrap" id="tblWrap">
           <table class="log" id="logTable">
             <colgroup>
+              <col class="col-aksi">
               <col class="col-num">
               <col class="col-kode">
               <col class="col-op">
@@ -1221,10 +1222,10 @@
               <col class="col-batch">
               <col class="col-good">
               <col class="col-defect">
-              <col class="col-aksi">
             </colgroup>
             <thead>
               <tr>
+                <th class="col-aksi" rowspan="2">Aksi</th>
                 <th class="col-num" rowspan="2">#</th>
                 <th class="col-kode" rowspan="2">
                   Kode
@@ -1255,7 +1256,6 @@
                 <th class="col-wo" rowspan="2">WO</th>
                 <th class="col-batch" rowspan="2">Produk</th>
                 <th colspan="2">Output</th>
-                <th class="col-aksi" rowspan="2">Aksi</th>
               </tr>
               <tr>
                 <th class="col-good">
@@ -1539,41 +1539,41 @@
             <nav class="weekly-nav" id="weeklyNav">
               <button type="button" class="weekly-nav-item is-active" data-weekly-page="yield">
                 <span class="wn-icon">📈</span>
-                <span class="wn-label">Capaian Yield Produksi</span>
+                <span class="wn-label"><span class="wn-full">Capaian Yield Produksi</span><span class="wn-short">Yield</span></span>
               </button>
               <button type="button" class="weekly-nav-item" data-weekly-page="oee-prod">
                 <span class="wn-icon">🎯</span>
-                <span class="wn-label">OEE PRODUCTION</span>
+                <span class="wn-label"><span class="wn-full">OEE PRODUCTION</span><span class="wn-short">OEE</span></span>
               </button>
-              <div class="weekly-nav-divider">Mesin Filling</div>
+              <div class="weekly-nav-divider">Filling</div>
               <button type="button" class="weekly-nav-item" data-weekly-page="filling-1">
                 <span class="wn-icon">⚙️</span>
-                <span class="wn-label">MESIN FILLING LINE 1</span>
+                <span class="wn-label"><span class="wn-full">MESIN FILLING LINE 1</span><span class="wn-short">Fill L1</span></span>
               </button>
               <button type="button" class="weekly-nav-item" data-weekly-page="filling-2">
                 <span class="wn-icon">⚙️</span>
-                <span class="wn-label">MESIN FILLING LINE 2</span>
+                <span class="wn-label"><span class="wn-full">MESIN FILLING LINE 2</span><span class="wn-short">Fill L2</span></span>
               </button>
               <button type="button" class="weekly-nav-item" data-weekly-page="filling-4">
                 <span class="wn-icon">⚙️</span>
-                <span class="wn-label">MESIN FILLING LINE 4</span>
+                <span class="wn-label"><span class="wn-full">MESIN FILLING LINE 4</span><span class="wn-short">Fill L4</span></span>
               </button>
-              <div class="weekly-nav-divider">Mesin Kemas</div>
+              <div class="weekly-nav-divider">Kemas</div>
               <button type="button" class="weekly-nav-item" data-weekly-page="kemas-1">
                 <span class="wn-icon">📦</span>
-                <span class="wn-label">MESIN KEMAS LINE 1</span>
+                <span class="wn-label"><span class="wn-full">MESIN KEMAS LINE 1</span><span class="wn-short">Kemas L1</span></span>
               </button>
               <button type="button" class="weekly-nav-item" data-weekly-page="kemas-2">
                 <span class="wn-icon">📦</span>
-                <span class="wn-label">MESIN KEMAS LINE 2</span>
+                <span class="wn-label"><span class="wn-full">MESIN KEMAS LINE 2</span><span class="wn-short">Kemas L2</span></span>
               </button>
               <button type="button" class="weekly-nav-item" data-weekly-page="kemas-4">
                 <span class="wn-icon">📦</span>
-                <span class="wn-label">MESIN KEMAS LINE 4</span>
+                <span class="wn-label"><span class="wn-full">MESIN KEMAS LINE 4</span><span class="wn-short">Kemas L4</span></span>
               </button>
             </nav>
             <div class="weekly-sidebar-foot">
-              <button type="button" class="btn btn-ghost btn-sm" id="weeklyBackToOee">← Kembali ke Dashboard OEE</button>
+              <button type="button" class="weekly-back-btn" id="weeklyBackToOee">← Kembali ke Dashboard OEE</button>
             </div>
           </aside>
 
@@ -1970,12 +1970,17 @@
               <article class="oee-bar-card pica-card">
                 <div class="oee-bar-title" id="msTitle">Minor Stoppage OEE</div>
                 <div class="oee-filter-status" id="msStatusMsg"></div>
+                <div style="display:flex;justify-content:flex-end;margin:0 0 8px">
+                  <button type="button" class="btn btn-primary btn-sm" id="msAddBtn">➕ Tambah Minor Stop</button>
+                </div>
                 <div class="pica-table-wrap">
                   <table class="pica-table">
                     <thead><tr>
-                      <th>No.</th><th>Produk</th><th>No. Batch</th><th>Problem</th><th>Durasi (min)</th><th>Frekuensi</th>
+                      <th></th><th>No.</th><th>Produk</th><th>No. Batch</th><th>Problem</th><th>Frekuensi</th>
+                      <th>Why 1</th><th>Why 2</th><th>Why 3</th>
+                      <th>Corrective Action</th><th>Preventive Action</th><th>PIC</th><th>Status</th>
                     </tr></thead>
-                    <tbody id="msBody"><tr><td colspan="6">Memuat…</td></tr></tbody>
+                    <tbody id="msBody"><tr><td colspan="13">Belum ada data — klik ➕ Tambah Minor Stop</td></tr></tbody>
                   </table>
                 </div>
               </article>
@@ -1986,9 +1991,9 @@
                 <div class="pica-table-wrap">
                   <table class="pica-table">
                     <thead><tr>
-                      <th>No.</th><th>Produk</th><th>No. Batch</th><th>Problem</th><th>Durasi (min)</th>
+                      <th></th><th>No.</th><th>Produk</th><th>No. Batch</th><th>Problem</th><th>Durasi (min)</th>
                       <th>Why 1</th><th>Why 2</th><th>Why 3</th>
-                      <th>Corrective Action</th><th>Preventive Action</th><th>PIC</th><th>Status</th><th></th>
+                      <th>Corrective Action</th><th>Preventive Action</th><th>PIC</th><th>Status</th>
                     </tr></thead>
                     <tbody id="picaBody"><tr><td colspan="13">Memuat…</td></tr></tbody>
                   </table>
@@ -2038,6 +2043,12 @@
       </div>
       <div class="cm-body">
         <div class="pica-ctx" id="picaCtx"></div>
+        <div class="pica-form-grid" id="picaMinorFields" hidden>
+          <label>Produk<input id="msProduk" type="text" placeholder="Mis. VPEL1"></label>
+          <label>No. Batch<input id="msBatch" type="text" placeholder="Mis. L027103"></label>
+          <label>Problem<textarea id="msProblem" rows="2" placeholder="Deskripsi minor stop…"></textarea></label>
+          <label>Frekuensi (kali)<input id="msFreq" type="number" min="1" step="1" value="1" inputmode="numeric"></label>
+        </div>
         <div class="pica-form-grid">
           <label>Why 1<textarea id="picaWhy1" rows="2" placeholder="Akar masalah tingkat 1…"></textarea></label>
           <label>Why 2<textarea id="picaWhy2" rows="2"></textarea></label>

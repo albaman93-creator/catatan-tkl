@@ -269,6 +269,10 @@ const Rows = (() => {
       prods.map(p => `<option value="${p}">${p}</option>`).join('');
 
     tr.innerHTML = `
+      <td class="col-aksi c-aksi">
+        <button type="button" class="btn-icon btn-insert" title="Sisip baris di bawah">➕</button>
+        <button type="button" class="del" title="Hapus baris">✕</button>
+      </td>
       <td class="col-num">${rows().length + 1}</td>
       <td class="col-kode"><div class="c-kode"><span class="dot"></span>
         <input data-f="kode" data-nav class="in mono ctr" type="tel" inputmode="numeric" maxlength="1" placeholder=" " aria-label="Kode">
@@ -287,10 +291,6 @@ const Rows = (() => {
       <td class="col-batch"><select data-f="batch" data-nav class="in mono" aria-label="Produk & Batch">${optionsHtml}</select></td>
       <td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Good"></td>
       <td class="col-defect"><input data-f="defect" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Defect"></td>
-      <td class="col-aksi c-aksi">
-        <button type="button" class="btn-icon btn-insert" title="Sisip baris di bawah">➕</button>
-        <button type="button" class="del" title="Hapus baris">✕</button>
-      </td>
     `;
 
     if (data) {
