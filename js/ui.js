@@ -680,7 +680,7 @@ const UI = (() => {
     tick, startClock, toast, autoResizeTextarea,
     applyModeUI, bindModeButtons, loadNavMode,
     applyShiftUI, applyLineUI, applyStageUI, bindFilterToggles, bindShiftButtons, loadEvalShift,
-    updateShiftIndicator, updateUnifiedControl, bindUnifiedControls,
+    updateShiftIndicator, updateUnifiedControl, updateKpiHealthBar, bindUnifiedControls,
     bindToolbarToggle, loadToolbarCollapsed,
     bindScreenNav, loadActiveScreen, showScreen, openRecord,
     bindLogsheetHelp,

@@ -207,6 +207,43 @@ const Calculation = (() => {
       }
     }
 
+    // Kartu A / P / Q / OEE di atas log sheet — tulis LANGSUNG dari angka hitung
+    // (jangan hanya mengandalkan salinan DOM lewat updateUnifiedControl).
+    const setKpi = (key, text) => {
+      let el = State.el[key];
+      if (!el) { el = document.getElementById(key); if (el) State.el[key] = el; }
+      if (el) el.textContent = text;
+    };
+    setKpi('sheetKpiA', Utils.nf2(sF) + '%');
+    setKpi('sheetKpiP', Utils.nf2(avgPerfI) + '%');
+    setKpi('sheetKpiQ', Utils.nf2(M) + '%');
+    setKpi('sheetKpiOEE', Utils.nf2(oee) + '%');
+    // Health-bar warna (jika UI tersedia)
+    if (typeof UI !== 'undefined' && UI.updateKpiHealthBar) {
+      const bar = (id, val) => {
+        const node = State.el[id];
+        const card = node && node.closest ? node.closest('.sheet-kpi') : null;
+        if (card) UI.updateKpiHealthBar(card, String(val));
+      };
+      bar('sheetKpiA', sF);
+      bar('sheetKpiP', avgPerfI);
+      bar('sheetKpiQ', M);
+      bar('sheetKpiOEE', oee);
+    } else {
+      // Fallback: update fill lebar sederhana
+      [['sheetKpiA', sF, 90], ['sheetKpiP', avgPerfI, 98], ['sheetKpiQ', M, 99.5], ['sheetKpiOEE', oee, 88]].forEach(([id, val, tgt]) => {
+        const node = State.el[id];
+        const card = node && node.closest ? node.closest('.sheet-kpi') : null;
+        if (!card) return;
+        const fill = card.querySelector('.kpi-fill');
+        if (fill) fill.style.width = Math.max(0, Math.min(100, (val / tgt) * 100)) + '%';
+        card.removeAttribute('data-state');
+        if (val >= tgt) card.setAttribute('data-state', 'ok');
+        else if (val >= tgt * 0.75) card.setAttribute('data-state', 'near');
+        else card.setAttribute('data-state', 'bad');
+      });
+    }
+
     // === DIAGNOSTIK ===
     const issues = [];
     if (nShift === 0) issues.push(`Tidak ada baris log pada Shift ${State.evalShift + 1} — cek tombol SHIFT atau jam mulai.`);
