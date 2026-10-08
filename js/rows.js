@@ -43,25 +43,24 @@ const Rows = (() => {
     return idx >= 0 ? rates[idx] : 0;
   };
 
-  /** Base man power (orang) untuk rate master — default 4 jika kosong. */
-  const getBaseOpForProduct = (prodName) => {
-    if (!prodName) return 4;
+  /** Ukuran kemasan (ml) dari master produk — untuk tabel rate Kemas L2. */
+  const getUkuranForProduct = (prodName) => {
+    if (!prodName) return '';
     const names = [
       State.el.prodName1?.value.trim() || '',
       State.el.prodName2?.value.trim() || '',
       State.el.prodName3?.value.trim() || ''
     ];
-    const ops = [
-      parseFloat(State.el.prodBaseOp1?.value) || 0,
-      parseFloat(State.el.prodBaseOp2?.value) || 0,
-      parseFloat(State.el.prodBaseOp3?.value) || 0,
+    const uks = [
+      State.el.prodUkuran1?.value || '',
+      State.el.prodUkuran2?.value || '',
+      State.el.prodUkuran3?.value || '',
     ];
     const idx = names.indexOf(prodName);
-    const v = idx >= 0 ? ops[idx] : 0;
-    return v > 0 ? v : 4;
+    return idx >= 0 ? String(uks[idx] || '') : '';
   };
 
-  /** Kemas Line 1 & 2 memakai rate proporsional man power; L4 & tahapan lain = rate mesin. */
+  /** Kemas Line 1 & 2 memakai tabel rate man power; L4 & tahapan lain = rate mesin. */
   const usesManpowerRate = () => {
     const stage = String(State.el.fStage?.value || '').toLowerCase();
     const line = String(State.el.fLine?.value || '');
@@ -69,19 +68,36 @@ const Rows = (() => {
   };
 
   /**
-   * Rate efektif (unit/mnt).
-   * Kemas L1/L2: (OP baris / Base OP) × Rate master.
-   * OP kosong → anggap = Base OP (full team).
-   * Selain itu: Rate master apa adanya.
+   * Rate efektif (bag/mnt).
+   * Kemas L1: OP < 3 → 8; OP ≥ 3 → 12 (batas mesin).
+   * Kemas L2: tabel ukuran (100/250/500) × band OP (≤3 vs >3).
+   * Lainnya: Rate master produk.
    */
   const getEffectiveRate = (prodName, opValue) => {
-    const baseRate = getRateForProduct(prodName);
-    if (!(baseRate > 0)) return 0;
-    if (!usesManpowerRate()) return baseRate;
-    const baseOp = getBaseOpForProduct(prodName);
+    const stage = String(State.el.fStage?.value || '').toLowerCase();
+    const line = String(State.el.fLine?.value || '');
     const op = parseFloat(String(opValue ?? '').replace(',', '.'));
-    const orang = (Number.isFinite(op) && op > 0) ? op : baseOp;
-    return (orang / baseOp) * baseRate;
+    const orang = (Number.isFinite(op) && op > 0) ? op : 0;
+
+    if (stage === 'kemas' && line === '1') {
+      const cfg = CONFIG.KEMAS_L1_RATE || { low: 8, high: 12, opThreshold: 3 };
+      // OP kosong → anggap full team (≥ threshold)
+      if (!(orang > 0) || orang >= (cfg.opThreshold || 3)) return cfg.high;
+      return cfg.low;
+    }
+
+    if (stage === 'kemas' && line === '2') {
+      const uk = getUkuranForProduct(prodName);
+      const table = (CONFIG.KEMAS_L2_RATE || {})[uk];
+      if (table) {
+        if (!(orang > 0) || orang <= 3) return table.le3;
+        return table.gt3;
+      }
+      // Ukuran belum diisi → fallback rate master
+      return getRateForProduct(prodName);
+    }
+
+    return getRateForProduct(prodName);
   };
 
   /** Baca nilai produk/WO langsung dari DOM (lebih andal dari cache State). */
@@ -257,7 +273,7 @@ const Rows = (() => {
       <td class="col-kode"><div class="c-kode"><span class="dot"></span>
         <input data-f="kode" data-nav class="in mono ctr" type="tel" inputmode="numeric" maxlength="1" placeholder=" " aria-label="Kode">
       </div></td>
-      <td class="col-op"><input data-f="op" data-nav class="in mono ctr" type="text" inputmode="numeric" maxlength="12" placeholder="org" aria-label="Jumlah orang (OP)" title="Jumlah orang — Kemas L1/L2: rate efektif = (OP÷Base OP)×Rate"></td>
+      <td class="col-op"><input data-f="op" data-nav class="in mono ctr" type="text" inputmode="numeric" maxlength="12" placeholder="org" aria-label="Jumlah orang (OP)" title="Kemas L1: OP&lt;3→8, OP≥3→12 bag/mnt. Kemas L2: tergantung ukuran produk + OP"></td>
       <td class="col-mulai"><input data-f="mulai" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Jam Mulai"></td>
       <td class="col-panggil"><input data-f="panggil" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Panggil Teknik"></td>
       <td class="col-teknik"><input data-f="teknik" data-nav class="in mono ctr t-time" inputmode="numeric" maxlength="5" placeholder="--:--" aria-label="Teknik Datang"></td>
@@ -266,6 +282,7 @@ const Rows = (() => {
       <td class="col-kegiatan"><textarea data-f="kegiatan" data-nav class="in" placeholder="Kegiatan " aria-label="Kegiatan" rows="1"></textarea></td>
       <td class="col-masalah"><textarea data-f="masalah" data-nav class="in" placeholder="Penyebab " aria-label="Masalah" rows="1"></textarea></td>
       <td class="col-disposisi"><textarea data-f="disposisi" data-nav class="in" placeholder="Tindakan " aria-label="Disposisi" rows="1"></textarea></td>
+      <td class="col-desc"><textarea data-f="description" data-nav class="in" placeholder="Keterangan bebas…" aria-label="Description" rows="1" title="Catatan acak operator: downtime, trial, dll."></textarea></td>
       <td class="col-wo"><textarea data-f="wo" data-nav class="in mono wo-wrap" placeholder="No WO " aria-label="Nomor WO" rows="1"></textarea></td>
       <td class="col-batch"><select data-f="batch" data-nav class="in mono" aria-label="Produk & Batch">${optionsHtml}</select></td>
       <td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Good"></td>
@@ -281,7 +298,7 @@ const Rows = (() => {
         const el = tr.querySelector(`[data-f="${f}"]`);
         if (el && data[f] != null) {
           el.value = data[f];
-          if (['kegiatan','masalah','disposisi'].includes(f)) {
+          if (['kegiatan','masalah','disposisi','description'].includes(f)) {
             setTimeout(() => UI.autoResizeTextarea(el), 10);
           }
         }
@@ -550,7 +567,7 @@ const Rows = (() => {
   return {
     getActiveProducts,
     getRateForProduct,
-    getBaseOpForProduct,
+    getUkuranForProduct,
     getEffectiveRate,
     usesManpowerRate,
     getWoForProduct,

@@ -481,10 +481,10 @@ const App = (() => {
     // ============================================================
     // MASTER PRODUK & OPERATOR → recalc + sync ke Master
     // ============================================================
-    ['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3','prodBaseOp1','prodBaseOp2','prodBaseOp3','prodWo1','prodWo2','prodWo3'].forEach(id => {
+    ['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3','prodUkuran1','prodUkuran2','prodUkuran3','prodWo1','prodWo2','prodWo3'].forEach(id => {
       if (!State.el[id]) return;
       State.el[id].addEventListener('input', () => {
-        if (id.startsWith('prodName') || id.startsWith('prodRate') || id.startsWith('prodBaseOp')) {
+        if (id.startsWith('prodName') || id.startsWith('prodRate') || id.startsWith('prodUkuran')) {
           Rows.updateAllDropdowns();
           Rows.updateMatrixProductHeaders();
           Calculation.recalc();
@@ -504,14 +504,17 @@ const App = (() => {
     // SYNC DUA ARAH: Master Produk ↔ Sheet Produk
     // ============================================================
     document.querySelectorAll('#masterProductGrid [data-sync]').forEach(el => {
-      el.addEventListener('input', () => {
+      const syncToSheet = () => {
         const targetId = el.getAttribute('data-sync');
         const target = State.el[targetId] || document.getElementById(targetId);
         if (target && target.value !== el.value) {
           target.value = el.value;
           target.dispatchEvent(new Event('input', { bubbles: true }));
+          target.dispatchEvent(new Event('change', { bubbles: true }));
         }
-      });
+      };
+      el.addEventListener('input', syncToSheet);
+      el.addEventListener('change', syncToSheet);
     });
 
     // ============================================================

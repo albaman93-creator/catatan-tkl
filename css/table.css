@@ -193,6 +193,7 @@ col.col-kegiatan  {
 
 col.col-masalah   { width: 120px; }
 col.col-disposisi { width: 120px; }
+col.col-desc      { width: 140px; }
 
 /* DIPERLEBAR */
 col.col-wo {

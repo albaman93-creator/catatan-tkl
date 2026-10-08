@@ -81,7 +81,7 @@ const CONFIG = Object.freeze({
   // filter offsetParent di Navigation.navCells).
   NAV_FIELDS: [
     'kode', 'op', 'mulai', 'panggil', 'teknik', 'selesai', 'durasi',
-    'kegiatan', 'masalah', 'disposisi', 'wo', 'batch',
+    'kegiatan', 'masalah', 'disposisi', 'description', 'wo', 'batch',
     'good', 'defect'
   ],
 
@@ -90,8 +90,19 @@ const CONFIG = Object.freeze({
     kode: 'KODE', op: 'OP', mulai: 'JAM MULAI', panggil: 'PANGGIL TEKNIK',
     teknik: 'TEKNIK DATANG', selesai: 'JAM SELESAI', durasi: 'DURASI (MENIT)',
     kegiatan: 'KEGIATAN',
-    masalah: 'MASALAH', disposisi: 'DISPOSISI', wo: 'NOMOR WO',
+    masalah: 'MASALAH', disposisi: 'DISPOSISI', description: 'DESCRIPTION',
+    wo: 'NOMOR WO',
     batch: 'PRODUK & BATCH', good: 'GOOD', defect: 'DEFECT'
+  },
+
+  // ====== RATE KEMAS L1 / L2 (bag per menit) by man power ======
+  // L1: OP < 3 → 8; OP ≥ 3 → 12 (batas mesin)
+  // L2: by ukuran ml + OP band
+  KEMAS_L1_RATE: { low: 8, high: 12, opThreshold: 3 },
+  KEMAS_L2_RATE: {
+    100: { le3: 14, gt3: 18 },
+    250: { le3: 10, gt3: 14 },
+    500: { le3: 8,  gt3: 12 },
   },
 
   // ====== SUGESTI KEGIATAN (ghost-text) ======

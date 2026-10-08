@@ -194,7 +194,7 @@
       forwardChoice(btn, 'data-sheet-shift');
     }));
 
-    $$('.sheet-op-box, #prodName1, #prodName2, #prodName3, #prodRate1, #prodRate2, #prodRate3, #prodBaseOp1, #prodBaseOp2, #prodBaseOp3, #prodWo1, #prodWo2, #prodWo3')
+    $$('.sheet-op-box, #prodName1, #prodName2, #prodName3, #prodRate1, #prodRate2, #prodRate3, #prodUkuran1, #prodUkuran2, #prodUkuran3, #prodWo1, #prodWo2, #prodWo3')
       .forEach(input => {
         input.addEventListener('input', syncSummary);
         input.addEventListener('change', syncSummary);

@@ -55,13 +55,13 @@ const Storage = (() => {
   const collect = () => ({
     products: {
       p1Name: State.el.prodName1.value, p1Rate: State.el.prodRate1.value,
-      p1BaseOp: State.el.prodBaseOp1 ? State.el.prodBaseOp1.value : '',
+      p1Ukuran: State.el.prodUkuran1 ? State.el.prodUkuran1.value : '',
       p1Wo: State.el.prodWo1 ? State.el.prodWo1.value : '',
       p2Name: State.el.prodName2.value, p2Rate: State.el.prodRate2.value,
-      p2BaseOp: State.el.prodBaseOp2 ? State.el.prodBaseOp2.value : '',
+      p2Ukuran: State.el.prodUkuran2 ? State.el.prodUkuran2.value : '',
       p2Wo: State.el.prodWo2 ? State.el.prodWo2.value : '',
       p3Name: State.el.prodName3.value, p3Rate: State.el.prodRate3.value,
-      p3BaseOp: State.el.prodBaseOp3 ? State.el.prodBaseOp3.value : '',
+      p3Ukuran: State.el.prodUkuran3 ? State.el.prodUkuran3.value : '',
       p3Wo: State.el.prodWo3 ? State.el.prodWo3.value : '',
     },
     operators: {
@@ -85,6 +85,7 @@ const Storage = (() => {
         kode: g('kode'), op: g('op'), mulai: g('mulai'), panggil: g('panggil'),
         teknik: g('teknik'), selesai: g('selesai'), durasi: g('durasi'),
         kegiatan: g('kegiatan'), masalah: g('masalah'), disposisi: g('disposisi'),
+        description: g('description'),
         wo: g('wo'), batch: g('batch'), good: g('good'), defect: g('defect'),
       };
     }),
@@ -99,25 +100,25 @@ const Storage = (() => {
     if (d && d.products) {
       State.el.prodName1.value = d.products.p1Name || '';
       State.el.prodRate1.value = d.products.p1Rate || '';
-      if (State.el.prodBaseOp1) State.el.prodBaseOp1.value = d.products.p1BaseOp || '';
+      if (State.el.prodUkuran1) State.el.prodUkuran1.value = d.products.p1Ukuran || '';
       if (State.el.prodWo1) State.el.prodWo1.value = d.products.p1Wo || '';
       State.el.prodName2.value = d.products.p2Name || '';
       State.el.prodRate2.value = d.products.p2Rate || '';
-      if (State.el.prodBaseOp2) State.el.prodBaseOp2.value = d.products.p2BaseOp || '';
+      if (State.el.prodUkuran2) State.el.prodUkuran2.value = d.products.p2Ukuran || '';
       if (State.el.prodWo2) State.el.prodWo2.value = d.products.p2Wo || '';
       State.el.prodName3.value = d.products.p3Name || '';
       State.el.prodRate3.value = d.products.p3Rate || '';
-      if (State.el.prodBaseOp3) State.el.prodBaseOp3.value = d.products.p3BaseOp || '';
+      if (State.el.prodUkuran3) State.el.prodUkuran3.value = d.products.p3Ukuran || '';
       if (State.el.prodWo3) State.el.prodWo3.value = d.products.p3Wo || '';
     } else {
       State.el.prodName1.value = ''; State.el.prodRate1.value = '';
-      if (State.el.prodBaseOp1) State.el.prodBaseOp1.value = '';
+      if (State.el.prodUkuran1) State.el.prodUkuran1.value = '';
       if (State.el.prodWo1) State.el.prodWo1.value = '';
       State.el.prodName2.value = ''; State.el.prodRate2.value = '';
-      if (State.el.prodBaseOp2) State.el.prodBaseOp2.value = '';
+      if (State.el.prodUkuran2) State.el.prodUkuran2.value = '';
       if (State.el.prodWo2) State.el.prodWo2.value = '';
       State.el.prodName3.value = ''; State.el.prodRate3.value = '';
-      if (State.el.prodBaseOp3) State.el.prodBaseOp3.value = '';
+      if (State.el.prodUkuran3) State.el.prodUkuran3.value = '';
       if (State.el.prodWo3) State.el.prodWo3.value = '';
     }
     // Sync ke Master Produk UI
