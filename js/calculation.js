@@ -66,16 +66,37 @@ const Calculation = (() => {
     let sumGood = 0, sumDefect = 0;
     const sh = [{B:0,D:0},{B:0,D:0},{B:0,D:0}];
 
-    const pNames = [
-      State.el.prodName1.value.trim(),
-      State.el.prodName2.value.trim(),
-      State.el.prodName3.value.trim()
-    ];
+    // Label produk: kode saja ATAU "kode + BN" (setelah issue #7)
+    const pLabels = [];
+    for (let i = 1; i <= 3; i++) {
+      const name = (State.el['prodName' + i]?.value || '').trim();
+      const bn = (State.el['prodBn' + i]?.value || '').trim();
+      const label = bn ? `${name} ${bn}` : name;
+      pLabels.push(label);
+    }
     const prodStats = [
       { dur:0, rate:parseFloat(State.el.prodRate1.value)||0, target:0, actual:0 },
       { dur:0, rate:parseFloat(State.el.prodRate2.value)||0, target:0, actual:0 },
       { dur:0, rate:parseFloat(State.el.prodRate3.value)||0, target:0, actual:0 },
     ];
+
+    /** Cocokkan batch baris ke slot produk 0..2 (fleksibel: "VPEL1" ≈ "VPEL1 L027103"). */
+    const matchProdSlot = (batchVal) => {
+      const v = String(batchVal || '').trim();
+      if (!v) return -1;
+      const lower = v.toLowerCase();
+      for (let i = 0; i < 3; i++) {
+        const label = pLabels[i];
+        if (!label) continue;
+        const l = label.toLowerCase();
+        if (l === lower) return i;
+        if (l.startsWith(lower + ' ') || lower.startsWith(l + ' ')) return i;
+        const l0 = l.split(/\s+/)[0];
+        const v0 = lower.split(/\s+/)[0];
+        if (l0 && l0 === v0) return i;
+      }
+      return -1;
+    };
 
     Rows.rows().forEach(tr => {
       const g = (f) => { const el = tr.querySelector(`[data-f="${f}"]`); return el ? el.value : ''; };
@@ -133,16 +154,15 @@ const Calculation = (() => {
       else if (c === 'unplanned'){ D += dur; if (si != null) sh[si].D += dur; }
       else if (c === 'prod') {
         if (si === State.evalShift && prodName) {
-          for (let i = 0; i < 3; i++) {
-            if (pNames[i] && pNames[i] === prodName) {
-              prodStats[i].dur += dur;
-              prodStats[i].actual += rowActual;
-              // Rate efektif: Kemas L1/L2 proporsional OP baris; selain itu rate master
-              const eff = (Rows.getEffectiveRate)
-                ? Rows.getEffectiveRate(prodName, g('op'))
-                : (prodStats[i].rate || 0);
-              prodStats[i].target += dur * (eff || 0);
-            }
+          const slot = matchProdSlot(prodName);
+          if (slot >= 0) {
+            prodStats[slot].dur += dur;
+            prodStats[slot].actual += rowActual;
+            // Rate efektif: Kemas L1/L2 proporsional OP baris; selain itu rate master
+            const eff = (Rows.getEffectiveRate)
+              ? Rows.getEffectiveRate(prodName, g('op'))
+              : (prodStats[slot].rate || 0);
+            prodStats[slot].target += dur * (eff || 0);
           }
         }
       }
@@ -177,7 +197,7 @@ const Calculation = (() => {
       const hAct = prodStats[i].actual;
       const perfI = gTarget > 0 ? (hAct / gTarget) * 100 : 0;
 
-      if (pNames[i] && (prodStats[i].rate > 0 || prodStats[i].target > 0)) {
+      if (pLabels[i] && (prodStats[i].rate > 0 || prodStats[i].target > 0 || prodStats[i].actual > 0)) {
         activeCount++; totalPerfSum += perfI;
       }
 

@@ -1,23 +1,74 @@
-/* Auto-paired 1:1 with js/suggest.js — edit styles for that module here */
+/**
+ * SUGGEST.CSS — hanya untuk modul js/suggest.js
+ * ============================================================
+ * File ini SENGAJA terpisah dari wizard / quickmode / bulkfill.
+ * Edit di sini TIDAK mengubah tema wizard setup awal.
+ *
+ * Struktur:
+ *   1. Ghost text (teks abu di belakang input Kegiatan)
+ *   2. Dropdown Kegiatan   → .kegiatan-suggest-drop / .kegiatan-suggest-item
+ *   3. Dropdown Kode Produk → .prod-suggest-drop / .prod-suggest-item
+ *   4. Dropdown BN          → .bn-suggest-drop / .bn-suggest-item
+ *   5. Modal kelola sugesti → #suggestOverlay / #suggestModal
+ *
+ * Z-index dropdown = 9000 (di bawah overlay modal ~10000+),
+ * supaya tidak menembus wizard / modal lain.
+ * ============================================================
+ */
 
-.ghost-wrap { position: relative; display: block; width: 100%; }
+/* ---- 1. Ghost text ---- */
+.ghost-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
 
 .ghost-layer {
-  position: absolute; top: 0; left: 0; z-index: 3;
-  pointer-events: none; overflow: hidden;
-  white-space: pre-wrap; word-wrap: break-word; word-break: break-word;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
   background: transparent;
 }
 
 .ghost-layer .ghost-typed { color: transparent; }
-
 .ghost-layer .ghost-suggest { color: #a3aeb6; }
 
 .log .ghost-wrap { height: 100%; }
 
-.prod-suggest-drop[hidden] { display: none !important; }
+/* ---- 2–4. Dropdown bersama (base) ---- */
+.kegiatan-suggest-drop,
+.prod-suggest-drop,
+.bn-suggest-drop {
+  position: fixed;
+  z-index: 1100; /* di bawah .qm-overlay (1200) agar tidak tembus wizard/modal */
+  overflow-y: auto;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 36, 55, 0.12);
+  background: #fff;
+  box-shadow:
+    0 10px 28px rgba(15, 36, 55, 0.14),
+    0 2px 8px rgba(15, 36, 55, 0.06);
+  -webkit-overflow-scrolling: touch;
+  pointer-events: auto;
+}
 
-.prod-suggest-item {
+.kegiatan-suggest-drop[hidden],
+.prod-suggest-drop[hidden],
+.bn-suggest-drop[hidden] {
+  display: none !important;
+}
+
+/* Item di dalam dropdown */
+.kegiatan-suggest-item,
+.prod-suggest-item,
+.bn-suggest-item {
   display: block;
   width: 100%;
   text-align: left;
@@ -32,12 +83,60 @@
   transition: background 0.12s ease, color 0.12s ease;
 }
 
+.kegiatan-suggest-item:hover,
+.kegiatan-suggest-item.on,
 .prod-suggest-item:hover,
-.prod-suggest-item.on {
+.prod-suggest-item.on,
+.bn-suggest-item:hover,
+.bn-suggest-item.on {
   background: rgba(18, 161, 80, 0.12);
   color: #0b7a3b;
 }
 
-.prod-suggest-item:active {
+.kegiatan-suggest-item:active,
+.prod-suggest-item:active,
+.bn-suggest-item:active {
   background: rgba(18, 161, 80, 0.2);
+}
+
+/* Dark theme */
+[data-theme="dark"] .kegiatan-suggest-drop,
+[data-theme="dark"] .prod-suggest-drop,
+[data-theme="dark"] .bn-suggest-drop {
+  background: #0f172a;
+  border-color: #334155;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .kegiatan-suggest-item,
+[data-theme="dark"] .prod-suggest-item,
+[data-theme="dark"] .bn-suggest-item {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .kegiatan-suggest-item:hover,
+[data-theme="dark"] .kegiatan-suggest-item.on,
+[data-theme="dark"] .prod-suggest-item:hover,
+[data-theme="dark"] .prod-suggest-item.on,
+[data-theme="dark"] .bn-suggest-item:hover,
+[data-theme="dark"] .bn-suggest-item.on {
+  background: rgba(34, 197, 94, 0.18);
+  color: #86efac;
+}
+
+/* ---- 5. Modal "Sugesti Kegiatan" (kelola daftar) ---- */
+/* Sengaja punya class sendiri (.suggest-modal) agar tidak ikut
+   gaya .bulk-modal / .wizard-modal / .qm-modal jika diubah. */
+#suggestOverlay.qm-overlay {
+  /* pakai kerangka overlay yang sama, tapi isi modal independen */
+}
+
+#suggestModal.suggest-modal {
+  max-width: 480px;
+  width: 94vw;
+}
+
+/* Silakan ubah warna/tema modal kelola di sini tanpa menyentuh wizard */
+#suggestModal.suggest-modal .qm-head h3 {
+  /* contoh: color: #0b7a3b; */
 }

@@ -451,6 +451,28 @@ const Rows = (() => {
   };
 
   // ====== TABEL RINCIAN PRODUK ======
+  /**
+   * Cocokkan nilai batch di baris ke label produk master.
+   * Mendukung "VTTS1", "VTTS1 L030101", dll. (setelah split Produk/BN).
+   */
+  const resolveSummaryKey = (batchVal, summary) => {
+    const v = String(batchVal || '').trim();
+    if (!v) return null;
+    if (summary[v]) return v;
+    // Cocokkan ke label gabungan / kode saja
+    const keys = Object.keys(summary);
+    const lower = v.toLowerCase();
+    for (const k of keys) {
+      if (k.toLowerCase() === lower) return k;
+      if (k.toLowerCase().startsWith(lower + ' ') || lower.startsWith(k.toLowerCase() + ' ')) return k;
+      // Token pertama sama (kode produk)
+      const k0 = k.split(/\s+/)[0].toLowerCase();
+      const v0 = lower.split(/\s+/)[0];
+      if (k0 && k0 === v0) return k;
+    }
+    return null;
+  };
+
   const updateProductDetailTable = () => {
     const container = State.el.tbodyProdDetail;
     if (!container) return;
@@ -461,7 +483,8 @@ const Rows = (() => {
     if (prods.length === 0) {
       container.innerHTML = `
         <div class="product-detail-empty">
-          Belum ada produk terdaftar di Master Produk.
+          Belum ada produk di Master Produk.<br>
+          <small>Isi <b>Kode produk</b> (dan BN) di tab Produk / Master Produk, lalu pilih di kolom Batch pada baris log.</small>
         </div>`;
       return;
     }
@@ -475,12 +498,12 @@ const Rows = (() => {
         durasiPlannedDT: 0,
         durasiUnplannedDT: 0,
         rate: getRateForProduct(p),
-        baseOp: getBaseOpForProduct(p),
         target: 0,       // Σ (durasi × rate efektif) — penting untuk Kemas L1/L2
         actual: 0
       };
     });
 
+    let rowsWithBatch = 0;
     rows().forEach(tr => {
       const g = (f) => {
         const el = tr.querySelector(`[data-f="${f}"]`);
@@ -495,25 +518,29 @@ const Rows = (() => {
       const defectVal = parseFloat(String(g('defect') || '0').replace(',', '.')) || 0;
       const rowActual = goodVal + defectVal;
 
-      if (mulai == null || selesai == null || !prodName || !summary[prodName]) return;
+      if (mulai == null || selesai == null) return;
+      const key = resolveSummaryKey(prodName, summary);
+      if (!key) return;
+      rowsWithBatch++;
+
       const dur = (selesai - mulai + 1440) % 1440;
       const si = Utils.shiftOf(mulai);
 
       if (si === State.evalShift) {
-        summary[prodName].durasiTotal += dur;
+        summary[key].durasiTotal += dur;
 
         if (CONFIG.PLANNED_CODES.has(kodeNum)) {
-          summary[prodName].durasiPlannedDT += dur;
+          summary[key].durasiPlannedDT += dur;
         } else if (CONFIG.UNPLANNED_CODES.has(kodeNum)) {
-          summary[prodName].durasiUnplannedDT += dur;
+          summary[key].durasiUnplannedDT += dur;
         } else if (Utils.catOf(kodeStr) === 'prod') {
-          summary[prodName].durasiProdAll += dur;
+          summary[key].durasiProdAll += dur;
 
           if (goodVal >= 1) {
-            summary[prodName].durasiValid += dur;
-            summary[prodName].actual += rowActual;
-            const eff = getEffectiveRate(prodName, g('op'));
-            summary[prodName].target += dur * eff;
+            summary[key].durasiValid += dur;
+            summary[key].actual += rowActual;
+            const eff = getEffectiveRate(key, g('op'));
+            summary[key].target += dur * eff;
           }
         }
       }
@@ -578,6 +605,18 @@ const Rows = (() => {
 
       container.appendChild(block);
     });
+
+    // Petunjuk jika produk ada tapi belum ada output / batch
+    if (rowsWithBatch === 0) {
+      const tip = document.createElement('div');
+      tip.className = 'product-detail-empty';
+      tip.style.marginTop = '12px';
+      tip.innerHTML = `
+        Belum ada baris log yang memilih <b>Batch / Produk</b>.<br>
+        <small>Di tab Sheet, isi kolom <b>Batch</b> (pilih produk), lalu isi <b>Good</b> / <b>Defect</b>
+        pada baris <b>Kode 2</b> (produksi) agar % Performance terhitung.</small>`;
+      container.appendChild(tip);
+    }
   };
 
   // ====== EXPORT ======

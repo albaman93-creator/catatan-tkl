@@ -204,31 +204,59 @@ const Suggest = (() => {
     return { tokenStart, token };
   };
 
-  // Cari sugesti terbaik untuk ghost-text.
-  // Prioritas: alias → bentuk baku, lalu prefix, lalu kata-tengah.
+  /**
+   * Cari alias yang diawali / cocok dengan query (partial).
+   * "rapihkan" → "Merapihkan Media" via alias "rapihkan media".
+   */
+  const findAliasMatch = (query) => {
+    const q = String(query || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    if (!q || q.length < 3) return null;
+    const aliases = CONFIG.KEGIATAN_ALIASES || {};
+    // Exact dulu
+    if (aliases[q]) return aliases[q];
+    // Alias yang diawali query, atau query yang diawali alias
+    let best = null;
+    for (const [alias, canon] of Object.entries(aliases)) {
+      if (alias === q) return canon;
+      if (alias.startsWith(q) || q.startsWith(alias)) {
+        if (!best || alias.length < best.aliasLen) best = { canon, aliasLen: alias.length };
+      }
+    }
+    return best ? best.canon : null;
+  };
+
+  // Cari sugesti terbaik untuk ghost-text / Tab-accept.
+  // Alias non-prefix TIDAK dipakai untuk ghost append (hanya dropdown + blur).
   const bestMatch = (segment) => {
     if (!segment) return null;
     const lower = segment.toLowerCase();
-    // 0) Alias exact → bentuk baku (Issue #9)
-    const canon = resolveAlias(lower);
-    if (canon && canon.toLowerCase() !== lower) return canon;
 
     const list = getSuggestions();
-    // 1) Prefix penuh (paling cocok untuk ghost text)
+    // 1) Prefix penuh saja — aman untuk ghost text "ketikan|sisanya"
     const prefix = list.find(s => {
       const t = s.toLowerCase();
       return t.startsWith(lower) && t !== lower;
     });
     if (prefix) return prefix;
-    // 2) Ada kata di tengah yang diawali query (mis. "c" → "Line Clearance")
-    return list.find(s => {
+
+    // 2) Kata di tengah yang diawali query — untuk Tab-accept, bukan ghost
+    //    (ghost tidak ditampilkan karena isPrefixMatch = false)
+    const mid = list.find(s => {
       const t = s.toLowerCase();
       if (t === lower) return false;
       return t.split(/[\s\-_/]+/).some(w => w.startsWith(lower) && w !== lower);
-    }) || null;
+    });
+    if (mid) return mid;
+
+    // 3) Alias partial ("rapihkan" → Merapihkan Media) — Tab/blur, bukan ghost
+    const aliasHit = findAliasMatch(lower);
+    if (aliasHit && aliasHit.toLowerCase() !== lower) return aliasHit;
+
+    return null;
   };
 
-  // Apakah match adalah prefix dari segmen yang diketik? (untuk tampilan ghost)
+  // Ghost text HANYA jika match benar-benar diawali teks yang diketik
+  // (kalau tidak, "rapihkan" + "Merapihkan Media" jadi tampilan rusak).
   const isPrefixMatch = (segment, match) => {
     if (!segment || !match) return false;
     return match.toLowerCase().startsWith(segment.toLowerCase());
@@ -253,15 +281,14 @@ const Suggest = (() => {
   // dan penyisipannya per-kata-aktif (segmen), bukan seluruh isi kotak — jadi
   // tetap jalan walau sudah ada kegiatan sebelumnya (dipisah koma). Dibuat
   // karena HP tidak punya tombol Tab, jadi user harus bisa pilih dengan tap.
-  // Filter dropdown: dukung pencarian dari kata tengah + alias (Issue #9).
-  // Ranking: exact-alias/baku > prefix > awal-kata > substring.
+  // Filter dropdown: kata tengah + alias (Issue #9).
+  // Ranking: alias-baku > prefix > awal-kata > substring.
   const filterActivities = (segment) => {
     const q = (segment || '').trim().toLowerCase();
     const all = [...new Set(getSuggestions())];
     if (!q) return all.slice(0, 12);
 
-    // Jika query adalah alias → prioritaskan bentuk baku di urutan teratas
-    const canon = resolveAlias(q);
+    const canon = findAliasMatch(q);
 
     const scored = [];
     for (const s of all) {
@@ -269,19 +296,19 @@ const Suggest = (() => {
       if (t === q) continue;
       let rank;
       if (canon && t === canon.toLowerCase()) {
-        rank = -1; // alias ketik "beberes media" → "Merapihkan Media" paling atas
+        rank = -1;
       } else if (t.startsWith(q)) {
         rank = 0;
       } else if (t.split(/[\s\-_/]+/).some(w => w.startsWith(q))) {
         rank = 1;
-      } else if (t.includes(q)) {
+      } else if (q.length >= 4 && t.includes(q)) {
+        // Substring hanya jika query cukup panjang (hindari "a" mencocok semua)
         rank = 2;
       } else {
         continue;
       }
       scored.push({ s, rank, len: t.length });
     }
-    // Alias exact: pastikan bentuk baku selalu masuk meskipun filter di atas miss
     if (canon && !scored.some(x => x.s.toLowerCase() === canon.toLowerCase())) {
       scored.unshift({ s: canon, rank: -1, len: canon.length });
     }
@@ -297,8 +324,9 @@ const Suggest = (() => {
   const ensureActDropdown = () => {
     if (_actDrop) return _actDrop;
     _actDrop = document.createElement('div');
-    _actDrop.className = 'prod-suggest-drop';
+    _actDrop.className = 'kegiatan-suggest-drop';
     _actDrop.setAttribute('role', 'listbox');
+    _actDrop.setAttribute('data-suggest-kind', 'kegiatan');
     _actDrop.hidden = true;
     document.body.appendChild(_actDrop);
     document.addEventListener('mousedown', (e) => {
@@ -328,19 +356,39 @@ const Suggest = (() => {
     }
   };
 
+  /** True jika wizard / modal manapun sedang terbuka — dropdown disembunyikan. */
+  const isAnyOverlayOpen = () => {
+    return !!document.querySelector(
+      '.qm-overlay:not(.hide), #wizardOverlay:not(.hide), #suggestOverlay:not(.hide), #qmOverlay:not(.hide), #bulkOverlay:not(.hide)'
+    );
+  };
+
+  const hideAllSuggestDropdowns = () => {
+    hideActDropdown();
+    if (typeof hideProdDropdown === 'function') hideProdDropdown();
+    if (typeof hideBnDropdown === 'function') hideBnDropdown();
+  };
+
   const hideActDropdown = () => {
     if (_actDrop) _actDrop.hidden = true;
     _actActiveInput = null;
     _actHighlight = -1;
   };
 
-  const selectActivity = (el, text, tokenStart) => {
+  /**
+   * Pilih kegiatan dari dropdown: ganti SELURUH segmen aktif (bukan hanya
+   * kata terakhir), supaya "rapihkan" + pilih "Merapihkan Media" tidak jadi
+   * "rapihkan Merapihkan Media".
+   */
+  const selectActivity = (el, text, _tokenStart) => {
     if (!el || !text) return;
-    const before = el.value.slice(0, tokenStart);
-    const after = el.value.slice(el.selectionEnd || el.value.length);
-    // Tambahkan spasi otomatis: siap langsung ketik kegiatan berikutnya.
-    el.value = before + text.trim() + ' ' + after.replace(/^\s+/, '');
-    const pos = before.length + text.trim().length + 1;
+    const info = getActiveSegment(el.value);
+    const before = el.value.slice(0, info.segStart);
+    // Setelah segmen aktif: buang sisa segmen lama, sisakan pemisah berikutnya jika ada
+    const afterRaw = el.value.slice(info.segStart + info.segment.length);
+    const canon = text.trim();
+    el.value = before + canon + (afterRaw.match(/^[,;\n]/) ? afterRaw : ' ' + afterRaw.replace(/^\s+/, ''));
+    const pos = before.length + canon.length + (el.value[before.length + canon.length] === ' ' ? 1 : 0);
     el.selectionStart = el.selectionEnd = pos;
     el.focus();
     hideActDropdown();
@@ -348,6 +396,7 @@ const Suggest = (() => {
   };
 
   const renderActDropdown = (el, items, segStart) => {
+    if (isAnyOverlayOpen()) { hideActDropdown(); return; }
     const drop = ensureActDropdown();
     _actActiveInput = el;
     _actSegStart = segStart;
@@ -357,9 +406,9 @@ const Suggest = (() => {
       return;
     }
     drop.innerHTML = items.map((text, i) =>
-      `<button type="button" class="prod-suggest-item${i === 0 ? ' on' : ''}" role="option" data-text="${Utils.escapeHtml(text)}">${Utils.escapeHtml(text)}</button>`
+      `<button type="button" class="kegiatan-suggest-item${i === 0 ? ' on' : ''}" role="option" data-text="${Utils.escapeHtml(text)}">${Utils.escapeHtml(text)}</button>`
     ).join('');
-    drop.querySelectorAll('.prod-suggest-item').forEach(btn => {
+    drop.querySelectorAll('.kegiatan-suggest-item').forEach(btn => {
       btn.addEventListener('mousedown', (e) => {
         e.preventDefault();
         selectActivity(el, btn.getAttribute('data-text'), segStart);
@@ -436,9 +485,14 @@ const Suggest = (() => {
     };
 
     const acceptSuggestion = () => {
-      const before = el.value.slice(0, currentSegStart);
-      el.value = before + currentSuggestion;
-      el.selectionStart = el.selectionEnd = el.value.length;
+      if (!currentSuggestion) return;
+      // Ganti seluruh segmen aktif (bukan append), termasuk match alias
+      const info = getActiveSegment(el.value);
+      const before = el.value.slice(0, info.segStart);
+      const afterRaw = el.value.slice(info.segStart + info.segment.length);
+      const canon = currentSuggestion.trim();
+      el.value = before + canon + (afterRaw.match(/^[,;\n]/) ? afterRaw : '');
+      el.selectionStart = el.selectionEnd = before.length + canon.length;
       currentSuggestion = '';
       ghost.textContent = '';
       hideActDropdown();
@@ -467,7 +521,7 @@ const Suggest = (() => {
     el.addEventListener('keydown', (e) => {
       // Navigasi dropdown (panah atas/bawah + Enter) kalau dropdown sedang tampil
       if (_actDrop && !_actDrop.hidden && _actActiveInput === el) {
-        const items = [..._actDrop.querySelectorAll('.prod-suggest-item')];
+        const items = [..._actDrop.querySelectorAll('.kegiatan-suggest-item')];
         if (items.length) {
           if (e.key === 'ArrowDown') {
             e.preventDefault();
@@ -717,6 +771,7 @@ const Suggest = (() => {
     _prodDrop = document.createElement('div');
     _prodDrop.className = 'prod-suggest-drop';
     _prodDrop.setAttribute('role', 'listbox');
+    _prodDrop.setAttribute('data-suggest-kind', 'produk');
     _prodDrop.hidden = true;
     document.body.appendChild(_prodDrop);
     document.addEventListener('mousedown', (e) => {
@@ -786,6 +841,7 @@ const Suggest = (() => {
   };
 
   const renderProdDropdown = (input, items) => {
+    if (isAnyOverlayOpen()) { hideProdDropdown(); return; }
     const drop = ensureProdDropdown();
     _prodActiveInput = input;
     _prodHighlight = items.length ? 0 : -1;
@@ -883,8 +939,9 @@ const Suggest = (() => {
   const ensureBnDropdown = () => {
     if (_bnDrop) return _bnDrop;
     _bnDrop = document.createElement('div');
-    _bnDrop.className = 'prod-suggest-drop';
+    _bnDrop.className = 'bn-suggest-drop';
     _bnDrop.setAttribute('role', 'listbox');
+    _bnDrop.setAttribute('data-suggest-kind', 'bn');
     _bnDrop.hidden = true;
     document.body.appendChild(_bnDrop);
     document.addEventListener('mousedown', (e) => {
@@ -919,6 +976,7 @@ const Suggest = (() => {
   };
 
   const renderBnDropdown = (input, items) => {
+    if (isAnyOverlayOpen()) { hideBnDropdown(); return; }
     const drop = ensureBnDropdown();
     _bnActiveInput = input;
     _bnHighlight = items.length ? 0 : -1;
@@ -927,9 +985,9 @@ const Suggest = (() => {
       return;
     }
     drop.innerHTML = items.map((bn, i) =>
-      `<button type="button" class="prod-suggest-item${i === 0 ? ' on' : ''}" role="option" data-bn="${bn}">${bn}</button>`
+      `<button type="button" class="bn-suggest-item${i === 0 ? ' on' : ''}" role="option" data-bn="${bn}">${bn}</button>`
     ).join('');
-    drop.querySelectorAll('.prod-suggest-item').forEach(btn => {
+    drop.querySelectorAll('.bn-suggest-item').forEach(btn => {
       btn.addEventListener('mousedown', (e) => {
         e.preventDefault();
         selectBn(input, btn.getAttribute('data-bn'));
@@ -978,7 +1036,7 @@ const Suggest = (() => {
         if (e.key === 'Escape') hideBnDropdown();
         return;
       }
-      const items = [..._bnDrop.querySelectorAll('.prod-suggest-item')];
+      const items = [..._bnDrop.querySelectorAll('.bn-suggest-item')];
       if (!items.length) return;
       if (e.key === 'ArrowDown') {
         e.preventDefault();
