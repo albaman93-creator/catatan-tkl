@@ -25,46 +25,58 @@ const PhotoImport = (() => {
   ];
 
   /** Prompt siap kirim ke Meta AI / Gemini bersama foto form TKL */
-  const AI_PROMPT = `Baca foto FORM TKL (Formulir Catatan Pemakaian TKL) ini.
-Kembalikan HANYA JSON valid, tanpa markdown, tanpa penjelasan.
-
-HEADER (abaikan logo & tanda tangan approve):
-- tanggal → meta.tanggal
-- shift → meta.shift
-- Nama Mesin → meta.nama_mesin
-- No. Mesin → meta.no_mesin
-- Tahapan proses → meta.tahapan
-- Kec. standar PQ (output/menit) → meta.rate_standar
-- Kec. Actual → ABAIKAN
-- Inisial OP/Packer → meta.inisial
-
-SETIAP BARIS TABEL:
-| Kolom form | Field JSON |
-| Kode keg. | kode (1 digit 1-9) |
-| Jumlah TKL | op |
-| Dari | mulai (HH:MM) |
-| Panggil teknik | panggil (HH:MM) |
-| Teknik datang | teknik (HH:MM) |
-| Sampai | selesai (HH:MM) |
-| Durasi (menit) | durasi |
-| Aktivitas kegiatan | kegiatan |
-| Masalah/penyebab | masalah |
-| Disposisi/tindakan | disposisi |
-| Nomor WO | wo |
-| Kode produk & batch | batch |
-| Good | good |
-| Defect | defect |
-
-Format WAJIB:
-{"rows":[{"kode":"2","op":"","mulai":"07:00","panggil":"","teknik":"","selesai":"07:35","durasi":"35","kegiatan":"...","masalah":"","disposisi":"","wo":"","batch":"","good":"918","defect":"4"}],"meta":{"tanggal":"2026-09-28","shift":"1","nama_mesin":"","no_mesin":"","tahapan":"mixing","rate_standar":"26","inisial":"","catatan":""}}
-
-Aturan:
-1. Jam format HH:MM (7.30 → 07:30).
-2. kode hanya 1 digit.
-3. Jika durasi kosong tapi jam ada, hitung durasi dari mulai-selesai.
-4. good/defect utamanya di kode 2.
-5. Abaikan baris kosong. Urut atas ke bawah.
-6. Jangan bungkus dengan \`\`\`json.`;
+  const AI_PROMPT = `# TASK: IMG→JSON_ONLY | NO_MD | NO_PROSE | NO_FENCE
+# SCHEMA v1.4 TKL_FORM_OCR
+λ read(photo) ⇒ emit(JSON)
+HDR_MAP := {
+  δt → meta.tanggal,          # ISO-8601 Y-m-d
+  σ  → meta.shift,            # "1"|"2"|"3"
+  μN → meta.nama_mesin,
+  μK → meta.no_mesin,
+  τ  → meta.tahapan,          # lower: mixing|filling|steril|visual|kemas
+  ρS → meta.rate_standar,     # unit/min
+  ρA → ∅,                     # DROP / ignore actual rate
+  ι  → meta.inisial           # OP/Packer initials
+}
+ROW_MAP := {
+  κ  → kode,      # ∈ {1..9} single digit
+  ω  → op,        # TKL count
+  t0 → mulai,     # HH:MM
+  tP → panggil,   # HH:MM
+  tT → teknik,    # HH:MM
+  t1 → selesai,   # HH:MM
+  Δ  → durasi,    # minutes
+  α  → kegiatan,
+  ψ  → masalah,
+  δx → disposisi,
+  WO → wo,
+  β  → batch,     # product+batch code
+  G  → good,
+  D  → defect
+}
+CANON := {
+  "rows":[ {
+    "kode":"2","op":"","mulai":"07:00","panggil":"","teknik":"",
+    "selesai":"07:35","durasi":"35","kegiatan":"...","masalah":"",
+    "disposisi":"","wo":"","batch":"","good":"918","defect":"4"
+  } ],
+  "meta":{
+    "tanggal":"2026-09-28","shift":"1","nama_mesin":"","no_mesin":"",
+    "tahapan":"mixing","rate_standar":"26","inisial":"","catatan":""
+  }
+}
+RULES := [
+  R1: normalize_time(x) → HH:MM  # 7.30⇒07:30 ; 7:5⇒07:05
+  R2: kode := digit₁ only
+  R3: if Δ=∅ ∧ t0∧t1 → Δ := (t1−t0) mod 1440
+  R4: G,D primary on κ=2
+  R5: skip empty rows; order = top→bottom scan
+  R6: output RAW JSON only — forbid \`\`\` / commentary / keys outside CANON
+]
+EXEC:
+  parse(HDR) with HDR_MAP
+  parse(TABLE) with ROW_MAP + RULES
+  return CANON-shaped object`;
 
   let draftRows = [];
   let draftMeta = {};
