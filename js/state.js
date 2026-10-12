@@ -28,6 +28,8 @@ const State = (() => {
       'loginOverlay', 'loginForm', 'loginEmail', 'loginPassword', 'loginBtn', 'loginError', 'loginOfflineNote', 'loginOfflineBtn',
       'appContainer', 'pos', 'hint', 'lastSaved', 'syncStatus',
       'shiftIndicator', 'shiftIndicatorText', 'oeeIndicator', 'oeeIndicatorValue',
+      'oee365Indicator', 'oee365IndicatorValue',
+      'o365A', 'o365E', 'o365F', 'o365P', 'o365Q', 'oee365', 'diag365', 'rincSub365',
       'toolbarToggle', 'toolbarToggleIcon', 'toolbarBody', 'screenNav',
       'logsheetHelpBtn', 'logsheetHelpPanel',
       'viewModeToggle', 'tblWrap',

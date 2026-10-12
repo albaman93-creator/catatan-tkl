@@ -89,6 +89,16 @@ const App = (() => {
     if (State.el.oeeIndicator) {
       State.el.oeeIndicator.addEventListener('click', () => UI.showScreen('oee'));
     }
+    if (State.el.oee365Indicator) {
+      State.el.oee365Indicator.addEventListener('click', () => UI.showScreen('oee365'));
+    }
+    const btnMeeting = document.getElementById('btnDashboardMeeting');
+    if (btnMeeting) {
+      btnMeeting.addEventListener('click', () => {
+        if (typeof UI !== 'undefined' && UI.showScreen) UI.showScreen('weekly');
+        else if (typeof WeeklyDashboard !== 'undefined' && WeeklyDashboard.open) WeeklyDashboard.open();
+      });
+    }
 
     // ============================================================
     // ROW INTERACTIONS (delegation pada tbody)

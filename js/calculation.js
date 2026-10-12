@@ -229,11 +229,39 @@ const Calculation = (() => {
     oMEl.style.color = M >= CONFIG.TARGET.QUALITY ? 'var(--green-d)' : 'var(--red)';
     oMEl.style.fontWeight = '700';
 
-    // === OEE ===
+    // === OEE standar (Availability = E/C vs waktu terencana) ===
     const oee = sF * avgPerfI * M / 10000;
     const oeeEl = State.el.oee;
     oeeEl.textContent = Utils.nf2(oee) + '%';
     oeeEl.style.color = oee >= CONFIG.TARGET.OEE ? '#2ee27e' : '#f87171';
+
+    // === OEE 365 (Availability = E / A_shift penuh, mis. 510 mnt) ===
+    // Contoh: shift 510 mnt, waktu operasional E = 400 → A365 = 400/510 ≈ 78,43%
+    const a365 = sA > 0 ? (sE / sA) * 100 : 0;
+    const oee365 = a365 * avgPerfI * M / 10000;
+
+    const set365 = (key, text, color) => {
+      let el = State.el[key];
+      if (!el) { el = document.getElementById(key); if (el) State.el[key] = el; }
+      if (!el) return;
+      el.textContent = text;
+      if (color) el.style.color = color;
+    };
+    set365('o365A', Utils.nf0(sA));
+    set365('o365E', Utils.nf0(sE));
+    set365('o365F', Utils.nf2(a365) + ' %', a365 >= CONFIG.TARGET.AVAILABILITY ? 'var(--green-d)' : 'var(--red)');
+    set365('o365P', Utils.nf2(avgPerfI) + ' %');
+    set365('o365Q', Utils.nf2(M) + ' %');
+    set365('oee365', Utils.nf2(oee365) + '%', oee365 >= CONFIG.TARGET.OEE ? '#2ee27e' : '#f87171');
+    if (State.el.rincSub365) {
+      State.el.rincSub365.textContent =
+        `Shift ${State.evalShift + 1} · A₃₆₅ = ${sA} mnt · E = ${Utils.nf0(sE)} mnt · A365 = ${Utils.nf2(a365)}%`;
+    }
+    if (State.el.diag365) {
+      State.el.diag365.innerHTML =
+        `<div class="d-item ok">OEE 365 = ${Utils.nf2(a365)}% × ${Utils.nf2(avgPerfI)}% × ${Utils.nf2(M)}% = <b>${Utils.nf2(oee365)}%</b>
+         <br><small>Availability 365 = waktu operasional (E) ÷ menit penuh shift (${sA}), bukan ÷ waktu terencana (C).</small></div>`;
+    }
 
     // Badge %OEE mini di toolbar atas — biar kelihatan real-time tanpa
     // harus pindah ke screen "Perhitungan OEE". 3 tingkat warna:
@@ -245,6 +273,15 @@ const Calculation = (() => {
         if (oee >= CONFIG.TARGET.OEE) State.el.oeeIndicator.classList.add('good');
         else if (oee >= 80) State.el.oeeIndicator.classList.add('warn');
         else State.el.oeeIndicator.classList.add('bad');
+      }
+    }
+    if (State.el.oee365IndicatorValue) {
+      State.el.oee365IndicatorValue.textContent = Utils.nf2(oee365) + '%';
+      if (State.el.oee365Indicator) {
+        State.el.oee365Indicator.classList.remove('good', 'warn', 'bad');
+        if (oee365 >= CONFIG.TARGET.OEE) State.el.oee365Indicator.classList.add('good');
+        else if (oee365 >= 80) State.el.oee365Indicator.classList.add('warn');
+        else State.el.oee365Indicator.classList.add('bad');
       }
     }
 

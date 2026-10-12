@@ -219,3 +219,38 @@
     padding: 18px 22px;
   }
 }
+
+/* Label lebih panjang: Shift&Produk, OEE 365 */
+.bottom-nav .bn-label {
+  font-size: 8.5px;
+  max-width: 58px;
+  text-align: center;
+  line-height: 1.15;
+  white-space: normal;
+}
+.oee365-indicator {
+  margin-left: 6px;
+}
+
+
+/* Tombol Dashboard Meeting di app-bar */
+.meeting-indicator {
+  cursor: pointer;
+  border: 0;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 6px;
+  background: linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.35);
+}
+.meeting-indicator:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.meeting-indicator .oi-label {
+  opacity: 1;
+  font-size: 13px;
+}

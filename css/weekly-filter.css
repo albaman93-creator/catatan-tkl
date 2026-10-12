@@ -1,0 +1,122 @@
+/**
+ * WEEKLY-FILTER.CSS — filter Produk/Batch + Shift di weekly OEE / mesin
+ */
+
+.oee-filter-extended {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 12px;
+}
+
+.oee-filter-extended .field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.oee-filter-extended .field label {
+  font: 600 10.5px system-ui, sans-serif;
+  color: #64748b;
+  letter-spacing: 0.2px;
+}
+
+.oee-filter-extended input[type="date"],
+.oee-filter-extended select {
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  font: 500 12.5px system-ui, sans-serif;
+  color: #0f172a;
+  min-width: 132px;
+}
+
+.oee-filter-extended select {
+  min-width: 160px;
+  max-width: 220px;
+}
+
+.mch-shift-field {
+  flex: none;
+}
+
+.mch-shift-group {
+  display: inline-flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  background: #f1f5f9;
+  height: 34px;
+}
+
+.mch-shift-btn {
+  border: 0;
+  background: transparent;
+  padding: 0 12px;
+  font: 700 12px system-ui, sans-serif;
+  color: #64748b;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  min-width: 40px;
+}
+
+.mch-shift-btn + .mch-shift-btn {
+  border-left: 1px solid #cbd5e1;
+}
+
+.mch-shift-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.mch-shift-btn.on {
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #fff;
+}
+
+.oee-filter-extended .btn-sm {
+  height: 34px;
+  padding: 0 14px;
+}
+
+[data-theme="dark"] .oee-filter-extended input[type="date"],
+[data-theme="dark"] .oee-filter-extended select {
+  background: #0f172a;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .mch-shift-group {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .mch-shift-btn {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .mch-shift-btn + .mch-shift-btn {
+  border-left-color: #334155;
+}
+
+[data-theme="dark"] .mch-shift-btn.on {
+  background: linear-gradient(180deg, #3b82f6 0%, #1e40af 100%);
+  color: #fff;
+}
+
+@media (max-width: 700px) {
+  .oee-filter-extended {
+    width: 100%;
+  }
+  .oee-filter-extended input[type="date"],
+  .oee-filter-extended select {
+    min-width: 0;
+    width: 100%;
+  }
+  .oee-filter-extended .field {
+    flex: 1 1 140px;
+  }
+}
