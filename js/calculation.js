@@ -6,6 +6,28 @@ const Calculation = (() => {
   'use strict';
 
   /**
+   * Apakah menit `mins` valid untuk shift `shiftIndex` pada input Mulai/Selesai.
+   * Berbeda dari Utils.shiftOf (half-open, tiap menit 1 shift): di sini batas
+   * shift bersifat inklusif di kedua sisi, supaya jam akhir shift boleh sama
+   * persis dengan jam mulai shift berikutnya tanpa peringatan kuning.
+   *
+   * Contoh (Issue #3):
+   *   Shift 1 07:00–15:30 → 15:30 OK; kuning mulai 15:31
+   *   Shift 2 15:30–23:30 → 23:30 OK; kuning mulai 23:31
+   *   Shift 3 23:30–07:00 → 07:00 OK; kuning mulai 07:01
+   */
+  const isTimeAllowedInShift = (mins, shiftIndex) => {
+    if (mins == null || isNaN(mins)) return false;
+    for (const range of CONFIG.SHIFT_RANGES) {
+      if (range.index !== shiftIndex) continue;
+      // Inklusif di from dan to → menit batas (930, 1410, 420) diterima
+      // baik oleh shift yang berakhir maupun yang dimulai di menit itu.
+      if (mins >= range.from && mins <= range.to) return true;
+    }
+    return false;
+  };
+
+  /**
    * Validasi apakah input jam berada di dalam shift aktif.
    * Memberi warning visual (warna kuning) kalau shift tidak sesuai.
    */
@@ -19,8 +41,7 @@ const Calculation = (() => {
     const mins = Utils.parseTime(val);
     if (mins === null) return;
 
-    const actualShift = Utils.shiftOf(mins);
-    if (actualShift !== State.evalShift) {
+    if (!isTimeAllowedInShift(mins, State.evalShift)) {
       inputEl.classList.add('warn-shift');
       UI.toast('Pastikan shift yang Anda pilih benar ⚠', true, 'warn');
     } else {

@@ -36,6 +36,11 @@ const CONFIG = Object.freeze({
   // hanya menjaga-jaga data tidak hilang kalau browser/tab tertutup tiba-tiba.
   AUTO_SAVE_INTERVAL_MS: 60000, // 1 menit
 
+  // Auto-save ke Supabase setiap N ms (senyap, tanpa tombol Simpan).
+  // Hanya jalan saat online + login cloud; skip jika offline / Mode Offline.
+  // Interval lebih jarang dari lokal agar tidak membebani jaringan.
+  AUTO_SAVE_SUPABASE_INTERVAL_MS: 90000, // 90 detik
+
   // ====== DEFAULTS ======
   // Jumlah baris awal saat sheet kosong. Viewport tabel menampilkan ~10 baris;
   // baris 11–25 (dan tambahan) digulir di dalam .tbl-wrap.
@@ -115,10 +120,12 @@ const CONFIG = Object.freeze({
     mixing: [
       'Loading Lot A', 'Loading Lot B', 'Loading Lot C', 'Loading Lot D',
       'Mixing', 'Persiapan', 'Ganti Lot', 'Ganti Baju',
+      'Merapihkan Media', 'Papar Media', 'Tutup Media', 'Ganti SP Media',
     ],
     filling: [
       'Filling Lot A', 'Filling Lot B', 'Filling Lot C', 'Filling Lot D',
       'Persiapan',
+      'Merapihkan Media', 'Papar Media', 'Tutup Media', 'Ganti SP Media',
     ],
     steril: [
       'Sterilisasi', 'Persiapan', 'Loading Chamber', 'Unloading Chamber',
@@ -131,7 +138,38 @@ const CONFIG = Object.freeze({
     ],
     common: [
       'Cleaning', 'Istirahat', 'Menunggu Instruksi',
+      'Merapihkan Media', 'Papar Media', 'Tutup Media', 'Ganti SP Media',
     ],
+  },
+
+  // ====== STANDARISASI KOSA KATA (Issue #9) ======
+  // Alias (tulisan bervariasi) → bentuk baku.
+  // Saat user mengetik alias lalu blur / pilih, teks diganti ke bentuk baku.
+  // Key & value dibandingkan case-insensitive; value yang disimpan = penulisan baku.
+  // Tambah baris di sini untuk kegiatan lain yang sering ditulis berbeda-beda.
+  KEGIATAN_ALIASES: {
+    // Merapihkan Media
+    'merapihkan media': 'Merapihkan Media',
+    'rapihkan media': 'Merapihkan Media',
+    'beberes media': 'Merapihkan Media',
+    'beres media': 'Merapihkan Media',
+    'bungkus media': 'Merapihkan Media',
+    'rapihin media': 'Merapihkan Media',
+    'merapikan media': 'Merapihkan Media',
+    'rapi media': 'Merapihkan Media',
+    // Papar Media
+    'papar media': 'Papar Media',
+    'memapar media': 'Papar Media',
+    'buka media': 'Papar Media',
+    // Tutup Media
+    'tutup media': 'Tutup Media',
+    'menutup media': 'Tutup Media',
+    'nutup media': 'Tutup Media',
+    // Ganti SP Media
+    'ganti sp media': 'Ganti SP Media',
+    'ganti sp': 'Ganti SP Media',
+    'ganti media': 'Ganti SP Media',
+    'ganti sampel media': 'Ganti SP Media',
   },
 
   // ====== KODE PRODUK REFERENSI (autocomplete nama produk) ======

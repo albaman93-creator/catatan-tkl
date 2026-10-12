@@ -7,11 +7,44 @@ const Rows = (() => {
   'use strict';
 
   // ====== HELPER ======
+  /** BN slot i — teks bebas (user ketik manual, termasuk L jika perlu). */
+  const getBn = (i) => {
+    const el = (State.el && State.el['prodBn' + i]) || document.getElementById('prodBn' + i);
+    return el ? String(el.value || '').trim() : '';
+  };
+
+  /** Gabung kode produk + BN → label dropdown, mis. "VTTS1 L030101". */
+  const composeLabel = (name, bn) => {
+    const n = String(name || '').trim();
+    const b = String(bn || '').trim();
+    if (!n) return '';
+    return b ? `${n} ${b}` : n;
+  };
+
+  /** Label produk slot i (kode + BN). */
+  const productLabel = (i) => {
+    const nameEl = (State.el && State.el['prodName' + i]) || document.getElementById('prodName' + i);
+    const name = nameEl ? nameEl.value.trim() : '';
+    return composeLabel(name, getBn(i));
+  };
+
   const getAllProducts = () => {
-    const p1 = State.el.prodName1.value.trim();
-    const p2 = State.el.prodName2.value.trim();
-    const p3 = State.el.prodName3.value.trim();
-    return [p1, p2, p3].filter(Boolean);
+    return [1, 2, 3].map(productLabel).filter(Boolean);
+  };
+
+  /** Cocokkan label batch (bisa "VTTS1 L030101" atau "VTTS1") ke slot 1–3. */
+  const findProductSlot = (prodLabel) => {
+    if (!prodLabel) return -1;
+    const needle = String(prodLabel).trim();
+    for (let i = 1; i <= 3; i++) {
+      const nameEl = (State.el && State.el['prodName' + i]) || document.getElementById('prodName' + i);
+      const name = nameEl ? nameEl.value.trim() : '';
+      if (!name) continue;
+      const label = composeLabel(name, getBn(i));
+      if (label === needle || name === needle) return i;
+      if (needle.startsWith(name + ' ') || needle.startsWith(name + 'L')) return i;
+    }
+    return -1;
   };
 
   /**
@@ -28,36 +61,18 @@ const Rows = (() => {
   };
 
   const getRateForProduct = (prodName) => {
-    if (!prodName) return 0;
-    const names = [
-      State.el.prodName1.value.trim(),
-      State.el.prodName2.value.trim(),
-      State.el.prodName3.value.trim()
-    ];
-    const rates = [
-      parseFloat(State.el.prodRate1.value) || 0,
-      parseFloat(State.el.prodRate2.value) || 0,
-      parseFloat(State.el.prodRate3.value) || 0,
-    ];
-    const idx = names.indexOf(prodName);
-    return idx >= 0 ? rates[idx] : 0;
+    const slot = findProductSlot(prodName);
+    if (slot < 0) return 0;
+    const el = (State.el && State.el['prodRate' + slot]) || document.getElementById('prodRate' + slot);
+    return parseFloat(el?.value) || 0;
   };
 
   /** Ukuran kemasan (ml) dari master produk — untuk tabel rate Kemas L2. */
   const getUkuranForProduct = (prodName) => {
-    if (!prodName) return '';
-    const names = [
-      State.el.prodName1?.value.trim() || '',
-      State.el.prodName2?.value.trim() || '',
-      State.el.prodName3?.value.trim() || ''
-    ];
-    const uks = [
-      State.el.prodUkuran1?.value || '',
-      State.el.prodUkuran2?.value || '',
-      State.el.prodUkuran3?.value || '',
-    ];
-    const idx = names.indexOf(prodName);
-    return idx >= 0 ? String(uks[idx] || '') : '';
+    const slot = findProductSlot(prodName);
+    if (slot < 0) return '';
+    const el = (State.el && State.el['prodUkuran' + slot]) || document.getElementById('prodUkuran' + slot);
+    return String(el?.value || '');
   };
 
   /** Kemas Line 1 & 2 memakai tabel rate man power; L4 & tahapan lain = rate mesin. */
@@ -113,27 +128,28 @@ const Rows = (() => {
   };
 
   /**
-   * Cari No. WO untuk nama produk.
-   * Cocokkan exact (ignore case), lalu prefix (VKAM1 ≈ VKAM1 Mixing L).
+   * Cari No. WO untuk nama produk / label batch.
+   * Cocokkan slot via findProductSlot (kode, BN, atau label gabungan).
    */
   const getWoForProduct = (prodName) => {
     if (!prodName) return '';
+    const slot = findProductSlot(prodName);
+    if (slot > 0) {
+      const woEl = (State.el && State.el['prodWo' + slot]) || document.getElementById('prodWo' + slot)
+        || document.getElementById('masterProdWo' + slot);
+      return woEl ? String(woEl.value || '').trim() : '';
+    }
+    // Fallback: prefix match pada kode produk
     const needle = prodName.trim().toLowerCase();
-    const slots = [1, 2, 3].map(readProdSlot);
-
-    // 1) Exact match
-    let hit = slots.find(s => s.name && s.name.toLowerCase() === needle);
-    if (hit && hit.wo) return hit.wo;
-
-    // 2) Prefix / contains (kode pendek vs nama panjang)
-    hit = slots.find(s => {
-      if (!s.name) return false;
+    for (let i = 1; i <= 3; i++) {
+      const s = readProdSlot(i);
+      if (!s.name) continue;
       const n = s.name.toLowerCase();
-      return n.startsWith(needle) || needle.startsWith(n) || n.includes(needle) || needle.includes(n);
-    });
-    if (hit && hit.wo) return hit.wo;
-
-    return hit ? (hit.wo || '') : '';
+      if (n.startsWith(needle) || needle.startsWith(n) || n.includes(needle) || needle.includes(n)) {
+        return s.wo || '';
+      }
+    }
+    return '';
   };
 
   /**
@@ -285,6 +301,7 @@ const Rows = (() => {
       <td class="col-durasi dur"><b class="dur-v" style="display:none"> </b><input data-f="durasi" data-nav class="in mono ctr durasi-input" type="text" inputmode="decimal" maxlength="4" placeholder="0" aria-label="Durasi (menit)"></td>
       <td class="col-kegiatan"><textarea data-f="kegiatan" data-nav class="in" placeholder="Kegiatan " aria-label="Kegiatan" rows="1"></textarea></td>
       <td class="col-masalah"><textarea data-f="masalah" data-nav class="in" placeholder="Penyebab " aria-label="Masalah" rows="1"></textarea></td>
+      <td class="col-ms"><input data-f="ms" data-nav class="in mono ctr" type="text" inputmode="numeric" maxlength="4" placeholder="0" aria-label="Minor Stop (kali)" title="Minor Stop — isi angka frekuensi (kali) pada baris ini"></td>
       <td class="col-disposisi"><textarea data-f="disposisi" data-nav class="in" placeholder="Tindakan " aria-label="Disposisi" rows="1"></textarea></td>
       <td class="col-desc"><textarea data-f="description" data-nav class="in" placeholder="Keterangan bebas…" aria-label="Description" rows="1" title="Catatan acak operator: downtime, trial, dll."></textarea></td>
       <td class="col-wo"><textarea data-f="wo" data-nav class="in mono wo-wrap" placeholder="No WO " aria-label="Nomor WO" rows="1"></textarea></td>

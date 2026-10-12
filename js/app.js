@@ -29,12 +29,15 @@ const App = (() => {
     // Load record pertama
     Storage.loadRecord();
 
-    // Auto-save LOKAL tiap N ms (default 1 menit) — tidak menyentuh Supabase
+    // Auto-save LOKAL tiap N ms (default 60 dtk) — tidak menyentuh Supabase
+    // Auto-save SUPABASE tiap M ms (default 90 dtk) — hanya saat online
     // (lewat Perf.every supaya ikut berhenti saat app disembunyikan/background)
     if (typeof Perf !== 'undefined') {
       Perf.every(CONFIG.AUTO_SAVE_INTERVAL_MS || 60000, Storage.autoSaveLocal);
+      Perf.every(CONFIG.AUTO_SAVE_SUPABASE_INTERVAL_MS || 90000, Storage.autoSaveSupabase);
     } else {
       setInterval(Storage.autoSaveLocal, CONFIG.AUTO_SAVE_INTERVAL_MS || 60000);
+      setInterval(() => { Storage.autoSaveSupabase(); }, CONFIG.AUTO_SAVE_SUPABASE_INTERVAL_MS || 90000);
     }
 
     // Start clock
@@ -128,7 +131,9 @@ const App = (() => {
         Calculation.validateTimeInput(t);
       }
 
-      // Durasi manual: mulai + durasi → hitung Jam Selesai
+      // Durasi manual: sinkron rantai mulai → durasi → selesai → mulai baris berikutnya.
+      // Kosongkan durasi → kosongkan selesai baris ini + mulai baris berikutnya
+      // (Issue #5: durasi harus bisa dihapus, tidak langsung terisi ulang).
       if (t.getAttribute('data-f') === 'durasi') {
         const cleaned = t.value.replace(/[^\d.,]/g, '');
         if (cleaned !== t.value) t.value = cleaned;
@@ -137,11 +142,34 @@ const App = (() => {
           const mulaiEl = tr.querySelector('[data-f="mulai"]');
           const selesaiEl = tr.querySelector('[data-f="selesai"]');
           const mulaiMin = mulaiEl ? Utils.parseTime(mulaiEl.value) : null;
-          const durMin = parseFloat(String(t.value).replace(',', '.'));
-          if (mulaiMin != null && isFinite(durMin) && durMin >= 0 && selesaiEl) {
-            selesaiEl.value = Utils.minutesToHHMM(mulaiMin + durMin);
+          const raw = String(t.value).trim();
+          const durMin = parseFloat(raw.replace(',', '.'));
+
+          let next = tr.nextElementSibling;
+          while (next && !next.classList.contains('log-row')) next = next.nextElementSibling;
+          const nextMulaiEl = next ? next.querySelector('[data-f="mulai"]') : null;
+
+          if (raw === '' || !isFinite(durMin)) {
+            // Durasi dikosongkan → lepas rantai waktu
+            if (selesaiEl) {
+              selesaiEl.value = '';
+              selesaiEl.classList.remove('invalid', 'warn-shift');
+            }
+            if (nextMulaiEl) {
+              nextMulaiEl.value = '';
+              nextMulaiEl.classList.remove('invalid', 'warn-shift');
+            }
+          } else if (mulaiMin != null && durMin >= 0 && selesaiEl) {
+            const endStr = Utils.minutesToHHMM(mulaiMin + durMin);
+            selesaiEl.value = endStr;
             selesaiEl.classList.remove('invalid');
             Calculation.validateTimeInput(selesaiEl);
+            // Isi mulai baris berikutnya agar rantai antar-baris tetap sinkron
+            if (nextMulaiEl) {
+              nextMulaiEl.value = endStr;
+              nextMulaiEl.classList.remove('invalid');
+              Calculation.validateTimeInput(nextMulaiEl);
+            }
           }
         }
       }
@@ -318,16 +346,39 @@ const App = (() => {
       return all;
     };
 
-    /** Setelah isi durasi: mulai + durasi → selesai */
+    /** Setelah isi/kosongkan durasi: sinkron selesai baris ini + mulai baris berikutnya */
     const applyDurasiToSelesai = (row, durasiStr) => {
       const mulaiEl = row.querySelector('[data-f="mulai"]');
       const selesaiEl = row.querySelector('[data-f="selesai"]');
       const mulaiMin = mulaiEl ? Utils.parseTime(mulaiEl.value) : null;
-      const durMin = parseFloat(String(durasiStr).replace(',', '.'));
-      if (mulaiMin != null && isFinite(durMin) && durMin >= 0 && selesaiEl) {
-        selesaiEl.value = Utils.minutesToHHMM(mulaiMin + durMin);
+      const raw = String(durasiStr ?? '').trim();
+      const durMin = parseFloat(raw.replace(',', '.'));
+
+      let next = row.nextElementSibling;
+      while (next && !next.classList.contains('log-row')) next = next.nextElementSibling;
+      const nextMulaiEl = next ? next.querySelector('[data-f="mulai"]') : null;
+
+      if (raw === '' || !isFinite(durMin)) {
+        if (selesaiEl) {
+          selesaiEl.value = '';
+          selesaiEl.classList.remove('invalid', 'warn-shift');
+        }
+        if (nextMulaiEl) {
+          nextMulaiEl.value = '';
+          nextMulaiEl.classList.remove('invalid', 'warn-shift');
+        }
+        return;
+      }
+      if (mulaiMin != null && durMin >= 0 && selesaiEl) {
+        const endStr = Utils.minutesToHHMM(mulaiMin + durMin);
+        selesaiEl.value = endStr;
         selesaiEl.classList.remove('invalid');
         Calculation.validateTimeInput(selesaiEl);
+        if (nextMulaiEl) {
+          nextMulaiEl.value = endStr;
+          nextMulaiEl.classList.remove('invalid');
+          Calculation.validateTimeInput(nextMulaiEl);
+        }
       }
     };
 
@@ -481,16 +532,16 @@ const App = (() => {
     // ============================================================
     // MASTER PRODUK & OPERATOR → recalc + sync ke Master
     // ============================================================
-    ['prodName1','prodName2','prodName3','prodRate1','prodRate2','prodRate3','prodUkuran1','prodUkuran2','prodUkuran3','prodWo1','prodWo2','prodWo3'].forEach(id => {
+    ['prodName1','prodName2','prodName3','prodBn1','prodBn2','prodBn3','prodRate1','prodRate2','prodRate3','prodUkuran1','prodUkuran2','prodUkuran3','prodWo1','prodWo2','prodWo3'].forEach(id => {
       if (!State.el[id]) return;
       State.el[id].addEventListener('input', () => {
-        if (id.startsWith('prodName') || id.startsWith('prodRate') || id.startsWith('prodUkuran')) {
+        if (id.startsWith('prodName') || id.startsWith('prodBn') || id.startsWith('prodRate') || id.startsWith('prodUkuran')) {
           Rows.updateAllDropdowns();
           Rows.updateMatrixProductHeaders();
           Calculation.recalc();
         }
-        // WO / nama master berubah → refresh No. WO di semua baris
-        if (id.startsWith('prodWo') || id.startsWith('prodName')) {
+        // WO / nama / BN master berubah → refresh No. WO di semua baris
+        if (id.startsWith('prodWo') || id.startsWith('prodName') || id.startsWith('prodBn')) {
           if (Rows.refreshAllRowWo) Rows.refreshAllRowWo();
           else Rows.rows().forEach(tr => Rows.applyWoFromBatch(tr));
         }
@@ -507,8 +558,10 @@ const App = (() => {
       const syncToSheet = () => {
         const targetId = el.getAttribute('data-sync');
         const target = State.el[targetId] || document.getElementById(targetId);
-        if (target && target.value !== el.value) {
-          target.value = el.value;
+        if (!target) return;
+        const val = el.value;
+        if (target.value !== val) {
+          target.value = val;
           target.dispatchEvent(new Event('input', { bubbles: true }));
           target.dispatchEvent(new Event('change', { bubbles: true }));
         }
@@ -801,8 +854,11 @@ const App = (() => {
     if (typeof CsvImport !== 'undefined') CsvImport.bind();
 
     // Autocomplete kode produk di kolom Nama Produk (Sheet + Master)
-    if (typeof Suggest !== 'undefined' && Suggest.attachProductAll) {
-      Suggest.attachProductAll('#prodName1, #prodName2, #prodName3, #masterProdName1, #masterProdName2, #masterProdName3');
+    if (typeof Suggest !== 'undefined') {
+      if (Suggest.seedHistoryFromDb) Suggest.seedHistoryFromDb();
+      if (Suggest.attachProductAll) {
+        Suggest.attachProductAll('#prodName1, #prodName2, #prodName3, #masterProdName1, #masterProdName2, #masterProdName3');
+      }
     }
 
     Auth.initSession();

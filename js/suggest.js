@@ -4,17 +4,16 @@
  * (sel tabel langsung, kotak Isi Massal, dan Form Input) karena semuanya
  * cukup memanggil Suggest.attachGhost(elemen).
  *
- * Cara kerja: sambil mengetik, kalau teks yang sudah diketik (di kata/frasa
- * yang SEDANG aktif — dipisah tanda koma "," titik-koma ";" atau baris baru)
- * cocok dengan AWALAN salah satu daftar sugesti untuk Tahapan Proses yang
- * sedang aktif (Mixing/Filling/dst — lihat #fStage), sisa katanya
- * ditampilkan abu-abu transparan tepat di belakang kursor (seperti
- * autocomplete Gmail/VSCode). Karena dihitung per-kata-aktif (bukan dari
- * awal kotak), sugesti tetap muncul walau sudah mengetik kata/kegiatan ke-2,
- * ke-3, dst — asal dipisah koma/baris baru dari kata sebelumnya, misal:
- * "Loading Lot A, Loading Lot B" → sugesti tetap jalan untuk "Loading Lot B".
- * Tekan Tab atau → (panah kanan, saat kursor di ujung teks) untuk menerima
- * sugesti; Esc untuk membatalkan.
+ * Cara kerja: sambil mengetik, teks di kata/frasa aktif (dipisah koma ","
+ * titik-koma ";" atau baris baru) dicocokkan ke daftar sugesti Tahapan
+ * Proses aktif (#fStage). Pencarian mendukung:
+ *   (1) awalan frasa  — "Fil" → "Filling Lot A"  (ghost text + dropdown)
+ *   (2) awalan kata di tengah — "C" → "Line Clearance", "Filling Lot C"
+ *   (3) substring di mana saja — "ear" → "Line Clearance"  (dropdown)
+ * Ghost text abu-abu hanya untuk match awalan (aman secara visual);
+ * match kata-tengah dipilih lewat dropdown atau Tab. Karena dihitung
+ * per-segmen aktif, sugesti tetap jalan untuk kegiatan ke-2/ke-3, misal:
+ * "Loading Lot A, Loading Lot B". Tab / → menerima sugesti; Esc batal.
  *
  * Daftar sugesti ada di CONFIG.KEGIATAN_SUGGESTIONS (js/config.js) — cukup
  * tambah/ubah teks di sana, tidak perlu sentuh file ini.
@@ -53,7 +52,52 @@ const Suggest = (() => {
     const remote = remoteSuggestions
       .filter(x => x.stage === 'common' || x.stage === stage)
       .map(x => x.suggestion);
-    return [...new Set([...list, ...common, ...loadCustomSuggestions(), ...remote])];
+    const aliasCanon = Object.values(CONFIG.KEGIATAN_ALIASES || {});
+    return [...new Set([...list, ...common, ...aliasCanon, ...loadCustomSuggestions(), ...remote])];
+  };
+
+  /**
+   * Standarisasi kosa kata (Issue #9).
+   * Alias → bentuk baku. Return teks baru, atau null jika tidak berubah.
+   */
+  const normalizeKegiatanText = (raw) => {
+    if (!raw || typeof raw !== 'string') return null;
+    const aliases = CONFIG.KEGIATAN_ALIASES || {};
+    if (!Object.keys(aliases).length) return null;
+
+    const parts = [];
+    let changed = false;
+    let last = 0;
+    const re = /[,;\n]/g;
+    let m;
+    const pushSeg = (seg) => {
+      const lead = (seg.match(/^\s*/) || [''])[0];
+      const trail = (seg.match(/\s*$/) || [''])[0];
+      const core = seg.trim();
+      if (!core) { parts.push(seg); return; }
+      const key = core.toLowerCase().replace(/\s+/g, ' ');
+      if (aliases[key]) {
+        parts.push(lead + aliases[key] + trail);
+        changed = true;
+      } else {
+        parts.push(seg);
+      }
+    };
+    const str = raw;
+    while ((m = re.exec(str)) !== null) {
+      pushSeg(str.slice(last, m.index));
+      parts.push(m[0]);
+      last = m.index + m[0].length;
+    }
+    pushSeg(str.slice(last));
+    return changed ? parts.join('') : null;
+  };
+
+  /** Resolve alias → bentuk baku untuk matching sugesti. */
+  const resolveAlias = (q) => {
+    const key = String(q || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    const aliases = CONFIG.KEGIATAN_ALIASES || {};
+    return aliases[key] || null;
   };
 
   const getClient = () => (typeof SupabaseClient !== 'undefined' && SupabaseClient.getClient)
@@ -160,12 +204,34 @@ const Suggest = (() => {
     return { tokenStart, token };
   };
 
-  // Cari sugesti pertama yang diawali oleh kata/frasa aktif (case-insensitive)
+  // Cari sugesti terbaik untuk ghost-text.
+  // Prioritas: alias → bentuk baku, lalu prefix, lalu kata-tengah.
   const bestMatch = (segment) => {
     if (!segment) return null;
     const lower = segment.toLowerCase();
+    // 0) Alias exact → bentuk baku (Issue #9)
+    const canon = resolveAlias(lower);
+    if (canon && canon.toLowerCase() !== lower) return canon;
+
     const list = getSuggestions();
-    return list.find(s => s.toLowerCase().startsWith(lower) && s.toLowerCase() !== lower) || null;
+    // 1) Prefix penuh (paling cocok untuk ghost text)
+    const prefix = list.find(s => {
+      const t = s.toLowerCase();
+      return t.startsWith(lower) && t !== lower;
+    });
+    if (prefix) return prefix;
+    // 2) Ada kata di tengah yang diawali query (mis. "c" → "Line Clearance")
+    return list.find(s => {
+      const t = s.toLowerCase();
+      if (t === lower) return false;
+      return t.split(/[\s\-_/]+/).some(w => w.startsWith(lower) && w !== lower);
+    }) || null;
+  };
+
+  // Apakah match adalah prefix dari segmen yang diketik? (untuk tampilan ghost)
+  const isPrefixMatch = (segment, match) => {
+    if (!segment || !match) return false;
+    return match.toLowerCase().startsWith(segment.toLowerCase());
   };
 
   // Salin metrik visual (font, padding, dsb) dari elemen asli ke layer ghost
@@ -187,11 +253,40 @@ const Suggest = (() => {
   // dan penyisipannya per-kata-aktif (segmen), bukan seluruh isi kotak — jadi
   // tetap jalan walau sudah ada kegiatan sebelumnya (dipisah koma). Dibuat
   // karena HP tidak punya tombol Tab, jadi user harus bisa pilih dengan tap.
+  // Filter dropdown: dukung pencarian dari kata tengah + alias (Issue #9).
+  // Ranking: exact-alias/baku > prefix > awal-kata > substring.
   const filterActivities = (segment) => {
     const q = (segment || '').trim().toLowerCase();
     const all = [...new Set(getSuggestions())];
     if (!q) return all.slice(0, 12);
-    return all.filter(s => s.toLowerCase().startsWith(q) && s.toLowerCase() !== q).slice(0, 12);
+
+    // Jika query adalah alias → prioritaskan bentuk baku di urutan teratas
+    const canon = resolveAlias(q);
+
+    const scored = [];
+    for (const s of all) {
+      const t = s.toLowerCase();
+      if (t === q) continue;
+      let rank;
+      if (canon && t === canon.toLowerCase()) {
+        rank = -1; // alias ketik "beberes media" → "Merapihkan Media" paling atas
+      } else if (t.startsWith(q)) {
+        rank = 0;
+      } else if (t.split(/[\s\-_/]+/).some(w => w.startsWith(q))) {
+        rank = 1;
+      } else if (t.includes(q)) {
+        rank = 2;
+      } else {
+        continue;
+      }
+      scored.push({ s, rank, len: t.length });
+    }
+    // Alias exact: pastikan bentuk baku selalu masuk meskipun filter di atas miss
+    if (canon && !scored.some(x => x.s.toLowerCase() === canon.toLowerCase())) {
+      scored.unshift({ s: canon, rank: -1, len: canon.length });
+    }
+    scored.sort((a, b) => a.rank - b.rank || a.len - b.len || a.s.localeCompare(b.s));
+    return scored.slice(0, 12).map(x => x.s);
   };
 
   let _actDrop = null;
@@ -318,7 +413,9 @@ const Suggest = (() => {
       currentSuggestion = match || '';
       currentSegStart = segStart;
 
-      if (match) {
+      // Ghost text hanya ditampilkan untuk prefix-match (aman secara visual).
+      // Match kata-tengah tetap tersedia lewat dropdown + Tab/Enter.
+      if (match && isPrefixMatch(segment, match)) {
         const seg = typed.slice(segStart);
         const rest = match.slice(seg.length);
         ghost.innerHTML =
@@ -356,9 +453,16 @@ const Suggest = (() => {
     });
     el.addEventListener('blur', () => {
       ghost.textContent = '';
-      // Delay dikit: kalau blur ini dipicu oleh tap di item dropdown, biar
-      // handler klik itemnya sempat jalan dulu sebelum dropdown ditutup.
-      setTimeout(() => { if (document.activeElement !== el) hideActDropdown(); }, 150);
+      // Standarisasi kosa kata: alias → bentuk baku (Issue #9)
+      setTimeout(() => {
+        if (document.activeElement === el) return;
+        hideActDropdown();
+        const next = normalizeKegiatanText(el.value);
+        if (next != null && next !== el.value) {
+          el.value = next;
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }, 150);
     });
     el.addEventListener('keydown', (e) => {
       // Navigasi dropdown (panah atas/bawah + Enter) kalau dropdown sedang tampil
@@ -443,19 +547,165 @@ const Suggest = (() => {
     kemas:   ['VTTSA','VKAMA','VLONA','VMONA','VTRAB','VCLNB','VMNTA','VTRME','VPELA','ITTCB','VTTCA'],
   };
 
+  // ====== HISTORY PRODUK + BN (Issue #8) ======
+  // Menyimpan kombinasi kode+BN yang pernah diisi, agar bisa dipilih lagi
+  // tanpa mengetik ulang. Disimpan di localStorage per browser.
+  const PROD_HISTORY_KEY = 'TKL_PRODUCT_HISTORY_V1';
+  const PROD_HISTORY_MAX = 80;
+
+  const loadProdHistory = () => {
+    try {
+      const raw = localStorage.getItem(PROD_HISTORY_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (_) { return []; }
+  };
+
+  const saveProdHistory = (arr) => {
+    try {
+      localStorage.setItem(PROD_HISTORY_KEY, JSON.stringify(arr.slice(0, PROD_HISTORY_MAX)));
+    } catch (_) {}
+  };
+
+  /**
+   * Catat kombinasi kode produk + BN ke history.
+   * Dipanggil saat user mengisi/menyimpan master produk.
+   */
+  const rememberProduct = (code, bn) => {
+    const c = String(code || '').trim();
+    if (!c) return;
+    const b = String(bn || '').trim();
+    const cKey = c.toUpperCase();
+    const bKey = b.toUpperCase();
+    let list = loadProdHistory().filter(x =>
+      !(String(x.code || '').toUpperCase() === cKey && String(x.bn || '').toUpperCase() === bKey)
+    );
+    list.unshift({ code: c, bn: b, at: Date.now() });
+    saveProdHistory(list);
+  };
+
+  /** Semua kode unik dari history (paling baru dulu). */
+  const historyCodes = () => {
+    const seen = new Set();
+    const out = [];
+    for (const x of loadProdHistory()) {
+      const c = String(x.code || '').trim();
+      if (!c || seen.has(c.toUpperCase())) continue;
+      seen.add(c.toUpperCase());
+      out.push(c);
+    }
+    return out;
+  };
+
+  /** BN unik yang pernah dipakai untuk kode produk tertentu (paling baru dulu). */
+  const historyBnFor = (code) => {
+    const c = String(code || '').trim().toUpperCase();
+    if (!c) {
+      // Tanpa kode: tampilkan semua BN unik dari history
+      const seen = new Set();
+      const out = [];
+      for (const x of loadProdHistory()) {
+        const b = String(x.bn || '').trim();
+        if (!b || seen.has(b.toUpperCase())) continue;
+        seen.add(b.toUpperCase());
+        out.push(b);
+      }
+      return out;
+    }
+    const seen = new Set();
+    const out = [];
+    for (const x of loadProdHistory()) {
+      if (String(x.code || '').toUpperCase() !== c) continue;
+      const b = String(x.bn || '').trim();
+      if (!b || seen.has(b.toUpperCase())) continue;
+      seen.add(b.toUpperCase());
+      out.push(b);
+    }
+    return out;
+  };
+
+  /**
+   * Seed history dari data sheet yang sudah tersimpan di localStorage
+   * (supaya produk/BN lama langsung muncul tanpa harus simpan ulang).
+   */
+  const seedHistoryFromDb = () => {
+    try {
+      if (typeof Storage === 'undefined' || !Storage.dbGet) return;
+      const db = Storage.dbGet();
+      if (!db || typeof db !== 'object') return;
+      Object.values(db).forEach((rec) => {
+        const p = rec && rec.products;
+        if (!p) return;
+        for (const i of [1, 2, 3]) {
+          let name = String(p['p' + i + 'Name'] || '').trim();
+          let bn = String(p['p' + i + 'Bn'] || '').trim();
+          if (!bn && name.includes(' ')) {
+            const sp = name.indexOf(' ');
+            bn = name.slice(sp + 1).trim();
+            name = name.slice(0, sp).trim();
+          }
+          if (name) rememberProduct(name, bn);
+        }
+      });
+    } catch (_) {}
+  };
+
+  /** Scan 3 slot master produk & catat ke history. */
+  const rememberFromMaster = () => {
+    for (let i = 1; i <= 3; i++) {
+      const nameEl = document.getElementById('prodName' + i) || document.getElementById('masterProdName' + i);
+      const bnEl = document.getElementById('prodBn' + i) || document.getElementById('masterProdBn' + i);
+      const code = nameEl ? nameEl.value.trim() : '';
+      const bn = bnEl ? bnEl.value.trim() : '';
+      if (code) rememberProduct(code, bn);
+    }
+  };
+
   const getProductCodes = () => {
     const stage = getActiveStage();
     const map = (typeof CONFIG !== 'undefined' && CONFIG.PRODUCT_CODE_SUGGESTIONS)
       || FALLBACK_PRODUCT_CODES;
     const list = map[stage] || map.mixing || FALLBACK_PRODUCT_CODES.mixing;
-    return [...new Set(list)];
+    // History dulu: tampilkan "KODE · BN" jika ada BN, supaya user langsung lihat batch
+    const histItems = [];
+    const seenCode = new Set();
+    for (const x of loadProdHistory()) {
+      const c = String(x.code || '').trim();
+      if (!c) continue;
+      const b = String(x.bn || '').trim();
+      const label = b ? `${c} · ${b}` : c;
+      if (seenCode.has(label.toUpperCase())) continue;
+      seenCode.add(label.toUpperCase());
+      histItems.push(label);
+    }
+    // Kode unik history (tanpa BN) + daftar standar
+    const codes = [...historyCodes(), ...list];
+    const merged = [];
+    const seen = new Set();
+    for (const item of [...histItems, ...codes]) {
+      const k = String(item).toUpperCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      merged.push(item);
+    }
+    return merged;
   };
 
   const filterProductCodes = (query) => {
     const q = (query || '').trim().toUpperCase();
     const all = getProductCodes();
     if (!q) return all.slice(0, 12);
-    return all.filter(code => code.toUpperCase().startsWith(q)).slice(0, 12);
+    const scored = [];
+    for (const code of all) {
+      const t = code.toUpperCase();
+      let rank;
+      if (t.startsWith(q)) rank = 0;
+      else if (t.includes(q)) rank = 1;
+      else continue;
+      scored.push({ code, rank });
+    }
+    scored.sort((a, b) => a.rank - b.rank);
+    return scored.slice(0, 12).map(x => x.code);
   };
 
   let _prodDrop = null;
@@ -504,16 +754,35 @@ const Suggest = (() => {
 
   const selectProductCode = (input, code) => {
     if (!input || !code) return;
-    const val = input.value || '';
-    const m = val.match(/^([A-Za-z0-9]*)(.*)$/);
-    const rest = m ? m[2] : '';
-    const next = code + rest;
-    input.value = next;
-    const pos = code.length;
-    input.setSelectionRange(pos, pos);
+    // Bisa "VTTS1" atau "VTTS1 · L030101" dari history
+    let pureCode = code;
+    let bnFromLabel = '';
+    const sep = code.indexOf(' · ');
+    if (sep >= 0) {
+      pureCode = code.slice(0, sep).trim();
+      bnFromLabel = code.slice(sep + 3).trim();
+    }
+    input.value = pureCode;
+    const pos = pureCode.length;
+    try { input.setSelectionRange(pos, pos); } catch (_) {}
     input.focus();
     input.dispatchEvent(new Event('input', { bubbles: true }));
     hideProdDropdown();
+
+    // Isi BN: dari label history, atau BN terakhir untuk kode ini
+    const id = input.id || '';
+    const slotMatch = id.match(/(?:master)?[Pp]rodName(\d)/);
+    if (slotMatch) {
+      const n = slotMatch[1];
+      const bnEl = document.getElementById('prodBn' + n) || document.getElementById('masterProdBn' + n);
+      if (bnEl) {
+        const fill = bnFromLabel || (historyBnFor(pureCode)[0] || '');
+        if (fill) {
+          bnEl.value = fill;
+          bnEl.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    }
   };
 
   const renderProdDropdown = (input, items) => {
@@ -606,6 +875,144 @@ const Suggest = (() => {
     document.querySelectorAll(selector).forEach(attachProductAutocomplete);
   };
 
+  // ====== AUTOCOMPLETE BN (history per kode produk) ======
+  let _bnDrop = null;
+  let _bnActiveInput = null;
+  let _bnHighlight = -1;
+
+  const ensureBnDropdown = () => {
+    if (_bnDrop) return _bnDrop;
+    _bnDrop = document.createElement('div');
+    _bnDrop.className = 'prod-suggest-drop';
+    _bnDrop.setAttribute('role', 'listbox');
+    _bnDrop.hidden = true;
+    document.body.appendChild(_bnDrop);
+    document.addEventListener('mousedown', (e) => {
+      if (!_bnDrop || _bnDrop.hidden) return;
+      if (_bnDrop.contains(e.target)) return;
+      if (_bnActiveInput && _bnActiveInput === e.target) return;
+      hideBnDropdown();
+    });
+    return _bnDrop;
+  };
+
+  const hideBnDropdown = () => {
+    if (_bnDrop) _bnDrop.hidden = true;
+    _bnActiveInput = null;
+    _bnHighlight = -1;
+  };
+
+  const relatedProductCode = (bnInput) => {
+    const id = bnInput.id || '';
+    const m = id.match(/(?:master)?[Pp]rodBn(\d)/);
+    if (!m) return '';
+    const n = m[1];
+    const nameEl = document.getElementById('prodName' + n) || document.getElementById('masterProdName' + n);
+    return nameEl ? nameEl.value.trim() : '';
+  };
+
+  const selectBn = (input, bn) => {
+    if (!input || !bn) return;
+    input.value = String(bn).trim();
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    hideBnDropdown();
+  };
+
+  const renderBnDropdown = (input, items) => {
+    const drop = ensureBnDropdown();
+    _bnActiveInput = input;
+    _bnHighlight = items.length ? 0 : -1;
+    if (!items.length) {
+      drop.hidden = true;
+      return;
+    }
+    drop.innerHTML = items.map((bn, i) =>
+      `<button type="button" class="prod-suggest-item${i === 0 ? ' on' : ''}" role="option" data-bn="${bn}">${bn}</button>`
+    ).join('');
+    drop.querySelectorAll('.prod-suggest-item').forEach(btn => {
+      btn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        selectBn(input, btn.getAttribute('data-bn'));
+      });
+    });
+    // Reuse positioning logic
+    const r = input.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - r.bottom;
+    const maxH = Math.min(220, Math.max(120, spaceBelow - 8));
+    drop.style.position = 'fixed';
+    drop.style.left = Math.max(4, r.left) + 'px';
+    drop.style.width = Math.max(r.width, 120) + 'px';
+    drop.style.maxHeight = maxH + 'px';
+    if (spaceBelow < 100 && r.top > spaceBelow) {
+      drop.style.top = 'auto';
+      drop.style.bottom = (window.innerHeight - r.top + 4) + 'px';
+    } else {
+      drop.style.bottom = 'auto';
+      drop.style.top = (r.bottom + 4) + 'px';
+    }
+    drop.hidden = false;
+  };
+
+  const refreshBnDropdown = (input) => {
+    const code = relatedProductCode(input);
+    let items = historyBnFor(code);
+    const q = String(input.value || '').trim().toUpperCase();
+    if (q) items = items.filter(b => b.toUpperCase().startsWith(q) || b.toUpperCase().includes(q));
+    if (items.length === 1 && items[0].toUpperCase() === q) {
+      hideBnDropdown();
+      return;
+    }
+    renderBnDropdown(input, items.slice(0, 12));
+  };
+
+  const attachBnAutocomplete = (el) => {
+    if (!el || el.dataset.bnSuggestBound === '1') return;
+    el.dataset.bnSuggestBound = '1';
+    el.setAttribute('autocomplete', 'off');
+
+    el.addEventListener('focus', () => refreshBnDropdown(el));
+    el.addEventListener('input', () => refreshBnDropdown(el));
+    el.addEventListener('click', () => refreshBnDropdown(el));
+    el.addEventListener('keydown', (e) => {
+      if (!_bnDrop || _bnDrop.hidden || _bnActiveInput !== el) {
+        if (e.key === 'Escape') hideBnDropdown();
+        return;
+      }
+      const items = [..._bnDrop.querySelectorAll('.prod-suggest-item')];
+      if (!items.length) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        _bnHighlight = (_bnHighlight + 1) % items.length;
+        items.forEach((b, i) => b.classList.toggle('on', i === _bnHighlight));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        _bnHighlight = (_bnHighlight - 1 + items.length) % items.length;
+        items.forEach((b, i) => b.classList.toggle('on', i === _bnHighlight));
+      } else if (e.key === 'Enter' || e.key === 'Tab') {
+        if (_bnHighlight >= 0 && items[_bnHighlight]) {
+          e.preventDefault();
+          selectBn(el, items[_bnHighlight].getAttribute('data-bn'));
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        hideBnDropdown();
+      }
+    });
+    el.addEventListener('blur', () => {
+      setTimeout(() => { if (document.activeElement !== el) hideBnDropdown(); }, 150);
+      // Catat ke history saat blur jika ada kode+BN
+      const code = relatedProductCode(el);
+      const bn = el.value.trim();
+      if (code && bn) rememberProduct(code, bn);
+    });
+  };
+
+  const isBnInput = (el) => {
+    if (!el || el.tagName !== 'INPUT') return false;
+    const id = el.id || '';
+    return /^prodBn[123]$/.test(id) || /^masterProdBn[123]$/.test(id);
+  };
+
   // Delegasi global: tetap jalan meski input di-render ulang / user belum attach manual
   const isProductNameInput = (el) => {
     if (!el || el.tagName !== 'INPUT') return false;
@@ -626,16 +1033,24 @@ const Suggest = (() => {
 
     document.addEventListener('focusin', (e) => {
       const el = e.target;
-      if (!isProductNameInput(el)) return;
-      attachProductAutocomplete(el);
-      refreshProdDropdown(el);
+      if (isProductNameInput(el)) {
+        attachProductAutocomplete(el);
+        refreshProdDropdown(el);
+      } else if (isBnInput(el)) {
+        attachBnAutocomplete(el);
+        refreshBnDropdown(el);
+      }
     }, true);
 
     document.addEventListener('input', (e) => {
       const el = e.target;
-      if (!isProductNameInput(el)) return;
-      attachProductAutocomplete(el);
-      refreshProdDropdown(el);
+      if (isProductNameInput(el)) {
+        attachProductAutocomplete(el);
+        refreshProdDropdown(el);
+      } else if (isBnInput(el)) {
+        attachBnAutocomplete(el);
+        refreshBnDropdown(el);
+      }
     }, true);
   };
 
@@ -726,5 +1141,6 @@ const Suggest = (() => {
   return {
     attachGhost, attachAll, getSuggestions, addSuggestion, removeSuggestion, getCustomSuggestions,
     initRemote, refreshRemoteSuggestions, attachProductAll, openManage,
+    rememberProduct, rememberFromMaster, historyBnFor, historyCodes, seedHistoryFromDb,
   };
 })();

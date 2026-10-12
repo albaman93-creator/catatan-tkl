@@ -54,13 +54,19 @@ const Storage = (() => {
    */
   const collect = () => ({
     products: {
-      p1Name: State.el.prodName1.value, p1Rate: State.el.prodRate1.value,
+      p1Name: State.el.prodName1.value,
+      p1Bn: State.el.prodBn1 ? State.el.prodBn1.value.trim() : '',
+      p1Rate: State.el.prodRate1.value,
       p1Ukuran: State.el.prodUkuran1 ? State.el.prodUkuran1.value : '',
       p1Wo: State.el.prodWo1 ? State.el.prodWo1.value : '',
-      p2Name: State.el.prodName2.value, p2Rate: State.el.prodRate2.value,
+      p2Name: State.el.prodName2.value,
+      p2Bn: State.el.prodBn2 ? State.el.prodBn2.value.trim() : '',
+      p2Rate: State.el.prodRate2.value,
       p2Ukuran: State.el.prodUkuran2 ? State.el.prodUkuran2.value : '',
       p2Wo: State.el.prodWo2 ? State.el.prodWo2.value : '',
-      p3Name: State.el.prodName3.value, p3Rate: State.el.prodRate3.value,
+      p3Name: State.el.prodName3.value,
+      p3Bn: State.el.prodBn3 ? State.el.prodBn3.value.trim() : '',
+      p3Rate: State.el.prodRate3.value,
       p3Ukuran: State.el.prodUkuran3 ? State.el.prodUkuran3.value : '',
       p3Wo: State.el.prodWo3 ? State.el.prodWo3.value : '',
     },
@@ -96,28 +102,44 @@ const Storage = (() => {
    * Apply data ke form (saat load record atau reset).
    */
   const applyRecord = (d) => {
-    // Products
+    // Products — dukung format lama "VTTS1 L030001" (name+BN digabung) & format baru terpisah
+    const splitLegacyName = (raw, bnField) => {
+      const s = String(raw || '').trim();
+      if (bnField != null && String(bnField).trim() !== '') {
+        return { name: s, bn: String(bnField).trim() };
+      }
+      // "VTTS1 L030001" atau "VTTS1 L 030001" → pecah di spasi pertama
+      const m = s.match(/^(\S+)\s+(.+)$/);
+      if (m) return { name: m[1], bn: m[2].trim() };
+      return { name: s, bn: '' };
+    };
     if (d && d.products) {
-      State.el.prodName1.value = d.products.p1Name || '';
+      const p1 = splitLegacyName(d.products.p1Name, d.products.p1Bn);
+      const p2 = splitLegacyName(d.products.p2Name, d.products.p2Bn);
+      const p3 = splitLegacyName(d.products.p3Name, d.products.p3Bn);
+      State.el.prodName1.value = p1.name;
+      if (State.el.prodBn1) State.el.prodBn1.value = p1.bn;
       State.el.prodRate1.value = d.products.p1Rate || '';
       if (State.el.prodUkuran1) State.el.prodUkuran1.value = d.products.p1Ukuran || '';
       if (State.el.prodWo1) State.el.prodWo1.value = d.products.p1Wo || '';
-      State.el.prodName2.value = d.products.p2Name || '';
+      State.el.prodName2.value = p2.name;
+      if (State.el.prodBn2) State.el.prodBn2.value = p2.bn;
       State.el.prodRate2.value = d.products.p2Rate || '';
       if (State.el.prodUkuran2) State.el.prodUkuran2.value = d.products.p2Ukuran || '';
       if (State.el.prodWo2) State.el.prodWo2.value = d.products.p2Wo || '';
-      State.el.prodName3.value = d.products.p3Name || '';
+      State.el.prodName3.value = p3.name;
+      if (State.el.prodBn3) State.el.prodBn3.value = p3.bn;
       State.el.prodRate3.value = d.products.p3Rate || '';
       if (State.el.prodUkuran3) State.el.prodUkuran3.value = d.products.p3Ukuran || '';
       if (State.el.prodWo3) State.el.prodWo3.value = d.products.p3Wo || '';
     } else {
-      State.el.prodName1.value = ''; State.el.prodRate1.value = '';
+      State.el.prodName1.value = ''; if (State.el.prodBn1) State.el.prodBn1.value = ''; State.el.prodRate1.value = '';
       if (State.el.prodUkuran1) State.el.prodUkuran1.value = '';
       if (State.el.prodWo1) State.el.prodWo1.value = '';
-      State.el.prodName2.value = ''; State.el.prodRate2.value = '';
+      State.el.prodName2.value = ''; if (State.el.prodBn2) State.el.prodBn2.value = ''; State.el.prodRate2.value = '';
       if (State.el.prodUkuran2) State.el.prodUkuran2.value = '';
       if (State.el.prodWo2) State.el.prodWo2.value = '';
-      State.el.prodName3.value = ''; State.el.prodRate3.value = '';
+      State.el.prodName3.value = ''; if (State.el.prodBn3) State.el.prodBn3.value = ''; State.el.prodRate3.value = '';
       if (State.el.prodUkuran3) State.el.prodUkuran3.value = '';
       if (State.el.prodWo3) State.el.prodWo3.value = '';
     }
@@ -304,6 +326,11 @@ const Storage = (() => {
     db[curKey()] = rec;
     dbSet(db);
 
+    // Catat kombinasi produk+BN ke history (Issue #8)
+    if (typeof Suggest !== 'undefined' && Suggest.rememberFromMaster) {
+      try { Suggest.rememberFromMaster(); } catch (_) {}
+    }
+
     State.el.lastSaved.textContent = '✓ tersimpan ' + new Date().toLocaleTimeString('id-ID');
     UI.updateEditChip(rec);
     if (!opts.silent) UI.toast('Data tersimpan lokal ✓');
@@ -348,11 +375,69 @@ const Storage = (() => {
       const db = dbGet();
       db[curKey()] = rec;
       dbSet(db);
+      if (typeof Suggest !== 'undefined' && Suggest.rememberFromMaster) {
+        try { Suggest.rememberFromMaster(); } catch (_) {}
+      }
       if (State.el.lastSaved) {
         State.el.lastSaved.textContent = '💾 auto-save lokal ' + new Date().toLocaleTimeString('id-ID');
       }
     } catch (e) {
       console.warn('Auto-save lokal gagal:', e);
+    }
+  };
+
+  // ====== AUTO-SAVE SUPABASE (setiap CONFIG.AUTO_SAVE_SUPABASE_INTERVAL_MS) ======
+  // Senyap, tanpa toast. Hanya saat online + bukan Mode Offline.
+  // Skip jika payload identik dengan yang terakhir berhasil di-push (hemat bandwidth).
+  let _autoSupabaseBusy = false;
+  let _lastAutoSupabaseHash = '';
+
+  const autoSaveSupabase = async () => {
+    try {
+      if (!State.el.tbody) return;
+      if (_autoSupabaseBusy) return;
+
+      const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
+      if (offlineMode) return;
+      if (!isOnline()) return;
+
+      const rec = collect();
+      // Hash ringan: skip upload kalau isi sheet belum berubah sejak auto-save terakhir
+      const hash = JSON.stringify({
+        k: curKey(),
+        rows: rec.rows,
+        products: rec.products,
+        mesin: rec.mesin,
+        summary: rec.summary,
+      });
+      if (hash === _lastAutoSupabaseHash) return;
+
+      _autoSupabaseBusy = true;
+      // Simpan lokal dulu (sama seperti saveData), lalu push ke Supabase senyap
+      const db = dbGet();
+      db[curKey()] = rec;
+      dbSet(db);
+
+      const filter = activeFilter();
+      const row = buildSupabaseRow(rec, filter);
+
+      UI.setSyncStatus('sync', 'auto-save Supabase…');
+      try {
+        await Sync.pushRow(row);
+        _lastAutoSupabaseHash = hash;
+        UI.setSyncStatus('ok', '✓ auto-save Supabase');
+        if (State.el.lastSaved) {
+          State.el.lastSaved.textContent = '☁️ auto-save cloud ' + new Date().toLocaleTimeString('id-ID');
+        }
+      } catch (err) {
+        console.warn('Auto-save Supabase gagal, diantrekan:', err);
+        const n = Sync.queuePush(row);
+        UI.setSyncStatus('err', `⚠ auto-save gagal, antre (${n})`);
+      }
+    } catch (e) {
+      console.warn('Auto-save Supabase error:', e);
+    } finally {
+      _autoSupabaseBusy = false;
     }
   };
 
@@ -503,7 +588,7 @@ const Storage = (() => {
 
   return {
     dbGet, dbSet, curKey, labelFilter, collect, applyRecord,
-    loadRecord, saveData, autoSaveLocal, exportCsv,
+    loadRecord, saveData, autoSaveLocal, autoSaveSupabase, exportCsv,
     copyOrMoveRecord, targetExists, activeFilter,
   };
 })();

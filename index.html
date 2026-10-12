@@ -900,9 +900,10 @@
         </div>
         <div class="product-grid" id="masterProductGrid">
           <div class="field">
-            <label>Produk 1 (Nama · Rate · Ukuran ml · No. WO)</label>
-            <div class="split-input split-input-4">
-              <input type="text" id="masterProdName1" placeholder="Misal: VTTS1 L030001" data-sync="prodName1">
+            <label>Produk 1 (Kode · BN · Rate · Ukuran · No. WO)</label>
+            <div class="split-input split-input-prod-bn">
+              <input type="text" id="masterProdName1" placeholder="cth: VTTS1" data-sync="prodName1" title="Kode produk — klik untuk history">
+              <input type="text" id="masterProdBn1" placeholder="BN cth: L030101" data-sync="prodBn1" class="mono" maxlength="20" title="Batch Number — ketik manual (termasuk L jika perlu)">
               <input type="number" id="masterProdRate1" placeholder="Rate/mnt (mesin)" inputmode="decimal" data-sync="prodRate1" title="Rate mesin / default — Kemas L1/L2 diganti tabel man power">
               <select id="masterProdUkuran1" data-sync="prodUkuran1" title="Ukuran kemasan — dipakai tabel rate Kemas Line 2">
                 <option value="">Ukuran</option>
@@ -912,12 +913,13 @@
               </select>
               <input type="text" id="masterProdWo1" placeholder="No. WO" class="mono" data-sync="prodWo1">
             </div>
-            <small class="field-hint">Kemas L1: OP&lt;3 → 8 bag/mnt, OP≥3 → 12 bag/mnt. Kemas L2: rate dari ukuran (100/250/500 ml) + OP. Line 4 &amp; Filling: pakai Rate/mnt mesin.</small>
+            <small class="field-hint">Produk &amp; BN terpisah. BN diketik manual (mis. <b>L030101</b>). Klik field untuk pilih dari history. Contoh: VTTS1 + L030101 → dropdown &quot;VTTS1 L030101&quot;.</small>
           </div>
           <div class="field">
             <label>Produk 2 (Cadangan)</label>
-            <div class="split-input split-input-4">
-              <input type="text" id="masterProdName2" placeholder="Misal: VPEL1 L027001" data-sync="prodName2">
+            <div class="split-input split-input-prod-bn">
+              <input type="text" id="masterProdName2" placeholder="cth: VPEL1" data-sync="prodName2" title="Kode produk">
+              <input type="text" id="masterProdBn2" placeholder="BN cth: L027001" data-sync="prodBn2" class="mono" maxlength="20" title="Batch Number — ketik manual">
               <input type="number" id="masterProdRate2" placeholder="Rate/mnt (mesin)" inputmode="decimal" data-sync="prodRate2">
               <select id="masterProdUkuran2" data-sync="prodUkuran2">
                 <option value="">Ukuran</option>
@@ -930,8 +932,9 @@
           </div>
           <div class="field">
             <label>Produk 3 (Cadangan)</label>
-            <div class="split-input split-input-4">
-              <input type="text" id="masterProdName3" placeholder="Misal: PROD-C" data-sync="prodName3">
+            <div class="split-input split-input-prod-bn">
+              <input type="text" id="masterProdName3" placeholder="cth: PROD-C" data-sync="prodName3" title="Kode produk">
+              <input type="text" id="masterProdBn3" placeholder="BN cth: L010101" data-sync="prodBn3" class="mono" maxlength="20" title="Batch Number — ketik manual">
               <input type="number" id="masterProdRate3" placeholder="Rate/mnt (mesin)" inputmode="decimal" data-sync="prodRate3">
               <select id="masterProdUkuran3" data-sync="prodUkuran3">
                 <option value="">Ukuran</option>
@@ -1049,9 +1052,9 @@
               <div class="compact-popover compact-form-panel compact-product-panel" id="compactProductPanel">
                 <div class="compact-popover-head"><b>Produk (maks. 3)</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
                 <div class="compact-product-list">
-                  <div class="compact-product-row"><span>1</span><input type="text" id="prodName1" placeholder="Nama produk"><input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal" title="Rate mesin"><select id="prodUkuran1" title="Ukuran ml (Kemas L2)"><option value="">ml</option><option value="100">100</option><option value="250">250</option><option value="500">500</option></select><input type="text" id="prodWo1" placeholder="No. WO" class="mono"></div>
-                  <div class="compact-product-row"><span>2</span><input type="text" id="prodName2" placeholder="Nama produk"><input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal"><select id="prodUkuran2" title="Ukuran ml"><option value="">ml</option><option value="100">100</option><option value="250">250</option><option value="500">500</option></select><input type="text" id="prodWo2" placeholder="No. WO" class="mono"></div>
-                  <div class="compact-product-row"><span>3</span><input type="text" id="prodName3" placeholder="Nama produk"><input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal"><select id="prodUkuran3" title="Ukuran ml"><option value="">ml</option><option value="100">100</option><option value="250">250</option><option value="500">500</option></select><input type="text" id="prodWo3" placeholder="No. WO" class="mono"></div>
+                  <div class="compact-product-row"><span>1</span><input type="text" id="prodName1" placeholder="Kode produk" title="Kode produk — klik untuk history"><input type="text" id="prodBn1" placeholder="BN" class="mono" maxlength="20" title="Batch Number — ketik manual, klik untuk history"><input type="number" id="prodRate1" placeholder="Rate/mnt" inputmode="decimal" title="Rate mesin"><select id="prodUkuran1" title="Ukuran ml (Kemas L2)"><option value="">ml</option><option value="100">100</option><option value="250">250</option><option value="500">500</option></select><input type="text" id="prodWo1" placeholder="No. WO" class="mono"></div>
+                  <div class="compact-product-row"><span>2</span><input type="text" id="prodName2" placeholder="Kode produk"><input type="text" id="prodBn2" placeholder="BN" class="mono" maxlength="20" title="Batch Number"><input type="number" id="prodRate2" placeholder="Rate/mnt" inputmode="decimal"><select id="prodUkuran2" title="Ukuran ml"><option value="">ml</option><option value="100">100</option><option value="250">250</option><option value="500">500</option></select><input type="text" id="prodWo2" placeholder="No. WO" class="mono"></div>
+                  <div class="compact-product-row"><span>3</span><input type="text" id="prodName3" placeholder="Kode produk"><input type="text" id="prodBn3" placeholder="BN" class="mono" maxlength="20" title="Batch Number"><input type="number" id="prodRate3" placeholder="Rate/mnt" inputmode="decimal"><select id="prodUkuran3" title="Ukuran ml"><option value="">ml</option><option value="100">100</option><option value="250">250</option><option value="500">500</option></select><input type="text" id="prodWo3" placeholder="No. WO" class="mono"></div>
                 </div>
               </div>
             </div>
