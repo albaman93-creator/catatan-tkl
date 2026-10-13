@@ -151,6 +151,26 @@ abu di belakang kursor sesuai Tahapan Proses aktif (Mixing/Filling/dst).
 Screen **"Dashboard OEE"** — rekap tabel + grafik OEE.
 → Edit di sini kalau: tampilan/grafik dashboard perlu diubah.
 
+### `weekly-dashboard.js`
+Dashboard **Weekly Meeting** (halaman Yield, OEE Production, detail mesin
+Filling/Kemas). Mengambil data record dari Supabase (cache per rentang
+tanggal), lalu menggambar gauge OEE OPE & OEE 365, tabel Speed Standar,
+grafik tren/batang, Shutdown, dan PICA. Ganti produk/shift hanya menghitung
+ulang dari cache (tanpa fetch ulang).
+→ Edit di sini kalau: tampilan/grafik/tabel weekly perlu diubah.
+
+### `weekly-calc.js`
+**Rumus** untuk dashboard weekly (tanpa DOM): A/P/Q/OEE per record (sama
+dengan `calculation.js`), agregasi OPE & OEE 365, filter produk/batch &
+shift, serta daftar produk untuk dropdown.
+→ Edit di sini kalau: cara hitung weekly (bobot, basis hari OEE 365, rate
+efektif Kemas) perlu diubah.
+
+### `weekly-filter.js`
+Kontrol filter **Produk & Batch** (dropdown) dan **Shift** (All/S1/S2/S3)
+untuk halaman OEE Production dan halaman mesin. Hanya tampilan filter.
+→ Edit di sini kalau: isi/tampilan dropdown atau tombol shift perlu diubah.
+
 ### `printsheet.js`
 Fitur **Cetak (Print)** ke format A4 Landscape mengikuti formulir kertas resmi
 FIMA.
@@ -231,6 +251,9 @@ auto-pause saat app di-background bermasalah.
 |---|---|
 | Ubah default jam/isian awal baris log sheet | `rows.js` |
 | Ubah rumus OEE/Availability/Performance/Quality | `calculation.js` |
+| Ubah rumus OEE di Dashboard Weekly (OPE / OEE 365 / per produk) | `weekly-calc.js` |
+| Ubah dropdown Produk & Batch / tombol Shift di Dashboard Weekly | `weekly-filter.js` |
+| Ubah gauge, speed standar, grafik, tabel di Dashboard Weekly | `weekly-dashboard.js` |
 | Ubah perilaku tombol ganti Shift, toast, sidebar | `ui.js` |
 | Tambah/ubah state global atau elemen DOM yang di-cache | `state.js` |
 | Ubah urutan Tab/Enter atau kolom yang disembunyikan | `navigation.js` |

@@ -16,7 +16,19 @@ const Settings = (() => {
     localStorage.setItem(KEY_DECOR, on ? '1' : '0');
   };
 
-  const getTheme = () => localStorage.getItem(KEY_THEME) || 'light';
+  const getTheme = () => {
+    try {
+      const stored = localStorage.getItem(KEY_THEME);
+      if (stored) return stored;
+    } catch (e) { /* private mode / blocked storage */ }
+    // Preferensi sistem sebagai default awal jika pengguna belum memilih
+    try {
+      if (typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+    } catch (e) {}
+    return 'light';
+  };
 
   const applyTheme = (mode) => {
     document.documentElement.setAttribute('data-theme', mode);
@@ -28,7 +40,7 @@ const Settings = (() => {
   };
 
   const setTheme = (mode) => {
-    localStorage.setItem(KEY_THEME, mode);
+    try { localStorage.setItem(KEY_THEME, mode); } catch (e) {}
     applyTheme(mode);
   };
 

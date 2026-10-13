@@ -113,42 +113,22 @@ const WeeklyDashboard = (() => {
     return out;
   };
 
-  // Metrik per record. en = waktu operasional (menit) = (shift − planned) − unplanned.
-  const recMetrics = (r) => {
-    const sm = CONFIG.SHIFT_A[(Number(r.shift) || 1) - 1] || 0;
-    const rows = Array.isArray(r.payload?.rows) ? r.payload.rows : [];
-    let planned = 0, unplanned = 0;
-    rows.forEach((x) => {
-      const k = parseInt(String(x.kode ?? '').trim(), 10);
-      const s = Utils.parseTime(x.mulai), e = Utils.parseTime(x.selesai);
-      const d = s != null && e != null ? (e - s + 1440) % 1440 : (toNum(x.durasi) || 0);
-      if (CONFIG.PLANNED_CODES.has(k)) planned += d;
-      else if (CONFIG.UNPLANNED_CODES.has(k)) unplanned += d;
-    });
-    const c = Math.max(sm - planned, 0);
-    const a = toNum(r.availability);
-    const en = rows.length ? Math.max(c - unplanned, 0) : (a != null ? (c * a) / 100 : 0);
-    return { a, p: toNum(r.performance), q: toNum(r.quality), o: toNum(r.oee), en };
+  // Cache hasil fetch per (mesin, rentang): ganti filter produk/shift tidak perlu fetch ulang.
+  // Dikosongkan tiap Terapkan / ganti tanggal supaya data selalu segar.
+  const rowsCache = new Map();
+  const fetchCached = async (from, to, stage, line) => {
+    const k = [stage || '*', line || '*', from, to].join('|');
+    if (!rowsCache.has(k)) rowsCache.set(k, await fetchOeeRows(from, to, stage, line));
+    return rowsCache.get(k);
   };
 
-  // OPE : rata-rata A/P/Q/OEE tersimpan per record (sama dengan Dashboard 360°).
-  // 365 : A365 = Σ waktu operasional ÷ (1440 mnt × hari kalender) per mesin; P & Q sama dengan OPE.
-  const calcSet = (rows, days) => {
-    const m = rows.map(recMetrics);
-    const ope = { a: avg(m.map((x) => x.a)), p: avg(m.map((x) => x.p)), q: avg(m.map((x) => x.q)), oee: avg(m.map((x) => x.o)) };
-    const byM = {};
-    rows.forEach((r, i) => { const k = r.tahapan + '|' + r.line; (byM[k] = byM[k] || []).push(m[i]); });
-    const per = {};
-    Object.keys(byM).forEach((k) => {
-      const list = byM[k];
-      const a365 = Math.min(100, (list.reduce((s, x) => s + x.en, 0) / (DAY_MIN * Math.max(1, days))) * 100);
-      const p = avg(list.map((x) => x.p)), q = avg(list.map((x) => x.q));
-      per[k] = { a365, p, q, o365: p != null && q != null ? (a365 * p * q) / 10000 : null, ope: avg(list.map((x) => x.o)) };
-    });
-    const v = Object.values(per);
-    const o365 = { a: avg(v.map((x) => x.a365)), p: avg(v.map((x) => x.p)), q: avg(v.map((x) => x.q)), oee: avg(v.map((x) => x.o365)) };
-    return { ope, o365, per };
-  };
+  // Metrik per record & agregasi A/P/Q/OEE/OEE 365 → js/weekly-calc.js
+  // (rumus sama dengan log sheet; mendukung filter produk/batch & shift).
+  const recMetrics = (r) => WeeklyCalc.metric(r, '') || { a: null, p: null, q: null, o: null, en: 0 };
+  const calcFor = (recs, f, days) =>
+    WeeklyCalc.calcSet(WeeklyCalc.metrics(recs, f.product), { days, product: !!f.product, shift: f.shift });
+  const shiftText = (f) => (f.shift === 'all' ? 'Semua shift' : 'Shift ' + f.shift);
+  const say = (id, m, err) => { const st = $(id); if (st) { st.textContent = m; st.className = 'oee-filter-status' + (err ? ' err' : ''); } };
 
   const setApq = (id, val, tgt) => {
     const n = $(id);
@@ -169,13 +149,14 @@ const WeeklyDashboard = (() => {
 
   // Sumber tiap baris Speed Standar: record terbaru (tanggal, lalu shift) yang memuat produk itu.
   // Klik baris → buka log sheet record tersebut.
-  const speedLatest = (rows, keyFn) => {
+  const speedLatest = (rows, keyFn, product) => {
     const latest = {};
     rows.forEach((r) => {
       const p = r.payload?.products || {};
-      [[p.p1Name, p.p1Rate], [p.p2Name, p.p2Rate], [p.p3Name, p.p3Rate]].forEach(([n, rt]) => {
+      [[p.p1Name, p.p1Rate, p.p1Bn], [p.p2Name, p.p2Rate, p.p2Bn], [p.p3Name, p.p3Rate, p.p3Bn]].forEach(([n, rt, bn]) => {
         const name = String(n || '').trim(), rate = toNum(rt), key = keyFn(name);
         if (!name || !key || !(rate > 0)) return;
+        if (product && !WeeklyCalc.matches(bn ? name + ' ' + String(bn).trim() : name, product)) return;
         const cur = latest[key];
         const newer = !cur || r.date > cur.date || (r.date === cur.date && Number(r.shift) > Number(cur.shift));
         if (newer) latest[key] = { rate, date: String(r.date), shift: Number(r.shift) || 1, line: String(r.line), stage: r.tahapan };
@@ -194,10 +175,10 @@ const WeeklyDashboard = (() => {
     };
   };
 
-  const renderSpeed = (rows) => {
+  const renderSpeed = (rows, product) => {
     const body = $('oeeSpeedBody');
     if (!body) return;
-    const latest = speedLatest(rows, (n) => n);
+    const latest = speedLatest(rows, (n) => n, product);
     const names = Object.keys(latest).sort().reverse();
     body.innerHTML = names.length
       ? names.map((n) => {
@@ -263,14 +244,22 @@ const WeeklyDashboard = (() => {
     return Math.max(1, dayDiff(a > from ? a : from, b < to ? b : to));
   };
 
-  const renderOee = (rows, from, to) => {
-    const all = calcSet(rows, dayDiff(from, to));
+  // Data halaman OEE Production (semua mesin) — gauge, speed standar & grafik dihitung
+  // ulang dari cache ini setiap filter produk / shift berubah.
+  let oeeRaw = [], oeeRng = null;
+
+  const renderOee = () => {
+    if (!oeeRng) return;
+    const { from, to } = oeeRng;
+    const f = WeeklyFilter.get('oee');
+    const recs = WeeklyCalc.filterShift(oeeRaw, f.shift);
+    const all = calcFor(recs, f, dayDiff(from, to));
     setOeeGauges(all);
-    renderSpeed(rows);
+    renderSpeed(recs, f.product);
     const byMonth = {};
-    rows.forEach((r) => { const k = String(r.date).slice(0, 7); (byMonth[k] = byMonth[k] || []).push(r); });
+    recs.forEach((r) => { const k = String(r.date).slice(0, 7); (byMonth[k] = byMonth[k] || []).push(r); });
     const series = Object.keys(byMonth).sort().map((k) => {
-      const c = calcSet(byMonth[k], monthSpan(k, from, to));
+      const c = calcFor(byMonth[k], f, monthSpan(k, from, to));
       return { label: monthLabel(k), ope: c.ope.oee, o365: c.o365.oee };
     });
     trendSvg('chartOeeOpe', series.map((s) => ({ label: s.label, v: s.ope })), '#3b82f6', '#93c5fd', 'Capaian OEE OPE', 100);
@@ -278,24 +267,29 @@ const WeeklyDashboard = (() => {
     const items = (st) => OEE_MACHINES[st].map((m) => { const p = all.per[st + '|' + m.line]; return { ...m, ope: p?.ope ?? null, o365: p?.o365 ?? null }; });
     barSvg('oeeBarFfs', items('filling'), '#22c55e', '#86efac', '#f59e0b', '#fcd34d', 'Automatic Form Fill Seal Machine');
     barSvg('oeeBarOw', items('kemas'), '#f43f5e', '#fda4af', '#22d3ee', '#a5f3fc', 'Overwrapping Machine');
+    const info = `${f.product || 'Semua produk'} · ${shiftText(f)} · ${fmtD(from)} – ${fmtD(to)}`;
+    if (all.n) say('oeeStatus', `✓ ${all.n} record · Filling & Kemas Line 1, 2, 4 · ${info}`);
+    else say('oeeStatus', `⚠ Tidak ada data untuk filter ini · ${info}`, true);
   };
 
   const loadOee = async () => {
-    const from = $('oeeFrom')?.value, to = $('oeeTo')?.value, st = $('oeeStatus');
-    const say = (m, err) => { if (st) { st.textContent = m; st.className = 'oee-filter-status' + (err ? ' err' : ''); } };
-    if (!from || !to) return say('Isi Dari Tanggal dan Sampai Tanggal.', true);
-    if (from > to) return say('Tanggal awal tidak boleh melebihi tanggal akhir.', true);
-    if (!navigator.onLine) return say('⚠ Tidak ada koneksi — data OEE diambil dari Supabase.', true);
+    const from = $('oeeFrom')?.value, to = $('oeeTo')?.value;
+    if (!from || !to) return say('oeeStatus', 'Isi Dari Tanggal dan Sampai Tanggal.', true);
+    if (from > to) return say('oeeStatus', 'Tanggal awal tidak boleh melebihi tanggal akhir.', true);
+    if (!navigator.onLine) return say('oeeStatus', '⚠ Tidak ada koneksi — data OEE diambil dari Supabase.', true);
     const my = ++oeeSeq;
-    say('Memuat data…');
+    say('oeeStatus', 'Memuat data…');
     try {
-      const rows = await fetchOeeRows(from, to);
+      rowsCache.clear();
+      const rows = await fetchCached(from, to);
       if (my !== oeeSeq) return;
-      renderOee(rows, from, to);
-      say(`✓ ${rows.length} record · Filling & Kemas Line 1, 2, 4 · ${fmtD(from)} – ${fmtD(to)}`);
+      oeeRaw = rows; oeeRng = { from, to };
+      // Dropdown Produk & Batch = riwayat produk/batch pada rentang tanggal ini.
+      WeeklyFilter.populate('oee', WeeklyCalc.productOptions(rows));
+      renderOee();
     } catch (e) {
       console.warn('OEE Production error:', e);
-      say('⚠ Gagal memuat data: ' + (e.message || e), true);
+      say('oeeStatus', '⚠ Gagal memuat data: ' + (e.message || e), true);
     }
   };
 
@@ -322,7 +316,7 @@ const WeeklyDashboard = (() => {
     $('mchApply')?.addEventListener('click', () => { copyRange('mch', 'oee'); loadMachine(); });
     $('mchFrom')?.addEventListener('change', () => { copyRange('mch', 'oee'); loadMachine(); });
     $('mchTo')?.addEventListener('change', () => { copyRange('mch', 'oee'); loadMachine(); });
-    $('mchReset')?.addEventListener('click', () => { $('oeeFrom').value = ''; $('oeeTo').value = ''; initOeeFilter(); syncMchRange(); loadMachine(); });
+    $('mchReset')?.addEventListener('click', () => { WeeklyFilter.reset('mch'); $('oeeFrom').value = ''; $('oeeTo').value = ''; initOeeFilter(); syncMchRange(); loadMachine(); });
     const mb = $('mchSpeedBody');
     mb?.addEventListener('click', (e) => { const tr = e.target.closest('tr.speed-row'); if (tr) openSpeedMenu(tr); });
     mb?.addEventListener('keydown', (e) => {
@@ -330,7 +324,7 @@ const WeeklyDashboard = (() => {
       const tr = e.target.closest('tr.speed-row');
       if (tr) { e.preventDefault(); openSpeedMenu(tr); }
     });
-    $('oeeReset')?.addEventListener('click', () => { $('oeeFrom').value = ''; $('oeeTo').value = ''; initOeeFilter(); loadOee(); });
+    $('oeeReset')?.addEventListener('click', () => { WeeklyFilter.reset('oee'); $('oeeFrom').value = ''; $('oeeTo').value = ''; initOeeFilter(); loadOee(); });
   };
 
   // ===== HALAMAN DETAIL MESIN (Filling / Kemas · Line 1, 2, 4) =====
@@ -342,6 +336,8 @@ const WeeklyDashboard = (() => {
   const STAGE_TYPE = { filling: 'Automatic Form Fill Seal Machine', kemas: 'Overwrapping Machine' };
   const C_OPE = '#a3c93a', C_365 = '#22b8cf';
   let curMachine = null, mchSeq = 0;
+  let mchRaw = [], mchRng = null;   // data mesin aktif (cache) + rentang tanggalnya
+  let wantProd = null;               // produk yang harus terpilih setelah data mesin termuat
 
   // ===== GRAFIK OEE PER PRODUK (BAWAH TABEL) + MULTI-MESIN =====
   const MACHINE_KEYS = ['filling-1', 'filling-2', 'filling-4', 'kemas-1', 'kemas-2', 'kemas-4'];
@@ -367,7 +363,7 @@ const WeeklyDashboard = (() => {
       const name = String(x.batch || '').trim();
       const toks = name.split(/\s+/);
       const wo = String(x.wo || '').trim() || list.find((l) => l.name && l.name === name)?.wo || (toks.length > 1 ? toks[1] : '');
-      out.push({ code: prodCode(name), wo: wo.toUpperCase(), d });
+      out.push({ code: prodCode(name), wo: wo.toUpperCase(), d, label: WeeklyCalc.rowLabel(x, WeeklyCalc.slotsOf(pr)) });
     });
     return out;
   };
@@ -375,14 +371,14 @@ const WeeklyDashboard = (() => {
   // Per batch (WO): OPE & 365 dari record-record yang memuat WO itu.
   //  OPE  = rata-rata OEE tersimpan, dibobot menit produksi WO di tiap record.
   //  365  = A365 × P × Q; A365 = waktu operasional yang dialokasikan ke WO ÷ (1440 mnt × jumlah hari WO berjalan).
-  const calcBatches = (rows) => {
+  const calcBatches = (rows, product) => {
     const by = {};
     rows.forEach((r) => {
       const m = recMetrics(r), pr = prodRows(r);
       const tAll = pr.reduce((s, x) => s + x.d, 0);
       if (!tAll) return;
       const mine = {};
-      pr.filter((x) => x.wo).forEach((x) => {
+      pr.filter((x) => x.wo && (!product || WeeklyCalc.matches(x.label, product))).forEach((x) => {
         const b = (mine[x.wo] = mine[x.wo] || { t: 0, code: x.code });
         b.t += x.d; if (!b.code) b.code = x.code;
       });
@@ -462,10 +458,10 @@ const WeeklyDashboard = (() => {
     svg.innerHTML = s;
   };
 
-  const renderMachineSpeed = (rows, counts) => {
+  const renderMachineSpeed = (rows, counts, product) => {
     const body = $('mchSpeedBody');
     if (!body) return;
-    const latest = speedLatest(rows, prodCode);
+    const latest = speedLatest(rows, prodCode, product);
     const codes = Object.keys(latest).sort((a, b) => (counts[b] || 0) - (counts[a] || 0) || (a < b ? -1 : 1));
     body.innerHTML = codes.length
       ? codes.map((c, i) => {
@@ -476,37 +472,65 @@ const WeeklyDashboard = (() => {
       : '<tr><td colspan="3">Tidak ada data pada rentang ini</td></tr>';
   };
 
-  const renderMachine = (rows, from, to, meta) => {
-    setOeeGauges(calcSet(rows, dayDiff(from, to)), 'mch');
-    const batches = calcBatches(rows);
+  const renderMachine = () => {
+    const meta = MACHINE_PAGES[curMachine];
+    if (!meta || !mchRng) return;
+    const { from, to } = mchRng;
+    const f = WeeklyFilter.get('mch');
+    prodSel = new Set(f.product ? [f.product] : []);
+    const recs = WeeklyCalc.filterShift(mchRaw, f.shift);
+    const all = calcFor(recs, f, dayDiff(from, to));
+    setOeeGauges(all, 'mch');
+    const batches = calcBatches(recs, f.product);
     const counts = {};
     batches.forEach((b) => { if (b.code) counts[b.code] = (counts[b.code] || 0) + 1; });
-    renderMachineSpeed(rows, counts);
+    renderMachineSpeed(recs, counts, f.product);
     countSvg('mchBatchSvg', Object.keys(counts).sort((a, b) => counts[b] - counts[a] || (a < b ? -1 : 1)).map((c) => ({ label: c, v: counts[c] })));
     renderProdBarChips();
     loadProdBar();
-    if (typeof Pica !== 'undefined') Pica.render(rows, meta, from, to);
-    if (typeof Shutdown !== 'undefined') Shutdown.render(rows, meta);
+    // Tabel bawah (Shutdown, Minor Stop, PICA) ikut filter: record shift terpilih, baris log milik produk.
+    const view = WeeklyCalc.productView(recs, f.product);
+    if (typeof Pica !== 'undefined') Pica.render(view, meta, from, to);
+    if (typeof Shutdown !== 'undefined') {
+      const days = dayDiff(from, to);
+      const now = new Date();
+      const updatedAt = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      Shutdown.render(view, {
+        ...meta,
+        from,
+        to,
+        days,
+        shiftLabel: shiftText(f),
+        product: f.product || null,
+        updatedAt
+      });
+    }
+    const info = `${STAGE_LABEL[meta.stage]} Line ${meta.line} · ${f.product || 'Semua produk'} · ${shiftText(f)} · ${fmtD(from)} – ${fmtD(to)}`;
+    if (all.n) say('mchStatus', `✓ ${all.n} record · ${info}`);
+    else say('mchStatus', `⚠ Tidak ada data untuk filter ini · ${info}`, true);
   };
 
   const loadMachine = async () => {
     const meta = MACHINE_PAGES[curMachine];
     if (!meta) return;
-    const from = $('mchFrom')?.value, to = $('mchTo')?.value, st = $('mchStatus');
-    const say = (m, err) => { if (st) { st.textContent = m; st.className = 'oee-filter-status' + (err ? ' err' : ''); } };
-    if (!from || !to) return say('Isi Dari Tanggal dan Sampai Tanggal.', true);
-    if (from > to) return say('Tanggal awal tidak boleh melebihi tanggal akhir.', true);
-    if (!navigator.onLine) return say('⚠ Tidak ada koneksi — data OEE diambil dari Supabase.', true);
+    const from = $('mchFrom')?.value, to = $('mchTo')?.value;
+    if (!from || !to) return say('mchStatus', 'Isi Dari Tanggal dan Sampai Tanggal.', true);
+    if (from > to) return say('mchStatus', 'Tanggal awal tidak boleh melebihi tanggal akhir.', true);
+    if (!navigator.onLine) return say('mchStatus', '⚠ Tidak ada koneksi — data OEE diambil dari Supabase.', true);
     const my = ++mchSeq;
-    say('Memuat data…');
+    say('mchStatus', 'Memuat data…');
     try {
-      const rows = await fetchOeeRows(from, to, meta.stage, meta.line);
+      rowsCache.clear();
+      const rows = await fetchCached(from, to, meta.stage, meta.line);
       if (my !== mchSeq) return;
-      renderMachine(rows, from, to, meta);
-      say(`✓ ${rows.length} record · ${STAGE_LABEL[meta.stage]} Line ${meta.line} · ${fmtD(from)} – ${fmtD(to)}`);
+      mchRaw = rows; mchRng = { from, to };
+      // Dropdown Produk & Batch = riwayat produk/batch di mesin ini pada rentang tanggal.
+      WeeklyFilter.populate('mch', WeeklyCalc.productOptions(rows), wantProd);
+      wantProd = null;
+      renderMachine();
     } catch (e) {
       console.warn('Detail mesin error:', e);
-      say('⚠ Gagal memuat data: ' + (e.message || e), true);
+      say('mchStatus', '⚠ Gagal memuat data: ' + (e.message || e), true);
     }
   };
 
@@ -539,19 +563,21 @@ const WeeklyDashboard = (() => {
     say('Memuat grafik Capaian OEE…');
     try {
       const batches = [];
+      const f = WeeklyFilter.get('mch');
+      const pf = [...prodSel][0] || '';
       for (const key of [...machSel]) {
         const [stage, line] = key.split('-');
-        const rows = await fetchOeeRows(from, to, stage, line);
-        batches.push(...calcBatches(rows).map((b) => ({ ...b, m: key })));
+        const rows = WeeklyCalc.filterShift(await fetchCached(from, to, stage, line), f.shift);
+        batches.push(...calcBatches(rows, pf).map((b) => ({ ...b, m: key })));
       }
       if (my !== barSeq) return;
-      const list = (prodSel.size ? batches.filter((b) => prodSel.has(b.code)) : batches)
+      const list = batches
         .sort((a, b) => (a.m < b.m ? -1 : a.m > b.m ? 1 : a.first < b.first ? -1 : a.first > b.first ? 1 : a.wo < b.wo ? -1 : 1));
       const t = $('mchBarTitle');
       if (t) {
         const prods = prodSel.size ? [...prodSel].join(', ') : 'Semua Produk';
         const machs = [...machSel].map((k) => { const [s2, l2] = k.split('-'); return `${STAGE_LABEL[s2]} Line ${l2}`; }).join(' + ');
-        t.textContent = `Capaian OEE OPE & OEE 365 · ${prods} · ${machs} · ${rangeLabel(from, to)}`;
+        t.textContent = `Capaian OEE OPE & OEE 365 · ${prods} · ${machs} · ${rangeLabel(from, to)}${f.shift === 'all' ? '' : ' · Shift ' + f.shift}`;
       }
       batchBarSvg('mchBarSvg', list);
       say(`✓ ${list.length} batch WO ditampilkan`);
@@ -625,14 +651,17 @@ const WeeklyDashboard = (() => {
         const mt = MACHINE_PAGES[pageId], mm = OEE_MACHINES[mt.stage].find((x) => x.line === mt.line);
         if (badge) badge.textContent = `Mesin ${STAGE_TYPE[mt.stage]} ${mm.name} ${mm.sub}`;
         curMachine = pageId;
-        if (pendingProd != null) { prodSel = new Set(pendingProd ? [pendingProd] : []); pendingProd = null; }
-        else machSel = new Set([pageId]);
+        if (pendingProd != null) { wantProd = pendingProd; pendingProd = null; }
+        else { machSel = new Set([pageId]); wantProd = ''; }
         initOeeFilter(); syncMchRange(); loadMachine();
       }
     }
   };
 
   const bind = () => {
+    WeeklyFilter.bind();
+    WeeklyFilter.on('oee', renderOee);
+    WeeklyFilter.on('mch', renderMachine);
     bindOee();
     document.querySelectorAll('.weekly-nav-item').forEach(btn => {
       btn.addEventListener('click', () => showPage(btn.dataset.weeklyPage));
@@ -649,8 +678,8 @@ const WeeklyDashboard = (() => {
     $('prodBarProducts')?.addEventListener('click', (e) => {
       const chip = e.target.closest('.prodbar-chip');
       if (!chip?.dataset.code) return;
-      prodSel.delete(chip.dataset.code);
-      renderProdBarChips(); loadProdBar();
+      WeeklyFilter.setProduct('mch', '');   // hapus filter produk → seluruh halaman mesin ikut
+      renderMachine();
     });
     $('prodBarMachines')?.addEventListener('click', (e) => {
       const chip = e.target.closest('.prodbar-chip');

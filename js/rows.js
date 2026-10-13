@@ -32,19 +32,37 @@ const Rows = (() => {
     return [1, 2, 3].map(productLabel).filter(Boolean);
   };
 
-  /** Cocokkan label batch (bisa "VTTS1 L030101" atau "VTTS1") ke slot 1–3. */
+  /**
+   * Cocokkan label batch baris ke slot Master Produk 1–3.
+   * Pilih kecocokan PALING SPESIFIK (label/nama terpanjang), supaya
+   * "VPEL1 mixing L027103" tidak tertarik ke slot "VPEL1" hanya karena
+   * berbagi kata pertama. Urutan skor:
+   *   100 exact label (nama+BN) · 90 exact nama · 80 prefix label · 50 prefix nama
+   * Tidak memakai "kata pertama saja" — itu yang membuat multi-produk
+   * dengan kode sama (VPEL1 vs VPEL1 mixing) saling menumpuk.
+   */
   const findProductSlot = (prodLabel) => {
     if (!prodLabel) return -1;
-    const needle = String(prodLabel).trim();
+    const needle = String(prodLabel).trim().toLowerCase();
+    if (!needle) return -1;
+    let best = -1, bestScore = 0;
     for (let i = 1; i <= 3; i++) {
       const nameEl = (State.el && State.el['prodName' + i]) || document.getElementById('prodName' + i);
       const name = nameEl ? nameEl.value.trim() : '';
       if (!name) continue;
       const label = composeLabel(name, getBn(i));
-      if (label === needle || name === needle) return i;
-      if (needle.startsWith(name + ' ') || needle.startsWith(name + 'L')) return i;
+      const n = name.toLowerCase();
+      const l = label.toLowerCase();
+      let score = 0;
+      if (l === needle) score = 100;
+      else if (n === needle) score = 90;
+      else if (needle.startsWith(l + ' ')) score = 80 + Math.min(l.length, 19);
+      else if (needle.startsWith(n + ' ')) score = 50 + Math.min(n.length, 19);
+      // Bonus panjang nama: "VPEL1 mixing" (12) mengalahkan "VPEL1" (5)
+      // saat keduanya prefix-match, tanpa mengandalkan urutan slot.
+      if (score > bestScore) { bestScore = score; best = i; }
     }
-    return -1;
+    return best;
   };
 
   /**
@@ -455,22 +473,26 @@ const Rows = (() => {
    * Cocokkan nilai batch di baris ke label produk master.
    * Mendukung "VTTS1", "VTTS1 L030101", dll. (setelah split Produk/BN).
    */
+  /**
+   * Petakan nilai kolom Batch baris → kunci summary (label master produk).
+   * Pilih kecocokan paling spesifik (label terpanjang), tanpa "kata pertama saja".
+   */
   const resolveSummaryKey = (batchVal, summary) => {
     const v = String(batchVal || '').trim();
     if (!v) return null;
     if (summary[v]) return v;
-    // Cocokkan ke label gabungan / kode saja
     const keys = Object.keys(summary);
     const lower = v.toLowerCase();
+    let best = null, bestScore = 0;
     for (const k of keys) {
-      if (k.toLowerCase() === lower) return k;
-      if (k.toLowerCase().startsWith(lower + ' ') || lower.startsWith(k.toLowerCase() + ' ')) return k;
-      // Token pertama sama (kode produk)
-      const k0 = k.split(/\s+/)[0].toLowerCase();
-      const v0 = lower.split(/\s+/)[0];
-      if (k0 && k0 === v0) return k;
+      const kl = k.toLowerCase();
+      let score = 0;
+      if (kl === lower) score = 100;
+      else if (lower.startsWith(kl + ' ')) score = 80 + Math.min(kl.length, 19);
+      else if (kl.startsWith(lower + ' ')) score = 60 + Math.min(lower.length, 19);
+      if (score > bestScore) { bestScore = score; best = k; }
     }
-    return null;
+    return best;
   };
 
   const updateProductDetailTable = () => {
@@ -622,6 +644,7 @@ const Rows = (() => {
   // ====== EXPORT ======
   return {
     getActiveProducts,
+    findProductSlot,
     getRateForProduct,
     getUkuranForProduct,
     getEffectiveRate,

@@ -64,6 +64,7 @@ const Calculation = (() => {
   const recalc = () => {
     let B = 0, D = 0, tot = 0, nShift = 0;
     let sumGood = 0, sumDefect = 0;
+    let mixingDur = 0; // Kegiatan "Mixing" — dikurangi dari basis OEE 365
     const sh = [{B:0,D:0},{B:0,D:0},{B:0,D:0}];
 
     // Label produk: kode saja ATAU "kode + BN" (setelah issue #7)
@@ -80,22 +81,31 @@ const Calculation = (() => {
       { dur:0, rate:parseFloat(State.el.prodRate3.value)||0, target:0, actual:0 },
     ];
 
-    /** Cocokkan batch baris ke slot produk 0..2 (fleksibel: "VPEL1" ≈ "VPEL1 L027103"). */
+    /**
+     * Cocokkan batch baris ke slot produk 0..2.
+     * Delegasi ke Rows.findProductSlot (skor paling spesifik) supaya
+     * "VPEL1 mixing L027103" tidak tertarik ke slot "VPEL1".
+     * Fallback lokal tanpa matching "kata pertama saja".
+     */
     const matchProdSlot = (batchVal) => {
+      if (typeof Rows !== 'undefined' && typeof Rows.findProductSlot === 'function') {
+        const slot1 = Rows.findProductSlot(batchVal); // 1..3 atau -1
+        return slot1 > 0 ? slot1 - 1 : -1;
+      }
       const v = String(batchVal || '').trim();
       if (!v) return -1;
       const lower = v.toLowerCase();
+      let best = -1, bestScore = 0;
       for (let i = 0; i < 3; i++) {
         const label = pLabels[i];
         if (!label) continue;
         const l = label.toLowerCase();
-        if (l === lower) return i;
-        if (l.startsWith(lower + ' ') || lower.startsWith(l + ' ')) return i;
-        const l0 = l.split(/\s+/)[0];
-        const v0 = lower.split(/\s+/)[0];
-        if (l0 && l0 === v0) return i;
+        let score = 0;
+        if (l === lower) score = 100;
+        else if (lower.startsWith(l + ' ')) score = 80 + Math.min(l.length, 19);
+        if (score > bestScore) { bestScore = score; best = i; }
       }
-      return -1;
+      return best;
     };
 
     Rows.rows().forEach(tr => {
@@ -150,7 +160,15 @@ const Calculation = (() => {
       const si = Utils.shiftOf(mulai);
       if (si === State.evalShift) nShift++;
 
-      if (c === 'planned')       { B += dur; if (si != null) sh[si].B += dur; }
+      if (c === 'planned') {
+        B += dur;
+        if (si != null) sh[si].B += dur;
+        // OEE 365: kegiatan "Mixing" (apa pun kodenya planned) dikurangi dari basis shift
+        const keg = String(g('kegiatan') || '').trim().toLowerCase();
+        if (si === State.evalShift && /\bmixing\b/.test(keg)) {
+          mixingDur += dur;
+        }
+      }
       else if (c === 'unplanned'){ D += dur; if (si != null) sh[si].D += dur; }
       else if (c === 'prod') {
         if (si === State.evalShift && prodName) {
@@ -188,8 +206,11 @@ const Calculation = (() => {
     oFEl.style.fontWeight = '700';
 
     // === PERFORMANCE PER PRODUK ===
-    // Target (G) = Σ (durasi × rate efektif baris). Kemas L1/L2: rate mengikuti OP.
-    let totalPerfSum = 0, activeCount = 0;
+    // Setiap slot produk dihitung INDEPENDEN: target = Σ(durasi_baris × rate_efektif_baris).
+    // Rate mengikuti master produk slot tersebut (atau tabel man-power Kemas L1/L2).
+    // Performance total = tertimbang: Σ actual / Σ target (bukan rata-rata % antar produk),
+    // supaya produk A rate 10 dan produk B rate 20 tidak "digabung" secara setara.
+    let sumTargetAll = 0, sumActualAll = 0;
     for (let i = 0; i < 3; i++) {
       const gTarget = prodStats[i].target > 0
         ? prodStats[i].target
@@ -198,7 +219,8 @@ const Calculation = (() => {
       const perfI = gTarget > 0 ? (hAct / gTarget) * 100 : 0;
 
       if (pLabels[i] && (prodStats[i].rate > 0 || prodStats[i].target > 0 || prodStats[i].actual > 0)) {
-        activeCount++; totalPerfSum += perfI;
+        sumTargetAll += gTarget;
+        sumActualAll += hAct;
       }
 
       State.el['oG' + (i+1)].textContent = Utils.nf0(gTarget);
@@ -209,7 +231,8 @@ const Calculation = (() => {
       elI.style.fontWeight = '700';
     }
 
-    const avgPerfI = activeCount > 0 ? (totalPerfSum / activeCount) : 0;
+    // Tertimbang: total output aktual ÷ total target teoritis seluruh produk aktif
+    const avgPerfI = sumTargetAll > 0 ? (sumActualAll / sumTargetAll) * 100 : 0;
     State.el.oITotal.textContent = Utils.nf2(avgPerfI);
     const badge = State.el.badgeAvgP;
     badge.style.color = avgPerfI >= CONFIG.TARGET.PERFORMANCE ? 'var(--green-d)' : 'var(--red)';
@@ -235,9 +258,16 @@ const Calculation = (() => {
     oeeEl.textContent = Utils.nf2(oee) + '%';
     oeeEl.style.color = oee >= CONFIG.TARGET.OEE ? '#2ee27e' : '#f87171';
 
-    // === OEE 365 (Availability = E / A_shift penuh, mis. 510 mnt) ===
-    // Contoh: shift 510 mnt, waktu operasional E = 400 → A365 = 400/510 ≈ 78,43%
-    const a365 = sA > 0 ? (sE / sA) * 100 : 0;
+    // === OEE 365 ===
+    // Basis shift dikurangi kegiatan "Mixing" (waktu sebelum filling, bukan loading time filling).
+    // Contoh (Shift 2 = 480, Mixing = 335):
+    //   A365_base = 480 − 335 = 145
+    //   Planned non-mixing = 30, Unplanned = 20 → E = 145 − 30 − 20 = 95
+    //   A365 = 95/145 ≈ 65,52%  →  OEE365 = A365 × P × Q
+    // Jika tidak ada Mixing, basis = menit penuh shift (perilaku lama).
+    const a365Base = Math.max(sA - mixingDur, 0);
+    // E tetap sama: sE = sA − B − D = a365Base − (B − mixing) − D
+    const a365 = a365Base > 0 ? (sE / a365Base) * 100 : 0;
     const oee365 = a365 * avgPerfI * M / 10000;
 
     const set365 = (key, text, color) => {
@@ -247,20 +277,24 @@ const Calculation = (() => {
       el.textContent = text;
       if (color) el.style.color = color;
     };
-    set365('o365A', Utils.nf0(sA));
+    set365('o365A', Utils.nf0(a365Base));
     set365('o365E', Utils.nf0(sE));
     set365('o365F', Utils.nf2(a365) + ' %', a365 >= CONFIG.TARGET.AVAILABILITY ? 'var(--green-d)' : 'var(--red)');
     set365('o365P', Utils.nf2(avgPerfI) + ' %');
     set365('o365Q', Utils.nf2(M) + ' %');
     set365('oee365', Utils.nf2(oee365) + '%', oee365 >= CONFIG.TARGET.OEE ? '#2ee27e' : '#f87171');
     if (State.el.rincSub365) {
+      const mixNote = mixingDur > 0 ? ` − Mixing ${Utils.nf0(mixingDur)}` : '';
       State.el.rincSub365.textContent =
-        `Shift ${State.evalShift + 1} · A₃₆₅ = ${sA} mnt · E = ${Utils.nf0(sE)} mnt · A365 = ${Utils.nf2(a365)}%`;
+        `Shift ${State.evalShift + 1} · A₃₆₅ = ${Utils.nf0(a365Base)} mnt (${sA}${mixNote}) · E = ${Utils.nf0(sE)} mnt · A365 = ${Utils.nf2(a365)}%`;
     }
     if (State.el.diag365) {
+      const mixNote = mixingDur > 0
+        ? ` Basis = shift ${sA} − Mixing ${Utils.nf0(mixingDur)} = ${Utils.nf0(a365Base)} mnt.`
+        : ` Basis = menit penuh shift (${sA}).`;
       State.el.diag365.innerHTML =
         `<div class="d-item ok">OEE 365 = ${Utils.nf2(a365)}% × ${Utils.nf2(avgPerfI)}% × ${Utils.nf2(M)}% = <b>${Utils.nf2(oee365)}%</b>
-         <br><small>Availability 365 = waktu operasional (E) ÷ menit penuh shift (${sA}), bukan ÷ waktu terencana (C).</small></div>`;
+         <br><small>Availability 365 = E ÷ basis OEE 365.${mixNote} Bukan ÷ waktu terencana (C).</small></div>`;
     }
 
     // Badge %OEE mini di toolbar atas — biar kelihatan real-time tanpa

@@ -2051,9 +2051,15 @@
 
               <!-- SHUTDOWN ANALYSIS (Planned & Unplanned) — gaya Looker Studio -->
               <div class="shutdown-wrap">
+                <div class="shutdown-empty-note" id="sdEmptyNote"></div>
                 <div class="shutdown-row">
                   <article class="shutdown-card">
                     <div class="shutdown-title" id="sdPlanDonutTitle">Planned Shutdown</div>
+                    <div class="shutdown-ctx" id="sdPlanCtx"></div>
+                    <div class="shutdown-summary">
+                      <span>Total: <strong id="sdPlanTotalMin">—</strong> (<span id="sdPlanTotalPct">—</span>)</span>
+                      <span class="sd-top">Terbanyak: <span id="sdPlanTop">—</span></span>
+                    </div>
                     <div class="shutdown-donut-flex">
                       <svg id="sdPlanDonut" class="shutdown-donut" viewBox="0 0 200 200" role="img" aria-label="Distribusi planned shutdown"></svg>
                       <div id="sdPlanLegend" class="shutdown-legend"></div>
@@ -2061,10 +2067,18 @@
                   </article>
                   <article class="shutdown-card">
                     <div class="shutdown-title" id="sdPlanTableTitle">Planned Shutdown Activity</div>
+                    <div class="shutdown-ctx" id="sdPlanTableCtx"></div>
                     <div class="shutdown-table-wrap">
                       <table class="shutdown-table">
-                        <thead><tr><th style="width:28px"></th><th>Aktivitas</th><th>Waktu Aktivitas (mnt)</th><th>Persentase</th></tr></thead>
-                        <tbody id="sdPlanBody"><tr><td colspan="4">Memuat…</td></tr></tbody>
+                        <thead><tr>
+                          <th style="width:32px">No</th>
+                          <th>Aktivitas</th>
+                          <th>Menit</th>
+                          <th>Frek.</th>
+                          <th>Rata-rata</th>
+                          <th>Persentase</th>
+                        </tr></thead>
+                        <tbody id="sdPlanBody"><tr><td colspan="6">Memuat…</td></tr></tbody>
                       </table>
                     </div>
                     <div class="shutdown-pager">
@@ -2077,6 +2091,11 @@
                 <div class="shutdown-row">
                   <article class="shutdown-card">
                     <div class="shutdown-title" id="sdUnpDonutTitle">Unplanned Shutdown</div>
+                    <div class="shutdown-ctx" id="sdUnpCtx"></div>
+                    <div class="shutdown-summary">
+                      <span>Total: <strong id="sdUnpTotalMin">—</strong> (<span id="sdUnpTotalPct">—</span>)</span>
+                      <span class="sd-top">Terbanyak: <span id="sdUnpTop">—</span></span>
+                    </div>
                     <div class="shutdown-donut-flex">
                       <svg id="sdUnpDonut" class="shutdown-donut" viewBox="0 0 200 200" role="img" aria-label="Distribusi unplanned shutdown"></svg>
                       <div id="sdUnpLegend" class="shutdown-legend"></div>
@@ -2084,10 +2103,18 @@
                   </article>
                   <article class="shutdown-card">
                     <div class="shutdown-title" id="sdUnpTableTitle">Unplanned Shutdown Activity</div>
+                    <div class="shutdown-ctx" id="sdUnpTableCtx"></div>
                     <div class="shutdown-table-wrap">
                       <table class="shutdown-table">
-                        <thead><tr><th style="width:28px"></th><th>Aktivitas</th><th>Waktu Aktivitas (mnt)</th><th>Persentase</th></tr></thead>
-                        <tbody id="sdUnpBody"><tr><td colspan="4">Memuat…</td></tr></tbody>
+                        <thead><tr>
+                          <th style="width:32px">No</th>
+                          <th>Aktivitas</th>
+                          <th>Menit</th>
+                          <th>Frek.</th>
+                          <th>Rata-rata</th>
+                          <th>Persentase</th>
+                        </tr></thead>
+                        <tbody id="sdUnpBody"><tr><td colspan="6">Memuat…</td></tr></tbody>
                       </table>
                     </div>
                     <div class="shutdown-pager">
@@ -2376,6 +2403,8 @@
   <script src="./js/sync.js"></script>
   <script src="./js/storage.js"></script>
   <script src="./js/dashboard.js"></script>
+  <script src="./js/weekly-calc.js"></script>
+  <script src="./js/weekly-filter.js"></script>
   <script src="./js/weekly-dashboard.js"></script>
   <script src="./js/pica.js"></script>
   <script src="./js/shutdown.js"></script>
@@ -2393,8 +2422,6 @@
   <script src="./js/fx.js"></script>
   <script src="./js/weather.js"></script>
   <script src="./js/settings.js"></script>
-  <script src="./js/weekly-filter.js"></script>
-  <script src="./js/weekly-oee.js"></script>
   <script src="./js/verify-agent.js"></script>
   <script src="./js/app.js"></script>
   <script src="./js/sheet-op-sync.js"></script>
