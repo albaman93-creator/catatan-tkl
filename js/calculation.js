@@ -65,6 +65,7 @@ const Calculation = (() => {
     let B = 0, D = 0, tot = 0, nShift = 0;
     let sumGood = 0, sumDefect = 0;
     let mixingDur = 0; // Kegiatan "Mixing" — dikurangi dari basis OEE 365
+    let minMixingStart = null; // menit dari 00:00 kegiatan Mixing paling awal di shift eval
     const sh = [{B:0,D:0},{B:0,D:0},{B:0,D:0}];
 
     // Label produk: kode saja ATAU "kode + BN" (setelah issue #7)
@@ -167,6 +168,9 @@ const Calculation = (() => {
         const keg = String(g('kegiatan') || '').trim().toLowerCase();
         if (si === State.evalShift && /\bmixing\b/.test(keg)) {
           mixingDur += dur;
+          if (mulai != null && (minMixingStart == null || mulai < minMixingStart)) {
+            minMixingStart = mulai;
+          }
         }
       }
       else if (c === 'unplanned'){ D += dur; if (si != null) sh[si].D += dur; }
@@ -259,14 +263,23 @@ const Calculation = (() => {
     oeeEl.style.color = oee >= CONFIG.TARGET.OEE ? '#2ee27e' : '#f87171';
 
     // === OEE 365 ===
-    // Basis shift dikurangi kegiatan "Mixing" (waktu sebelum filling, bukan loading time filling).
-    // Contoh (Shift 2 = 480, Mixing = 335):
-    //   A365_base = 480 − 335 = 145
+    // Jeda = waktu dari awal shift sampai kegiatan Mixing pertama (waktu sebelum Mixing).
+    // Time Available Filling / basis OEE 365 = shift − jeda − Mixing.
+    // Contoh (Shift 2 = 480, jeda 67, Mixing 268):
+    //   A365_base = 480 − 67 − 268 = 145
     //   Planned non-mixing = 30, Unplanned = 20 → E = 145 − 30 − 20 = 95
     //   A365 = 95/145 ≈ 65,52%  →  OEE365 = A365 × P × Q
     // Jika tidak ada Mixing, basis = menit penuh shift (perilaku lama).
-    const a365Base = Math.max(sA - mixingDur, 0);
-    // E tetap sama: sE = sA − B − D = a365Base − (B − mixing) − D
+    let jedaDur = 0;
+    if (mixingDur > 0 && minMixingStart != null) {
+      const shiftStarts = [420, 930, 1410]; // 07:00, 15:30, 23:30
+      let startMin = shiftStarts[State.evalShift];
+      if (State.evalShift === 2 && minMixingStart < 420) startMin = 0;
+      jedaDur = Math.max(0, minMixingStart - startMin);
+      if (jedaDur > sA) jedaDur = 0;
+    }
+    const a365Base = Math.max(sA - jedaDur - mixingDur, 0);
+    // E tetap sama: sE = sA − B − D
     const a365 = a365Base > 0 ? (sE / a365Base) * 100 : 0;
     const oee365 = a365 * avgPerfI * M / 10000;
 
@@ -284,17 +297,24 @@ const Calculation = (() => {
     set365('o365Q', Utils.nf2(M) + ' %');
     set365('oee365', Utils.nf2(oee365) + '%', oee365 >= CONFIG.TARGET.OEE ? '#2ee27e' : '#f87171');
     if (State.el.rincSub365) {
-      const mixNote = mixingDur > 0 ? ` − Mixing ${Utils.nf0(mixingDur)}` : '';
+      let note = '';
+      if (jedaDur > 0 || mixingDur > 0) {
+        note = (jedaDur > 0 ? ` − Jeda ${Utils.nf0(jedaDur)}` : '') +
+               (mixingDur > 0 ? ` − Mixing ${Utils.nf0(mixingDur)}` : '');
+      }
       State.el.rincSub365.textContent =
-        `Shift ${State.evalShift + 1} · A₃₆₅ = ${Utils.nf0(a365Base)} mnt (${sA}${mixNote}) · E = ${Utils.nf0(sE)} mnt · A365 = ${Utils.nf2(a365)}%`;
+        `Shift ${State.evalShift + 1} · A₃₆₅ = ${Utils.nf0(a365Base)} mnt (${sA}${note}) · E = ${Utils.nf0(sE)} mnt · A365 = ${Utils.nf2(a365)}%`;
     }
     if (State.el.diag365) {
-      const mixNote = mixingDur > 0
-        ? ` Basis = shift ${sA} − Mixing ${Utils.nf0(mixingDur)} = ${Utils.nf0(a365Base)} mnt.`
+      const mixNote = (jedaDur > 0 || mixingDur > 0)
+        ? ` Basis = shift ${sA}` +
+          (jedaDur > 0 ? ` − Jeda ${Utils.nf0(jedaDur)}` : '') +
+          (mixingDur > 0 ? ` − Mixing ${Utils.nf0(mixingDur)}` : '') +
+          ` = ${Utils.nf0(a365Base)} mnt.`
         : ` Basis = menit penuh shift (${sA}).`;
       State.el.diag365.innerHTML =
         `<div class="d-item ok">OEE 365 = ${Utils.nf2(a365)}% × ${Utils.nf2(avgPerfI)}% × ${Utils.nf2(M)}% = <b>${Utils.nf2(oee365)}%</b>
-         <br><small>Availability 365 = E ÷ basis OEE 365.${mixNote} Bukan ÷ waktu terencana (C).</small></div>`;
+         <br><small>Availability 365 = E ÷ Time Available Filling (basis OEE 365).${mixNote} Bukan ÷ waktu terencana (C).</small></div>`;
     }
 
     // Badge %OEE mini di toolbar atas — biar kelihatan real-time tanpa

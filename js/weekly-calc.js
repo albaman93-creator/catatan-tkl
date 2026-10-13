@@ -129,6 +129,7 @@ const WeeklyCalc = (() => {
     const sA = CONFIG.SHIFT_A[si];
 
     let B = 0, D = 0, tAll = 0, good = 0, defect = 0, mixing = 0;
+    let minMixingStart = null; // menit dari 00:00 untuk kegiatan Mixing paling awal di shift
     const st = slots.map(() => ({ dur: 0, actual: 0, target: 0 }));
     const info = [];
 
@@ -137,7 +138,8 @@ const WeeklyCalc = (() => {
       good += g; defect += d;                       // sheet: dihitung walau durasi kosong
       const dur = durOf(x);
       const cat = Utils.catOf(x.kode);
-      const rs = Utils.shiftOf(Utils.parseTime(x.mulai));
+      const mulaiMin = Utils.parseTime(x.mulai);
+      const rs = Utils.shiftOf(mulaiMin);
       const inShift = rs === si;
       const keg = String(x.kegiatan || '').trim().toLowerCase();
       const isMixing = cat === 'planned' && /\bmixing\b/.test(keg);
@@ -145,7 +147,12 @@ const WeeklyCalc = (() => {
       if (dur == null || !inShift) return;
       if (cat === 'planned') {
         B += dur;
-        if (isMixing) mixing += dur;
+        if (isMixing) {
+          mixing += dur;
+          if (mulaiMin != null && (minMixingStart == null || mulaiMin < minMixingStart)) {
+            minMixingStart = mulaiMin;
+          }
+        }
       } else if (cat === 'unplanned') D += dur;
       else if (cat === 'prod') {
         tAll += dur;
@@ -162,8 +169,25 @@ const WeeklyCalc = (() => {
     const C = Math.max(sA - B, 0);
     const E = Math.max(C - D, 0);
     const A = C > 0 ? (E / C) * 100 : 0;
-    // Basis OEE 365 = shift − Mixing (Time Available Filling)
-    const availBase = Math.max(sA - mixing, 0);
+
+    // Jeda = waktu dari awal shift sampai kegiatan Mixing pertama (waktu sebelum Mixing).
+    // Time Available Filling = shift − jeda − Mixing  (waktu keseluruhan yang dimiliki tahapan Filling).
+    // Contoh Shift 2 = 480: jeda 67 + Mixing 268 → Available = 145.
+    let jeda = 0;
+    if (mixing > 0 && minMixingStart != null) {
+      const shiftStarts = [420, 930, 1410]; // 07:00, 15:30, 23:30 (menit dari 00:00)
+      let startMin = shiftStarts[si];
+      // S3 (index 2) bisa mulai 23:30 (1410) atau setelah tengah malam (0).
+      // Jika Mixing mulai < 420 (setelah 00:00), treat start sebagai 0 untuk hitung jeda.
+      if (si === 2 && minMixingStart < 420) {
+        startMin = 0;
+      }
+      jeda = Math.max(0, minMixingStart - startMin);
+      // Jika Mixing melewati tengah malam dari S2, dll. — clamp ke sA
+      if (jeda > sA) jeda = 0;
+    }
+    // Basis OEE 365 / Time Available Filling = shift − jeda − Mixing
+    const availBase = Math.max(sA - jeda - mixing, 0);
 
     let sum = 0, n = 0, sumIdealE = 0, sumActual = 0;
     const perSlot = slots.map((s, i) => {
@@ -184,7 +208,7 @@ const WeeklyCalc = (() => {
     const Q = out > 0 ? (good / out) * 100 : 0;
     return {
       A, P, Q, O: (A * P * Q) / 10000,
-      sA, B, D, C, E, tAll, mixing, availBase,
+      sA, B, D, C, E, tAll, mixing, jeda, availBase,
       sumIdealE, sumActual,
       slots, perSlot, info, si, stage, line
     };
@@ -226,7 +250,7 @@ const WeeklyCalc = (() => {
         good: has ? re.info.reduce((s, r) => s + r.g, 0) : 0,
         defect: has ? re.info.reduce((s, r) => s + r.d, 0) : 0,
         ideal: has ? re.sumIdealE : 0,           // rate × E (Excel batch)
-        availBase: has ? re.availBase : 0,       // shift − Mixing
+        availBase: has ? re.availBase : 0,       // shift − jeda − Mixing (Time Available Filling)
         rate: rateSum,                           // speed standar (bag/mnt) record ini
       };
     }
@@ -339,7 +363,7 @@ const WeeklyCalc = (() => {
     const qBatch = actual > 0 ? (sumGood / actual) * 100 : null;
     const oBatch = (aBatch != null && pBatch != null && qBatch != null)
       ? (aBatch * pBatch * qBatch) / 10000 : null;
-    // OEE 365: A365 = ΣE / Σ(shift − Mixing)
+    // OEE 365: A365 = ΣE / Σ(shift − jeda − Mixing) = ΣE / Σ Time Available Filling
     const a365Batch = sumAvail > 0 ? (sumE / sumAvail) * 100 : null;
     const o365Batch = (a365Batch != null && pBatch != null && qBatch != null)
       ? (a365Batch * pBatch * qBatch) / 10000 : null;
