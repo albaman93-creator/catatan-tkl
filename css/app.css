@@ -1846,3 +1846,135 @@
     justify-content: flex-start;
   }
 }
+
+/* ============================================================
+   KPI OPE + 365 — full width desktop (isi space kosong)
+   ============================================================ */
+.sheet-kpi-stack {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 6px 0 10px;
+}
+
+.sheet-kpi-stack .sheet-kpi-row {
+  display: grid !important;
+  grid-template-columns: 48px repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  width: 100%;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  border-top: none;
+  flex-wrap: nowrap;
+}
+
+.sheet-kpi-stack .sheet-kpi-row-label {
+  min-width: 0;
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  border-radius: 10px;
+  padding: 0 6px;
+}
+
+.sheet-kpi-stack .sheet-kpi {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sheet-kpi-stack .sheet-kpi span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sheet-kpi-stack .sheet-kpi b {
+  font-size: 15px !important;
+  font-weight: 800;
+}
+
+/* Warna label A/P/Q/OEE via data-kpi (bukan nth-child — child 1 = label) */
+.sheet-kpi-stack .sheet-kpi[data-kpi="A"],
+.sheet-kpi-stack .sheet-kpi[data-kpi="A365"] { --kpi-color: #16a34a; }
+.sheet-kpi-stack .sheet-kpi[data-kpi="P"],
+.sheet-kpi-stack .sheet-kpi[data-kpi="P365"] { --kpi-color: #2563eb; }
+.sheet-kpi-stack .sheet-kpi[data-kpi="Q"],
+.sheet-kpi-stack .sheet-kpi[data-kpi="Q365"] { --kpi-color: #7c3aed; }
+.sheet-kpi-stack .sheet-kpi[data-kpi="OEE"],
+.sheet-kpi-stack .sheet-kpi[data-kpi="OEE365"],
+.sheet-kpi-stack .sheet-kpi-oee { --kpi-color: #ea580c; }
+
+@media (min-width: 1200px) {
+  .sheet-kpi-stack .sheet-kpi {
+    min-height: 46px;
+    padding: 10px 18px;
+  }
+  .sheet-kpi-stack .sheet-kpi b {
+    font-size: 17px !important;
+  }
+  .sheet-kpi-stack .sheet-kpi span {
+    font-size: 13px;
+  }
+  .sheet-kpi-stack .sheet-kpi-row {
+    gap: 12px !important;
+    grid-template-columns: 56px repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Tetap horizontal (label + A + P + Q + OEE sebaris) — jangan wrap jadi 2 kolom.
+     Elemen diperkecil supaya tetap muat & rapi di layar ponsel. */
+  .sheet-kpi-stack .sheet-kpi-row {
+    grid-template-columns: 30px repeat(4, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+  }
+  .sheet-kpi-stack .sheet-kpi-row-label {
+    font-size: 10px;
+  }
+  .sheet-kpi-stack .sheet-kpi {
+    min-height: 32px;
+    padding: 4px 2px;
+    gap: 2px;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+  .sheet-kpi-stack .sheet-kpi span {
+    font-size: 9px;
+  }
+  .sheet-kpi-stack .sheet-kpi b {
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  /* Ponsel sangat sempit: susut lagi, tetap 5 kolom sebaris (flexible). */
+  .sheet-kpi-stack .sheet-kpi-row {
+    grid-template-columns: 24px repeat(4, minmax(0, 1fr)) !important;
+    gap: 3px !important;
+  }
+  .sheet-kpi-stack .sheet-kpi {
+    padding: 3px 1px;
+    min-height: 28px;
+  }
+  .sheet-kpi-stack .sheet-kpi span {
+    font-size: 8px;
+  }
+  .sheet-kpi-stack .sheet-kpi b {
+    font-size: 10px !important;
+  }
+}

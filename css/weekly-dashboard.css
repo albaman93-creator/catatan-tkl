@@ -1114,25 +1114,32 @@ body.wd-resizing {
   .weekly-sidebar-resizer,
   .weekly-side-toggle { display: none; }
 }
-/* ---------- Ringkasan waktu operasional / terencana / output (per filter batch) ---------- */
+/* ---------- Ringkasan waktu operasional / terencana / output (per filter batch) ----------
+   Flexbox horizontal yang fleksibel: kartu-kartu sebaris selama muat, baru wrap
+   kalau layar benar-benar sempit — tidak langsung jadi 1 kolom vertikal. */
 .wd-totals {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin: 10px 0 4px;
 }
 .wd-tot-card {
+  flex: 1 1 128px;
+  min-width: 108px;
   background: var(--bg-surface, #161618);
   border: 1px solid var(--border-default, rgba(255,255,255,.08));
   border-radius: 10px;
   padding: 10px 12px;
-  min-width: 0;
+  box-sizing: border-box;
 }
 .wd-tot-label {
   font: 500 11px var(--font-sans, 'IBM Plex Sans', sans-serif);
   color: var(--text-muted, #8e8e93);
   line-height: 1.3;
   margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .wd-tot-val {
   font: 700 18px var(--font-sans, 'IBM Plex Sans', sans-serif);
@@ -1145,12 +1152,6 @@ body.wd-resizing {
   color: var(--text-secondary, #aeaeb2);
   margin-top: 2px;
 }
-@media (max-width: 900px) {
-  .wd-totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 480px) {
-  .wd-totals { grid-template-columns: 1fr; }
-}
 @media print {
   .wd-tot-card {
     background: #fff !important;
@@ -1161,8 +1162,11 @@ body.wd-resizing {
   .wd-tot-label, .wd-tot-unit { color: #475569 !important; }
 }
 
-.wd-totals {
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+/* Kartu persentase (OEE OPE / OEE 365) butuh sedikit lebih lebar karena teksnya panjang,
+   tapi tetap kartu biasa yang ikut flow horizontal, bukan baris sendiri penuh. */
+.wd-tot-pct {
+  flex: 1 1 200px;
+  min-width: 180px;
 }
 .wd-tot-pct .wd-tot-val-sm {
   font-size: 13px;
@@ -1170,9 +1174,18 @@ body.wd-resizing {
   line-height: 1.35;
   word-break: break-word;
 }
-.wd-tot-pct {
-  grid-column: span 2;
+.wd-tot-pct .wd-tot-label,
+.wd-tot-pct .wd-tot-unit {
+  white-space: normal;
 }
-@media (max-width: 600px) {
-  .wd-tot-pct { grid-column: span 1; }
+
+@media (max-width: 900px) {
+  .wd-tot-card { flex-basis: 108px; min-width: 96px; }
+  .wd-tot-pct { flex-basis: 170px; min-width: 150px; }
+}
+@media (max-width: 480px) {
+  /* Masih horizontal: dua kartu sebaris, bukan satu kolom penuh ke bawah. */
+  .wd-tot-card { flex-basis: calc(50% - 4px); min-width: calc(50% - 4px); }
+  .wd-tot-pct { flex-basis: 100%; min-width: 100%; }
+  .wd-tot-val { font-size: 16px; }
 }
