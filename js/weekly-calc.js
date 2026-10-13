@@ -209,6 +209,13 @@ const WeeklyCalc = (() => {
     const a = sa != null ? sa : (has ? re.A : null);
 
     if (!norm(product)) {
+      // Rate mesin: jumlah rate semua slot aktif di record ini (untuk total Speed Standar)
+      let rateSum = 0;
+      if (has) {
+        re.slots.forEach((s, i) => {
+          if (re.perSlot[i].active) rateSum += (re.perSlot[i].rate || s.rate || 0);
+        });
+      }
       return {
         ...base, w: 1, en: enWhole, a,
         p: sp != null ? sp : (has ? re.P : null),
@@ -220,6 +227,7 @@ const WeeklyCalc = (() => {
         defect: has ? re.info.reduce((s, r) => s + r.d, 0) : 0,
         ideal: has ? re.sumIdealE : 0,           // rate × E (Excel batch)
         availBase: has ? re.availBase : 0,       // shift − Mixing
+        rate: rateSum,                           // speed standar (bag/mnt) record ini
       };
     }
     if (!has) return null;
@@ -238,15 +246,21 @@ const WeeklyCalc = (() => {
     const aa = a != null ? a : re.A;
     // Ideal per batch (Excel): speed standar × waktu operasional E
     let ideal = 0;
+    let rateSum = 0;
     if (idx.length) {
       idx.forEach((i) => {
         const rate = re.perSlot[i].rate || re.slots[i].rate || 0;
         ideal += rate * re.E;
+        rateSum += rate;
       });
     } else {
       // fallback: rate dari label produk yang cocok
       re.slots.forEach((s, i) => {
-        if (s.label && matches(s.label, product)) ideal += (s.rate || 0) * re.E;
+        if (s.label && matches(s.label, product)) {
+          const rate = s.rate || 0;
+          ideal += rate * re.E;
+          rateSum += rate;
+        }
       });
     }
     return {
@@ -259,6 +273,7 @@ const WeeklyCalc = (() => {
       defect: d,
       ideal,
       availBase: re.availBase,
+      rate: rateSum,                              // speed standar (bag/mnt) produk di record ini
     };
   };
 
@@ -307,7 +322,8 @@ const WeeklyCalc = (() => {
     };
     // --- Agregasi total (Issue #12: OEE per batch = Σ bukan rata-rata %) ---
     // A = ΣE / ΣC · P = Σaktual / Σ(rate×E) · Q = Σbaik / Σaktual
-    let sumC = 0, sumE = 0, sumGood = 0, sumDefect = 0, sumIdeal = 0, sumAvail = 0;
+    // Speed Standar total = Σ rate (bag/mnt) tiap record/shift yang memuat produk
+    let sumC = 0, sumE = 0, sumGood = 0, sumDefect = 0, sumIdeal = 0, sumAvail = 0, sumRate = 0;
     ms.forEach((m) => {
       sumC += Number(m.C) || 0;
       sumE += Number(m.E) || 0;
@@ -315,6 +331,7 @@ const WeeklyCalc = (() => {
       sumDefect += Number(m.defect) || 0;
       sumIdeal += Number(m.ideal) || 0;
       sumAvail += Number(m.availBase) || 0;
+      sumRate += Number(m.rate) || 0;
     });
     const actual = sumGood + sumDefect;
     const aBatch = sumC > 0 ? (sumE / sumC) * 100 : null;
@@ -329,7 +346,7 @@ const WeeklyCalc = (() => {
 
     const totals = {
       C: sumC, E: sumE, good: sumGood, defect: sumDefect, actual,
-      ideal: sumIdeal, availBase: sumAvail,
+      ideal: sumIdeal, availBase: sumAvail, rateTotal: sumRate,
       a: aBatch, p: pBatch, q: qBatch, oee: oBatch,
       a365: a365Batch, oee365: o365Batch,
     };

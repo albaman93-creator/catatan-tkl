@@ -147,22 +147,18 @@ const WeeklyDashboard = (() => {
     setApq(pf + '365A', all.o365.a, TGT_365.a); setApq(pf + '365P', all.o365.p, TGT_365.p); setApq(pf + '365Q', all.o365.q, TGT_365.q);
   };
 
-  /** Isi kartu ringkasan waktu/output + OEE per batch (Issue #12: rumus Σ). */
+  /** Isi kartu ringkasan waktu/output (Issue #12: rumus Σ). A/P/Q/OEE ada di gauge. */
   const setTotals = (all, prefix) => {
     const t = (all && all.totals) || {};
     const fmt = (n) => (n == null || !Number.isFinite(Number(n))) ? '—' : Number(n).toLocaleString('id-ID');
-    const pct = (n) => (n == null || !Number.isFinite(Number(n))) ? '—' :
-      Number(n).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
     const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
     set(prefix + 'TotE', fmt(t.E));
     set(prefix + 'TotC', fmt(t.C));
+    set(prefix + 'TotRate', fmt(t.rateTotal));
     set(prefix + 'TotActual', fmt(t.actual));
     set(prefix + 'TotIdeal', fmt(t.ideal));
     set(prefix + 'TotGood', fmt(t.good));
-    // OPE: A=ΣE/ΣC · P=Σakt/Σ(rate×E) · Q=baik/akt
-    set(prefix + 'TotOpe', [pct(t.a), pct(t.p), pct(t.q), pct(t.oee)].join(' · '));
-    // 365: A365=ΣE/Σ(shift−Mixing)
-    set(prefix + 'Tot365', [pct(t.a365), pct(t.p), pct(t.q), pct(t.oee365)].join(' · '));
+    set(prefix + 'TotDefect', fmt(t.defect));
   };
 
   // Sumber tiap baris Speed Standar: record terbaru (tanggal, lalu shift) yang memuat produk itu.
@@ -387,35 +383,42 @@ const WeeklyDashboard = (() => {
     return out;
   };
 
-  // Per batch (WO): OPE & 365 dari record-record yang memuat WO itu.
-  //  OPE  = rata-rata OEE tersimpan, dibobot menit produksi WO di tiap record.
-  //  365  = A365 × P × Q; A365 = waktu operasional yang dialokasikan ke WO ÷ (1440 mnt × jumlah hari WO berjalan).
-  const calcBatches = (rows, product) => {
+  // Per batch (WO): OPE & 365 memakai rumus Σ yang sama dengan gauge (Issue #12).
+  //  OPE  = A×P×Q dengan A=ΣE/ΣC · P=Σaktual/Σ(rate×E) · Q=Σbaik/Σaktual
+  //  365  = A365×P×Q dengan A365=ΣE/Σ(shift−Mixing)
+  //  Filter produk/batch (jika ada) membatasi baris produksi yang masuk perhitungan.
+  const calcBatches = (rows, product, shift) => {
     const by = {};
     rows.forEach((r) => {
-      const m = recMetrics(r), pr = prodRows(r);
-      const tAll = pr.reduce((s, x) => s + x.d, 0);
-      if (!tAll) return;
-      const mine = {};
-      pr.filter((x) => x.wo && (!product || WeeklyCalc.matches(x.label, product))).forEach((x) => {
-        const b = (mine[x.wo] = mine[x.wo] || { t: 0, code: x.code });
-        b.t += x.d; if (!b.code) b.code = x.code;
-      });
-      Object.keys(mine).forEach((wo) => {
-        const t = mine[wo].t;
-        const b = (by[wo] = by[wo] || { wo, code: mine[wo].code, so: 0, wso: 0, sp: 0, wsp: 0, sq: 0, wsq: 0, en: 0, dates: new Set(), first: String(r.date) });
-        if (m.o != null) { b.so += m.o * t; b.wso += t; }
-        if (m.p != null) { b.sp += m.p * t; b.wsp += t; }
-        if (m.q != null) { b.sq += m.q * t; b.wsq += t; }
-        b.en += (m.en * t) / tAll;
-        b.dates.add(String(r.date));
-        if (String(r.date) < b.first) b.first = String(r.date);
+      const pr = prodRows(r);
+      pr.forEach((x) => {
+        if (!x.wo) return;
+        if (product && !WeeklyCalc.matches(x.label, product)) return;
+        const b = (by[x.wo] = by[x.wo] || {
+          wo: x.wo, code: x.code, labels: new Set(), recs: new Map(), first: String(r.date || '')
+        });
+        if (x.code) b.code = x.code;
+        if (x.label) b.labels.add(x.label);
+        b.recs.set(r, true);
+        const d = String(r.date || '');
+        if (d && (!b.first || d < b.first)) b.first = d;
       });
     });
     return Object.values(by).map((b) => {
-      const p = b.wsp ? b.sp / b.wsp : null, q = b.wsq ? b.sq / b.wsq : null;
-      const a365 = Math.min(100, (b.en / (DAY_MIN * Math.max(1, b.dates.size))) * 100);
-      return { wo: b.wo, code: b.code, ope: b.wso ? b.so / b.wso : null, o365: p != null && q != null ? (a365 * p * q) / 10000 : null, first: b.first };
+      const recs = [...b.recs.keys()];
+      const labels = [...b.labels];
+      // Satu label penuh (KODE BN) → filter exact; beberapa label → filter kode produk
+      const prodFilter = labels.length === 1 ? labels[0] : (b.code || product || '');
+      const ms = WeeklyCalc.metrics(recs, prodFilter);
+      const dayCount = new Set(ms.map((m) => m.date)).size || 1;
+      const set = WeeklyCalc.calcSet(ms, { days: dayCount, product: true, shift: shift || 'all' });
+      return {
+        wo: b.wo,
+        code: b.code,
+        ope: set.ope.oee,
+        o365: set.o365.oee,
+        first: b.first
+      };
     }).sort((x, y) => (x.first < y.first ? -1 : x.first > y.first ? 1 : x.wo < y.wo ? -1 : 1));
   };
 
@@ -501,7 +504,7 @@ const WeeklyDashboard = (() => {
     const all = calcFor(recs, f, dayDiff(from, to));
     setOeeGauges(all, 'mch');
     setTotals(all, 'mch');
-    const batches = calcBatches(recs, f.product);
+    const batches = calcBatches(recs, f.product, f.shift);
     const counts = {};
     batches.forEach((b) => { if (b.code) counts[b.code] = (counts[b.code] || 0) + 1; });
     renderMachineSpeed(recs, counts, f.product);
@@ -588,7 +591,7 @@ const WeeklyDashboard = (() => {
       for (const key of [...machSel]) {
         const [stage, line] = key.split('-');
         const rows = WeeklyCalc.filterShift(await fetchCached(from, to, stage, line), f.shift);
-        batches.push(...calcBatches(rows, pf).map((b) => ({ ...b, m: key })));
+        batches.push(...calcBatches(rows, pf, f.shift).map((b) => ({ ...b, m: key })));
       }
       if (my !== barSeq) return;
       const list = batches
