@@ -128,7 +128,7 @@ const WeeklyCalc = (() => {
     const line = String(rec.line == null ? '' : rec.line);
     const sA = CONFIG.SHIFT_A[si];
 
-    let B = 0, D = 0, tAll = 0, good = 0, defect = 0;
+    let B = 0, D = 0, tAll = 0, good = 0, defect = 0, mixing = 0;
     const st = slots.map(() => ({ dur: 0, actual: 0, target: 0 }));
     const info = [];
 
@@ -139,10 +139,14 @@ const WeeklyCalc = (() => {
       const cat = Utils.catOf(x.kode);
       const rs = Utils.shiftOf(Utils.parseTime(x.mulai));
       const inShift = rs === si;
-      info.push({ x, g, d, dur, cat, inShift });
+      const keg = String(x.kegiatan || '').trim().toLowerCase();
+      const isMixing = cat === 'planned' && /\bmixing\b/.test(keg);
+      info.push({ x, g, d, dur, cat, inShift, isMixing });
       if (dur == null || !inShift) return;
-      if (cat === 'planned') B += dur;
-      else if (cat === 'unplanned') D += dur;
+      if (cat === 'planned') {
+        B += dur;
+        if (isMixing) mixing += dur;
+      } else if (cat === 'unplanned') D += dur;
       else if (cat === 'prod') {
         tAll += dur;
         const pi = slotIndex(x.batch, slots, false); // sheet: batch kosong tidak dihitung ke P
@@ -154,22 +158,36 @@ const WeeklyCalc = (() => {
       }
     });
 
+    // C = shift − planned (termasuk Mixing) = (shift − Mixing) − planned_filling
     const C = Math.max(sA - B, 0);
     const E = Math.max(C - D, 0);
     const A = C > 0 ? (E / C) * 100 : 0;
+    // Basis OEE 365 = shift − Mixing (Time Available Filling)
+    const availBase = Math.max(sA - mixing, 0);
 
-    let sum = 0, n = 0;
+    let sum = 0, n = 0, sumIdealE = 0, sumActual = 0;
     const perSlot = slots.map((s, i) => {
       const gT = st[i].target > 0 ? st[i].target : st[i].dur * s.rate;
       const p = gT > 0 ? (st[i].actual / gT) * 100 : 0;
       const active = !!s.label && (s.rate > 0 || st[i].target > 0 || st[i].actual > 0);
-      if (active) { sum += p; n++; }
-      return { p, active };
+      if (active) {
+        sum += p; n++;
+        // Ideal batch (Excel): rate × waktu operasional E (bukan hanya durasi kode 2)
+        const rate = effRate(stage, line, s, null) || s.rate || 0;
+        sumIdealE += rate * E;
+        sumActual += st[i].actual;
+      }
+      return { p, active, actual: st[i].actual, rate: s.rate };
     });
     const P = n > 0 ? sum / n : 0;
     const out = good + defect;
     const Q = out > 0 ? (good / out) * 100 : 0;
-    return { A, P, Q, O: (A * P * Q) / 10000, sA, B, D, C, E, tAll, slots, perSlot, info, si, stage, line };
+    return {
+      A, P, Q, O: (A * P * Q) / 10000,
+      sA, B, D, C, E, tAll, mixing, availBase,
+      sumIdealE, sumActual,
+      slots, perSlot, info, si, stage, line
+    };
   };
 
   // ---------- metrik per record (dipakai agregasi) ----------
@@ -196,6 +214,12 @@ const WeeklyCalc = (() => {
         p: sp != null ? sp : (has ? re.P : null),
         q: sq != null ? sq : (has ? re.Q : null),
         o: so != null ? so : (has ? re.O : null),
+        C: has ? re.C : 0,
+        E: has ? re.E : 0,
+        good: has ? re.info.reduce((s, r) => s + r.g, 0) : 0,
+        defect: has ? re.info.reduce((s, r) => s + r.d, 0) : 0,
+        ideal: has ? re.sumIdealE : 0,           // rate × E (Excel batch)
+        availBase: has ? re.availBase : 0,       // shift − Mixing
       };
     }
     if (!has) return null;
@@ -212,10 +236,29 @@ const WeeklyCalc = (() => {
     const p = idx.length ? idx.reduce((s, i) => s + re.perSlot[i].p, 0) / idx.length : 0;
     const q = g + d > 0 ? (g / (g + d)) * 100 : 0;
     const aa = a != null ? a : re.A;
+    // Ideal per batch (Excel): speed standar × waktu operasional E
+    let ideal = 0;
+    if (idx.length) {
+      idx.forEach((i) => {
+        const rate = re.perSlot[i].rate || re.slots[i].rate || 0;
+        ideal += rate * re.E;
+      });
+    } else {
+      // fallback: rate dari label produk yang cocok
+      re.slots.forEach((s, i) => {
+        if (s.label && matches(s.label, product)) ideal += (s.rate || 0) * re.E;
+      });
+    }
     return {
       ...base, w: t,
       en: re.tAll > 0 ? (enWhole * t) / re.tAll : 0,
       a: aa, p, q, o: (aa * p * q) / 10000,
+      C: re.C,
+      E: re.E,
+      good: g,
+      defect: d,
+      ideal,
+      availBase: re.availBase,
     };
   };
 
@@ -262,7 +305,48 @@ const WeeklyCalc = (() => {
       a: mean(v.map((x) => x.a365)), p: mean(v.map((x) => x.p)),
       q: mean(v.map((x) => x.q)), oee: mean(v.map((x) => x.o365)),
     };
-    return { ope, o365, per, n: ms.length };
+    // --- Agregasi total (Issue #12: OEE per batch = Σ bukan rata-rata %) ---
+    // A = ΣE / ΣC · P = Σaktual / Σ(rate×E) · Q = Σbaik / Σaktual
+    let sumC = 0, sumE = 0, sumGood = 0, sumDefect = 0, sumIdeal = 0, sumAvail = 0;
+    ms.forEach((m) => {
+      sumC += Number(m.C) || 0;
+      sumE += Number(m.E) || 0;
+      sumGood += Number(m.good) || 0;
+      sumDefect += Number(m.defect) || 0;
+      sumIdeal += Number(m.ideal) || 0;
+      sumAvail += Number(m.availBase) || 0;
+    });
+    const actual = sumGood + sumDefect;
+    const aBatch = sumC > 0 ? (sumE / sumC) * 100 : null;
+    const pBatch = sumIdeal > 0 ? (actual / sumIdeal) * 100 : null;
+    const qBatch = actual > 0 ? (sumGood / actual) * 100 : null;
+    const oBatch = (aBatch != null && pBatch != null && qBatch != null)
+      ? (aBatch * pBatch * qBatch) / 10000 : null;
+    // OEE 365: A365 = ΣE / Σ(shift − Mixing)
+    const a365Batch = sumAvail > 0 ? (sumE / sumAvail) * 100 : null;
+    const o365Batch = (a365Batch != null && pBatch != null && qBatch != null)
+      ? (a365Batch * pBatch * qBatch) / 10000 : null;
+
+    const totals = {
+      C: sumC, E: sumE, good: sumGood, defect: sumDefect, actual,
+      ideal: sumIdeal, availBase: sumAvail,
+      a: aBatch, p: pBatch, q: qBatch, oee: oBatch,
+      a365: a365Batch, oee365: o365Batch,
+    };
+
+    // Saat filter produk/batch aktif → pakai rumus Σ (Issue #12), bukan rata-rata berbobot
+    if (o.product) {
+      if (aBatch != null) ope.a = aBatch;
+      if (pBatch != null) ope.p = pBatch;
+      if (qBatch != null) ope.q = qBatch;
+      if (oBatch != null) ope.oee = oBatch;
+      if (a365Batch != null) o365.a = a365Batch;
+      if (pBatch != null) o365.p = pBatch;
+      if (qBatch != null) o365.q = qBatch;
+      if (o365Batch != null) o365.oee = o365Batch;
+    }
+
+    return { ope, o365, per, n: ms.length, totals };
   };
 
   // ---------- filter & daftar produk ----------

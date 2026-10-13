@@ -1085,7 +1085,9 @@
           </div>
         </div>
 
-        <div class="sheet-kpi-row" aria-label="Ringkasan OEE">
+        <div class="sheet-kpi-stack" aria-label="Ringkasan OEE">
+          <div class="sheet-kpi-row" aria-label="OEE OPE">
+            <div class="sheet-kpi-row-label" title="OEE OPE — Availability vs waktu terencana (C)">OPE</div>
             <div class="sheet-kpi" data-kpi="A" data-target="90">
               <div class="kpi-fill" style="width:0%"></div>
               <div class="kpi-stars" aria-hidden="true"></div>
@@ -1107,6 +1109,30 @@
               <span>OEE</span><b id="sheetKpiOEE">0,00%</b>
             </div>
           </div>
+          <div class="sheet-kpi-row sheet-kpi-row-365" aria-label="OEE 365">
+            <div class="sheet-kpi-row-label" title="OEE 365 — Availability vs basis shift (dikurangi Mixing bila ada)">365</div>
+            <div class="sheet-kpi" data-kpi="A365" data-target="56">
+              <div class="kpi-fill" style="width:0%"></div>
+              <div class="kpi-stars" aria-hidden="true"></div>
+              <span>A</span><b id="sheetKpiA365">0,00%</b>
+            </div>
+            <div class="sheet-kpi" data-kpi="P365" data-target="98">
+              <div class="kpi-fill" style="width:0%"></div>
+              <div class="kpi-stars" aria-hidden="true"></div>
+              <span>P</span><b id="sheetKpiP365">0,00%</b>
+            </div>
+            <div class="sheet-kpi" data-kpi="Q365" data-target="99.5">
+              <div class="kpi-fill" style="width:0%"></div>
+              <div class="kpi-stars" aria-hidden="true"></div>
+              <span>Q</span><b id="sheetKpiQ365">0,00%</b>
+            </div>
+            <div class="sheet-kpi sheet-kpi-oee" data-kpi="OEE365" data-target="88">
+              <div class="kpi-fill" style="width:0%"></div>
+              <div class="kpi-stars" aria-hidden="true"></div>
+              <span>OEE</span><b id="sheetKpiOEE365">0,00%</b>
+            </div>
+          </div>
+        </div>
 
         <div class="logsheet-topbar" aria-label="Kontrol tampilan log sheet">
           <div class="sec-h">
@@ -1792,6 +1818,43 @@
                   <button type="button" class="btn btn-ghost btn-sm" id="oeeReset">Reset</button>
                 </div>
                 <div class="oee-filter-status" id="oeeStatus"></div>
+                <div class="wd-totals" id="oeeTotals" aria-label="Ringkasan waktu dan output per filter">
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Waktu Operasional (E)</div>
+                    <div class="wd-tot-val" id="oeeTotE">—</div>
+                    <div class="wd-tot-unit">menit</div>
+                  </div>
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Waktu Produksi Terencana (C)</div>
+                    <div class="wd-tot-val" id="oeeTotC">—</div>
+                    <div class="wd-tot-unit">menit</div>
+                  </div>
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Output Aktual (Baik+Defect)</div>
+                    <div class="wd-tot-val" id="oeeTotActual">—</div>
+                    <div class="wd-tot-unit">unit</div>
+                  </div>
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Output Standar (rate×E)</div>
+                    <div class="wd-tot-val" id="oeeTotIdeal">—</div>
+                    <div class="wd-tot-unit">unit</div>
+                  </div>
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Output Baik</div>
+                    <div class="wd-tot-val" id="oeeTotGood">—</div>
+                    <div class="wd-tot-unit">unit</div>
+                  </div>
+                  <div class="wd-tot-card wd-tot-pct">
+                    <div class="wd-tot-label">A · P · Q · OEE (OPE)</div>
+                    <div class="wd-tot-val wd-tot-val-sm" id="oeeTotOpe">—</div>
+                    <div class="wd-tot-unit">ΣE/ΣC · Σakt/Σstd · baik/akt</div>
+                  </div>
+                  <div class="wd-tot-card wd-tot-pct">
+                    <div class="wd-tot-label">A · P · Q · OEE (365)</div>
+                    <div class="wd-tot-val wd-tot-val-sm" id="oeeTot365">—</div>
+                    <div class="wd-tot-unit">ΣE/Σ(shift−Mixing)</div>
+                  </div>
+                </div>
               </div>
 
               <div class="oee-prod-grid">
@@ -1961,6 +2024,43 @@
                   <button type="button" class="btn btn-ghost btn-sm" id="mchReset">Reset</button>
                 </div>
                 <div class="oee-filter-status" id="mchStatus"></div>
+                <div class="wd-totals" id="mchTotals" aria-label="Ringkasan waktu dan output per filter">
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Waktu Operasional (E)</div>
+                    <div class="wd-tot-val" id="mchTotE">—</div>
+                    <div class="wd-tot-unit">menit</div>
+                  </div>
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Waktu Produksi Terencana (C)</div>
+                    <div class="wd-tot-val" id="mchTotC">—</div>
+                    <div class="wd-tot-unit">menit</div>
+                  </div>
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Output Aktual (Baik+Defect)</div>
+                    <div class="wd-tot-val" id="mchTotActual">—</div>
+                    <div class="wd-tot-unit">unit</div>
+                  </div>
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Output Standar (rate×E)</div>
+                    <div class="wd-tot-val" id="mchTotIdeal">—</div>
+                    <div class="wd-tot-unit">unit</div>
+                  </div>
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Output Baik</div>
+                    <div class="wd-tot-val" id="mchTotGood">—</div>
+                    <div class="wd-tot-unit">unit</div>
+                  </div>
+                  <div class="wd-tot-card wd-tot-pct">
+                    <div class="wd-tot-label">A · P · Q · OEE (OPE)</div>
+                    <div class="wd-tot-val wd-tot-val-sm" id="mchTotOpe">—</div>
+                    <div class="wd-tot-unit">ΣE/ΣC · Σakt/Σstd · baik/akt</div>
+                  </div>
+                  <div class="wd-tot-card wd-tot-pct">
+                    <div class="wd-tot-label">A · P · Q · OEE (365)</div>
+                    <div class="wd-tot-val wd-tot-val-sm" id="mchTot365">—</div>
+                    <div class="wd-tot-unit">ΣE/Σ(shift−Mixing)</div>
+                  </div>
+                </div>
               </div>
 
               <div class="oee-prod-grid">

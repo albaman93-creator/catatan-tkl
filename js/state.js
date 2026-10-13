@@ -42,6 +42,7 @@ const State = (() => {
       'fDate', 'fLine', 'fStage', 'fMesinNama', 'fMesinKode',
       'sheetUnifiedControl', 'sheetShift', 'sheetLine', 'sheetDateTrigger', 'sheetDateText',
       'sheetKpiA', 'sheetKpiP', 'sheetKpiQ', 'sheetKpiOEE',
+      'sheetKpiA365', 'sheetKpiP365', 'sheetKpiQ365', 'sheetKpiOEE365',
       'op1','op2','op3','op4','op5','op6',
       'prodName1','prodBn1','prodRate1','prodUkuran1','prodWo1','prodName2','prodBn2','prodRate2','prodUkuran2','prodWo2','prodName3','prodBn3','prodRate3','prodUkuran3','prodWo3',
       'thProd1','thProd2','thProd3',

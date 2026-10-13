@@ -172,11 +172,34 @@ const UI = (() => {
     if (State.el.sheetKpiQ && State.el.oM) State.el.sheetKpiQ.textContent = `${State.el.oM.textContent}%`;
     if (State.el.sheetKpiOEE && State.el.oee) State.el.sheetKpiOEE.textContent = State.el.oee.textContent;
 
+    // KPI OEE 365 (A365 / P / Q / OEE365)
+    if (State.el.sheetKpiA365 && State.el.o365F) State.el.sheetKpiA365.textContent = State.el.o365F.textContent.replace(/\s*%?\s*$/, '') + (State.el.o365F.textContent.includes('%') ? '' : '%');
+    // o365F sudah berisi "xx,xx %"; normalisasi agar format seragam
+    if (State.el.sheetKpiA365 && State.el.o365F) {
+      const raw = String(State.el.o365F.textContent || '').replace('%', '').trim();
+      State.el.sheetKpiA365.textContent = raw ? raw + '%' : '0,00%';
+    }
+    if (State.el.sheetKpiP365 && State.el.o365P) {
+      const raw = String(State.el.o365P.textContent || '').replace('%', '').trim();
+      State.el.sheetKpiP365.textContent = raw ? raw + '%' : '0,00%';
+    }
+    if (State.el.sheetKpiQ365 && State.el.o365Q) {
+      const raw = String(State.el.o365Q.textContent || '').replace('%', '').trim();
+      State.el.sheetKpiQ365.textContent = raw ? raw + '%' : '0,00%';
+    }
+    if (State.el.sheetKpiOEE365 && State.el.oee365) {
+      State.el.sheetKpiOEE365.textContent = State.el.oee365.textContent;
+    }
+
     // Health bar + warna dinamis per KPI (merah/kuning/hijau/biru sesuai target)
     updateKpiHealthBar(State.el.sheetKpiA && State.el.sheetKpiA.closest('.sheet-kpi'), State.el.oF && State.el.oF.textContent);
     updateKpiHealthBar(State.el.sheetKpiP && State.el.sheetKpiP.closest('.sheet-kpi'), State.el.oITotal && State.el.oITotal.textContent);
     updateKpiHealthBar(State.el.sheetKpiQ && State.el.sheetKpiQ.closest('.sheet-kpi'), State.el.oM && State.el.oM.textContent);
     updateKpiHealthBar(State.el.sheetKpiOEE && State.el.sheetKpiOEE.closest('.sheet-kpi'), State.el.oee && State.el.oee.textContent);
+    updateKpiHealthBar(State.el.sheetKpiA365 && State.el.sheetKpiA365.closest('.sheet-kpi'), State.el.o365F && State.el.o365F.textContent);
+    updateKpiHealthBar(State.el.sheetKpiP365 && State.el.sheetKpiP365.closest('.sheet-kpi'), State.el.o365P && State.el.o365P.textContent);
+    updateKpiHealthBar(State.el.sheetKpiQ365 && State.el.sheetKpiQ365.closest('.sheet-kpi'), State.el.o365Q && State.el.o365Q.textContent);
+    updateKpiHealthBar(State.el.sheetKpiOEE365 && State.el.sheetKpiOEE365.closest('.sheet-kpi'), State.el.oee365 && State.el.oee365.textContent);
   };
 
   // ====== KPI HEALTH BAR ======

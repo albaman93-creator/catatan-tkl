@@ -147,6 +147,24 @@ const WeeklyDashboard = (() => {
     setApq(pf + '365A', all.o365.a, TGT_365.a); setApq(pf + '365P', all.o365.p, TGT_365.p); setApq(pf + '365Q', all.o365.q, TGT_365.q);
   };
 
+  /** Isi kartu ringkasan waktu/output + OEE per batch (Issue #12: rumus Σ). */
+  const setTotals = (all, prefix) => {
+    const t = (all && all.totals) || {};
+    const fmt = (n) => (n == null || !Number.isFinite(Number(n))) ? '—' : Number(n).toLocaleString('id-ID');
+    const pct = (n) => (n == null || !Number.isFinite(Number(n))) ? '—' :
+      Number(n).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+    const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
+    set(prefix + 'TotE', fmt(t.E));
+    set(prefix + 'TotC', fmt(t.C));
+    set(prefix + 'TotActual', fmt(t.actual));
+    set(prefix + 'TotIdeal', fmt(t.ideal));
+    set(prefix + 'TotGood', fmt(t.good));
+    // OPE: A=ΣE/ΣC · P=Σakt/Σ(rate×E) · Q=baik/akt
+    set(prefix + 'TotOpe', [pct(t.a), pct(t.p), pct(t.q), pct(t.oee)].join(' · '));
+    // 365: A365=ΣE/Σ(shift−Mixing)
+    set(prefix + 'Tot365', [pct(t.a365), pct(t.p), pct(t.q), pct(t.oee365)].join(' · '));
+  };
+
   // Sumber tiap baris Speed Standar: record terbaru (tanggal, lalu shift) yang memuat produk itu.
   // Klik baris → buka log sheet record tersebut.
   const speedLatest = (rows, keyFn, product) => {
@@ -255,6 +273,7 @@ const WeeklyDashboard = (() => {
     const recs = WeeklyCalc.filterShift(oeeRaw, f.shift);
     const all = calcFor(recs, f, dayDiff(from, to));
     setOeeGauges(all);
+    setTotals(all, 'oee');
     renderSpeed(recs, f.product);
     const byMonth = {};
     recs.forEach((r) => { const k = String(r.date).slice(0, 7); (byMonth[k] = byMonth[k] || []).push(r); });
@@ -481,6 +500,7 @@ const WeeklyDashboard = (() => {
     const recs = WeeklyCalc.filterShift(mchRaw, f.shift);
     const all = calcFor(recs, f, dayDiff(from, to));
     setOeeGauges(all, 'mch');
+    setTotals(all, 'mch');
     const batches = calcBatches(recs, f.product);
     const counts = {};
     batches.forEach((b) => { if (b.code) counts[b.code] = (counts[b.code] || 0) + 1; });

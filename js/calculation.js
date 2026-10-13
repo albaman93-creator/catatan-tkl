@@ -330,21 +330,25 @@ const Calculation = (() => {
     setKpi('sheetKpiP', Utils.nf2(avgPerfI) + '%');
     setKpi('sheetKpiQ', Utils.nf2(M) + '%');
     setKpi('sheetKpiOEE', Utils.nf2(oee) + '%');
+    // Baris OEE 365 (A365 = E ÷ basis shift − Mixing; P & Q sama dengan OPE)
+    setKpi('sheetKpiA365', Utils.nf2(a365) + '%');
+    setKpi('sheetKpiP365', Utils.nf2(avgPerfI) + '%');
+    setKpi('sheetKpiQ365', Utils.nf2(M) + '%');
+    setKpi('sheetKpiOEE365', Utils.nf2(oee365) + '%');
     // Health-bar warna (jika UI tersedia)
+    const kpiPairs = [
+      ['sheetKpiA', sF, 90], ['sheetKpiP', avgPerfI, 98], ['sheetKpiQ', M, 99.5], ['sheetKpiOEE', oee, 88],
+      ['sheetKpiA365', a365, 56], ['sheetKpiP365', avgPerfI, 98], ['sheetKpiQ365', M, 99.5], ['sheetKpiOEE365', oee365, 88],
+    ];
     if (typeof UI !== 'undefined' && UI.updateKpiHealthBar) {
-      const bar = (id, val) => {
-        const node = State.el[id];
+      kpiPairs.forEach(([id, val]) => {
+        const node = State.el[id] || document.getElementById(id);
         const card = node && node.closest ? node.closest('.sheet-kpi') : null;
         if (card) UI.updateKpiHealthBar(card, String(val));
-      };
-      bar('sheetKpiA', sF);
-      bar('sheetKpiP', avgPerfI);
-      bar('sheetKpiQ', M);
-      bar('sheetKpiOEE', oee);
+      });
     } else {
-      // Fallback: update fill lebar sederhana
-      [['sheetKpiA', sF, 90], ['sheetKpiP', avgPerfI, 98], ['sheetKpiQ', M, 99.5], ['sheetKpiOEE', oee, 88]].forEach(([id, val, tgt]) => {
-        const node = State.el[id];
+      kpiPairs.forEach(([id, val, tgt]) => {
+        const node = State.el[id] || document.getElementById(id);
         const card = node && node.closest ? node.closest('.sheet-kpi') : null;
         if (!card) return;
         const fill = card.querySelector('.kpi-fill');
