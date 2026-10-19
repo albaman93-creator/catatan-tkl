@@ -105,11 +105,21 @@ const Pica = (() => {
             id: 'ms_' + k,
             produk, batch, problem, freq: 0,
             date: String(r.date || r.rec_date || ''),
+            shift: r.shift != null && r.shift !== '' ? r.shift : '',
             why1: '', why2: '', why3: '', corrective: '', preventive: '', pic: '', status: 'Open',
             kind: 'minor', line: String(r.line), stage: String(r.tahapan || r.stage || ''),
           });
         }
-        map.get(k).freq += freq;
+        const entry = map.get(k);
+        entry.freq += freq;
+        const sh = r.shift != null && r.shift !== '' ? String(r.shift) : '';
+        if (sh) {
+          if (!entry.shift) entry.shift = sh;
+          else {
+            const parts = String(entry.shift).split(',').map((s) => s.trim()).filter(Boolean);
+            if (!parts.includes(sh)) entry.shift = parts.concat(sh).join(',');
+          }
+        }
       });
     });
     return Array.from(map.values()).sort((a, b) => b.freq - a.freq);
@@ -148,7 +158,8 @@ const Pica = (() => {
   const cell = (v) => (v ? `<td>${esc(v)}</td>` : '<td class="pica-null"></td>');
 
   // ===== Bar chart sederhana (nilai per produk) =====
-  const barChart = (svgId, pairs, valueLabel, color) => {
+  // opts: { clickable, selectedLabel }
+  const barChart = (svgId, pairs, valueLabel, color, opts = {}) => {
     const svg = $(svgId);
     if (!svg) return;
     const items = pairs.slice(0, 12);
@@ -167,22 +178,150 @@ const Pica = (() => {
       svg.innerHTML = s + `<text x="${W / 2}" y="${T + ph / 2}" fill="#64748b" font-size="11" text-anchor="middle">Tidak ada data</text>`;
       return;
     }
+    const clickable = !!opts.clickable;
+    const selected = opts.selectedLabel || '';
     items.forEach((it, i) => {
       const x = L + i * slot + 12, w = slot - 24, cx = x + w / 2;
       const y = Y(it.v);
-      s += `<rect x="${x}" y="${y}" width="${w}" height="${T + ph - y}" rx="3" fill="${color}">`
-        + `<title>${esc(it.label)} · ${it.v} ${valueLabel}</title></rect>`
-        + `<text x="${cx}" y="${y - 5}" fill="#e2e8f0" font-size="10" font-weight="700" text-anchor="middle">${it.v}</text>`
-        + `<text x="${cx}" y="${T + ph + 14}" fill="#94a3b8" font-size="9" text-anchor="middle">${esc(it.label)}</text>`;
+      const isSel = selected && it.label === selected;
+      const fill = isSel ? '#fb7185' : color;
+      const stroke = isSel ? ' stroke="#fecdd3" stroke-width="2"' : '';
+      const tip = clickable
+        ? `${esc(it.label)} · ${it.v} ${valueLabel} — klik untuk detail`
+        : `${esc(it.label)} · ${it.v} ${valueLabel}`;
+      // data-label on rect; pointer-events all; invisible hit area full height optional
+      const dl = esc(it.label).replace(/"/g, '&quot;');
+      s += `<g class="${clickable ? 'bd-bar-hit' : ''}" data-label="${dl}" style="${clickable ? 'cursor:pointer' : ''}">`
+        + `<rect class="bd-bar-rect" data-label="${dl}" x="${x}" y="${y}" width="${w}" height="${Math.max(1, T + ph - y)}" rx="3" fill="${fill}"${stroke} style="pointer-events:all">`
+        + `<title>${tip}</title></rect>`
+        // full-column hit target (transparent) so label area also clicks
+        + (clickable
+          ? `<rect class="bd-bar-hitarea" data-label="${dl}" x="${x}" y="${T}" width="${w}" height="${ph}" fill="transparent" style="cursor:pointer;pointer-events:all"></rect>`
+          : '')
+        + `<text x="${cx}" y="${y - 5}" fill="#e2e8f0" font-size="10" font-weight="700" text-anchor="middle" style="pointer-events:none">${it.v}</text>`
+        + `<text x="${cx}" y="${T + ph + 14}" fill="${isSel ? '#fecdd3' : '#94a3b8'}" font-size="9" text-anchor="middle" style="pointer-events:none">${esc(it.label)}</text>`
+        + `</g>`;
     });
     svg.innerHTML = s;
+  };
+
+  // ===== Detail breakdown per masalah untuk satu produk (panel di samping) =====
+  let selectedBdProd = '';
+
+  const setChartsRowMode = (open) => {
+    const row = $('picaChartsRow');
+    if (row) row.classList.toggle('has-bd-detail', !!open);
+  };
+
+  const hideBdDetail = () => {
+    selectedBdProd = '';
+    const wrap = $('bdDetailWrap');
+    if (wrap) wrap.hidden = true;
+    setChartsRowMode(false);
+  };
+
+  const redrawBdMain = (selected) => {
+    const bdByProd = {};
+    listBd.forEach((p) => { bdByProd[p.produk] = (bdByProd[p.produk] || 0) + (p.dur || 0); });
+    barChart(
+      'bdChartSvg',
+      Object.entries(bdByProd).map(([label, v]) => ({ label, v })).sort((a, b) => b.v - a.v),
+      'mnt',
+      '#f43f5e',
+      { clickable: true, selectedLabel: selected || '' }
+    );
+  };
+
+  const renderBdDetail = (produk) => {
+    const wrap = $('bdDetailWrap');
+    const svg = $('bdDetailSvg');
+    if (!wrap || !svg) return;
+    selectedBdProd = produk || '';
+    if (!produk) { hideBdDetail(); return; }
+
+    const rows = listBd.filter((p) => String(p.produk || '') === produk);
+    const byProb = new Map();
+    rows.forEach((p) => {
+      const key = String(p.problem || '(tanpa keterangan)').trim() || '(tanpa keterangan)';
+      if (!byProb.has(key)) byProb.set(key, { problem: key, dur: 0, items: [] });
+      const e = byProb.get(key);
+      e.dur += Number(p.dur) || 0;
+      e.items.push(p);
+    });
+    const items = [...byProb.values()].sort((a, b) => b.dur - a.dur).slice(0, 15);
+
+    const set = (id, t) => { const el = $(id); if (el) el.textContent = t; };
+    set('bdDetailTitle', `Breakdown Durasi (menit) - Produk ${produk}`);
+    set('bdDetailSub', '');
+    wrap.hidden = false;
+    setChartsRowMode(true);
+
+    const slot = 90, L = 44, R = 12, T = 28, B = 48, H = 240, ph = H - T - B;
+    const W = Math.max(320, L + R + Math.max(1, items.length) * slot);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.style.width = W > 480 ? W + 'px' : '100%';
+    const max = Math.max(1, ...items.map((x) => x.dur));
+    // nice scale similar to reference (round up)
+    const top = max <= 10 ? 10 : max <= 30 ? Math.ceil(max / 10) * 10 : Math.ceil(max / 20) * 20;
+    const Y = (v) => T + ph - (v / top) * ph;
+    let s = '<g stroke="#334155" stroke-width="1">';
+    for (let i = 0; i <= 4; i++) {
+      const vv = (top * i) / 4;
+      s += `<line x1="${L}" y1="${Y(vv)}" x2="${W - R}" y2="${Y(vv)}"/>`;
+    }
+    s += '</g><g fill="#64748b" font-size="10" text-anchor="end">';
+    for (let i = 0; i <= 4; i++) {
+      const vv = (top * i) / 4;
+      s += `<text x="${L - 6}" y="${Y(vv) + 3}">${Math.round(vv)}</text>`;
+    }
+    s += `</g><text x="14" y="${T + ph / 2}" fill="#64748b" font-size="10" text-anchor="middle" transform="rotate(-90 14 ${T + ph / 2})">Menit</text>`;
+
+    if (!items.length) {
+      svg.innerHTML = s + `<text x="${W / 2}" y="${T + ph / 2}" fill="#64748b" font-size="11" text-anchor="middle">Tidak ada rincian</text>`;
+      set('bdDetailStatus', '');
+      return;
+    }
+
+    items.forEach((it) => {
+      const i = items.indexOf(it);
+      const x = L + i * slot + 16, w = slot - 28, cx = x + w / 2;
+      const y = Y(it.dur);
+      const lines = it.items.slice(0, 8).map((p) => {
+        const batch = p.batch ? ` ${p.batch}` : '';
+        const dt = p.date ? fmtD(p.date) : '—';
+        const sh = p.shift != null && p.shift !== '' ? ` S${p.shift}` : '';
+        return `${produk}${batch} ${dt}${sh} · ${p.dur || 0} mnt`;
+      });
+      if (it.items.length > 8) lines.push(`… +${it.items.length - 8} kejadian lain`);
+      const tip = `${esc(it.problem)} · total ${it.dur} mnt (${it.items.length}x) | ` + lines.map(esc).join(' | ');
+      const shortLbl = it.problem.length > 16 ? it.problem.slice(0, 15) + '…' : it.problem;
+      s += `<g>`
+        + `<rect x="${x}" y="${y}" width="${w}" height="${Math.max(2, T + ph - y)}" rx="4" fill="#ed405c">`
+        + `<title>${tip}</title></rect>`
+        + `<text x="${cx}" y="${y - 6}" fill="#e2e8f0" font-size="12" font-weight="700" text-anchor="middle">${it.dur}</text>`
+        + `<text x="${cx}" y="${T + ph + 16}" fill="#94a3b8" font-size="10" text-anchor="middle">${esc(shortLbl)}</text>`
+        + `</g>`;
+    });
+    svg.innerHTML = s;
+    set('bdDetailStatus', `${items.length} jenis masalah · total ${items.reduce((a, b) => a + b.dur, 0)} mnt`);
+  };
+
+  const showBdDetail = (produk) => {
+    if (!produk) { hideBdDetail(); redrawBdMain(''); return; }
+    if (selectedBdProd === produk) {
+      hideBdDetail();
+      redrawBdMain('');
+      return;
+    }
+    renderBdDetail(produk);
+    redrawBdMain(produk);
   };
 
   const renderMsTable = () => {
     const body = $('msBody');
     if (!body) return;
     if (!listMs.length) {
-      body.innerHTML = '<tr><td colspan="14">Belum ada minor stop — isi kolom <b>MS</b> (angka) di log sheet, lalu buka lagi halaman ini.</td></tr>';
+      body.innerHTML = '<tr><td colspan="15">Belum ada minor stop — isi kolom <b>MS</b> (angka) di log sheet, lalu buka lagi halaman ini.</td></tr>';
       return;
     }
     body.innerHTML = listMs.map((p, i) => {
@@ -190,6 +329,7 @@ const Pica = (() => {
         + `<td class="ctr"><button type="button" class="btn btn-ghost btn-sm ms-edit" data-i="${i}" title="Edit minor stop">✍️</button></td>`
         + `<td class="ctr">${i + 1}.</td>`
         + `<td class="mono pica-date">${esc(fmtShort(p.date))}</td>`
+        + `<td class="ctr mono">${esc(p.shift != null && p.shift !== '' ? p.shift : '—')}</td>`
         + `<td><b>${esc(p.produk)}</b></td>`
         + `<td class="mono">${esc(p.batch || '—')}</td><td class="pica-problem">${esc(p.problem)}</td>`
         + `<td class="ctr"><b>${p.freq || 1}</b></td>`
@@ -202,7 +342,7 @@ const Pica = (() => {
     const body = $('picaBody');
     if (!body) return;
     if (!listBd.length) {
-      body.innerHTML = '<tr><td colspan="14">Tidak ada breakdown (&gt;10 mnt) pada rentang ini.</td></tr>';
+      body.innerHTML = '<tr><td colspan="15">Tidak ada breakdown (&gt;10 mnt) pada rentang ini.</td></tr>';
       return;
     }
     body.innerHTML = listBd.map((p, i) => {
@@ -212,6 +352,7 @@ const Pica = (() => {
         + `<td class="ctr"><button type="button" class="btn btn-ghost btn-sm pica-edit" data-i="${i}" title="Isi / ubah Why-Why">✍️</button></td>`
         + `<td class="ctr">${i + 1}.</td>`
         + `<td class="mono pica-date" title="${esc(fmtD(p.date))}">${esc(fmtShort(p.date))}</td>`
+        + `<td class="ctr mono">${esc(p.shift != null && p.shift !== '' ? p.shift : '—')}</td>`
         + `<td><button type="button" class="pica-link bd-link"`
         +   ` data-i="${i}"`
         +   ` data-date="${esc(p.date)}"`
@@ -422,7 +563,8 @@ const Pica = (() => {
     const bdByProd = {};
     listBd.forEach((p) => { bdByProd[p.produk] = (bdByProd[p.produk] || 0) + (p.dur || 0); });
     barChart('msChartSvg', Object.entries(msByProd).map(([label, v]) => ({ label, v })).sort((a, b) => b.v - a.v), 'kali', '#f59e0b');
-    barChart('bdChartSvg', Object.entries(bdByProd).map(([label, v]) => ({ label, v })).sort((a, b) => b.v - a.v), 'mnt', '#f43f5e');
+    hideBdDetail();
+    redrawBdMain('');
 
     renderMsTable();
     renderBdTable();
@@ -433,7 +575,7 @@ const Pica = (() => {
       if (st) { st.textContent = m; st.className = 'oee-filter-status' + (err ? ' err' : ''); }
     };
     say('msChartStatus', listMs.length ? '' : 'Belum ada minor (input manual)');
-    say('bdChartStatus', listBd.length ? '' : 'Tidak ada breakdown');
+    say('bdChartStatus', listBd.length ? 'Klik batang produk untuk melihat rincian masalah' : 'Tidak ada breakdown');
 
     const my = ++seq;
     try {
@@ -485,6 +627,22 @@ const Pica = (() => {
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
   else bind();
+
+  // Event: klik batang produk (delegation) + tutup detail
+  const onBdChartClick = (e) => {
+    const el = e.target.closest('[data-label]');
+    if (!el) return;
+    const label = el.getAttribute('data-label');
+    if (label) showBdDetail(label);
+  };
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'bdDetailClose') {
+      showBdDetail('');
+      return;
+    }
+    const wrap = $('bdChartWrap') || $('bdChartSvg');
+    if (wrap && wrap.contains(e.target)) onBdChartClick(e);
+  });
 
   return { render };
 })();

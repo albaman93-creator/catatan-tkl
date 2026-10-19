@@ -163,14 +163,30 @@ const Storage = (() => {
       State.el.op4.value = ''; State.el.op5.value = ''; State.el.op6.value = '';
     }
 
-    // Mesin
+    // Mesin — rebuild dropdown dulu, lalu terapkan nilai tersimpan
     const mn = State.el.fMesinNama || document.getElementById('fMesinNama');
     const mk = State.el.fMesinKode || document.getElementById('fMesinKode');
+    if (typeof UI !== 'undefined' && typeof UI.fillMachineName === 'function') {
+      UI.fillMachineName();
+    }
     if (d && d.mesin) {
-      if (mn) mn.value = d.mesin.nama || '';
+      if (mn) {
+        const nama = d.mesin.nama || '';
+        // Pastikan opsi ada (data lama / nama custom)
+        if (mn.tagName === 'SELECT' && nama) {
+          const exists = Array.from(mn.options).some((o) => o.value === nama);
+          if (!exists) {
+            const opt = document.createElement('option');
+            opt.value = nama;
+            opt.textContent = nama;
+            mn.appendChild(opt);
+          }
+        }
+        mn.value = nama;
+      }
       if (mk) mk.value = d.mesin.kode || '';
     } else {
-      if (mn) mn.value = '';
+      if (mn && !mn.value) mn.value = '';
       if (mk) mk.value = '';
     }
 

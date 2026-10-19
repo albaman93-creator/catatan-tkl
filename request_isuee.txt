@@ -1,0 +1,140 @@
+atur ulang urutan dashboard weekly meeting menjadi urutan yang sebelum nya pada urutan dashboard
+misal saya pilih Filling
+
+⚙️
+MESIN FILLING LINE 1
+
+MESIN FILLING LINE 1
+Mesin Automatic Form Fill Seal Machine Shinva RSYG2-1-23005
+WEEKLY OEE OPE ,SPEED STANDAR (BAG / MENIT) ,WEEKLY OEE 365
+Planned Shutdown Filling – Line 1
+Planned Shutdown Activity – Line 1
+Unplanned Shutdown Filling – Line 1
+Unplanned Shutdown Activity – Line 1
+Minor Stoppage — Frekuensi per Produk · Filling L1
+Breakdown — Durasi per Produk (mnt) · Filling L1
+Minor Stoppage OEE Filling - Line 1
+PICA Problem OEE (Breakdown >10 mnt) Filling - Line 1
+Capaian OEE OPE & OEE 365 · Semua Produk · Filling Line 1 · Okt 2026
+
+menjadi urutanya
+
+
+⚙️
+MESIN FILLING LINE 1
+
+MESIN FILLING LINE 1
+Mesin Automatic Form Fill Seal Machine Shinva RSYG2-1-23005
+WEEKLY OEE OPE ,SPEED STANDAR (BAG / MENIT) ,WEEKLY OEE 365
+Planned Shutdown Filling – Line 1
+Planned Shutdown Activity – Line 1
+Unplanned Shutdown Filling – Line 1
+Unplanned Shutdown Activity – Line 1
+PICA Problem OEE (Breakdown >10 mnt) Filling - Line 1
+Breakdown — Durasi per Produk (mnt) · Filling L1
+Minor Stoppage — Frekuensi per Produk · Filling L1
+Minor Stoppage OEE Filling - Line 1
+Capaian OEE OPE & OEE 365 · Semua Produk · Filling Line 1 · Okt 2026
+
+
+#2 perbaikan tabel pica 
+pada bagian tabel "PICA Problem OEE (Breakdown >10 mnt) Filling - Line 1"
+tambahkan kolom tabel lagi 
+sebelum nya :
+
+
+No.	Date	Produk	No. Batch	Problem	Durasi (min) 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+1.	12/10	    —	    —	        eror	30		       -     -       -              -                   -               Open
+
+menjadi :
+
+No.	Date  shift	Produk	No. Batch	Problem	Durasi (min) 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+1.	12/10	 2   —	    —	        eror	30		       -     -       -              -                   -               Open
+
+
+dan pada tabel "Minor Stoppage OEE Filling - Line 1" sebelumnya :
+
+No.	Date  shift	Produk	No. Batch	Problem	            Frekuensi 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+1.	12/10	        —	    —	    Filling Lot A	        15		-		 -		 -             -                   -                Open
+
+
+#3 pastikan tabel pica mengambil data yang benar 
+
+ada kesalahan dalam pengambilan data 
+
+PICA Problem OEE (Breakdown >10 mnt) Filling - Line 2
+✓ 2 breakdown · 0 sudah diisi analisis Why-Why
+	No.	Date	Shift	Produk	No. Batch	Problem	Durasi (min) 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+	1.	02/10	1	        VPEL1	L027108	    PMS alarm merah	15							                                            Open
+	2.	02/10	2	        VPEL1	L027108	    Alarm PMS	15	                                                                        Open
+
+    di data oee 
+    tanggal 2/10 shift 1 
+            VPEL1 L027108	
+            % Availability
+            A	Waktu Operasional Pabrik (menit)	510 mnt
+            B	Waktu Berhenti Terencana (kode 5,6,7,8)	220 mnt
+            C	Waktu Produksi Terencana (A − B)	290 mnt
+            D	Waktu Berhenti Tidak Terencana (kode 1,3,4,9)	15 mnt (hanya ada 1 kejadian)
+            E	Waktu Operasional (C − D)	275 mnt
+            F	% A → (E ÷ C)
+            Target 90%	94,83 %
+           kolom MASALAH :PMS alarm merah
+
+   di data oee 
+    tanggal 2/10 shift 2 
+    VPEL1 L027108	
+            % Availability
+            A	Waktu Operasional Pabrik (menit)	480 mnt
+            B	Waktu Berhenti Terencana (kode 5,6,7,8)	80 mnt
+            C	Waktu Produksi Terencana (A − B)	400 mnt
+            D	Waktu Berhenti Tidak Terencana (kode 1,3,4,9)	15 mnt (ada di shift 2)
+            E	Waktu Operasional (C − D)	385 mnt
+            F	% A → (E ÷ C)
+            Target 90%	96,25 %
+        kolom MASALAH :Alarm PMS
+
+ehh sudah benar :
+
+
+
+#4 perbaruan pada tabel "Capaian OEE OPE & OEE 365 · Semua Produk · Filling Line 2 · Okt 2026"
+
+Capaian OEE OPE & OEE 365 · Semua Produk · Filling Line 2 · Okt 2026
+Produk
+Semua produk — klik baris pada tabel Speed Standar untuk memfilter
+Mesin (boleh pilih banyak)
+F1 · Filling L1
+F2 · Filling L2
+F4 · Filling L4
+K1 · Kemas L1
+K2 · Kemas L2
+K4 · Kemas L4
+✓ 2 batch WO ditampilkan
+OEE
+OEE_365
+0%  50% 100%    150%    
+89,1%   66,7%  F2·L027108   
+102,3%  62,3%   F2·L027109
+
+bisakah setiap nama grafik bar per bacth nya di tambahkan nama produk nya jangan no batch saja .
+
+menjadi :
+
+
+Capaian OEE OPE & OEE 365 · Semua Produk · Filling Line 2 · Okt 2026
+Produk
+Semua produk — klik baris pada tabel Speed Standar untuk memfilter
+Mesin (boleh pilih banyak)
+F1 · Filling L1
+F2 · Filling L2
+F4 · Filling L4
+K1 · Kemas L1
+K2 · Kemas L2
+K4 · Kemas L4
+✓ 2 batch WO ditampilkan
+OEE
+OEE_365
+0%  50% 100%    150%    
+89,1%   66,7%   F2 VPEL1_L027108   
+102,3%  62,3%   F2 VPEL1_L027109

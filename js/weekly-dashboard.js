@@ -453,7 +453,7 @@ const WeeklyDashboard = (() => {
   const batchBarSvg = (id, list) => {
     const svg = $(id);
     if (!svg) return;
-    const slot = 46, L = 44, R = 10, T = 20, B = 58, H = 250, ph = H - T - B;
+    const slot = 56, L = 44, R = 10, T = 20, B = 72, H = 265, ph = H - T - B;
     const W = Math.max(560, L + R + list.length * slot);
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.removeAttribute('height');
@@ -475,7 +475,13 @@ const WeeklyDashboard = (() => {
         s += `<rect x="${x}" y="${y}" width="16" height="${T + ph - y}" rx="2" fill="${c}"/>`
           + `<text x="${x + 8}" y="${y - 4}" fill="#e2e8f0" font-size="8" font-weight="600" transform="rotate(-90 ${x + 8} ${y - 4})">${fmtPct(v, 1)}</text>`;
       });
-      const lbl = (b.m ? machineShort(b.m) + '·' : '') + b.wo;
+      // Label: mesin + kode produk + WO/batch, contoh: F2 VPEL1_L027108
+      const codePart = b.code ? String(b.code).trim() : '';
+      const woPart = String(b.wo || '').trim();
+      const prodBatch = codePart && woPart
+        ? (woPart.toUpperCase().startsWith(codePart.toUpperCase()) ? woPart : codePart + '_' + woPart)
+        : (woPart || codePart || '—');
+      const lbl = (b.m ? machineShort(b.m) + ' ' : '') + prodBatch;
       s += `<text x="${cx}" y="${T + ph + 13}" fill="#94a3b8" font-size="9" text-anchor="end" transform="rotate(-40 ${cx} ${T + ph + 13})">${Utils.escapeHtml(lbl)}</text>`;
     });
     svg.innerHTML = s;

@@ -48,4 +48,42 @@
 
 .pica-link:active { transform: translateY(1px); }
 
-.pica-charts-row { margin-top: 14px; }
+
+/* ===== Breakdown detail (klik batang produk) — panel di samping ===== */
+.pica-charts-row {
+  margin-top: 14px;
+  grid-template-columns: 1fr 1fr;
+}
+.pica-charts-row.has-bd-detail {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+@media (max-width: 1100px) {
+  .pica-charts-row.has-bd-detail {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 900px) {
+  .pica-charts-row,
+  .pica-charts-row.has-bd-detail {
+    grid-template-columns: 1fr;
+  }
+}
+.bd-chart-card,
+.bd-detail-card { min-width: 0; }
+.bd-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.bd-detail-head .shutdown-title { margin: 0; flex: 1; }
+.bd-detail-sub {
+  font-size: 12px;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: 6px;
+  min-height: 0;
+}
+.bd-detail-chart { overflow-x: auto; }
+.bd-bar-hit { cursor: pointer; }
+.bd-bar-hit:hover .bd-bar-rect { filter: brightness(1.12); }
