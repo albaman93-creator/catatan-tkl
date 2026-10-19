@@ -473,7 +473,7 @@ const WeeklyDashboard = (() => {
         if (!Number.isFinite(v)) return;
         const y = Y(v);
         s += `<rect x="${x}" y="${y}" width="16" height="${T + ph - y}" rx="2" fill="${c}"/>`
-          + `<text x="${x + 8}" y="${y - 4}" fill="#e2e8f0" font-size="8" font-weight="600" transform="rotate(-90 ${x + 8} ${y - 4})">${fmtPct(v, 1)}</text>`;
+          + `<text x="${x + 8}" y="${y - 4}" fill="#e2e8f0" font-size="8" font-weight="600" transform="rotate(-90 ${x + 8} ${y - 4})">${fmtPct(v, 2)}</text>`;
       });
       // Label: mesin + kode produk + WO/batch, contoh: F2 VPEL1_L027108
       const codePart = b.code ? String(b.code).trim() : '';

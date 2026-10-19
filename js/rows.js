@@ -174,7 +174,12 @@ const Rows = (() => {
    * Isi No. WO baris mengikuti Produk yang dipilih.
    * Selalu dijalankan saat produk dipilih — tidak tergantung Kode.
    */
-  const applyWoFromBatch = (tr) => {
+  /**
+   * Isi No. WO baris mengikuti Produk yang dipilih.
+   * @param {HTMLElement} tr
+   * @param {{ silent?: boolean }} [opts] silent=true → tidak dispatch event (bulk update, hindari lag)
+   */
+  const applyWoFromBatch = (tr, opts) => {
     if (!tr) return;
     const batchEl = tr.querySelector('[data-f="batch"]');
     const woEl = tr.querySelector('[data-f="wo"]');
@@ -182,15 +187,19 @@ const Rows = (() => {
     const prodName = (batchEl.value || '').trim();
     if (!prodName) return;
     const wo = getWoForProduct(prodName);
-    if (wo) {
+    if (wo && woEl.value !== wo) {
       woEl.value = wo;
-      try { woEl.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+      if (!opts || !opts.silent) {
+        try { woEl.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+      } else if (typeof UI !== 'undefined' && UI.autoResizeTextarea) {
+        try { UI.autoResizeTextarea(woEl); } catch (e) {}
+      }
     }
   };
 
-  /** Isi ulang WO di semua baris sesuai produk masing-masing. */
+  /** Isi ulang WO di semua baris sesuai produk masing-masing (silent = tanpa cascade event). */
   const refreshAllRowWo = () => {
-    rows().forEach(tr => applyWoFromBatch(tr));
+    rows().forEach(tr => applyWoFromBatch(tr, { silent: true }));
   };
 
   // ====== DEFAULT JAM MULAI BARIS PERTAMA (mengikuti Shift terpilih) ======
@@ -238,28 +247,31 @@ const Rows = (() => {
   // ====== DROPDOWN PRODUK ======
   const updateAllDropdowns = () => {
     const prods = getActiveProducts();
+    const prodsKey = prods.join('\0');
     const selects = State.el.tbody.querySelectorAll('select[data-f="batch"]');
     selects.forEach(sel => {
       const currentVal = sel.value;
-      sel.innerHTML = '<option value="">-- Pilih Produk --</option>';
-      prods.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p;
-        opt.textContent = p;
-        if (p === currentVal) opt.selected = true;
-        sel.appendChild(opt);
-      });
-      // Belum ada pilihan sama sekali -> otomatis default ke Produk 1 (atau
-      // satu-satunya produk kalau memang cuma ada 1) supaya operator tidak
-      // perlu klik pilih manual lagi. No. WO ikut mengikuti (lihat
-      // applyWoFromBatch, refreshAllRowWo, hanya berlaku kalau Kode baris sudah terisi).
+      // Skip rebuild DOM jika daftar produk tidak berubah (hindari lag saat ketik WO/rate)
+      const existing = Array.from(sel.options).slice(1).map((o) => o.value);
+      const sameList = existing.length === prods.length && existing.every((v, i) => v === prods[i]);
+      if (!sameList) {
+        sel.innerHTML = '<option value="">-- Pilih Produk --</option>';
+        prods.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p;
+          opt.textContent = p;
+          if (p === currentVal) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      }
+      // Belum ada pilihan sama sekali -> otomatis default ke Produk 1
       if ((!currentVal || !prods.includes(currentVal)) && prods.length > 0) {
         sel.value = prods[0];
       }
       const tr = sel.closest('tr');
-      if (tr) applyWoFromBatch(tr);
+      if (tr) applyWoFromBatch(tr, { silent: true });
     });
-    // Pastikan semua baris dapat WO terbaru
+    // Pastikan semua baris dapat WO terbaru (satu kali, silent)
     refreshAllRowWo();
   };
 

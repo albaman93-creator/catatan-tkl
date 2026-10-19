@@ -542,22 +542,56 @@ const App = (() => {
     // ============================================================
     // MASTER PRODUK & OPERATOR → recalc + sync ke Master
     // ============================================================
+    // Debounce kerja berat (rebuild dropdown / refresh WO semua baris / recalc)
+    // supaya mengetik No. WO & kode produk di header tidak lag.
+    const _prodTimers = {};
+    const debounceProd = (key, fn, ms) => {
+      clearTimeout(_prodTimers[key]);
+      _prodTimers[key] = setTimeout(fn, ms);
+    };
     ['prodName1','prodName2','prodName3','prodBn1','prodBn2','prodBn3','prodRate1','prodRate2','prodRate3','prodUkuran1','prodUkuran2','prodUkuran3','prodWo1','prodWo2','prodWo3'].forEach(id => {
       if (!State.el[id]) return;
       State.el[id].addEventListener('input', () => {
+        // Sync ke Master Produk langsung (ringan)
+        const masterEl = document.querySelector(`[data-sync="${id}"]`);
+        if (masterEl && masterEl.value !== State.el[id].value) masterEl.value = State.el[id].value;
+
+        const isNameBn = id.startsWith('prodName') || id.startsWith('prodBn');
+        const isRateUk = id.startsWith('prodRate') || id.startsWith('prodUkuran');
+        const isWo = id.startsWith('prodWo');
+
+        // Header matrix teks bisa langsung (sangat ringan)
+        if (isNameBn) Rows.updateMatrixProductHeaders();
+
+        // Kerja berat: debounce 180ms; WO-only lebih agresif 120ms tanpa rebuild dropdown
+        if (isWo) {
+          debounceProd('wo', () => {
+            if (Rows.refreshAllRowWo) Rows.refreshAllRowWo();
+            else Rows.rows().forEach(tr => Rows.applyWoFromBatch(tr, { silent: true }));
+          }, 120);
+          return;
+        }
+        if (isNameBn || isRateUk) {
+          debounceProd('prod', () => {
+            Rows.updateAllDropdowns();
+            if (isNameBn) Rows.updateMatrixProductHeaders();
+            Calculation.recalc();
+          }, 180);
+        }
+      });
+      // Pastikan nilai final ikut terproses saat blur (tanpa menunggu debounce)
+      State.el[id].addEventListener('change', () => {
+        clearTimeout(_prodTimers['wo']);
+        clearTimeout(_prodTimers['prod']);
         if (id.startsWith('prodName') || id.startsWith('prodBn') || id.startsWith('prodRate') || id.startsWith('prodUkuran')) {
           Rows.updateAllDropdowns();
           Rows.updateMatrixProductHeaders();
           Calculation.recalc();
         }
-        // WO / nama / BN master berubah → refresh No. WO di semua baris
         if (id.startsWith('prodWo') || id.startsWith('prodName') || id.startsWith('prodBn')) {
           if (Rows.refreshAllRowWo) Rows.refreshAllRowWo();
-          else Rows.rows().forEach(tr => Rows.applyWoFromBatch(tr));
+          else Rows.rows().forEach(tr => Rows.applyWoFromBatch(tr, { silent: true }));
         }
-        // Sync ke input di halaman Master Produk (jika ada)
-        const masterEl = document.querySelector(`[data-sync="${id}"]`);
-        if (masterEl && masterEl.value !== State.el[id].value) masterEl.value = State.el[id].value;
       });
     });
 
