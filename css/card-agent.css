@@ -1,14 +1,14 @@
 /**
- * card-agent.css — Agent Verifikasi Rutin
+ * card-agent.css — Agent Verifikasi Rutin (Bright Theme)
  * HTML: #verifyAgentOverlay / #verifyAgentModal.verify-agent-modal
  * JS:   js/verify-agent.js
  * Catatan: detail status/list masih di verify-agent.css; edit visual card di sini.
  */
 #verifyAgentOverlay.qm-overlay {
   z-index: 1300;
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 #verifyAgentModal.verify-agent-modal,
@@ -16,33 +16,22 @@
   max-width: 520px;
   width: 94vw;
   border-radius: var(--card-radius, 16px);
-  background: linear-gradient(145deg, #ffffff, #f1f5f9);
-  /* Efek timbul modern multi-layer (elevation + inner highlight) */
+  /* Gradient cerah bernuansa putih bersih ke biru muda lembut */
+  background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+  /* Efek timbul modern dengan bayangan lembut berwarna */
   box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.25),
-    0 0 0 1px rgba(255, 255, 255, 0.9) inset,
-    0 2px 4px rgba(0, 0, 0, 0.04);
+    0 20px 40px -15px rgba(59, 130, 246, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.95) inset,
+    0 2px 8px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Dukungan otomatis untuk Dark Mode */
-@media (prefers-color-scheme: dark) {
-  #verifyAgentModal.verify-agent-modal,
-  #verifyAgentModal.card-agent {
-    background: linear-gradient(145deg, #1e293b, #0f172a);
-    box-shadow: 
-      0 25px 50px -12px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
-      0 2px 4px rgba(0, 0, 0, 0.3);
-  }
-}
-
-/* Hook optimasi — styling header, body, footer dengan nuansa timbul modern */
+/* Hook optimasi — styling header, body, footer dengan nuansa cerah */
 #verifyAgentModal .cm-header { 
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(248,250,252,0.9) 100%);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
 }
 
 #verifyAgentModal .cm-body { 
@@ -54,21 +43,9 @@
 
 #verifyAgentModal .cm-footer { 
   padding: 1rem 1.5rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  background: rgba(248, 250, 252, 0.6);
+  border-top: 1px solid rgba(59, 130, 246, 0.1);
+  background: #f8fbff;
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
-}
-
-/* Penyesuaian Dark Mode untuk bagian internal card */
-@media (prefers-color-scheme: dark) {
-  #verifyAgentModal .cm-header {
-    border-bottom-color: rgba(255, 255, 255, 0.06);
-    background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.15) 100%);
-  }
-  #verifyAgentModal .cm-footer {
-    border-top-color: rgba(255, 255, 255, 0.06);
-    background: rgba(15, 23, 42, 0.4);
-  }
 }
