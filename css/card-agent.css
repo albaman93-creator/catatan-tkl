@@ -6,16 +6,69 @@
  */
 #verifyAgentOverlay.qm-overlay {
   z-index: 1300;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 #verifyAgentModal.verify-agent-modal,
 #verifyAgentModal.card-agent {
   max-width: 520px;
   width: 94vw;
-  border-radius: var(--card-radius, 14px);
+  border-radius: var(--card-radius, 16px);
+  background: linear-gradient(145deg, #ffffff, #f1f5f9);
+  /* Efek timbul modern multi-layer (elevation + inner highlight) */
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.9) inset,
+    0 2px 4px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Hook optimasi — ubah warna header/body/footer card agent di sini */
-#verifyAgentModal .cm-header { /* padding, border, background */ }
-#verifyAgentModal .cm-body { /* gap, padding */ }
-#verifyAgentModal .cm-footer { /* tombol area */ }
+/* Dukungan otomatis untuk Dark Mode */
+@media (prefers-color-scheme: dark) {
+  #verifyAgentModal.verify-agent-modal,
+  #verifyAgentModal.card-agent {
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+      0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Hook optimasi — styling header, body, footer dengan nuansa timbul modern */
+#verifyAgentModal .cm-header { 
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(248,250,252,0.9) 100%);
+}
+
+#verifyAgentModal .cm-body { 
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+#verifyAgentModal .cm-footer { 
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(248, 250, 252, 0.6);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* Penyesuaian Dark Mode untuk bagian internal card */
+@media (prefers-color-scheme: dark) {
+  #verifyAgentModal .cm-header {
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.15) 100%);
+  }
+  #verifyAgentModal .cm-footer {
+    border-top-color: rgba(255, 255, 255, 0.06);
+    background: rgba(15, 23, 42, 0.4);
+  }
+}
