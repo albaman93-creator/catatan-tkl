@@ -1,0 +1,23 @@
+/**
+ * card-bulk.css — Bulk fill (isi massal kolom)
+ * HTML: #bulkOverlay / #bulkModal.bulk-modal
+ * JS:   js/bulkfill.js
+ */
+#bulkOverlay.qm-overlay {
+  z-index: 1260;
+}
+
+#bulkModal.bulk-modal,
+#bulkModal.card-bulk {
+  max-width: 360px;
+  border-radius: var(--card-radius, 14px);
+}
+
+#bulkModal.bulk-modal-wide {
+  max-width: 460px;
+}
+
+#bulkModal .qm-title { }
+#bulkModal .qm-sub { }
+#bulkModal .bulk-list { }
+#bulkModal .qm-actions { }

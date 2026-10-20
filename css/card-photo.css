@@ -1,0 +1,14 @@
+/**
+ * card-photo.css — Upload foto / import foto
+ * JS: js/photo-import.js
+ */
+.qm-overlay:has(.photo-modal),
+#photoOverlay.qm-overlay {
+  z-index: 1290;
+}
+
+.photo-modal,
+.card-photo {
+  max-width: 480px;
+  border-radius: var(--card-radius, 14px);
+}

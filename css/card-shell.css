@@ -1,0 +1,30 @@
+/**
+ * card-shell.css — kerangka bersama semua modal card
+ * (.qm-overlay / .qm-modal / .cm-header / .cm-body / .cm-footer)
+ *
+ * Ubah di sini HANYA jika ingin mempengaruhi SEMUA card.
+ * Untuk 1 card saja, edit file card-*.css milik card itu.
+ *
+ * Daftar card:
+ *   card-agent.css      → Agent Verifikasi Rutin
+ *   card-suggest.css    → Sugesti Kegiatan
+ *   card-quickmode.css  → Input cepat / Paste dari AI
+ *   card-copy-move.css  → Salin / Pindah Data
+ *   card-pica.css       → Form Why-Why / PICA
+ *   card-bulk.css       → Bulk fill
+ *   card-wizard.css     → Wizard setup
+ *   card-formmode.css   → Mode form
+ *   card-photo.css      → Upload foto
+ *   card-csv.css        → Import CSV
+ */
+
+/* Token opsional khusus card (boleh disesuaikan) */
+:root {
+  --card-radius: 14px;
+  --card-overlay-bg: rgba(15, 36, 55, 0.6);
+  --card-max-w: 440px;
+  --card-z: 1200;
+}
+
+/* Kerangka generik — sumber utama tetap quickmode.css + components.css.
+   File ini hanya menambahkan token / komentar untuk optimasi terpusat. */

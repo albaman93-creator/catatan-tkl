@@ -1,0 +1,14 @@
+/**
+ * card-formmode.css — Mode Form / Form lengkap
+ * HTML / JS: formmode.js, formfull.js (modal dinamis memakai .qm-overlay)
+ */
+.qm-overlay:has(.formmode-modal),
+#formmodeOverlay.qm-overlay {
+  z-index: 1240;
+}
+
+.formmode-modal,
+.card-formmode {
+  max-width: 520px;
+  border-radius: var(--card-radius, 14px);
+}

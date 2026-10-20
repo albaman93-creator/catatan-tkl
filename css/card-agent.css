@@ -1,0 +1,21 @@
+/**
+ * card-agent.css — Agent Verifikasi Rutin
+ * HTML: #verifyAgentOverlay / #verifyAgentModal.verify-agent-modal
+ * JS:   js/verify-agent.js
+ * Catatan: detail status/list masih di verify-agent.css; edit visual card di sini.
+ */
+#verifyAgentOverlay.qm-overlay {
+  z-index: 1300;
+}
+
+#verifyAgentModal.verify-agent-modal,
+#verifyAgentModal.card-agent {
+  max-width: 520px;
+  width: 94vw;
+  border-radius: var(--card-radius, 14px);
+}
+
+/* Hook optimasi — ubah warna header/body/footer card agent di sini */
+#verifyAgentModal .cm-header { /* padding, border, background */ }
+#verifyAgentModal .cm-body { /* gap, padding */ }
+#verifyAgentModal .cm-footer { /* tombol area */ }

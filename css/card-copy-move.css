@@ -1,0 +1,27 @@
+/**
+ * card-copy-move.css — Salin / Pindah Data
+ * HTML: #copyMoveOverlay / #copyMoveModal.copy-move-modal
+ * JS:   (copy-move di storage/app)
+ * Catatan: aturan lama ada di components.css; optimasi card di sini (load belakangan).
+ */
+#copyMoveOverlay.qm-overlay {
+  z-index: 1250;
+}
+
+#copyMoveModal.copy-move-modal,
+#copyMoveModal.card-copy-move {
+  width: min(440px, 94vw);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--card-radius, 14px);
+}
+
+#copyMoveModal .cm-header { }
+#copyMoveModal .cm-body { }
+#copyMoveModal .cm-footer { }
+#copyMoveModal .cm-source-val { }
+#copyMoveModal .cm-fields { }
+#copyMoveModal .cm-radio { }

@@ -1,0 +1,23 @@
+/**
+ * card-pica.css — Form Why-Why / PICA
+ * HTML: #picaOverlay / .pica-modal
+ * JS:   js/pica.js
+ * Catatan: tabel PICA di dashboard tetap di pica.css / weekly-dashboard.css.
+ */
+#picaOverlay.qm-overlay {
+  z-index: 1280;
+}
+
+.pica-modal.card-pica,
+#picaOverlay .pica-modal {
+  max-width: 640px;
+  width: 94vw;
+  border-radius: var(--card-radius, 14px);
+}
+
+#picaOverlay .cm-header { }
+#picaOverlay .cm-body { }
+#picaOverlay .cm-footer { }
+#picaOverlay .pica-modal input,
+#picaOverlay .pica-modal textarea,
+#picaOverlay .pica-modal select { }

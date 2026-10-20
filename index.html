@@ -51,6 +51,19 @@
   <link rel="stylesheet" href="./css/shutdown.css">
   <link rel="stylesheet" href="./css/printsheet.css">
   <link rel="stylesheet" href="./css/settings.css">
+  <!-- Card modal CSS (satu file per kotak — optimasi visual di sini) -->
+  <link rel="stylesheet" href="./css/card-shell.css">
+  <link rel="stylesheet" href="./css/card-agent.css">
+  <link rel="stylesheet" href="./css/card-suggest.css">
+  <link rel="stylesheet" href="./css/card-quickmode.css">
+  <link rel="stylesheet" href="./css/card-copy-move.css">
+  <link rel="stylesheet" href="./css/card-pica.css">
+  <link rel="stylesheet" href="./css/card-bulk.css">
+  <link rel="stylesheet" href="./css/card-wizard.css">
+  <link rel="stylesheet" href="./css/card-formmode.css">
+  <link rel="stylesheet" href="./css/card-photo.css">
+  <link rel="stylesheet" href="./css/card-csv.css">
+
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2432,7 +2445,7 @@
 
   <!-- MODAL AGENT VERIFIKASI RUTIN -->
   <div id="verifyAgentOverlay" class="qm-overlay hide">
-    <div class="qm-modal verify-agent-modal" id="verifyAgentModal" role="dialog" aria-labelledby="verifyAgentTitle">
+    <div class="qm-modal verify-agent-modal card-agent" id="verifyAgentModal" role="dialog" aria-labelledby="verifyAgentTitle">
       <div class="cm-header">
         <h3 id="verifyAgentTitle">🤖 Agent Verifikasi Rutin</h3>
         <button type="button" class="cm-close" id="verifyAgentClose" aria-label="Tutup">×</button>
@@ -2445,7 +2458,7 @@
 
   <!-- MODAL KELOLA SUGESTI KEGIATAN -->
   <div id="suggestOverlay" class="qm-overlay hide">
-    <div class="qm-modal suggest-modal" id="suggestModal" role="dialog" aria-labelledby="suggestModalTitle">
+    <div class="qm-modal suggest-modal card-suggest" id="suggestModal" role="dialog" aria-labelledby="suggestModalTitle">
       <div class="cm-header">
         <h3 id="suggestModalTitle">💡 Sugesti Kegiatan</h3>
         <button type="button" class="cm-close" id="suggestClose" aria-label="Tutup">×</button>
@@ -2474,7 +2487,7 @@
 
   <!-- MODAL FORM WHY-WHY (PICA) -->
   <div id="picaOverlay" class="qm-overlay hide">
-    <div class="qm-modal pica-modal" role="dialog" aria-labelledby="picaModalTitle">
+    <div class="qm-modal pica-modal card-pica" role="dialog" aria-labelledby="picaModalTitle">
       <div class="cm-header">
         <h3 id="picaModalTitle">✍️ Form Why-Why / PICA</h3>
         <button type="button" class="cm-close" id="picaClose" aria-label="Tutup">×</button>
@@ -2526,22 +2539,22 @@
 
   <!-- MODE CEPAT -->
   <div id="qmOverlay" class="qm-overlay hide">
-    <div class="qm-modal" id="qmModal"></div>
+    <div class="qm-modal card-quickmode" id="qmModal"></div>
   </div>
 
   <!-- ISI MASSAL -->
   <div id="bulkOverlay" class="qm-overlay hide">
-    <div class="qm-modal bulk-modal" id="bulkModal"></div>
+    <div class="qm-modal bulk-modal card-bulk" id="bulkModal"></div>
   </div>
 
   <!-- WIZARD SETUP AWAL -->
   <div id="wizardOverlay" class="qm-overlay hide">
-    <div class="qm-modal wizard-modal" id="wizardModal"></div>
+    <div class="qm-modal wizard-modal card-wizard" id="wizardModal"></div>
   </div>
 
   <!-- SALIN / PINDAH DATA -->
   <div id="copyMoveOverlay" class="qm-overlay hide">
-    <div class="qm-modal copy-move-modal" id="copyMoveModal" role="dialog" aria-labelledby="copyMoveTitle">
+    <div class="qm-modal copy-move-modal card-copy-move" id="copyMoveModal" role="dialog" aria-labelledby="copyMoveTitle">
       <div class="cm-header">
         <h3 id="copyMoveTitle">📋 Salin / Pindah Data</h3>
         <button type="button" class="cm-close" id="copyMoveClose" aria-label="Tutup">×</button>
