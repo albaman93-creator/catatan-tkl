@@ -55,3 +55,13 @@
 .rp-table td.mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
 .rp-table tbody tr:hover td { background: rgba(148,163,184,0.06); }
 #rpDownload { margin-left: 4px; }
+
+.rp-table tbody tr.rp-row-link {
+  cursor: pointer;
+}
+.rp-table tbody tr.rp-row-link:hover td {
+  background: rgba(59, 130, 246, 0.12);
+}
+.rp-table tbody tr.rp-row-link:hover td:first-child {
+  color: #93c5fd;
+}

@@ -333,12 +333,21 @@ const RincianProduk = (() => {
     const body = $('rpSummaryBody');
     if (!body) return;
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="13">Tidak ada data rekap produk.</td></tr>';
+      body.innerHTML = '<tr><td colspan="13">Tidak ada data rekap batch per shift.</td></tr>';
       return;
     }
     const max = 500;
     const slice = rows.slice(0, max);
-    body.innerHTML = slice.map((r) => `<tr>
+    body.innerHTML = slice.map((r) => {
+      const attrs = [
+        'class="rp-row-link"',
+        'title="Buka log sheet record ini"',
+        'data-date="' + esc(r.tgl || '') + '"',
+        'data-shift="' + esc(r.shift || '') + '"',
+        'data-line="' + esc(r.line || '') + '"',
+        'data-stage="' + esc(r.tahapan || '') + '"',
+      ].join(' ');
+      return `<tr ${attrs}>
       <td>${esc(r.produk)}</td>
       <td class="mono">${esc(r.batch)}</td>
       <td class="mono">${esc(fmtD(r.tgl))}</td>
@@ -352,10 +361,26 @@ const RincianProduk = (() => {
       <td class="ctr">${r.standartOutput}</td>
       <td class="ctr">${r.good}</td>
       <td class="ctr">${r.defect}</td>
-    </tr>`).join('');
+    </tr>`;
+    }).join('');
     if (rows.length > max) {
       body.innerHTML += `<tr><td colspan="13"><i>Menampilkan ${max} dari ${rows.length} baris — unduh Excel untuk data lengkap.</i></td></tr>`;
     }
+  };
+
+  /** Klik baris rekap batch per shift → buka log sheet tanggal/shift/line/tahapan itu */
+  const openSummaryRow = (tr) => {
+    if (!tr || !tr.dataset || !tr.dataset.date) return;
+    if (typeof UI === 'undefined' || !UI.openRecord) {
+      console.warn('RincianProduk: UI.openRecord tidak tersedia');
+      return;
+    }
+    UI.openRecord({
+      date: String(tr.dataset.date),
+      shift: String(tr.dataset.shift || 1),
+      line: String(tr.dataset.line || ''),
+      stage: String(tr.dataset.stage || ''),
+    });
   };
 
   const refreshView = () => {
@@ -515,6 +540,10 @@ const RincianProduk = (() => {
     $('rpDownload')?.addEventListener('click', downloadExcel);
     document.querySelectorAll('.rp-tab').forEach((b) => {
       b.addEventListener('click', () => showTab(b.dataset.rpTab));
+    });
+    $('rpSummaryBody')?.addEventListener('click', (e) => {
+      const tr = e.target.closest('tr.rp-row-link');
+      if (tr) openSummaryRow(tr);
     });
     // Filter lokal tanpa fetch ulang
     ['rpLine', 'rpStage', 'rpShift'].forEach((id) => {
