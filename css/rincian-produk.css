@@ -1,0 +1,57 @@
+/* Rincian per Produk — Issue #14 */
+.rp-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 10px;
+  flex-wrap: wrap;
+}
+.rp-tab {
+  background: var(--bg-surface, #1e293b);
+  border: 1px solid var(--border-default, #334155);
+  color: var(--text-secondary, #94a3b8);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font: 600 12.5px var(--font-sans, 'IBM Plex Sans', sans-serif);
+  cursor: pointer;
+}
+.rp-tab.is-on {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: #3b82f6;
+  color: #93c5fd;
+}
+.rp-table-wrap {
+  overflow: auto;
+  max-height: min(62vh, 640px);
+  border: 1px solid var(--border-default, #334155);
+  border-radius: 12px;
+  background: var(--bg-surface, #0f172a);
+}
+.rp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 400 12px var(--font-sans, 'IBM Plex Sans', sans-serif);
+  min-width: 960px;
+}
+.rp-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #10243c;
+  color: #dbe7f3;
+  font-weight: 700;
+  font-size: 11px;
+  text-align: left;
+  padding: 9px 8px;
+  border-bottom: 1px solid #24466b;
+  white-space: nowrap;
+}
+.rp-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: var(--text-primary, #e2e8f0);
+  vertical-align: top;
+}
+.rp-table td.ctr { text-align: center; white-space: nowrap; }
+.rp-table td.mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+.rp-table tbody tr:hover td { background: rgba(148,163,184,0.06); }
+#rpDownload { margin-left: 4px; }

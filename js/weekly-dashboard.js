@@ -671,6 +671,9 @@ const WeeklyDashboard = (() => {
     } else if (pageId === 'oee-prod') {
       document.getElementById('weeklyPageOee')?.classList.add('is-active');
       initOeeFilter(); syncMchRange(); loadOee();
+    } else if (pageId === 'rincian-produk') {
+      document.getElementById('weeklyPageRincian')?.classList.add('is-active');
+      if (typeof RincianProduk !== 'undefined' && RincianProduk.open) RincianProduk.open();
     } else if (MACHINE_TITLES[pageId]) {
       const page = document.getElementById('weeklyPageMachine');
       if (page) {

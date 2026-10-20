@@ -9,18 +9,19 @@
  *   OEE = A × P × Q
  * Hanya baris yang jam mulainya jatuh di shift record yang masuk A & P (aturan sheet).
  *
- * Agregasi (tidak berubah dari sebelumnya bila tanpa filter produk):
- *   OPE : rata-rata A/P/Q/OEE tersimpan per record.
- *   365 : A365 = Σ waktu operasional ÷ (menit basis × jumlah hari) per mesin;
- *         basis = 1440 (semua shift) atau menit shift terpilih (S1=510, S2=480, S3=450).
- *         P & Q = rata-rata per mesin; OEE 365 = rata-rata antar mesin.
+ * Agregasi (seragam Semua produk & filter produk/batch — Issue #12 + unifikasi):
+ *   OPE & OEE 365 selalu pakai rumus Σ (bukan rata-rata % per record):
+ *     A    = ΣE / ΣC
+ *     P    = Σaktual / Σ(rate × E)
+ *     Q    = Σbaik / Σaktual
+ *     OEE  = A × P × Q
+ *     A365 = ΣE / Σ(Time Available Filling)   // shift − jeda − Mixing
+ *     OEE365 = A365 × P × Q
  *
  * Filter PRODUK (kode = semua batch, atau "KODE BN" = satu batch):
- *   A  = availability record (downtime milik shift, tidak bisa dipisah per produk)
- *   P  = dari baris produksi produk itu · Q = dari good/defect baris produk itu
- *   bobot rata-rata = menit produksi produk itu di tiap record
- *   A365 = waktu operasional yang dialokasikan ke produk (proporsional menit produksi)
- *          ÷ (basis × jumlah hari produk itu berjalan di mesin tsb)
+ *   Hanya record yang punya menit produksi produk itu yang masuk agregasi.
+ *   good/defect/P diambil dari baris produk itu; E/C tetap basis shift record
+ *   (downtime shift tidak bisa dipisah per produk).
  */
 const WeeklyCalc = (() => {
   'use strict';
@@ -216,9 +217,11 @@ const WeeklyCalc = (() => {
 
   // ---------- metrik per record (dipakai agregasi) ----------
   /**
-   * Tanpa product → nilai tersimpan per record (bobot 1) — sama dengan perilaku lama.
-   * Dengan product → irisan record untuk produk itu; null bila produk tidak berjalan di record.
-   * { key, date, shift, w, en, a, p, q, o }
+   * Tanpa product → seluruh produk di record; record tanpa produksi/output di-skip
+   *   (cakupan sama semangatnya dengan filter produk).
+   * Dengan product → hanya record yang punya menit produksi produk itu.
+   * Agregasi di calcSet selalu rumus Σ.
+   * { key, date, shift, w, en, a, p, q, o, C, E, good, defect, ideal, availBase, rate }
    */
   const metric = (rec, product) => {
     const re = recompute(rec);
@@ -233,24 +236,30 @@ const WeeklyCalc = (() => {
     const a = sa != null ? sa : (has ? re.A : null);
 
     if (!norm(product)) {
+      // Samakan cakupan record dengan filter per-produk:
+      // skip shift yang tidak punya menit produksi (kode prod) dan tidak punya output.
+      // Tanpa ini, shift hanya downtime ikut ΣE/ΣAvail → OEE (terutama 365) turun
+      // dibanding "Per produk" meski output sama.
+      if (!has) return null;
+      const outAll = re.info.reduce((s, r) => s + r.g + r.d, 0);
+      if (!(re.tAll > 0) && !(outAll > 0)) return null;
+
       // Rate mesin: jumlah rate semua slot aktif di record ini (untuk total Speed Standar)
       let rateSum = 0;
-      if (has) {
-        re.slots.forEach((s, i) => {
-          if (re.perSlot[i].active) rateSum += (re.perSlot[i].rate || s.rate || 0);
-        });
-      }
+      re.slots.forEach((s, i) => {
+        if (re.perSlot[i].active) rateSum += (re.perSlot[i].rate || s.rate || 0);
+      });
       return {
         ...base, w: 1, en: enWhole, a,
-        p: sp != null ? sp : (has ? re.P : null),
-        q: sq != null ? sq : (has ? re.Q : null),
-        o: so != null ? so : (has ? re.O : null),
-        C: has ? re.C : 0,
-        E: has ? re.E : 0,
-        good: has ? re.info.reduce((s, r) => s + r.g, 0) : 0,
-        defect: has ? re.info.reduce((s, r) => s + r.d, 0) : 0,
-        ideal: has ? re.sumIdealE : 0,           // rate × E (Excel batch)
-        availBase: has ? re.availBase : 0,       // shift − jeda − Mixing (Time Available Filling)
+        p: sp != null ? sp : re.P,
+        q: sq != null ? sq : re.Q,
+        o: so != null ? so : re.O,
+        C: re.C,
+        E: re.E,
+        good: re.info.reduce((s, r) => s + r.g, 0),
+        defect: re.info.reduce((s, r) => s + r.d, 0),
+        ideal: re.sumIdealE,                     // rate × E (Excel batch)
+        availBase: re.availBase,                 // shift − jeda − Mixing (Time Available Filling)
         rate: rateSum,                           // speed standar (bag/mnt) record ini
       };
     }
@@ -320,33 +329,18 @@ const WeeklyCalc = (() => {
 
   /**
    * opts: { days (hari kalender rentang), product (bool), shift ('all'|1|2|3) }
-   * Return { ope:{a,p,q,oee}, o365:{a,p,q,oee}, per:{ 'tahapan|line': {...} }, n }
+   * Return { ope:{a,p,q,oee}, o365:{a,p,q,oee}, per:{ 'tahapan|line': {...} }, n, totals }
+   *
+   * OPE & OEE 365 SELALU rumus Σ (seragam "Semua produk" dan filter produk/batch):
+   *   A = ΣE/ΣC · P = Σaktual/Σ(rate×E) · Q = Σbaik/Σaktual · OEE = A×P×Q
+   *   A365 = ΣE/Σ(Time Available) · OEE365 = A365×P×Q
    */
   const calcSet = (ms, opts) => {
     const o = opts || {};
     const basis = shiftBasis(o.shift);
-    const ope = {
-      a: wavg(ms, (m) => m.a), p: wavg(ms, (m) => m.p),
-      q: wavg(ms, (m) => m.q), oee: wavg(ms, (m) => m.o),
-    };
-    const by = {};
-    ms.forEach((m) => { (by[m.key] = by[m.key] || []).push(m); });
-    const per = {};
-    Object.keys(by).forEach((k) => {
-      const list = by[k];
-      const dayCount = o.product ? new Set(list.map((m) => m.date)).size : Math.max(1, o.days || 1);
-      const a365 = Math.min(100, (list.reduce((s, m) => s + m.en, 0) / (basis * Math.max(1, dayCount))) * 100);
-      const p = wavg(list, (m) => m.p), q = wavg(list, (m) => m.q);
-      per[k] = { a365, p, q, o365: p != null && q != null ? (a365 * p * q) / 10000 : null, ope: wavg(list, (m) => m.o) };
-    });
-    const v = Object.values(per);
-    const o365 = {
-      a: mean(v.map((x) => x.a365)), p: mean(v.map((x) => x.p)),
-      q: mean(v.map((x) => x.q)), oee: mean(v.map((x) => x.o365)),
-    };
-    // --- Agregasi total (Issue #12: OEE per batch = Σ bukan rata-rata %) ---
+
+    // --- Agregasi total Σ (Issue #12) — dipakai untuk Semua produk & filter produk ---
     // A = ΣE / ΣC · P = Σaktual / Σ(rate×E) · Q = Σbaik / Σaktual
-    // Speed Standar total = Σ rate (bag/mnt) tiap record/shift yang memuat produk
     let sumC = 0, sumE = 0, sumGood = 0, sumDefect = 0, sumIdeal = 0, sumAvail = 0, sumRate = 0;
     ms.forEach((m) => {
       sumC += Number(m.C) || 0;
@@ -368,24 +362,48 @@ const WeeklyCalc = (() => {
     const o365Batch = (a365Batch != null && pBatch != null && qBatch != null)
       ? (a365Batch * pBatch * qBatch) / 10000 : null;
 
+    const ope = {
+      a: aBatch, p: pBatch, q: qBatch, oee: oBatch,
+    };
+    const o365 = {
+      a: a365Batch, p: pBatch, q: qBatch, oee: o365Batch,
+    };
+
+    // Breakdown per mesin (untuk halaman multi-mesin) — ikut rumus Σ per grup
+    const by = {};
+    ms.forEach((m) => { (by[m.key] = by[m.key] || []).push(m); });
+    const per = {};
+    Object.keys(by).forEach((k) => {
+      const list = by[k];
+      let c = 0, e = 0, g = 0, d = 0, ideal = 0, avail = 0;
+      list.forEach((m) => {
+        c += Number(m.C) || 0;
+        e += Number(m.E) || 0;
+        g += Number(m.good) || 0;
+        d += Number(m.defect) || 0;
+        ideal += Number(m.ideal) || 0;
+        avail += Number(m.availBase) || 0;
+      });
+      const act = g + d;
+      const a = c > 0 ? (e / c) * 100 : null;
+      const p = ideal > 0 ? (act / ideal) * 100 : null;
+      const q = act > 0 ? (g / act) * 100 : null;
+      const a365 = avail > 0 ? (e / avail) * 100 : null;
+      per[k] = {
+        a365,
+        p,
+        q,
+        o365: (a365 != null && p != null && q != null) ? (a365 * p * q) / 10000 : null,
+        ope: (a != null && p != null && q != null) ? (a * p * q) / 10000 : null,
+      };
+    });
+
     const totals = {
       C: sumC, E: sumE, good: sumGood, defect: sumDefect, actual,
       ideal: sumIdeal, availBase: sumAvail, rateTotal: sumRate,
       a: aBatch, p: pBatch, q: qBatch, oee: oBatch,
       a365: a365Batch, oee365: o365Batch,
     };
-
-    // Saat filter produk/batch aktif → pakai rumus Σ (Issue #12), bukan rata-rata berbobot
-    if (o.product) {
-      if (aBatch != null) ope.a = aBatch;
-      if (pBatch != null) ope.p = pBatch;
-      if (qBatch != null) ope.q = qBatch;
-      if (oBatch != null) ope.oee = oBatch;
-      if (a365Batch != null) o365.a = a365Batch;
-      if (pBatch != null) o365.p = pBatch;
-      if (qBatch != null) o365.q = qBatch;
-      if (o365Batch != null) o365.oee = o365Batch;
-    }
 
     return { ope, o365, per, n: ms.length, totals };
   };

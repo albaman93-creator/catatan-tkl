@@ -45,6 +45,7 @@
   <link rel="stylesheet" href="./css/oee365.css">
   <link rel="stylesheet" href="./css/dashboard.css">
   <link rel="stylesheet" href="./css/weekly-dashboard.css">
+  <link rel="stylesheet" href="./css/rincian-produk.css">
   <link rel="stylesheet" href="./css/weekly-filter.css">
   <link rel="stylesheet" href="./css/pica.css">
   <link rel="stylesheet" href="./css/shutdown.css">
@@ -1687,6 +1688,10 @@
                 <span class="wn-icon">🎯</span>
                 <span class="wn-label"><span class="wn-full">OEE PRODUCTION</span><span class="wn-short">OEE</span></span>
               </button>
+              <button type="button" class="weekly-nav-item" data-weekly-page="rincian-produk">
+                <span class="wn-icon">📋</span>
+                <span class="wn-label"><span class="wn-full">Rincian per Produk</span><span class="wn-short">Rincian</span></span>
+              </button>
               <div class="weekly-nav-divider">Filling</div>
               <button type="button" class="weekly-nav-item" data-weekly-page="filling-1">
                 <span class="wn-icon">⚙️</span>
@@ -2317,9 +2322,102 @@
                 <div class="mch-bar-scroll"><svg id="mchBarSvg" role="img" aria-label="Capaian OEE OPE dan OEE 365 per batch"></svg></div>
               </article>
 
-            </div>
-          </div>
-        </div>
+            </div><!-- /weeklyPageMachine -->
+
+            <!-- PAGE: Rincian per Produk (Issue #14) -->
+            <div class="weekly-page" data-weekly-page="rincian-produk" id="weeklyPageRincian">
+              <div class="weekly-hero compact oee-prod-head">
+                <div class="oee-prod-head-main">
+                  <div class="weekly-hero-title">RINCIAN PER PRODUK</div>
+                  <div class="weekly-hero-badge">Rekap kegiatan &amp; perhitungan per produk · unduh Excel</div>
+                </div>
+                <div class="oee-filter oee-filter-extended" id="rpFilterBar">
+                  <div class="field"><label for="rpFrom">Dari Tanggal</label><input type="date" id="rpFrom"></div>
+                  <div class="field"><label for="rpTo">Sampai Tanggal</label><input type="date" id="rpTo"></div>
+                  <div class="field">
+                    <label for="rpLine">Line</label>
+                    <select id="rpLine">
+                      <option value="">Semua line</option>
+                      <option value="1">Line 1</option>
+                      <option value="2">Line 2</option>
+                      <option value="4">Line 4</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="rpStage">Tahapan</label>
+                    <select id="rpStage">
+                      <option value="">Semua tahapan</option>
+                      <option value="filling">Filling</option>
+                      <option value="kemas">Kemas</option>
+                      <option value="mixing">Mixing</option>
+                      <option value="steril">Steril</option>
+                      <option value="visual">Visual</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="rpShift">Shift</label>
+                    <select id="rpShift">
+                      <option value="all">Semua shift</option>
+                      <option value="1">Shift 1</option>
+                      <option value="2">Shift 2</option>
+                      <option value="3">Shift 3</option>
+                    </select>
+                  </div>
+                  <button type="button" class="btn btn-primary btn-sm" id="rpApply">Terapkan</button>
+                  <button type="button" class="btn btn-ghost btn-sm" id="rpReset">Reset</button>
+                  <button type="button" class="btn btn-primary btn-sm" id="rpDownload">⬇ Unduh Excel</button>
+                </div>
+                <div class="oee-filter-status" id="rpStatus"></div>
+              </div>
+
+              <div class="rp-tabs" role="tablist">
+                <button type="button" class="rp-tab is-on" data-rp-tab="detail">Kegiatan (detail)</button>
+                <button type="button" class="rp-tab" data-rp-tab="summary">Rekap per produk</button>
+                <button type="button" class="rp-tab" data-rp-tab="batch">Rekap Per Batch</button>
+              </div>
+
+              <div id="rpPanelDetail" class="rp-panel">
+                <div class="rp-table-wrap">
+                  <table class="rp-table">
+                    <thead><tr>
+                      <th>Produk</th><th>Batch Number</th><th>TGL</th><th>Shift</th><th>Tahapan</th><th>Line</th>
+                      <th>Jam mulai</th><th>Jam selesai</th><th>Kegiatan</th><th>Durasi</th><th>Masalah</th>
+                      <th>Good</th><th>Defect</th><th>Operator</th>
+                    </tr></thead>
+                    <tbody id="rpDetailBody"><tr><td colspan="14">Pilih rentang tanggal lalu klik Terapkan.</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div id="rpPanelSummary" class="rp-panel" hidden>
+                <div class="rp-table-wrap">
+                  <table class="rp-table">
+                    <thead><tr>
+                      <th>Produk</th><th>Batch</th><th>TGL</th><th>Shift</th><th>Line</th><th>Tahapan</th>
+                      <th>Time Available</th><th>Waktu Produksi Terencana</th><th>Breakdown tidak terencana</th>
+                      <th>Waktu Operasional</th><th>Standart output</th><th>Good</th><th>Defect</th>
+                    </tr></thead>
+                    <tbody id="rpSummaryBody"><tr><td colspan="13">Pilih rentang tanggal lalu klik Terapkan.</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div id="rpPanelBatch" class="rp-panel" hidden>
+                <div class="rp-table-wrap">
+                  <table class="rp-table">
+                    <thead><tr>
+                      <th>Produk</th><th>Batch</th><th>TGL</th><th>Line</th><th>Tahapan</th>
+                      <th>Time Available</th><th>Waktu Produksi Terencana</th><th>Breakdown tidak terencana</th>
+                      <th>Waktu Operasional</th><th>Standart output</th><th>Good</th><th>Defect</th>
+                    </tr></thead>
+                    <tbody id="rpBatchBody"><tr><td colspan="12">Pilih rentang tanggal lalu klik Terapkan.</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div><!-- /weeklyPageRincian -->
+
+          </div><!-- /weekly-main inner -->
+        </div><!-- /weekly-layout -->
       </section>
 
       <!-- Footer sheet -->
@@ -2530,6 +2628,7 @@
   <script src="./js/weekly-calc.js"></script>
   <script src="./js/weekly-filter.js"></script>
   <script src="./js/weekly-dashboard.js"></script>
+  <script src="./js/rincian-produk.js"></script>
   <script src="./js/pica.js"></script>
   <script src="./js/shutdown.js"></script>
   <script src="./js/quickmode.js"></script>
