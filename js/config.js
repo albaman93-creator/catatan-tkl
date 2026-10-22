@@ -186,6 +186,21 @@ mixing: ['VTTS1 Mixing L', 'VTTS1 Loading L', 'VKAM1 Mixing L', 'VKAM1 Loading L
     kemas:   ['VTTSA','VKAMA','VLONA','VMONA','VTRAB','VCLNB','VMNTA','VTRME','VPELA','ITTCB','VTTCA'],
   },
 
+  // ====== NAMA MESIN (auto-isi sesuai Tahapan + Line) ======
+  // Dipakai oleh UI.fillMachineName() untuk mengisi field "Nama Mesin"
+  // (#fMesinNama di Data & Penyimpanan, dicerminkan juga di header Log Sheet)
+  // secara otomatis begitu Line / Tahapan Proses diganti.
+  // Key = '<tahapan>|<line>' (huruf kecil). Silakan tambah/ubah daftar di
+  // sini sesuka hati — tidak perlu sentuh js/ui.js.
+  MACHINE_NAMES: {
+    'filling|1': 'Automatic Form Fill Seal Machine Shinva RSYG2-1-23005',
+    'filling|2': 'Automatic Form Fill Seal Machine Plumat FFS 991',
+    'filling|4': 'Automatic Form Fill Seal Machine Plumat FFS 892',
+    'kemas|1':   'Overwrapping Machine Sysflex Line 1',
+    'kemas|2':   'Overwrapping Machine Sysflex Line 2',
+    'kemas|4':   'Overwrapping Machine Plumat OW 834',
+  },
+
   // ====== MODE INPUT (Normal / Cepat 1 / Cepat 2) ======
   INPUT_MODE_KEY: 'fima_input_mode',
 

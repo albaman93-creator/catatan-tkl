@@ -399,6 +399,14 @@
 
 .compact-op-grid .sheet-op-box { width:100%; min-width:0; box-sizing:border-box; min-height:35px; text-align:center; }
 
+.compact-mesin-panel { min-width:min(280px,92vw); }
+
+.compact-mesin-row { display:flex; }
+
+.compact-mesin-row input { width:100%; min-width:0; box-sizing:border-box; min-height:35px; padding:6px 8px; font-size:12px; }
+
+.compact-mesin-panel .field-hint { margin-top:7px; }
+
 .compact-product-list { display:grid; gap:6px; }
 
 .compact-product-row { display:grid; grid-template-columns:18px minmax(0,1fr) 74px 90px; gap:5px; align-items:center; }

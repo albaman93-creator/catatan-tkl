@@ -1029,10 +1029,7 @@
               <div class="compact-popover compact-choice-panel" id="compactStagePanel">
                 <div class="compact-popover-head"><b>Tahapan Proses</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
                 <div class="compact-choice-list">
-                  <button type="button" class="compact-stage-option" data-sheet-stage="mixing">Mixing</button>
                   <button type="button" class="compact-stage-option" data-sheet-stage="filling">Filling</button>
-                  <button type="button" class="compact-stage-option" data-sheet-stage="steril">Steril</button>
-                  <button type="button" class="compact-stage-option" data-sheet-stage="visual">Visual</button>
                   <button type="button" class="compact-stage-option" data-sheet-stage="kemas">Kemas</button>
                 </div>
               </div>
@@ -1100,6 +1097,21 @@
                 </div>
               </div>
             </div>
+
+            <!-- Mesin — tersambung (link) dengan field "Nama Mesin" di Data & Penyimpanan;
+                 terisi otomatis sesuai Line + Tahapan (lihat CONFIG.MACHINE_NAMES & js/sheet-mesin-sync.js) -->
+            <div class="compact-control compact-expand-control">
+              <button type="button" class="compact-trigger" aria-expanded="false" aria-controls="compactMesinPanel">
+                <span id="compactMesinValue">Mesin</span><span class="compact-chevron">▾</span>
+              </button>
+              <div class="compact-popover compact-form-panel compact-mesin-panel" id="compactMesinPanel">
+                <div class="compact-popover-head"><b>Nama Mesin</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
+                <div class="compact-mesin-row">
+                  <input type="text" id="sheetMesinNama" placeholder="Nama mesin" title="Nama mesin — terisi otomatis sesuai Line &amp; Tahapan, bisa diedit manual" autocomplete="off">
+                </div>
+                <small class="field-hint">Terisi otomatis sesuai Line &amp; Tahapan (Filling/Kemas). Tersambung dengan field Nama Mesin di Data &amp; Penyimpanan.</small>
+              </div>
+            </div>
           </div>
 
           <!-- Elemen lama dipertahankan sebagai state/select tersembunyi agar modul aplikasi tetap kompatibel. -->
@@ -1107,10 +1119,7 @@
             <div id="sheetShift"><button type="button" data-shift="0" data-sheet-shift="0">1</button><button type="button" data-shift="1" data-sheet-shift="1">2</button><button type="button" data-shift="2" data-sheet-shift="2">3</button></div>
             <div id="sheetLine"><button type="button" data-sheet-line="1">1</button><button type="button" data-sheet-line="2">2</button><button type="button" data-sheet-line="4">4</button></div>
             <div class="sheet-process-tabs">
-              <button type="button" class="sheet-stage-btn" data-sheet-stage="mixing" aria-selected="true">Mixing</button>
               <button type="button" class="sheet-stage-btn" data-sheet-stage="filling" aria-selected="false">Filling</button>
-              <button type="button" class="sheet-stage-btn" data-sheet-stage="steril" aria-selected="false">Steril</button>
-              <button type="button" class="sheet-stage-btn" data-sheet-stage="visual" aria-selected="false">Visual</button>
               <button type="button" class="sheet-stage-btn" data-sheet-stage="kemas" aria-selected="false">Kemas</button>
             </div>
           </div>
@@ -2799,6 +2808,7 @@
   <script src="./js/profile-avatar.js"></script>
   <script src="./js/app.js"></script>
   <script src="./js/sheet-op-sync.js"></script>
+  <script src="./js/sheet-mesin-sync.js"></script>
   <script src="./js/compact-controls.js"></script>
 </body>
 </html>

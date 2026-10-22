@@ -97,7 +97,9 @@
   function syncSummary() {
     const stage = $('#fStage')?.value || 'mixing';
     const stageBtn = $(`[data-sheet-stage="${CSS.escape(stage)}"]`);
-    setText('compactStageValue', stageBtn?.textContent?.trim() || stage);
+    // Tahapan di luar Filling/Kemas (mis. Mixing/Steril/Visual) tidak lagi
+    // punya tombol di header Log Sheet — tetap tampilkan labelnya dengan rapi.
+    setText('compactStageValue', stageBtn?.textContent?.trim() || (stage.charAt(0).toUpperCase() + stage.slice(1)));
 
     const line = $('#fLine')?.value || '1';
     setText('compactLineValue', 'Line ' + line);
