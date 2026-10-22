@@ -1,21 +1,51 @@
 /**
- * card-agent.css — Agent Verifikasi Rutin
+ * card-agent.css — Agent Verifikasi Rutin (Bright Theme)
  * HTML: #verifyAgentOverlay / #verifyAgentModal.verify-agent-modal
  * JS:   js/verify-agent.js
  * Catatan: detail status/list masih di verify-agent.css; edit visual card di sini.
  */
 #verifyAgentOverlay.qm-overlay {
   z-index: 1300;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 #verifyAgentModal.verify-agent-modal,
 #verifyAgentModal.card-agent {
   max-width: 520px;
   width: 94vw;
-  border-radius: var(--card-radius, 14px);
+  border-radius: var(--card-radius, 16px);
+  /* Gradient cerah bernuansa putih bersih ke biru muda lembut */
+  background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+  /* Efek timbul modern dengan bayangan lembut berwarna */
+  box-shadow: 
+    0 20px 40px -15px rgba(59, 130, 246, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.95) inset,
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Hook optimasi — ubah warna header/body/footer card agent di sini */
-#verifyAgentModal .cm-header { /* padding, border, background */ }
-#verifyAgentModal .cm-body { /* gap, padding */ }
-#verifyAgentModal .cm-footer { /* tombol area */ }
+/* Hook optimasi — styling header, body, footer dengan nuansa cerah */
+#verifyAgentModal .cm-header { 
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+#verifyAgentModal .cm-body { 
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+#verifyAgentModal .cm-footer { 
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(59, 130, 246, 0.1);
+  background: #f8fbff;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
