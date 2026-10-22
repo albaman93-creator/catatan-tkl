@@ -450,17 +450,30 @@ const Pica = (() => {
         pic: $('picaPic').value.trim(),
         status: $('picaStatus').value || 'Open',
         kind: 'minor',
-        line: metaCtx.line,
-        stage: metaCtx.stage,
+        line: String(current?.line || metaCtx.line || ''),
+        stage: String(current?.stage || metaCtx.stage || ''),
       };
       const idx = listMs.findIndex((x) => x.id === rec.id);
       if (idx >= 0) listMs[idx] = rec;
       else listMs.push(rec);
-      saveMinorLocal(metaCtx.line, metaCtx.stage, listMs);
+      const saveLine = rec.line || metaCtx.line;
+      const saveStage = rec.stage || metaCtx.stage;
+      // merge into store for that line/stage
+      const existing = loadMinorLocal(saveLine, saveStage);
+      const eidx = existing.findIndex((x) => (x.id || '') === rec.id ||
+        [x.produk, x.batch, x.problem].join('|') === [rec.produk, rec.batch, rec.problem].join('|'));
+      if (eidx >= 0) existing[eidx] = { ...existing[eidx], ...rec };
+      else existing.push(rec);
+      saveMinorLocal(saveLine, saveStage, existing);
+      // keep listMs in sync if same context
+      if (String(metaCtx.line) === String(saveLine) && String(metaCtx.stage) === String(saveStage)) {
+        /* listMs already updated above */
+      }
       renderMsTable();
       updateMsStatus();
       closeForm();
       if (typeof UI !== 'undefined' && UI.toast) UI.toast('✓ Minor stop disimpan');
+      if (onSavedCb) { try { onSavedCb(rec); } catch (_) {} onSavedCb = null; }
       const byProd = {};
       listMs.forEach((p) => { byProd[p.produk] = (byProd[p.produk] || 0) + (p.freq || 1); });
       barChart('msChartSvg', Object.entries(byProd).map(([label, v]) => ({ label, v })).sort((a, b) => b.v - a.v), 'kali', '#f59e0b');
@@ -486,6 +499,7 @@ const Pica = (() => {
       analysis[fullKey(p)] = rec;
       renderBdTable(); closeForm();
       if (typeof UI !== 'undefined' && UI.toast) UI.toast('✓ Analisis PICA disimpan');
+      if (onSavedCb) { try { onSavedCb(analysis[fullKey(p)] || rec); } catch (_) {} onSavedCb = null; }
     } catch (e) {
       console.warn('PICA save error:', e);
       if (typeof UI !== 'undefined' && UI.toast) UI.toast('⚠ Gagal simpan: ' + (e.message || e), true);
@@ -644,5 +658,68 @@ const Pica = (() => {
     if (wrap && wrap.contains(e.target)) onBdChartClick(e);
   });
 
-  return { render };
+
+  /**
+   * Buka form Why-Why dari Issue Dashboard (atau sumber lain).
+   * issue: { kind, date, shift, line, stage, key, produk, batch, problem, dur, freq, why1.., status, id }
+   * onSaved: callback setelah simpan sukses
+   */
+  let onSavedCb = null;
+  const openIssue = (issue, onSaved) => {
+    if (!issue) return;
+    onSavedCb = typeof onSaved === 'function' ? onSaved : null;
+    const isMinor = issue.kind === 'minor';
+    formMode = isMinor ? 'minor' : 'breakdown';
+    current = {
+      ...issue,
+      date: String(issue.date || '').slice(0, 10),
+      shift: issue.shift,
+      line: String(issue.line ?? ''),
+      stage: String(issue.stage || '').toLowerCase(),
+      key: issue.key || '',
+      produk: issue.produk || '',
+      batch: issue.batch || '',
+      problem: issue.problem || '',
+      dur: issue.dur || 0,
+      freq: issue.freq || 1,
+      id: issue.id || '',
+      kind: isMinor ? 'minor' : 'breakdown',
+    };
+    // pastikan metaCtx ikut line/stage issue agar save minor ke store yang benar
+    metaCtx = { line: current.line, stage: current.stage };
+
+    const mf = $('picaMinorFields');
+    if (mf) mf.hidden = !isMinor;
+    const title = $('picaModalTitle');
+    if (title) {
+      title.textContent = isMinor
+        ? '✍️ Form Why-Why / PICA (Minor Stop)'
+        : '✍️ Form Why-Why / PICA (Breakdown)';
+    }
+    const durTxt = isMinor
+      ? ((current.freq || 1) + ' kali')
+      : ((current.dur || 0) + ' mnt');
+    if ($('picaCtx')) {
+      $('picaCtx').innerHTML =
+        `<div class="pica-ctx-row"><b>${esc(current.produk)}</b> · Batch ${esc(current.batch || '—')} · ${fmtD(current.date)} · S${esc(current.shift)} · Line ${esc(current.line)} · ${esc(current.stage)}</div>`
+        + `<div class="pica-ctx-row">Problem: ${esc(current.problem)} (${durTxt})</div>`;
+    }
+    if (isMinor) {
+      if ($('msProduk')) $('msProduk').value = current.produk || '';
+      if ($('msBatch')) $('msBatch').value = current.batch || '';
+      if ($('msProblem')) $('msProblem').value = current.problem || '';
+      if ($('msFreq')) $('msFreq').value = String(current.freq || 1);
+    }
+    if ($('picaWhy1')) $('picaWhy1').value = issue.why1 || '';
+    if ($('picaWhy2')) $('picaWhy2').value = issue.why2 || '';
+    if ($('picaWhy3')) $('picaWhy3').value = issue.why3 || '';
+    if ($('picaCorrective')) $('picaCorrective').value = issue.corrective || '';
+    if ($('picaPreventive')) $('picaPreventive').value = issue.preventive || '';
+    if ($('picaPic')) $('picaPic').value = issue.pic || '';
+    if ($('picaStatus')) $('picaStatus').value = issue.status || 'Open';
+    $('picaOverlay')?.classList.remove('hide');
+    setTimeout(() => $('picaWhy1')?.focus(), 30);
+  };
+
+  return { render, openIssue };
 })();

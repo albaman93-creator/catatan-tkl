@@ -674,6 +674,9 @@ const WeeklyDashboard = (() => {
     } else if (pageId === 'rincian-produk') {
       document.getElementById('weeklyPageRincian')?.classList.add('is-active');
       if (typeof RincianProduk !== 'undefined' && RincianProduk.open) RincianProduk.open();
+    } else if (pageId === 'issue') {
+      document.getElementById('weeklyPageIssue')?.classList.add('is-active');
+      if (typeof IssueDashboard !== 'undefined' && IssueDashboard.open) IssueDashboard.open();
     } else if (MACHINE_TITLES[pageId]) {
       const page = document.getElementById('weeklyPageMachine');
       if (page) {
@@ -734,6 +737,7 @@ const WeeklyDashboard = (() => {
       inited = true;
     }
     showPage('yield');
+    if (typeof IssueDashboard !== 'undefined' && IssueDashboard.refreshBadge) IssueDashboard.refreshBadge();
   };
 
   return { open, showPage };

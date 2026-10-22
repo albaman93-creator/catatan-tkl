@@ -1,0 +1,340 @@
+/* =========================================================
+   Issue Dashboard — Weekly Meeting Issue #16 (Full Updated)
+   ========================================================= */
+
+/* 1. Badge & Navigasi Tab */
+.wn-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: #475569;
+  color: #FFFFFF;
+  font: 700 11px/1 var(--font-sans, system-ui, -apple-system, sans-serif);
+  vertical-align: middle;
+}
+
+.weekly-nav-item.is-active .wn-badge {
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+.issue-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0 12px;
+  align-items: center;
+}
+
+.issue-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #1E293B;
+  border: 1px solid #334155;
+  color: #E2E8F0;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font: 600 13px var(--font-sans, system-ui, -apple-system, sans-serif);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.issue-tab:hover {
+  background: #334155;
+  color: #FFFFFF;
+}
+
+.issue-tab.is-on {
+  background: #2563EB;
+  border-color: #3B82F6;
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+.issue-tab .wn-badge {
+  background: #475569;
+  margin-left: 2px;
+}
+
+.issue-tab.is-on .wn-badge {
+  background: #1D4ED8;
+  color: #FFFFFF;
+}
+
+.issue-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 700 14px var(--font-sans, system-ui, -apple-system, sans-serif);
+  color: #F8FAFC;
+  margin: 10px 0 8px;
+}
+
+/* =========================================================
+   2. Tabel Utama (Kontras Tinggi, Rapi & Responsif)
+   ========================================================= */
+.issue-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: min(60vh, 600px);
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.issue-table {
+  width: 100%;
+  min-width: 1100px;
+  border-collapse: collapse;
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1F2937;
+  background-color: #FFFFFF;
+}
+
+/* Header Tabel: Solid, Tebal, Kontras Putih */
+.issue-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #111827 !important;
+  color: #FFFFFF !important;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 2px solid #374151;
+  border-right: 1px solid #1F2937;
+  white-space: nowrap;
+}
+
+.issue-table thead th:last-child {
+  border-right: none;
+}
+
+/* Isi Cell Tabel: Teks Gelap Jelas & Border Antar Kolom/Baris */
+.issue-table tbody td {
+  padding: 11px 14px;
+  border-bottom: 1px solid #E5E7EB;
+  border-right: 1px solid #E5E7EB;
+  color: #111827 !important; /* Dijamin gelap & tidak pudar */
+  font-size: 14px;
+  font-weight: 400;
+  vertical-align: top;
+  text-align: left;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 280px;
+}
+
+.issue-table tbody td:last-child {
+  border-right: none;
+}
+
+/* Zebra Striping (Selang-seling Putih & Abu Sangat Muda) */
+.issue-table tbody tr:nth-child(odd) td {
+  background-color: #FFFFFF !important;
+}
+
+.issue-table tbody tr:nth-child(even) td {
+  background-color: #F9FAFB !important;
+}
+
+/* Hover Baris: Highlight Biru Halus & Teks Tetap Tajam */
+.issue-table tbody tr.issue-row {
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.issue-table tbody tr.issue-row:hover td,
+.issue-table tbody tr:hover td {
+  background-color: #EFF6FF !important;
+  color: #111827 !important;
+}
+
+/* Perataan Kolom Otomatis & Class Helper */
+.issue-table td.ctr,
+.issue-table th.ctr {
+  text-align: center !important;
+  white-space: nowrap;
+}
+
+.issue-table td.num,
+.issue-table th.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Otomatis rata kanan untuk kolom No (1) dan Durasi (7) */
+.issue-table thead th:nth-child(1),
+.issue-table tbody td:nth-child(1),
+.issue-table thead th:nth-child(7),
+.issue-table tbody td:nth-child(7) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Otomatis rata tengah untuk kolom Date (2) dan Shift (3) */
+.issue-table thead th:nth-child(2),
+.issue-table tbody td:nth-child(2),
+.issue-table thead th:nth-child(3),
+.issue-table tbody td:nth-child(3) {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.issue-table td.mono {
+  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  font-size: 13.5px;
+  color: #111827 !important;
+}
+
+/* Teks Terlalu Panjang (Ellipsis) */
+.issue-table td.truncate {
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================================================
+   3. Status & Kind (Hijau, Kuning, Merah Kontras Tinggi)
+   ========================================================= */
+.issue-kind {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background-color: #FEF3C7;
+  color: #92400E !important;
+  border: 1px solid #FDE68A;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Normal / Hijau */
+.status-badge.normal,
+.status-badge.success {
+  background-color: #DCFCE7;
+  color: #166534 !important;
+  border: 1px solid #86EFAC;
+}
+
+/* Warning / Kuning */
+.status-badge.warning {
+  background-color: #FEF3C7;
+  color: #92400E !important;
+  border: 1px solid #FDE68A;
+}
+
+/* Error / Merah */
+.status-badge.error,
+.status-badge.danger {
+  background-color: #FEE2E2;
+  color: #991B1B !important;
+  border: 1px solid #FCA5A5;
+}
+
+/* =========================================================
+   4. Action Menu (Pop-up Klik Baris Issue)
+   ========================================================= */
+.issue-action-menu {
+  position: fixed;
+  z-index: 1400;
+  min-width: 260px;
+  max-width: min(360px, 92vw);
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 12px;
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.25);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.issue-action-menu.hide {
+  display: none;
+}
+
+.issue-action-head {
+  padding: 4px 6px 10px;
+  border-bottom: 1px solid #E5E7EB;
+  margin-bottom: 4px;
+}
+
+.issue-action-title {
+  font: 700 14px system-ui, -apple-system, sans-serif;
+  color: #111827;
+}
+
+.issue-action-sub {
+  font: 400 12px system-ui, -apple-system, sans-serif;
+  color: #4B5563;
+  margin-top: 2px;
+}
+
+.issue-action-btn {
+  text-align: left;
+  border: 1px solid #D1D5DB;
+  background: #F9FAFB;
+  color: #1F2937;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: 600 13px system-ui, -apple-system, sans-serif;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.issue-action-btn:hover {
+  background: #EFF6FF;
+  border-color: #3B82F6;
+  color: #1D4ED8;
+}
+
+.issue-action-btn.primary {
+  background: #2563EB;
+  border-color: #1D4ED8;
+  color: #FFFFFF;
+}
+
+.issue-action-btn.primary:hover {
+  background: #1D4ED8;
+  color: #FFFFFF;
+}
+
+.issue-action-btn.ghost {
+  background: transparent;
+  border-color: transparent;
+  color: #4B5563;
+  text-align: center;
+}
+
+.issue-action-btn.ghost:hover {
+  background: #F3F4F6;
+  color: #111827;
+}
