@@ -78,6 +78,7 @@ const CONFIG = Object.freeze({
     PERFORMANCE:  98,     // %
     QUALITY:      99.50,  // %
     OEE:          88,     // %
+    OEE365:       55,     // % ← DIUBAH: target khusus OEE 365 (badge toolbar & health bar)
   },
 
   // ====== URUTAN KOLOM NAVIGASI (tab order) ======

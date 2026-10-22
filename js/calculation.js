@@ -326,7 +326,7 @@ const Calculation = (() => {
     set365('o365F', Utils.nf2(a365) + ' %', a365 >= CONFIG.TARGET.AVAILABILITY ? 'var(--green-d)' : 'var(--red)');
     set365('o365P', Utils.nf2(avgPerfI) + ' %');
     set365('o365Q', Utils.nf2(M) + ' %');
-    set365('oee365', Utils.nf2(oee365) + '%', oee365 >= CONFIG.TARGET.OEE ? '#2ee27e' : '#f87171');
+    set365('oee365', Utils.nf2(oee365) + '%', oee365 >= (CONFIG.TARGET.OEE365 || 55) ? '#2ee27e' : '#f87171'); // ← DIUBAH
     if (State.el.rincSub365) {
       let note = '';
       if (jedaDur > 0 || mixingDur > 0) {
@@ -358,8 +358,9 @@ const Calculation = (() => {
       State.el.oee365IndicatorValue.textContent = Utils.nf2(oee365) + '%';
       if (State.el.oee365Indicator) {
         State.el.oee365Indicator.classList.remove('good', 'warn', 'bad');
-        if (oee365 >= CONFIG.TARGET.OEE) State.el.oee365Indicator.classList.add('good');
-        else if (oee365 >= 80) State.el.oee365Indicator.classList.add('warn');
+        // ← DIUBAH: OEE 365 pakai target khusus 55%, bukan target OEE utama (88%)
+        if (oee365 >= (CONFIG.TARGET.OEE365 || 55)) State.el.oee365Indicator.classList.add('good');
+        else if (oee365 >= 45) State.el.oee365Indicator.classList.add('warn');
         else State.el.oee365Indicator.classList.add('bad');
       }
     }
@@ -383,7 +384,8 @@ const Calculation = (() => {
     // Health-bar warna (jika UI tersedia)
     const kpiPairs = [
       ['sheetKpiA', sF, 90], ['sheetKpiP', avgPerfI, 98], ['sheetKpiQ', M, 99.5], ['sheetKpiOEE', oee, 88],
-      ['sheetKpiA365', a365, 56], ['sheetKpiP365', avgPerfI, 98], ['sheetKpiQ365', M, 99.5], ['sheetKpiOEE365', oee365, 88],
+      ['sheetKpiA365', a365, 56], ['sheetKpiP365', avgPerfI, 98], ['sheetKpiQ365', M, 99.5],
+      ['sheetKpiOEE365', oee365, (CONFIG.TARGET.OEE365 || 55)], // ← DIUBAH: target 55, bukan 88
     ];
     if (typeof UI !== 'undefined' && UI.updateKpiHealthBar) {
       kpiPairs.forEach(([id, val]) => {
