@@ -765,3 +765,14 @@
 }
 
 .login-theme-option:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 1px; }
+
+/* Logo FIMA pada kartu login (menggantikan teks "TKL") — latar transparan */
+#loginOverlay .login-card .login-logo.login-logo--img {
+  width: auto; height: auto; max-width: 132px;   /* lebar maksimal logo */
+  padding: 0; margin: 0 auto 16px;
+  display: block; background: transparent; border: 0;
+  border-radius: 0; box-shadow: none;
+}
+#loginOverlay .login-card .login-logo--img img {
+  display: block; width: 100%; height: auto; max-height: 116px; object-fit: contain;
+}

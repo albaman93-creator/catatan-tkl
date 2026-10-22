@@ -126,6 +126,7 @@ const Auth = (() => {
       try { await client.auth.signOut(); } catch (e) { /* abaikan jika offline */ }
     }
     currentUser = null;
+    if (typeof ProfileAvatar !== 'undefined') ProfileAvatar.closeMenu();
     State.el.appContainer.classList.remove('show');
     State.el.loginOverlay.classList.remove('hide');
 
@@ -155,6 +156,9 @@ const Auth = (() => {
     State.el.loginOverlay.classList.add('hide');
     State.el.appContainer.classList.add('show');
     App.startMain();
+
+    // Perbarui ikon profil (foto / inisial email)
+    if (typeof ProfileAvatar !== 'undefined') ProfileAvatar.refresh();
 
     // Update indikator mode offline di UI (jika ada)
     if (typeof Shell !== 'undefined' && Shell.applyRoleVisibility) {

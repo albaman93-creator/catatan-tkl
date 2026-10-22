@@ -64,6 +64,7 @@
   <link rel="stylesheet" href="./css/card-formmode.css">
   <link rel="stylesheet" href="./css/card-photo.css">
   <link rel="stylesheet" href="./css/card-csv.css">
+  <link rel="stylesheet" href="./css/profile-avatar.css">
 
 
   <!-- Supabase SDK -->
@@ -597,7 +598,7 @@
 
     <div class="login-card">
       <div class="login-header">
-        <div class="login-logo">TKL</div>
+        <div class="login-logo login-logo--img"><img src="./icons/logo-transparent.png" alt="FIMA Internasional - A Kalbe Company" width="548" height="482"></div>
         <h2>OEE System Login</h2>
         <p>Masukan Email &amp; Password</p>
       </div>
@@ -665,6 +666,21 @@
             <span class="oi-label">📊</span>
             <span>Meeting</span>
           </button>
+        </div>
+
+        <!-- Ikon profil (pojok kanan atas) -->
+        <div class="app-bar-profile" id="appProfile">
+          <button type="button" class="ap-btn" id="apBtn" aria-haspopup="true" aria-expanded="false" title="Profil">?</button>
+          <div class="ap-menu" id="apMenu" hidden>
+            <div class="ap-head">
+              <span class="ap-btn" id="apAvatarLg" aria-hidden="true">?</span>
+              <div class="ap-id">
+                <strong id="apEmail">-</strong>
+                <span id="apSub">Sedang login</span>
+              </div>
+            </div>
+            <button type="button" class="ap-logout" id="apLogout">⎋ Keluar</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2780,6 +2796,7 @@
   <script src="./js/weather.js"></script>
   <script src="./js/settings.js"></script>
   <script src="./js/verify-agent.js"></script>
+  <script src="./js/profile-avatar.js"></script>
   <script src="./js/app.js"></script>
   <script src="./js/sheet-op-sync.js"></script>
   <script src="./js/compact-controls.js"></script>
