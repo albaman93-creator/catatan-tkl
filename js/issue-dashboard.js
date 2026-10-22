@@ -39,6 +39,15 @@ const IssueDashboard = (() => {
     return s.length >= 10 ? s.slice(8, 10) + '/' + s.slice(5, 7) : s;
   };
   const statusCls = (s) => (s === 'Closed' ? 'st-closed' : s === 'On Progress' ? 'st-progress' : 'st-open');
+  /** Label lokasi issue: "Filling · Line 1" (supaya jelas issue ada di mana) */
+  const locLabel = (p) => {
+    const st = String(p.stage || '').trim();
+    const ln = String(p.line ?? '').trim();
+    const stTxt = st ? st.charAt(0).toUpperCase() + st.slice(1) : '';
+    const lnTxt = ln ? 'Line ' + ln : '';
+    return [stTxt, lnTxt].filter(Boolean).join(' · ') || '—';
+  };
+
   const cell = (v) => (v ? `<td>${esc(v)}</td>` : '<td class="pica-null"></td>');
   const isClosed = (s) => String(s || 'Open') === 'Closed';
   const say = (msg, err) => {
@@ -345,7 +354,7 @@ const IssueDashboard = (() => {
     const body = $(bodyId);
     if (!body) return;
     if (!rows.length) {
-      body.innerHTML = `<tr><td colspan="14">${esc(emptyMsg)}</td></tr>`;
+      body.innerHTML = `<tr><td colspan="15">${esc(emptyMsg)}</td></tr>`;
       return;
     }
     body.innerHTML = rows.map((p, i) => {
@@ -357,6 +366,7 @@ const IssueDashboard = (() => {
         <td class="ctr mono">${esc(p.shift != null && p.shift !== '' ? p.shift : '—')}</td>
         <td>${esc(p.produk)}</td>
         <td class="mono">${esc(p.batch || '—')}</td>
+        <td class="ctr">${esc(locLabel(p))}</td>
         <td class="pica-problem">${esc(p.problem)}${p.kind === 'minor' ? ' <small class="issue-kind">MS</small>' : ''}</td>
         <td class="ctr">${esc(p.durLabel)}</td>
         ${cell(p.why1)}${cell(p.why2)}${cell(p.why3)}

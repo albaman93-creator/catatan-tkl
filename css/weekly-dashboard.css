@@ -1189,3 +1189,16 @@ body.wd-resizing {
   .wd-tot-pct { flex-basis: 100%; min-width: 100%; }
   .wd-tot-val { font-size: 16px; }
 }
+
+/* Ikon sidebar Weekly Meeting: SVG garis (modern), mengikuti warna teks */
+.weekly-brand-icon { width: 36px; height: 36px; display: grid; place-items: center; font-size: 0; border-radius: 10px; background: rgba(255,255,255,.08); color: #7dd3fc; }
+.weekly-brand-icon svg { width: 22px; height: 22px; }
+.wn-icon { display: inline-grid; place-items: center; font-size: 0; }
+.wn-icon svg { width: 18px; height: 18px; }
+.weekly-brand-icon svg, .wn-icon svg {
+  display: block; fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.weekly-nav-item .wn-icon { opacity: .85; }
+.weekly-nav-item.is-active .wn-icon, .weekly-nav-item:hover .wn-icon { opacity: 1; }
+@media (max-width: 1023px) { .weekly-nav-item .wn-icon svg { width: 16px; height: 16px; } }

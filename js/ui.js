@@ -423,7 +423,7 @@ const UI = (() => {
   const setSidebarOpen = (open) => {
     document.body.classList.toggle('sidebar-open', open);
     if (State.el.toolbarToggleIcon) {
-      State.el.toolbarToggleIcon.textContent = open ? '✕' : '☰';
+      /* ikon menu/tutup diatur CSS via body.sidebar-open */
     }
     try { localStorage.setItem(CONFIG.TOOLBAR_COLLAPSED_KEY, open ? '0' : '1'); } catch(e){}
   };

@@ -93,7 +93,7 @@
 
 .issue-table {
   width: 100%;
-  min-width: 1100px;
+  min-width: 1240px;
   border-collapse: collapse;
   font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
   font-size: 14px;
@@ -178,11 +178,11 @@
   white-space: nowrap;
 }
 
-/* Otomatis rata kanan untuk kolom No (1) dan Durasi (7) */
+/* Otomatis rata kanan untuk kolom No (1) dan Durasi (8) */
 .issue-table thead th:nth-child(1),
 .issue-table tbody td:nth-child(1),
-.issue-table thead th:nth-child(7),
-.issue-table tbody td:nth-child(7) {
+.issue-table thead th:nth-child(8),
+.issue-table tbody td:nth-child(8) {
   text-align: right;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;

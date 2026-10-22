@@ -254,3 +254,28 @@
   opacity: 1;
   font-size: 13px;
 }
+
+/* Ikon bottom-nav: SVG garis (modern, mengikuti warna teks tab) */
+.bottom-nav .bn-icon {
+  width: 22px !important; height: 22px !important; font-size: 0 !important;
+  display: grid; place-items: center;
+}
+.bottom-nav .bn-icon svg {
+  width: 22px; height: 22px; display: block;
+  fill: none; stroke: currentColor; stroke-width: 1.75;
+  stroke-linecap: round; stroke-linejoin: round;
+  transition: stroke-width .15s ease;
+}
+.bottom-nav .bn-item.on .bn-icon svg { stroke-width: 2.1; }
+
+/* Ikon app-bar: SVG garis (menu ☰/✕ dan tombol Meeting) */
+.ab-icon { display: inline-grid; place-items: center; font-size: 0; line-height: 0; }
+.ab-icon svg {
+  width: 20px; height: 20px; display: block;
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.meeting-indicator .ab-icon svg { width: 15px; height: 15px; }
+#toolbarToggleIcon .ab-ico-close { display: none; }
+body.sidebar-open #toolbarToggleIcon .ab-ico-menu { display: none; }
+body.sidebar-open #toolbarToggleIcon .ab-ico-close { display: block; }

@@ -133,7 +133,7 @@ const Auth = (() => {
     // ✅ Tutup sidebar saat logout
     document.body.classList.remove('sidebar-open');
     if (State.el.toolbarToggleIcon) {
-      State.el.toolbarToggleIcon.textContent = '☰';
+      /* ikon menu diatur CSS via body.sidebar-open */
     }
 
     State.el.loginPassword.value = '';
@@ -211,7 +211,7 @@ const Auth = (() => {
         // ✅ Tutup sidebar juga ketika session berakhir
         document.body.classList.remove('sidebar-open');
         if (State.el.toolbarToggleIcon) {
-          State.el.toolbarToggleIcon.textContent = '☰';
+          /* ikon menu diatur CSS via body.sidebar-open */
         }
       }
     });

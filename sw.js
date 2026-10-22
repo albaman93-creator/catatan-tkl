@@ -3,7 +3,7 @@
  * Cache semua aset aplikasi untuk mode offline.
  * Versi ditingkatkan untuk mencantumkan semua file JS modular.
  */
-const CACHE_NAME = 'tkl-oee-v62';
+const CACHE_NAME = 'tkl-oee-v66';
 
 const PRECACHE = [
   './css/variables.css',
