@@ -43,6 +43,7 @@
   <link rel="stylesheet" href="./css/wizard.css">
   <link rel="stylesheet" href="./css/verify-agent.css">
   <link rel="stylesheet" href="./css/oee365.css">
+  <link rel="stylesheet" href="./css/calculation.css">
   <link rel="stylesheet" href="./css/dashboard.css">
   <link rel="stylesheet" href="./css/weekly-dashboard.css">
   <link rel="stylesheet" href="./css/rincian-produk.css">
@@ -860,11 +861,12 @@
       <button type="button" class="screen-tab bn-item" data-screen="logsheet">
         <span class="bn-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span><span class="bn-label">Sheet</span>
       </button>
-      <button type="button" class="screen-tab bn-item" data-screen="perf-produk">
+      <!-- HIDDEN: tab Rincian Performa Per Produk — hapus atribut hidden di bawah untuk menampilkan lagi -->
+      <button type="button" class="screen-tab bn-item" data-screen="perf-produk" hidden aria-hidden="true">
         <span class="bn-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg></span><span class="bn-label">Performa</span>
       </button>
       <button type="button" class="screen-tab bn-item" data-screen="oee">
-        <span class="bn-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg></span><span class="bn-label">OEE</span>
+        <span class="bn-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg></span><span class="bn-label">OEE OPE</span>
       </button>
       <button type="button" class="screen-tab bn-item" data-screen="oee365">
         <span class="bn-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="M17 14h-6"/><path d="M13 18H7"/><path d="M7 14h.01"/><path d="M17 18h.01"/></svg></span><span class="bn-label">OEE 365</span>
@@ -1413,6 +1415,30 @@
           <div><h2>Perhitungan Pencapaian OEE</h2><div class="sub2" id="rincSub">Evaluasi Shift 1 · A = 510 mnt</div></div>
         </div>
 
+        <!-- Ringkasan produk (atas) — diisi JS dari calculation.js -->
+        <div class="oee-summary-wrap" id="oeeSummaryWrap">
+          <div class="modern-table-container">
+            <table class="modern-table" id="oeeSummaryTable">
+              <thead>
+                <tr>
+                  <th>Nama Produk</th>
+                  <th>Waktu Ops (mnt)</th>
+                  <th>Speed Std (u/mnt)</th>
+                  <th>Output Std</th>
+                  <th>Output Aktual</th>
+                  <th>Output Baik</th>
+                  <th>Output Defect</th>
+                </tr>
+              </thead>
+              <tbody id="oeeSummaryBody">
+                <tr class="oee-summary-empty">
+                  <td colspan="7">Belum ada data produk pada shift ini</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <div class="tbl-wrap">
           <table class="oee-matrix-tbl">
             <thead>
@@ -1472,7 +1498,7 @@
             <span class="oee365-badge">OEE</span>
             <div class="oee365-head-text">
               <h2>OEE 365</h2>
-              <p class="oee365-sub" id="rincSub365">Availability terhadap menit penuh shift (S1=510 · S2=480 · S3=450)</p>
+              <p class="oee365-sub" id="rincSub365">Availability vs Time Available Filling (S1=510 · S2=480 · S3=450)</p>
             </div>
           </header>
 
@@ -1487,24 +1513,17 @@
               <tbody>
                 <tr class="oee365-sec"><td colspan="2">% Availability 365</td></tr>
                 <tr>
-                  <td>
-                    <span class="oee365-code">A<sub>365</sub></span>
-                    Menit penuh shift (S1 510 / S2 480 / S3 450)
-                  </td>
+                  <td>Waktu Operasional Pabrik (menit)</td>
                   <td class="oee365-val"><span id="o365A">0</span> mnt</td>
                 </tr>
                 <tr>
-                  <td>
-                    <span class="oee365-code">E</span>
-                    Waktu operasional / produktif terpakai (C − D)
-                  </td>
+                  <td>Waktu Operasional (menit)</td>
                   <td class="oee365-val"><span id="o365E">0</span> mnt</td>
                 </tr>
                 <tr>
                   <td>
-                    <span class="oee365-code">F<sub>365</sub></span>
-                    <b>% A 365</b> → (E ÷ A<sub>365</sub>)
-                    <small class="oee365-hint">Berapa % dari shift penuh yang operasional</small>
+                    <span class="oee365-code">A</span>
+                    % Availability 365
                   </td>
                   <td class="oee365-val oee365-val-accent"><span id="o365F">0,00</span> %</td>
                 </tr>
@@ -1513,7 +1532,7 @@
                 <tr>
                   <td>
                     <span class="oee365-code">P</span>
-                    % Performance (rata-rata)
+                    % Performance
                   </td>
                   <td class="oee365-val"><span id="o365P">0,00</span> %</td>
                 </tr>
@@ -1529,7 +1548,7 @@
                 <tr class="oee365-result-row">
                   <td>
                     <span class="oee365-code">OEE</span>
-                    F<sub>365</sub> × P × Q · Availability berbasis menit penuh shift
+                    F<sub>365</sub> × P × Q
                   </td>
                   <td class="oee365-val oee365-val-result" id="oee365">0,00%</td>
                 </tr>

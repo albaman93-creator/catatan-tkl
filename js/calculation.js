@@ -77,9 +77,9 @@ const Calculation = (() => {
       pLabels.push(label);
     }
     const prodStats = [
-      { dur:0, rate:parseFloat(State.el.prodRate1.value)||0, target:0, actual:0 },
-      { dur:0, rate:parseFloat(State.el.prodRate2.value)||0, target:0, actual:0 },
-      { dur:0, rate:parseFloat(State.el.prodRate3.value)||0, target:0, actual:0 },
+      { dur:0, rate:parseFloat(State.el.prodRate1.value)||0, target:0, actual:0, good:0, defect:0 },
+      { dur:0, rate:parseFloat(State.el.prodRate2.value)||0, target:0, actual:0, good:0, defect:0 },
+      { dur:0, rate:parseFloat(State.el.prodRate3.value)||0, target:0, actual:0, good:0, defect:0 },
     ];
 
     /**
@@ -180,6 +180,8 @@ const Calculation = (() => {
           if (slot >= 0) {
             prodStats[slot].dur += dur;
             prodStats[slot].actual += rowActual;
+            prodStats[slot].good += gVal;
+            prodStats[slot].defect += dVal;
             // Rate efektif: Kemas L1/L2 proporsional OP baris; selain itu rate master
             const eff = (Rows.getEffectiveRate)
               ? Rows.getEffectiveRate(prodName, g('op'))
@@ -241,6 +243,35 @@ const Calculation = (() => {
     const badge = State.el.badgeAvgP;
     badge.style.color = avgPerfI >= CONFIG.TARGET.PERFORMANCE ? 'var(--green-d)' : 'var(--red)';
     badge.style.borderColor = avgPerfI >= CONFIG.TARGET.PERFORMANCE ? 'rgba(18,161,80,0.3)' : 'rgba(220,38,38,0.3)';
+
+    // === RINGKASAN PRODUK (tabel modern di atas matrix OEE) ===
+    // Tidak mengubah rumus OEE — hanya menampilkan ringkasan per slot produk aktif.
+    const summaryBody = document.getElementById('oeeSummaryBody');
+    if (summaryBody) {
+      const rows = [];
+      for (let i = 0; i < 3; i++) {
+        const st = prodStats[i];
+        const label = pLabels[i];
+        const hasData = label && (st.dur > 0 || st.actual > 0 || st.target > 0 || st.rate > 0);
+        if (!hasData) continue;
+        const gTarget = st.target > 0 ? st.target : (st.dur * st.rate);
+        const defectCls = st.defect > 0 ? ' class="defect-val"' : '';
+        rows.push(
+          `<tr>` +
+            `<td><span class="prod-icon">📦</span>${Utils.escapeHtml ? Utils.escapeHtml(label) : label}</td>` +
+            `<td class="highlight-text">${Utils.nf0(st.dur)}</td>` +
+            `<td>${Utils.nf0(st.rate)}</td>` +
+            `<td>${Utils.nf0(gTarget)}</td>` +
+            `<td>${Utils.nf0(st.actual)}</td>` +
+            `<td>${Utils.nf0(st.good)}</td>` +
+            `<td${defectCls}>${Utils.nf0(st.defect)}</td>` +
+          `</tr>`
+        );
+      }
+      summaryBody.innerHTML = rows.length
+        ? rows.join('')
+        : `<tr class="oee-summary-empty"><td colspan="7">Belum ada data produk pada shift ini</td></tr>`;
+    }
 
     // === QUALITY ===
     const K = sumDefect;
@@ -306,15 +337,9 @@ const Calculation = (() => {
         `Shift ${State.evalShift + 1} · A₃₆₅ = ${Utils.nf0(a365Base)} mnt (${sA}${note}) · E = ${Utils.nf0(sE)} mnt · A365 = ${Utils.nf2(a365)}%`;
     }
     if (State.el.diag365) {
-      const mixNote = (jedaDur > 0 || mixingDur > 0)
-        ? ` Basis = shift ${sA}` +
-          (jedaDur > 0 ? ` − Jeda ${Utils.nf0(jedaDur)}` : '') +
-          (mixingDur > 0 ? ` − Mixing ${Utils.nf0(mixingDur)}` : '') +
-          ` = ${Utils.nf0(a365Base)} mnt.`
-        : ` Basis = menit penuh shift (${sA}).`;
       State.el.diag365.innerHTML =
         `<div class="d-item ok">OEE 365 = ${Utils.nf2(a365)}% × ${Utils.nf2(avgPerfI)}% × ${Utils.nf2(M)}% = <b>${Utils.nf2(oee365)}%</b>
-         <br><small>Availability 365 = E ÷ Time Available Filling (basis OEE 365).${mixNote} Bukan ÷ waktu terencana (C).</small></div>`;
+         <br><small>Availability 365 = E ÷ Time Available Filling.</small></div>`;
     }
 
     // Badge %OEE mini di toolbar atas — biar kelihatan real-time tanpa

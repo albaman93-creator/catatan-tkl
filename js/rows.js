@@ -276,9 +276,17 @@ const Rows = (() => {
   };
 
   const updateMatrixProductHeaders = () => {
-    State.el.thProd1.textContent = State.el.prodName1.value.trim() || 'Produk 1';
-    State.el.thProd2.textContent = State.el.prodName2.value.trim() || 'Produk 2';
-    State.el.thProd3.textContent = State.el.prodName3.value.trim() || 'Produk 3';
+    const label = (i) => {
+      const name = (State.el['prodName' + i]?.value || '').trim();
+      const bn   = (State.el['prodBn' + i]?.value || '').trim();
+      if (name && bn) return name + ' ' + bn;
+      if (name) return name;
+      if (bn) return bn;
+      return 'Produk ' + i;
+    };
+    State.el.thProd1.textContent = label(1);
+    State.el.thProd2.textContent = label(2);
+    State.el.thProd3.textContent = label(3);
   };
 
   // ====== MANIPULASI BARIS ======

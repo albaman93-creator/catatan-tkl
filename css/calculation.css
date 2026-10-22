@@ -1,1 +1,140 @@
-/* 1:1 dengan js/calculation.js — belum ada style khusus (logic-only / pakai shared). Tambahkan aturan di sini bila modul punya UI sendiri. */
+/* Ringkasan produk di halaman OEE OPE (atas matrix A–M) */
+
+.oee-summary-wrap {
+  margin: 0 0 16px;
+}
+
+.modern-table-container {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.modern-table th {
+  background-color: #f8fafc;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 14px 16px;
+  border-bottom: 2px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.modern-table td {
+  padding: 14px 16px;
+  color: #334155;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #f1f5f9;
+  border-right: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.modern-table th:last-child,
+.modern-table td:last-child {
+  border-right: none;
+}
+
+.modern-table th:first-child,
+.modern-table td:first-child {
+  text-align: left;
+}
+
+.modern-table td:first-child {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.modern-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.modern-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.modern-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.modern-table .highlight-text {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.modern-table .defect-val {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.modern-table .oee-summary-empty td {
+  text-align: center;
+  color: #94a3b8;
+  font-weight: 400;
+  padding: 20px 16px;
+}
+
+.modern-table .prod-icon {
+  display: inline-block;
+  margin-right: 6px;
+  opacity: 0.85;
+}
+
+[data-theme="dark"] .modern-table-container,
+.dark .modern-table-container {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .modern-table th,
+.dark .modern-table th {
+  background-color: #0f172a;
+  color: #94a3b8;
+  border-bottom-color: #334155;
+  border-right-color: #334155;
+}
+
+[data-theme="dark"] .modern-table td,
+.dark .modern-table td {
+  color: #cbd5e1;
+  border-bottom-color: #1e293b;
+  border-right-color: #1e293b;
+}
+
+[data-theme="dark"] .modern-table td:first-child,
+.dark .modern-table td:first-child {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .modern-table tbody tr:hover,
+.dark .modern-table tbody tr:hover {
+  background-color: #0f172a;
+}
+
+[data-theme="dark"] .modern-table .highlight-text,
+.dark .modern-table .highlight-text {
+  color: #f8fafc;
+}
+
+@media (max-width: 720px) {
+  .oee-summary-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modern-table {
+    min-width: 640px;
+  }
+}

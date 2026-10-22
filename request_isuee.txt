@@ -456,3 +456,228 @@ dan buatkan juga untuk sheet yang perhitungan perproduk
 name sheet all proses produk (data per produk)
 
 Produk	|batch number|	TGL	| shift | Line | tahapan proses |Time Available | Waktu Produksi Terencana |waktu breakdown tidak terencana| Waktu Operasional |standart output| good|defect|
+
+
+#tambah filter rekapan 
+tambah disampingnya filet rekapan per bacth 
+jadi tombol yang tadinya "Kegiatan (detail)","Rekap per produk","Rekap Per Batch"
+isi dari pada "Rekap Per Batch"
+gabungan dari setiap batch 
+Produk	Batch	    TGL	                                                                   Line	Tahapan 	Time Available	Waktu Produksi Terencana	Breakdown tidak terencana 	Waktu Operasional	Standart    output  	Good	Defect
+VKAM1   26001074     01/10/26(atau jika tanggal nya beda jadikan misal 01/10-02/10/26)     1      Filling        ...                 ...                             ...                     ...             ...       ...           ..      
+
+
+nama button filter "Rekap per produk"
+ganti jadi
+"Rekap batch per shift"
+pada bagian data di dalam nya "Rekap batch per shift"
+ketika salah satu di klik maka akan nge link ke sheet nya misal
+
+
+
+    Produk	Batch	    TGL	        Shift	Line	Tahapan 	Time Available	Waktu ProduksiTerencana	    Breakdown tidak terencana 	Waktu Operasional	Standart output	    Good	   Defect
+    VKAM1 	L050007 	01/10/2026 	1 	        1 	filling 	       510 	                290 	                115 	                    175 	        3150 	        2430 	    8
+
+
+
+tambahkan baru pada dashboard weekly meeting
+
+ 📈 Capaian Yield Produksi
+🎯 OEE PRODUCTION
+📋 Rincian per Produk
+ISSUE terdapat indikator angka di dalam bulatan total issue yang belum terselesaikan
+    tambah dashborad khusus untuk mengumpulkn data issue yang terdapat pada 2 tabel yang terpisah terdapat 2 tabel open dan tabel close
+    ketika masih open akan berada di tabel atas yaitu tabel open , ketika sudah close berpindah ke tabel close 
+    setiap issue ada nomor nya terus juga ada 
+    contoh misal :
+
+    Tab Status (Filter): Di bagian bawahnya terdapat opsi untuk memfilter daftar issue berdasarkan statusnya:
+
+    Sebuah kotak centang (checkbox) kosong di sebelah kiri.
+
+    Tab "Open" dengan indikator angka 6 di dalam lingkaran abu-abu (menunjukkan ada 6 issue yang masih terbuka).
+
+    Tab "Closed" dengan indikator misal angka 9 di dalam lingkaran abu-abu (menunjukkan ada 9 issue yang sudah ditutup). Tulisan "Closed" tercetak tebal (bold), menandakan bahwa filter ini sedang aktif digunakan sesuai dengan kueri di kolom pencarian.
+>> tabel Open. tabel close total terdapat indikator angka total issue yang sudah close
+	No.	Date	Shift	Produk	No. Batch	Problem	Durasi (min) 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+
+
+>>
+tabel close total terdapat indikator angka total issue yang sudah close
+
+No.	Date	Shift	Produk	No. Batch	Problem	Durasi (min) 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+
+
+pada bagian "ISSUE DASHBOARD" itu tambahkan juga filter 
+Dari Tanggal
+Sampai Tanggal
+Line
+Tahapan
+Shift
+produk
+Mesin
+
+maka pada ISSUE DASHBOARD akan menampilkan issue atau breakdown ataupun minor stop nya 
+Kumpulan PICA Breakdown & Minor · Open / Closed
+Dari Tanggal
+Sampai Tanggal
+✓ 0 issue · Open 0 · Closed 0 · dari 7 record
+Open 0
+Closed 0
+Semua
+
+# ketika di klik pada baris tabel misal selection salah satu issue di tabel akan menampilkan pilihan lihat di log sheet atau buka kolom form why why untuk menyelesaikan issue
+
+✍️ Form Why-Why / PICA (Breakdown) atau form minor stop
+×
+— · Batch — · 07/10/2026 · S1 · Line 1 · filling
+Problem: Filling eror (20 mnt)
+Produk
+No. Batch
+Problem
+Frekuensi (kali)
+Why 1
+Why 2
+Why 3
+Corrective Action
+Preventive Action
+PIC
+Status
+
+data itu ngelink dengan data yang ada kalau di sini di close 
+maka di sana pun bisa di close 
+dengan begitu akan dengan mudah boleh dari pica boleh juga dari dashboard issue , karena dashboard issue adalah untuk memudahkan semua nya , 
+agar terlihat den terfilter dengan nyaman dan mudah dalam hal ini sehingga memudahkan di dalam pengerjaan 
+
+
+pada bagian ini fungsi nya belum berjalan ketika tombol di klik belum ada ngelink ataupun membuka form why why
+
+VTTS1 · Main drive tidak bisa berjalan
+06/10/2026 · S1 · L1 · filling · Breakdown · Open
+📄 Lihat di Log Sheet
+✍️ Buka Form Why-Why / PICA
+Batal
+
+
+dan saya mau menambahkan pada card di itu menjadi
+
+
+VTTS1 L030210 · Main drive tidak bisa berjalan
+06/10/2026 · S1 · L1 · filling · Breakdown · Open
+
+📄 Lihat di Log Sheet (ngelink ke log sheet tersebut)
+✍️ Buka Form Why-Why / PICA (ngelink buka form why why)
+Batal
+
+
+#Tambahkan Line pada dashboard issue
+No.	Date	Shift	Produk	No. Batch	Problem 	Durasi (min)	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+menjadi 
+
+No.	Date	Shift	Produk	No. Batch Line/tahapan	Problem 	Durasi (min)	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+
+
+#tambahkan 
+tambahkan pada bagian ISSUE DASHBOARD
+
+pada bagian masing masing tabel closed dan open 
+sebelum nya 
+No.	Date	Shift	Produk	No. Batch	Problem 	Durasi (min)	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+menjadi 
+
+No.	Date	Shift	Produk	No. Batch line/tahapan	Problem 	Durasi (min)	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+menambahkan kolom line dan tahapan supaya tau issue itu ada di mana 
+
+
+#Tambahkan Nama mesin pada bagian logsheet yang ngelink dengan di Data & Penyimpanan di 
+
+di tampilan log sheet oee 
+
+▣22 OCT 2026
+Mixing▾
+Line 1▾
+Shift 2▾
+OPR▾
+Produk▾ 
+Mesin▾ <<(tambahkan ini ])
+bagian itu juga bisa terisi otomatis isi nya :
+jika yang di piling line 1 tahapan filling maka Mesin Automatic Form Fill Seal Machine Shinva RSYG2-1-23005
+jika yang di piling line 2 tahapan filling maka Mesin Automatic Form Fill Seal Machine Plumat FFS 991
+jika yang di piling line 4 tahapan filling maka Mesin Automatic Form Fill Seal Machine Plumat FFS 892
+jika yang di piling line 1 tahapan kemas maka Mesin Overwrapping Machine Sysflex Line 1
+jika yang di piling line 1 tahapan kemas maka  Mesin Overwrapping Machine Sysflex Line 2
+jika yang di piling line 1 tahapan kemas maka  Mesin Overwrapping Machine Plumat OW 834
+
+
+pada bagian dropdown Mixing▾ tahapan proses nya di bagian logsheet yang sebelum nya Tahapan Proses
+×
+Mixing
+Filling
+Steril
+Visual
+Kemas
+
+menjadi :
+
+Tahapan Proses
+×
+Filling
+Kemas
+ saja 
+ namun di Tahapan Proses yang ada di halaman bagian Shift&Produk biarkan saja lengkap jangan di sentuh cukup yang bagian log sheet oee nya saja 
+
+Dan tanam dropdown pada kolom mesin 
+Mixing Olsa PCBS 2500,Mixing Tofflon,Mixing LB4000/1
+
+
+
+Raphkan tulisan supaya lebih rapih dan ringkas 
+
+pada OEE 365
+
+A365 Menit penuh shift (S1 510 / S2 480 / S3 450) Menjadi "A365 waktu terpakai filling"
+
+ Waktu operasional / produktif terpakai
+
+E Waktu operasional / produktif terpakai (C − D) menjadi "Waktu operasional / produktif terpakai"
+F365 % A 365 → (E ÷ A365)
+Berapa % dari shift penuh yang operasional menjadi "F365 % A 365"
+
+OEE 365 = 100,00% × 0,00% × 0,00% = 0,00%
+Availability 365 = E ÷ Time Available Filling (basis OEE 365). Basis = menit penuh shift (480). Bukan ÷ waktu terencana (C)". 
+menjadi
+OEE 365 = 100,00% × 0,00% × 0,00% = 0,00%
+Availability 365 = E ÷ Time Available Filling." 
+
+<span class="bn-label">OEE</span> jadi <span class="bn-label">OEE OPE</span>
+
+<th id="thProd1">Produk 1</th> akan menjadi format <th id="thProd1">Produk 1 = ambil dari nilai //*[@id="masterProdName1"] + //*[@id="masterProdBn1"] </th>
+
+
+
+
+Shift&Produk
+Inisial
+Sheet
+Performa
+OEE OPE
+OEE 365
+Dashboard 
+
+
+menjadi 
+
+
+Shift&Produk
+Inisial
+Sheet
+OEE OPE
+OEE 365
+Dashboard 
+
