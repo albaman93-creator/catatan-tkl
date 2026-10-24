@@ -29,6 +29,13 @@
   const writeToOriginal = (val) => {
     const el = original();
     if (!el) return;
+    // #fMesinNama berupa <select>: nama ketikan manual harus punya opsi, kalau tidak nilainya jadi kosong
+    if (el.tagName === 'SELECT' && val && !Array.from(el.options).some((o) => o.value === val)) {
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.textContent = val;
+      el.appendChild(opt);
+    }
     el.value = val;
     el.dispatchEvent(new Event('input', { bubbles: true }));
   };

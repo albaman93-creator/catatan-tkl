@@ -193,13 +193,29 @@ mixing: ['VTTS1 Mixing L', 'VTTS1 Loading L', 'VKAM1 Mixing L', 'VKAM1 Loading L
   // secara otomatis begitu Line / Tahapan Proses diganti.
   // Key = '<tahapan>|<line>' (huruf kecil). Silakan tambah/ubah daftar di
   // sini sesuka hati — tidak perlu sentuh js/ui.js.
-  MACHINE_NAMES: {
+    MACHINE_NAMES: {
+    'mixing|1':  'Mixing Tank OLSA PCBS 2500',
     'filling|1': 'Automatic Form Fill Seal Machine Shinva RSYG2-1-23005',
-    'filling|2': 'Automatic Form Fill Seal Machine Plumat FFS 991',
-    'filling|4': 'Automatic Form Fill Seal Machine Plumat FFS 892',
+    'steril|1':  'Autoclave Getinge 2',
+    'visual|1':  'Mesin Bonfiglioli',
     'kemas|1':   'Overwrapping Machine Sysflex Line 1',
+
+    'mixing|2':  'Mixing Tank Tofflon APLS 3500',
+    'filling|2': 'Automatic Form Fill Seal Machine Plumat FFS 991',
+    'steril|2':  'Autoclave Shinva',
+    'visual|2':  'NIKKA DENSOK',
     'kemas|2':   'Overwrapping Machine Sysflex Line 2',
+
+    'mixing|4':  'Mixing TANK LB4000/1',
+    'filling|4': 'Automatic Form Fill Seal Machine Plumat FFS 892',
+    'steril|4':  'Autoclave Getinge 4',
+    'visual|4':  'NIKKA DENSOK',
     'kemas|4':   'Overwrapping Machine Plumat OW 834',
+  },
+
+  // Pilihan ganda untuk kombinasi tertentu (urutan pertama = default)
+  MACHINE_NAMES_ALT: {
+    'kemas|1': ['Overwrapping Machine Sysflex Line 1', 'Mesin Colimatic'],
   },
 
   // ====== MODE INPUT (Normal / Cepat 1 / Cepat 2) ======

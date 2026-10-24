@@ -109,67 +109,82 @@ const UI = (() => {
     });
     fillMachineName();
   };
-  /**
-   * Isi dropdown Nama Mesin sesuai tahapan + line.
-   * - Opsi diambil dari CONFIG.MACHINE_NAMES / MACHINE_NAMES_ALT
-   * - Jika nilai tersimpan tidak ada di daftar, tetap ditampilkan agar data lama tidak hilang
-   * - Default terpilih = mesin utama untuk tahap+line tersebut
-   */
-  const fillMachineName = () => {
-    const stage = String(State.el.fStage?.value || 'mixing').toLowerCase();
-    const line = String(State.el.fLine?.value || '1');
-    const key = stage + '|' + line;
+  let lastAutoMachine = '';   // dipakai cabang input teks (versi lama)
+
+  /** Daftar nama mesin yang sah untuk kombinasi tahapan|line (default + pilihan ganda). */
+  const machineOptionsFor = (key) => {
     const names = CONFIG.MACHINE_NAMES || {};
     const alts = (CONFIG.MACHINE_NAMES_ALT && CONFIG.MACHINE_NAMES_ALT[key]) || [];
     const primary = names[key] || '';
+    const list = [];
+    const add = (v) => { const t = String(v || '').trim(); if (t && !list.includes(t)) list.push(t); };
+    add(primary);
+    alts.forEach(add);
+    return { primary, list };
+  };
+
+  const currentMachineKey = () =>
+    String(State.el.fStage?.value || 'mixing').toLowerCase() + '|' + String(State.el.fLine?.value || '1');
+
+  /**
+   * Isi Nama Mesin sesuai tahapan + line (dipanggil saat tombol Line/Tahapan berganti).
+   * - Dropdown berisi default + pilihan ganda dari CONFIG.MACHINE_NAMES / MACHINE_NAMES_ALT
+   * - Default (urutan pertama) langsung dipilih
+   * - Nama lain yang sudah ada di kolom (data lama / ketikan manual) tetap ditampilkan sebagai opsi
+   */
+  const fillMachineName = () => {
+    const key = currentMachineKey();
+    const { primary, list } = machineOptionsFor(key);
     const el = State.el.fMesinNama || document.getElementById('fMesinNama');
     if (!el) return;
-
     const cur = (el.value || '').trim();
-    // Susun daftar opsi unik: primary dulu, lalu alt, lalu nilai lama jika tidak ada di daftar
-    const opts = [];
-    const seen = new Set();
-    const add = (v) => {
-      const s = String(v || '').trim();
-      if (!s || seen.has(s)) return;
-      seen.add(s);
-      opts.push(s);
-    };
-    if (alts.length) {
-      alts.forEach(add);
-    } else if (primary) {
-      add(primary);
-    }
-    // Semua mesin lain di tahap yang sama (misal ganti line) ikut tampil sebagai cadangan
-    Object.keys(names).forEach((k) => {
-      if (k.startsWith(stage + '|')) add(names[k]);
-    });
-    if (cur) add(cur);
+    const allNames = Object.values(CONFIG.MACHINE_NAMES || {});
 
-    const isSelect = el.tagName === 'SELECT';
-    if (isSelect) {
-      const prev = cur;
+    if (el.tagName === 'SELECT') {
+      // Nama lama dipertahankan hanya jika BUKAN nama mesin milik kombinasi lain
+      // (nama custom / data lama tetap aman).
+      const keepCur = cur && !list.includes(cur) && !allNames.includes(cur);
+      const opts = keepCur ? [...list, cur] : list;
       el.innerHTML = '<option value="">— Pilih mesin —</option>' +
         opts.map((o) => `<option value="${String(o).replace(/"/g, '&quot;')}">${o}</option>`).join('');
-      // Pertahankan pilihan user jika masih valid; jika kosong / default lama → pilih primary
-      if (prev && seen.has(prev)) {
-        el.value = prev;
-      } else if (primary) {
-        el.value = primary;
-      } else if (opts.length) {
-        el.value = opts[0];
-      } else {
-        el.value = '';
-      }
+      if (primary) el.value = primary;
+      else if (keepCur) el.value = cur;
+      else el.value = '';
       el.dispatchEvent(new Event('change', { bubbles: true }));
     } else {
       // fallback input teks (versi lama)
-      if (!cur || Object.values(names).includes(cur) || alts.includes(cur)) {
+      if (!cur || cur === lastAutoMachine || allNames.includes(cur)) {
         el.value = primary || cur;
+        lastAutoMachine = el.value;
         el.dispatchEvent(new Event('input', { bubbles: true }));
       }
     }
   };
+
+  /**
+   * Koreksi setelah data tersimpan dimuat: kalau nama tersimpan adalah mesin milik
+   * kombinasi LAIN (sisa bug lama), ganti dengan default kombinasi yang aktif.
+   * Nama custom yang tidak ada di config dibiarkan.
+   */
+  const reconcileMachineName = () => {
+    const el = State.el.fMesinNama || document.getElementById('fMesinNama');
+    if (!el) return;
+    const key = currentMachineKey();
+    const { primary, list } = machineOptionsFor(key);
+    const cur = (el.value || '').trim();
+    if (!primary || cur === primary || list.includes(cur)) return;
+    const milikLain = Object.values(CONFIG.MACHINE_NAMES || {}).includes(cur);
+    if (!cur || milikLain) {
+      if (el.tagName === 'SELECT' && !Array.from(el.options).some((o) => o.value === primary)) {
+        const opt = document.createElement('option');
+        opt.value = primary; opt.textContent = primary;
+        el.appendChild(opt);
+      }
+      el.value = primary;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  };
+
   const bindFilterToggles = () => {
     document.querySelectorAll('#fLineSel [data-line]').forEach(b => {
       b.addEventListener('click', () => {
@@ -621,6 +636,10 @@ const UI = (() => {
     }
     State.el.syncStatus.dataset.edit = base;
     applyChip();
+    // Setelah data tersimpan dimuat, pastikan Nama Mesin cocok dengan Line + Tahapan aktif.
+    // Lewati jika ini hasil simpan barusan (jangan menimpa pilihan user).
+    const baruDisimpan = d && d.savedAt && (Date.now() - new Date(d.savedAt).getTime()) < 3000;
+    if (!baruDisimpan) reconcileMachineName();
   };
 
   const setSyncStatus = (kind, text) => {
@@ -765,7 +784,7 @@ const UI = (() => {
   return {
     tick, startClock, toast, autoResizeTextarea,
     applyModeUI, bindModeButtons, loadNavMode,
-    applyShiftUI, applyLineUI, applyStageUI, fillMachineName, bindFilterToggles, bindShiftButtons, loadEvalShift,
+    applyShiftUI, applyLineUI, applyStageUI, fillMachineName, reconcileMachineName, bindFilterToggles, bindShiftButtons, loadEvalShift,
     updateShiftIndicator, updateUnifiedControl, updateKpiHealthBar, bindUnifiedControls,
     bindToolbarToggle, loadToolbarCollapsed,
     bindScreenNav, loadActiveScreen, showScreen, openRecord,
