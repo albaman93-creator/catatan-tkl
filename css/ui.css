@@ -335,3 +335,56 @@ textarea.in {
 }
 
 .field-hint { display: block; margin-top: 6px; font-size: 11px; color: #64748b; line-height: 1.35; }
+
+/* Sembunyikan default form Produk 2 dan Produk 3 */
+#masterProductGrid > div.field:nth-child(2),
+#masterProductGrid > div.field:nth-child(3) {
+  display: none;
+  position: relative;
+}
+
+/* Munculkan form saat aktif */
+#masterProductGrid > div.field.show-prod {
+  display: block !important;
+}
+
+/* Tombol hapus/silang pada kotak produk cadangan */
+.btn-del-prod {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent;
+  border: none;
+  color: #d9383a;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.btn-del-prod:hover {
+  background-color: #fee2e2;
+}
+
+/* Tombol tambah produk cadangan */
+.btn-tambah-prod {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1264a3;
+  background-color: #f0f6fa;
+  border: 1px dashed #7aa3c4;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-tambah-prod:hover {
+  background-color: #e1eef7;
+  border-color: #1264a3;
+}

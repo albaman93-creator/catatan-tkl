@@ -1978,3 +1978,14 @@
     font-size: 10px !important;
   }
 }
+
+/* Sembunyikan default form Produk 2 dan Produk 3 */
+#masterProductGrid > div.field:nth-child(2),
+#masterProductGrid > div.field:nth-child(3) {
+  display: none;
+}
+
+/* Munculkan kembali saat kelas aktif diberikan oleh JS */
+#masterProductGrid > div.field.show-prod {
+  display: block !important;
+}

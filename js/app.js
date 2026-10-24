@@ -916,3 +916,161 @@ const App = (() => {
 
 // Boot aplikasi saat DOM siap
 document.addEventListener('DOMContentLoaded', App.init);
+
+// === PENGATURAN TAMBAH & HAPUS PRODUK CADANGAN ===
+function initProductButton() {
+  const grid = document.getElementById('masterProductGrid');
+  if (!grid) return;
+
+  const prod2Box = grid.querySelector('div.field:nth-child(2)');
+  const prod3Box = grid.querySelector('div.field:nth-child(3)');
+  const p2Name = document.getElementById('masterProdName2');
+  const p3Name = document.getElementById('masterProdName3');
+
+  // 1. Buat tombol "+ Tambah Produk Cadangan" jika belum ada
+  let btnAdd = document.getElementById('btnTambahProduk');
+  if (!btnAdd) {
+    btnAdd = document.createElement('button');
+    btnAdd.id = 'btnTambahProduk';
+    btnAdd.type = 'button';
+    btnAdd.className = 'btn-tambah-prod';
+    btnAdd.textContent = '+ Tambah Produk Cadangan';
+    grid.insertAdjacentElement('afterend', btnAdd);
+  }
+
+  // 2. Fungsi untuk mengosongkan semua input di dalam box produk
+  function resetBox(box) {
+    if (!box) return;
+    box.querySelectorAll('input, select').forEach((el) => {
+      el.value = '';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    box.classList.remove('show-prod');
+    cekStatusTombol();
+  }
+
+  // 3. Tambahkan tombol "✕ Hapus" pada Produk 2 & 3
+  function pasangTombolHapus(box, labelText) {
+    if (!box || box.querySelector('.btn-del-prod')) return;
+    const btnDel = document.createElement('button');
+    btnDel.type = 'button';
+    btnDel.className = 'btn-del-prod';
+    btnDel.innerHTML = '✕ Hapus ' + labelText;
+    btnDel.onclick = () => resetBox(box);
+    box.appendChild(btnDel);
+  }
+
+  pasangTombolHapus(prod2Box, 'Produk 2');
+  pasangTombolHapus(prod3Box, 'Produk 3');
+
+  // 4. Buka otomatis jika sudah ada data tersimpan sebelumnya
+  if (p2Name && p2Name.value.trim() !== '' && prod2Box) {
+    prod2Box.classList.add('show-prod');
+  }
+  if (p3Name && p3Name.value.trim() !== '' && prod3Box) {
+    prod3Box.classList.add('show-prod');
+  }
+
+  // 5. Cek visibilitas tombol tambah
+  function cekStatusTombol() {
+    const isP2 = prod2Box && prod2Box.classList.contains('show-prod');
+    const isP3 = prod3Box && prod3Box.classList.contains('show-prod');
+
+    if (isP2 && isP3) {
+      btnAdd.style.display = 'none';
+    } else {
+      btnAdd.style.display = 'inline-flex';
+    }
+  }
+
+  // 6. Klik tombol tambah: urutkan Produk 2 dulu, lalu Produk 3
+  btnAdd.onclick = function () {
+    if (prod2Box && !prod2Box.classList.contains('show-prod')) {
+      prod2Box.classList.add('show-prod');
+      p2Name?.focus();
+    } else if (prod3Box && !prod3Box.classList.contains('show-prod')) {
+      prod3Box.classList.add('show-prod');
+      p3Name?.focus();
+    }
+    cekStatusTombol();
+  };
+
+  cekStatusTombol();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initProductButton);
+} else {
+  initProductButton();
+}
+
+// === PENGATURAN SINKRONISASI KOLOM TABEL OEE agar kolom nya mengikuti jumlah produk ada berapa yang di pilih===
+function initMatrixSync() {
+  const p2Name = document.getElementById('masterProdName2');
+  const p3Name = document.getElementById('masterProdName3');
+
+  function syncColumns() {
+    const hasP2 = p2Name && p2Name.value.trim() !== '';
+    const hasP3 = p3Name && p3Name.value.trim() !== '';
+
+    let colCount = 1;
+    if (hasP2) colCount = 2;
+    if (hasP3) colCount = 3;
+
+    // 1. Ubah rentang kolom (colspan) hanya untuk Availability (A,B,C,D,E,F) dan baris OEE paling bawah
+    const colspanIds = ['oA', 'oB', 'oC', 'oD', 'oE', 'oF'];
+    colspanIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.parentElement && el.parentElement.tagName === 'TD') {
+        el.parentElement.colSpan = colCount;
+      }
+    });
+
+    const oeeEl = document.getElementById('oee');
+    if (oeeEl) oeeEl.colSpan = colCount;
+
+    // 2. Sembunyikan/Tampilkan Kolom Produk 2 (Performance & Quality)
+    const p2Display = hasP2 ? '' : 'none';
+    if (document.getElementById('thProd2')) document.getElementById('thProd2').style.display = p2Display;
+    ['oG2', 'oH2', 'oJ2', 'oK2', 'oL2'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.parentElement.style.display = p2Display;
+    });
+    ['colI2', 'colM2'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = p2Display;
+    });
+
+    // 3. Sembunyikan/Tampilkan Kolom Produk 3 (Performance & Quality)
+    const p3Display = hasP3 ? '' : 'none';
+    if (document.getElementById('thProd3')) document.getElementById('thProd3').style.display = p3Display;
+    ['oG3', 'oH3', 'oJ3', 'oK3', 'oL3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.parentElement.style.display = p3Display;
+    });
+    ['colI3', 'colM3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = p3Display;
+    });
+  }
+
+  // Pasang pemantau agar tabel ikut mengecil/membesar saat nama produk diketik atau dihapus
+  if (p2Name) {
+    p2Name.addEventListener('input', syncColumns);
+    p2Name.addEventListener('change', syncColumns);
+  }
+  if (p3Name) {
+    p3Name.addEventListener('input', syncColumns);
+    p3Name.addEventListener('change', syncColumns);
+  }
+
+  // Eksekusi sekali saat pertama kali dimuat
+  syncColumns();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMatrixSync);
+} else {
+  initMatrixSync();
+}

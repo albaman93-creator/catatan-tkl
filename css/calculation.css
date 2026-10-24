@@ -138,3 +138,17 @@
     min-width: 640px;
   }
 }
+
+/* Membuat tabel ringkasan produk OEE bisa digeser (slide/scroll horizontal) */
+#oeeSummaryWrap .modern-table-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    -webkit-overflow-scrolling: touch; /* Biar licin saat digeser di HP */
+}
+
+#oeeSummaryTable.modern-table {
+    width: 100%;
+    min-width: 680px; /* Memaksa tabel tetap lebar agar muncul slide di layar kecil */
+    white-space: nowrap; /* Mencegah judul kolom turun ke baris bawah */
+}
