@@ -1,0 +1,268 @@
+/**
+ * shift-produk.css
+ * Screen: Shift & Produk (data-screen="filter")
+ * button.screen-tab:nth-child(1) — 📊 Data & Penyimpanan + Master Produk
+ */
+
+/* ===== Section shell ===== */
+.sec[data-screen="filter"] {
+  padding: 1rem 1.25rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sec[data-screen="filter"] .sec-h {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.sec[data-screen="filter"] .sec-h .no {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.sec[data-screen="filter"] .sec-h h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #0f172a;
+}
+
+.sec[data-screen="filter"] .sec-h .sub2 {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* Status badge cloud (pojok kanan) */
+.sec[data-screen="filter"] .cloud-status {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  white-space: nowrap;
+}
+
+.sec[data-screen="filter"] .cloud-status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  flex-shrink: 0;
+}
+
+/* ===== Filter chips row (Tanggal / Shift / Line / Tahapan) ===== */
+.sec[data-screen="filter"] .filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.sec[data-screen="filter"] .filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sec[data-screen="filter"] .filter-group > label,
+.sec[data-screen="filter"] .chip-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+}
+
+.sec[data-screen="filter"] .chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.sec[data-screen="filter"] .chip-btn {
+  appearance: none;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.sec[data-screen="filter"] .chip-btn:hover {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.sec[data-screen="filter"] .chip-btn.is-active,
+.sec[data-screen="filter"] .chip-btn.on {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(22, 163, 74, 0.35);
+}
+
+/* Tanggal input */
+.sec[data-screen="filter"] .date-field {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.65rem;
+  background: #fff;
+  min-width: 140px;
+}
+
+.sec[data-screen="filter"] .date-field input[type="date"],
+.sec[data-screen="filter"] .date-field input[type="text"] {
+  border: none;
+  outline: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0f172a;
+  background: transparent;
+  width: 100%;
+}
+
+/* ===== Machine name / code ===== */
+.sec[data-screen="filter"] .machine-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.sec[data-screen="filter"] .machine-row .field label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  margin-bottom: 0.3rem;
+}
+
+.sec[data-screen="filter"] .machine-row input {
+  width: 100%;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+
+.sec[data-screen="filter"] .machine-row input:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.sec[data-screen="filter"] .machine-row input::placeholder {
+  color: #cbd5e1;
+}
+
+/* ===== Master Produk card ===== */
+.sec[data-screen="filter"] .master-produk-block {
+  margin-top: 0.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.sec[data-screen="filter"] .master-produk-block .sec-h {
+  margin-bottom: 1rem;
+}
+
+.sec[data-screen="filter"] .produk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.sec[data-screen="filter"] .produk-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.sec[data-screen="filter"] .produk-col > label,
+.sec[data-screen="filter"] .produk-col .col-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+}
+
+.sec[data-screen="filter"] .produk-col input,
+.sec[data-screen="filter"] .produk-col select {
+  width: 100%;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background: #fff;
+  color: #0f172a;
+  transition: border-color 0.15s;
+}
+
+.sec[data-screen="filter"] .produk-col input:focus,
+.sec[data-screen="filter"] .produk-col select:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.sec[data-screen="filter"] .produk-col input.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.02em;
+}
+
+.sec[data-screen="filter"] .produk-row-inline {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.sec[data-screen="filter"] .field-hint {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.sec[data-screen="filter"] .field-hint b {
+  color: #475569;
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+  .sec[data-screen="filter"] .machine-row,
+  .sec[data-screen="filter"] .produk-grid {
+    grid-template-columns: 1fr;
+  }
+  .sec[data-screen="filter"] .produk-row-inline {
+    grid-template-columns: 1fr;
+  }
+}

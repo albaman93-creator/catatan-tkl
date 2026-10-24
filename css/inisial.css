@@ -1,0 +1,108 @@
+/**
+ * inisial.css
+ * Screen: Inisial Operator (data-screen="operator")
+ * button.screen-tab:nth-child(2)
+ */
+
+.sec[data-screen="operator"] {
+  padding: 1.25rem 1.25rem 2.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.sec[data-screen="operator"] .sec-h {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.sec[data-screen="operator"] .sec-h .no {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.sec[data-screen="operator"] .sec-h h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.sec[data-screen="operator"] .sec-h .sub2 {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* Grid 6 kolom operator */
+.sec[data-screen="operator"] .operator-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.75rem;
+}
+
+.sec[data-screen="operator"] .operator-grid .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sec[data-screen="operator"] .operator-grid .field label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.sec[data-screen="operator"] .operator-grid input {
+  width: 100%;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.6rem;
+  padding: 0.7rem 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.sec[data-screen="operator"] .operator-grid input.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.sec[data-screen="operator"] .operator-grid input::placeholder {
+  color: #cbd5e1;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+}
+
+.sec[data-screen="operator"] .operator-grid input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+}
+
+.sec[data-screen="operator"] .operator-grid input:not(:placeholder-shown) {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+/* Responsive: 3 kolom di tablet, 2 di mobile */
+@media (max-width: 900px) {
+  .sec[data-screen="operator"] .operator-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .sec[data-screen="operator"] .operator-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
