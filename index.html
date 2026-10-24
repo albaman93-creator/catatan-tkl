@@ -943,53 +943,54 @@
           </div>
         </div>
         <div class="product-grid" id="masterProductGrid">
-          <div class="field">
-            <label>Produk 1 (Kode · BN · Rate · Ukuran · No. WO)</label>
-            <div class="split-input split-input-prod-bn">
-              <input type="text" id="masterProdName1" placeholder="cth: VTTS1" data-sync="prodName1" title="Kode produk — klik untuk history">
-              <input type="text" id="masterProdBn1" placeholder="BN cth: L030101" data-sync="prodBn1" class="mono" maxlength="20" title="Batch Number — ketik manual (termasuk L jika perlu)">
-              <input type="number" id="masterProdRate1" placeholder="Rate/mnt (mesin)" inputmode="decimal" data-sync="prodRate1" title="Rate mesin / default — Kemas L1/L2 diganti tabel man power">
-              <select id="masterProdUkuran1" data-sync="prodUkuran1" title="Ukuran kemasan — dipakai tabel rate Kemas Line 2">
-                <option value="">Ukuran</option>
-                <option value="100">100 ml</option>
-                <option value="250">250 ml</option>
-                <option value="500">500 ml</option>
-              </select>
-              <input type="text" id="masterProdWo1" placeholder="No. WO" class="mono" data-sync="prodWo1">
-            </div>
-            <small class="field-hint">Produk &amp; BN terpisah. BN diketik manual (mis. <b>L030101</b>). Klik field untuk pilih dari history. Contoh: VTTS1 + L030101 → dropdown &quot;VTTS1 L030101&quot;.</small>
-          </div>
-          <div class="field">
-            <label>Produk 2 (Cadangan)</label>
-            <div class="split-input split-input-prod-bn">
-              <input type="text" id="masterProdName2" placeholder="cth: VPEL1" data-sync="prodName2" title="Kode produk">
-              <input type="text" id="masterProdBn2" placeholder="BN cth: L027001" data-sync="prodBn2" class="mono" maxlength="20" title="Batch Number — ketik manual">
-              <input type="number" id="masterProdRate2" placeholder="Rate/mnt (mesin)" inputmode="decimal" data-sync="prodRate2">
-              <select id="masterProdUkuran2" data-sync="prodUkuran2">
-                <option value="">Ukuran</option>
-                <option value="100">100 ml</option>
-                <option value="250">250 ml</option>
-                <option value="500">500 ml</option>
-              </select>
-              <input type="text" id="masterProdWo2" placeholder="No. WO" class="mono" data-sync="prodWo2">
-            </div>
-          </div>
-          <div class="field">
-            <label>Produk 3 (Cadangan)</label>
-            <div class="split-input split-input-prod-bn">
-              <input type="text" id="masterProdName3" placeholder="cth: PROD-C" data-sync="prodName3" title="Kode produk">
-              <input type="text" id="masterProdBn3" placeholder="BN cth: L010101" data-sync="prodBn3" class="mono" maxlength="20" title="Batch Number — ketik manual">
-              <input type="number" id="masterProdRate3" placeholder="Rate/mnt (mesin)" inputmode="decimal" data-sync="prodRate3">
-              <select id="masterProdUkuran3" data-sync="prodUkuran3">
-                <option value="">Ukuran</option>
-                <option value="100">100 ml</option>
-                <option value="250">250 ml</option>
-                <option value="500">500 ml</option>
-              </select>
-              <input type="text" id="masterProdWo3" placeholder="No. WO" class="mono" data-sync="prodWo3">
-            </div>
-          </div>
-        </div>
+  <div class="field">
+    <label>Produk 1 (Kode · BN · Rate · Ukuran · No. WO)</label>
+    <div class="split-input split-input-prod-bn">
+      <input type="text" id="masterProdName1" placeholder="cth: VTTS1" data-sync="prodName1" title="Kode produk">
+      <input type="text" id="masterProdBn1" placeholder="BN cth: L030101" data-sync="prodBn1" class="mono" maxlength="20">
+      <input type="number" id="masterProdRate1" placeholder="Rate/mnt" data-sync="prodRate1">
+      <select id="masterProdUkuran1" data-sync="prodUkuran1">
+        <option value="">Ukuran</option>
+        <option value="100">100 ml</option>
+        <option value="250">250 ml</option>
+        <option value="500">500 ml</option>
+      </select>
+      <input type="text" id="masterProdWo1" placeholder="No. WO" class="mono" data-sync="prodWo1">
+    </div>
+  </div>
+  
+  <div class="field">
+    <label>Produk 2 (Cadangan)</label>
+    <div class="split-input split-input-prod-bn">
+      <input type="text" id="masterProdName2" placeholder="cth: VPEL1" data-sync="prodName2">
+      <input type="text" id="masterProdBn2" placeholder="BN cth: L027001" data-sync="prodBn2" class="mono" maxlength="20">
+      <input type="number" id="masterProdRate2" placeholder="Rate/mnt" data-sync="prodRate2">
+      <select id="masterProdUkuran2" data-sync="prodUkuran2">
+        <option value="">Ukuran</option>
+        <option value="100">100 ml</option>
+        <option value="250">250 ml</option>
+        <option value="500">500 ml</option>
+      </select>
+      <input type="text" id="masterProdWo2" placeholder="No. WO" class="mono" data-sync="prodWo2">
+    </div>
+  </div>
+  
+  <div class="field">
+    <label>Produk 3 (Cadangan)</label>
+    <div class="split-input split-input-prod-bn">
+      <input type="text" id="masterProdName3" placeholder="cth: PROD-C" data-sync="prodName3">
+      <input type="text" id="masterProdBn3" placeholder="BN cth: L010101" data-sync="prodBn3" class="mono" maxlength="20">
+      <input type="number" id="masterProdRate3" placeholder="Rate/mnt" data-sync="prodRate3">
+      <select id="masterProdUkuran3" data-sync="prodUkuran3">
+        <option value="">Ukuran</option>
+        <option value="100">100 ml</option>
+        <option value="250">250 ml</option>
+        <option value="500">500 ml</option>
+      </select>
+      <input type="text" id="masterProdWo3" placeholder="No. WO" class="mono" data-sync="prodWo3">
+    </div>
+  </div>
+</div>
       </section>
 
       <!-- Section: Operator -->
@@ -1441,81 +1442,93 @@
 
         <div class="tbl-wrap">
           <table class="oee-matrix-tbl">
-            <thead>
-              <tr>
-                <th colspan="2">% Availability, Performance, &amp; Quality</th>
-                <th id="thProd1">Produk 1</th>
-                <th id="thProd2">Produk 2</th>
-                <th id="thProd3">Produk 3</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="sec-header"><td colspan="5">% Availability</td></tr>
-              <tr><td class="code-col">A</td><td class="desc-col">Waktu Operasional Pabrik (menit)</td><td class="val-col" colspan="3"><span id="oA">510</span> mnt</td></tr>
-              <tr><td class="code-col">B</td><td class="desc-col">Waktu Berhenti Terencana (kode 5,6,7,8)</td><td class="val-col" colspan="3"><span id="oB">0</span> mnt</td></tr>
-              <tr><td class="code-col">C</td><td class="desc-col">Waktu Produksi Terencana (A − B)</td><td class="val-col" colspan="3"><span id="oC">510</span> mnt</td></tr>
-              <tr><td class="code-col">D</td><td class="desc-col">Waktu Berhenti Tidak Terencana (kode 1,3,4,9)</td><td class="val-col" colspan="3"><span id="oD">0</span> mnt</td></tr>
-              <tr><td class="code-col">E</td><td class="desc-col">Waktu Operasional (C − D)</td><td class="val-col" colspan="3"><span id="oE">510</span> mnt</td></tr>
-              <tr><td class="code-col">F</td><td class="desc-col"><b>% A</b> → (E ÷ C)<br><small>Target 90%</small></td><td class="val-col" colspan="3"><span id="oF">0,00</span> %</td></tr>
+  <thead>
+    <tr>
+      <th colspan="2">% Availability, Performance, & Quality</th>
+      <th id="thProd1">Produk 1</th>
+      <th id="thProd2">Produk 2</th>
+      <th id="thProd3">Produk 3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="sec-header"><td colspan="5">% Availability</td></tr>
+    <tr><td class="code-col">A</td><td class="desc-col">Waktu Operasional Pabrik (menit)</td><td class="val-col" colspan="3"><span id="oA">510</span> mnt</td></tr>
+    <tr><td class="code-col">B</td><td class="desc-col">Waktu Berhenti Terencana (kode 5,6,7,8)</td><td class="val-col" colspan="3"><span id="oB">0</span> mnt</td></tr>
+    <tr><td class="code-col">C</td><td class="desc-col">Waktu Produksi Terencana (A − B)</td><td class="val-col" colspan="3"><span id="oC">510</span> mnt</td></tr>
+    <tr><td class="code-col">D</td><td class="desc-col">Waktu Berhenti Tidak Terencana (kode 1,3,4,9)</td><td class="val-col" colspan="3"><span id="oD">0</span> mnt</td></tr>
+    <tr><td class="code-col">E</td><td class="desc-col">Waktu Operasional (C − D)</td><td class="val-col" colspan="3"><span id="oE">510</span> mnt</td></tr>
+    <tr><td class="code-col">F</td><td class="desc-col"><b>% A</b> → (E ÷ C)<br><small>Target 90%</small></td><td class="val-col" colspan="3"><span id="oF">0,00</span> %</td></tr>
 
-              <tr class="sec-header"><td colspan="5">% Performance</td></tr>
-              <tr><td class="code-col">G</td><td class="desc-col">Target output (Rate × Durasi)</td><td class="val-col"><span id="oG1">0</span> unit</td><td class="val-col"><span id="oG2">0</span> unit</td><td class="val-col"><span id="oG3">0</span> unit</td></tr>
-              <tr><td class="code-col">H</td><td class="desc-col">Output aktual (Good + Defect)</td><td class="val-col"><span id="oH1">0</span> unit</td><td class="val-col"><span id="oH2">0</span> unit</td><td class="val-col"><span id="oH3">0</span> unit</td></tr>
-              <tr>
-                <td class="code-col">I</td>
-                <td class="desc-col">
-                  <div class="perf-head">
-                    <span><b>% P</b> → (H ÷ G) per produk &amp; Rata-rata</span>
-                    <span id="badgeAvgP" class="badge-avg">Average: <span id="oITotal">0,00</span> %</span>
-                  </div>
-                  <small>Target %P = 98%</small>
-                </td>
-                <td class="val-col" id="colI1"><span id="oI1">0,00</span> %</td>
-                <td class="val-col" id="colI2"><span id="oI2">0,00</span> %</td>
-                <td class="val-col" id="colI3"><span id="oI3">0,00</span> %</td>
-              </tr>
+    <tr class="sec-header"><td colspan="5">% Performance</td></tr>
+    <tr>
+      <td class="code-col">G</td>
+      <td class="desc-col">Target output (Rate × Durasi)</td>
+      <td class="val-col"><span id="oG1">0</span> unit</td>
+      <td class="val-col"><span id="oG2">0</span> unit</td>
+      <td class="val-col"><span id="oG3">0</span> unit</td>
+    </tr>
+    <tr>
+      <td class="code-col">H</td>
+      <td class="desc-col">Output aktual (Good + Defect)</td>
+      <td class="val-col"><span id="oH1">0</span> unit</td>
+      <td class="val-col"><span id="oH2">0</span> unit</td>
+      <td class="val-col"><span id="oH3">0</span> unit</td>
+    </tr>
+    <tr>
+      <td class="code-col">I</td>
+      <td class="desc-col">
+        <div class="perf-head">
+          <span><b>% P</b> → (H ÷ G) per produk & Rata-rata</span>
+          <span id="badgeAvgP" class="badge-avg">Average: <span id="oITotal">0,00</span> %</span>
+        </div>
+        <small>Target %P = 98%</small>
+      </td>
+      <td class="val-col" id="colI1"><span id="oI1">0,00</span> %</td>
+      <td class="val-col" id="colI2"><span id="oI2">0,00</span> %</td>
+      <td class="val-col" id="colI3"><span id="oI3">0,00</span> %</td>
+    </tr>
 
-              <tr class="sec-header"><td colspan="5">% Quality</td></tr>
-<tr>
-  <td class="code-col">J</td>
-  <td class="desc-col">Total output (Good + Defect)</td>
-  <td class="val-col"><span id="oJ1">0</span> unit</td>
-  <td class="val-col" id="colJ2"><span id="oJ2">0</span> unit</td>
-  <td class="val-col" id="colJ3"><span id="oJ3">0</span> unit</td>
-</tr>
-<tr>
-  <td class="code-col">K</td>
-  <td class="desc-col">Total Defect</td>
-  <td class="val-col"><span id="oK1">0</span> unit</td>
-  <td class="val-col" id="colK2"><span id="oK2">0</span> unit</td>
-  <td class="val-col" id="colK3"><span id="oK3">0</span> unit</td>
-</tr>
-<tr>
-  <td class="code-col">L</td>
-  <td class="desc-col">Good Quality (J − K)</td>
-  <td class="val-col"><span id="oL1">0</span> unit</td>
-  <td class="val-col" id="colL2"><span id="oL2">0</span> unit</td>
-  <td class="val-col" id="colL3"><span id="oL3">0</span> unit</td>
-</tr>
-<tr>
-  <td class="code-col">M</td>
-  <td class="desc-col">
-    <div class="perf-head">
-      <span><b>% Q</b> → (L ÷ J) per produk</span>
-    </div>
-    <small>Target 99,50%</small>
-  </td>
-  <td class="val-col" id="colM1"><span id="oM1">0,00</span> %</td>
-  <td class="val-col" id="colM2"><span id="oM2">0,00</span> %</td>
-  <td class="val-col" id="colM3"><span id="oM3">0,00</span> %</td>
-</tr>
+    <tr class="sec-header"><td colspan="5">% Quality</td></tr>
+    <tr>
+      <td class="code-col">J</td>
+      <td class="desc-col">Total output (Good + Defect)</td>
+      <td class="val-col"><span id="oJ1">0</span> unit</td>
+      <td class="val-col" id="colJ2"><span id="oJ2">0</span> unit</td>
+      <td class="val-col" id="colJ3"><span id="oJ3">0</span> unit</td>
+    </tr>
+    <tr>
+      <td class="code-col">K</td>
+      <td class="desc-col">Total Defect</td>
+      <td class="val-col"><span id="oK1">0</span> unit</td>
+      <td class="val-col" id="colK2"><span id="oK2">0</span> unit</td>
+      <td class="val-col" id="colK3"><span id="oK3">0</span> unit</td>
+    </tr>
+    <tr>
+      <td class="code-col">L</td>
+      <td class="desc-col">Good Quality (J − K)</td>
+      <td class="val-col"><span id="oL1">0</span> unit</td>
+      <td class="val-col" id="colL2"><span id="oL2">0</span> unit</td>
+      <td class="val-col" id="colL3"><span id="oL3">0</span> unit</td>
+    </tr>
+    <tr>
+      <td class="code-col">M</td>
+      <td class="desc-col">
+        <div class="perf-head">
+          <span><b>% Q</b> → (L ÷ J) per produk</span>
+        </div>
+        <small>Target 99,50%</small>
+      </td>
+      <td class="val-col"><span id="oM1">0,00</span> %</td> <!-- <== Hilangkan id="colM1" di sini agar sama dengan oJ1/oK1/oL1 -->
+      <td class="val-col" id="colM2"><span id="oM2">0,00</span> %</td>
+      <td class="val-col" id="colM3"><span id="oM3">0,00</span> %</td>
+    </tr>
 
-              <tr class="highlight-res">
-                <td colspan="2"><span class="oee-title">% OVERALL EQUIPMENT EFFECTIVENESS (OEE)</span><br><small>Target 88% · A × P × Q</small></td>
-                <td colspan="3" id="oee">0,00%</td>
-              </tr>
-            </tbody>
-          </table>
+    <tr class="highlight-res">
+      <td colspan="2"><span class="oee-title">% OVERALL EQUIPMENT EFFECTIVENESS (OEE)</span><br><small>Target 88% · A × P × Q</small></td>
+      <td colspan="3" id="oee">0,00%</td>
+    </tr>
+  </tbody>
+</table>
         </div>
         <div class="diag" id="diag"></div>
       </section>
