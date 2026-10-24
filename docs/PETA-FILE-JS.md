@@ -293,3 +293,6 @@ Kalau nambah modul baru yang butuh `State.el.xxx`, pastikan dimuat **setelah**
 `state.js`. Kalau modul baru dipanggil dari modul lain (misal `Rows` dipanggil
 dari `ui.js`), pastikan urutannya benar atau pakai `typeof X !== 'undefined'`
 sebagai pengaman (pola yang sudah dipakai di banyak file ini).
+
+
+

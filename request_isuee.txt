@@ -681,3 +681,30 @@ OEE OPE
 OEE 365
 Dashboard 
 
+#perbaikan 
+
+
+
+BUAT procesudur atau perbaki prosedur yang sudah ada 
+
+jika pada tombol #fStageSel di klik maka otomatis kolom #fMesinNama akan mengisi nama mesin otomatis
+
+
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[1] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[1] set to //*[@id="fMesinNama"] Mixing Tank OLSA PCBS 2500            
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[1] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[2] set to //*[@id="fMesinNama"] Mesin Automatic Form Fill Seal Machine Shinva RSYG2-1-23005
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[1] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[3] set to //*[@id="fMesinNama"] Autoclave Getinge 2          
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[1] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[4] set to //*[@id="fMesinNama"] Mesin Bonfiglioli          
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[1] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[5] set to //*[@id="fMesinNama"] Overwrapping Machine Sysflex Line 1 atau mesin colimatic (ada 2 pilihan mesin bisa jadikan drop down pilihan)           
+
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[2] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[1] set to //*[@id="fMesinNama"] Mixing Tank Tofflon APLS 3500
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[2] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[2] set to //*[@id="fMesinNama"] Mesin Automatic Form Fill Seal Machine Plumat FFS 991  
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[2] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[3] set to //*[@id="fMesinNama"] Autoclave Shinva 
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[2] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[4] set to //*[@id="fMesinNama"] NIKKA DENSOK                
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[2] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[5] set to //*[@id="fMesinNama"] Mesin Overwrapping Machine Sysflex Line 2
+
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[1] set to //*[@id="fMesinNama"] Mixing TANK LB4000/1
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[2] set to //*[@id="fMesinNama"] Mesin Automatic Form Fill Seal Machine Plumat FFS 892  
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[3] set to //*[@id="fMesinNama"] Autoclave Getinge 4
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[4] set to //*[@id="fMesinNama"] NIKKA DENSOK                
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[5] set to //*[@id="fMesinNama"] Mesin Overwrapping Machine Plumat OW 834
+
