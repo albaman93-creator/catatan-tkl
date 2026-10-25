@@ -295,11 +295,15 @@ const Calculation = (() => {
       if (!hasData) continue;  
       
       const gTarget = st.target > 0 ? st.target : (st.dur * st.rate);  
-      const defectCls = st.defect > 0 ? ' class="defect-val"' : '';  
+      const defectCls = st.defect > 0 ? ' class="defect-val"' : ''; 
+      
+      //HITUNG WAKTU TOTAL SHIFT
+      const waktuTotal = st.dur + st.planned + st.unplanned;
       
       rows.push(  
         `<tr>` +  
-        `<td><span class="prod-icon">📦</span>${Utils.escapeHtml ? Utils.escapeHtml(label) : label}</td>` +  
+        `<td><span class="prod-icon">📦</span>${Utils.escapeHtml ? Utils.escapeHtml(label) : label}</td>` +
+        `<td class="highight-text bg-waktu-total"><b>${Utils.nf0(waktuTotal)}</b></td>` +
         `<td class="highlight-text bg-waktu-ops">${Utils.nf0(st.dur)}</td>` +  
         `<td class="bg-planned-dt">${Utils.nf0(st.planned)}</td>` +  
         `<td class="bg-unplanned-dt">${Utils.nf0(st.unplanned)}</td>` +  

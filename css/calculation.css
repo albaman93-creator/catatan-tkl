@@ -25,7 +25,7 @@
   color: #64748b;
   font-size: 0.75rem;
   font-weight: 600;
-  text-transform: uppercase;
+  text-transform: capitalize;
   letter-spacing: 0.05em;
   padding: 14px 16px;
   border-bottom: 2px solid #e2e8f0;
@@ -163,5 +163,31 @@
 }
 
 #oeeSummaryTable td.bg-unplanned-dt {
-  background-color: rgba(239, 68, 68, 0.1) !important;
+  background-color: rgba(201, 15, 15, 0.39) !important;
+}
+
+/* Waktu Shift Total = Biru tipis */
+#oeeSummaryTable td.bg-waktu-total {
+  background-color: rgba(62, 64, 66, 0.1) !important; /* Biru pudar */
+  color: #1e3a8a; /* Warna teks biru tua agar kontras */
+}
+
+/* Mengubah background header tabel ringkasan OEE menjadi Platinum */
+#oeeSummaryTable th {
+  background-color: #f2f3f4 !important; /* Warna Platinum */
+  color: #1f2937 !important; /* Teks abu-abu gelap agar tetap kontras dan terbaca */
+  border-bottom: 2px solid #080704 !important; /* Garis bawah platinum yang sedikit digelapkan agar terlihat rapi */
+  border-right: 1px solid #080704 !important; /* Garis kanan platinum yang sedikit digelapkan agar terlihat rapi */
+  border
+}
+
+/* Mengubah warna garis luar (kotak luar) tabel ringkasan OEE */
+#oeeSummaryWrap .modern-table-container {
+  border: 1px solid #000000 !important; /* Ganti #000000 dengan warna yang Anda inginkan */
+}
+
+/* Mengubah warna garis pembatas pada isi tabel (sel data / td) */
+#oeeSummaryTable td {
+  border-bottom: 1px solid #808080 !important; /* Garis horizontal (bawah) antar baris */
+  border-right: 1px solid #dcdcdc !important;  /* Garis vertikal (kanan) antar kolom */
 }
