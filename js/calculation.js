@@ -98,10 +98,10 @@ const Calculation = (() => {
     if (thProd3) thProd3.textContent = pLabels[2] || 'Produk 3';
     // -------------------------------------------------------------
 
-    const prodStats = [
-      { dur:0, rate:parseFloat(State.el.prodRate1.value)||0, target:0, actual:0, good:0, defect:0 },
-      { dur:0, rate:parseFloat(State.el.prodRate2.value)||0, target:0, actual:0, good:0, defect:0 },
-      { dur:0, rate:parseFloat(State.el.prodRate3.value)||0, target:0, actual:0, good:0, defect:0 },
+    const prodStats = [  
+    { dur:0, rate:parseFloat(State.el.prodRate1.value)||0, target:0, actual:0, good:0, defect:0, planned:0, unplanned:0 },  
+    { dur:0, rate:parseFloat(State.el.prodRate2.value)||0, target:0, actual:0, good:0, defect:0, planned:0, unplanned:0 },  
+    { dur:0, rate:parseFloat(State.el.prodRate3.value)||0, target:0, actual:0, good:0, defect:0, planned:0, unplanned:0 },  
     ];
 
     /**
@@ -186,6 +186,13 @@ const Calculation = (() => {
       if (c === 'planned') {
         B += dur;
         if (si != null) sh[si].B += dur;
+        
+        // TAMBAHAN: Catat Planned downtime ke dalam produk (jika dipilih)
+        if (si === State.evalShift && prodName) {
+          const slot = matchProdSlot(prodName);
+          if (slot >= 0) prodStats[slot].planned += dur;
+        }
+
         // OEE 365: kegiatan "Mixing" (apa pun kodenya planned) dikurangi dari basis shift
         const keg = String(g('kegiatan') || '').trim().toLowerCase();
         if (si === State.evalShift && /\bmixing\b/.test(keg)) {
@@ -195,7 +202,16 @@ const Calculation = (() => {
           }
         }
       }
-      else if (c === 'unplanned'){ D += dur; if (si != null) sh[si].D += dur; }
+      else if (c === 'unplanned'){ 
+        D += dur; 
+        if (si != null) sh[si].D += dur; 
+        
+        // TAMBAHAN: Catat Unplanned downtime ke dalam produk (jika dipilih)
+        if (si === State.evalShift && prodName) {
+          const slot = matchProdSlot(prodName);
+          if (slot >= 0) prodStats[slot].unplanned += dur;
+        }
+      }
       else if (c === 'prod') {
         if (si === State.evalShift && prodName) {
           const slot = matchProdSlot(prodName);
@@ -268,32 +284,37 @@ const Calculation = (() => {
 
     // === RINGKASAN PRODUK (tabel modern di atas matrix OEE) ===
     // Tidak mengubah rumus OEE — hanya menampilkan ringkasan per slot produk aktif.
-    const summaryBody = document.getElementById('oeeSummaryBody');
-    if (summaryBody) {
-      const rows = [];
-      for (let i = 0; i < 3; i++) {
-        const st = prodStats[i];
-        const label = pLabels[i];
-        const hasData = label && (st.dur > 0 || st.actual > 0 || st.target > 0 || st.rate > 0);
-        if (!hasData) continue;
-        const gTarget = st.target > 0 ? st.target : (st.dur * st.rate);
-        const defectCls = st.defect > 0 ? ' class="defect-val"' : '';
-        rows.push(
-          `<tr>` +
-            `<td><span class="prod-icon">📦</span>${Utils.escapeHtml ? Utils.escapeHtml(label) : label}</td>` +
-            `<td class="highlight-text">${Utils.nf0(st.dur)}</td>` +
-            `<td>${Utils.nf0(st.rate)}</td>` +
-            `<td>${Utils.nf0(gTarget)}</td>` +
-            `<td>${Utils.nf0(st.actual)}</td>` +
-            `<td>${Utils.nf0(st.good)}</td>` +
-            `<td${defectCls}>${Utils.nf0(st.defect)}</td>` +
-          `</tr>`
-        );
-      }
-      summaryBody.innerHTML = rows.length
-        ? rows.join('')
-        : `<tr class="oee-summary-empty"><td colspan="7">Belum ada data produk pada shift ini</td></tr>`;
-    }
+    // === RINGKASAN PRODUK (tabel modern di atas matrix OEE) ===  
+  const summaryBody = document.getElementById('oeeSummaryBody');  
+  if (summaryBody) {  
+    const rows = [];  
+    for (let i = 0; i < 3; i++) {  
+      const st = prodStats[i];  
+      const label = pLabels[i];  
+      const hasData = label && (st.dur > 0 || st.actual > 0 || st.target > 0 || st.rate > 0 || st.planned > 0 || st.unplanned > 0);  
+      if (!hasData) continue;  
+      
+      const gTarget = st.target > 0 ? st.target : (st.dur * st.rate);  
+      const defectCls = st.defect > 0 ? ' class="defect-val"' : '';  
+      
+      rows.push(  
+        `<tr>` +  
+        `<td><span class="prod-icon">📦</span>${Utils.escapeHtml ? Utils.escapeHtml(label) : label}</td>` +  
+        `<td class="highlight-text bg-waktu-ops">${Utils.nf0(st.dur)}</td>` +  
+        `<td class="bg-planned-dt">${Utils.nf0(st.planned)}</td>` +  
+        `<td class="bg-unplanned-dt">${Utils.nf0(st.unplanned)}</td>` +  
+        `<td>${Utils.nf0(st.rate)}</td>` +  
+        `<td>${Utils.nf0(gTarget)}</td>` +  
+        `<td>${Utils.nf0(st.actual)}</td>` +  
+        `<td>${Utils.nf0(st.good)}</td>` +  
+        `<td${defectCls}>${Utils.nf0(st.defect)}</td>` +  
+        `</tr>`  
+      );  
+    }  
+    summaryBody.innerHTML = rows.length  
+      ? rows.join('')  
+      : `<tr class="oee-summary-empty"><td colspan="9">Belum ada data produk pada shift ini</td></tr>`;  
+  }
 
     // === QUALITY PER PRODUK ===
     // Mengisi J/K/L/M per kolom produk (oJ1..oJ3, oK1..oK3, oL1..oL3, oM1..oM3),
