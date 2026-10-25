@@ -71,11 +71,33 @@ const Calculation = (() => {
     // Label produk: kode saja ATAU "kode + BN" (setelah issue #7)
     const pLabels = [];
     for (let i = 1; i <= 3; i++) {
-      const name = (State.el['prodName' + i]?.value || '').trim();
-      const bn = (State.el['prodBn' + i]?.value || '').trim();
+      // Prioritas ambil dari form sheet, fallback ke master jika kosong
+      let name = (State.el['prodName' + i]?.value || '').trim();
+      let bn = (State.el['prodBn' + i]?.value || '').trim();
+      
+      if (!name) {
+        const mName = document.getElementById('masterProdName' + i);
+        if (mName) name = mName.value.trim();
+      }
+      if (!bn) {
+        const mBn = document.getElementById('masterProdBn' + i);
+        if (mBn) bn = mBn.value.trim();
+      }
+
       const label = bn ? `${name} ${bn}` : name;
       pLabels.push(label);
     }
+
+    // --- TAMBAHAN: KEMAS KINI NAMA PRODUK DI HEADER TABEL OEE ---
+    const thProd1 = document.getElementById('thProd1');
+    const thProd2 = document.getElementById('thProd2');
+    const thProd3 = document.getElementById('thProd3');
+
+    if (thProd1) thProd1.textContent = pLabels[0] || 'Produk 1';
+    if (thProd2) thProd2.textContent = pLabels[1] || 'Produk 2';
+    if (thProd3) thProd3.textContent = pLabels[2] || 'Produk 3';
+    // -------------------------------------------------------------
+
     const prodStats = [
       { dur:0, rate:parseFloat(State.el.prodRate1.value)||0, target:0, actual:0, good:0, defect:0 },
       { dur:0, rate:parseFloat(State.el.prodRate2.value)||0, target:0, actual:0, good:0, defect:0 },
@@ -273,19 +295,41 @@ const Calculation = (() => {
         : `<tr class="oee-summary-empty"><td colspan="7">Belum ada data produk pada shift ini</td></tr>`;
     }
 
-    // === QUALITY ===
-    const K = sumDefect;
-    const J = totalOutputJ;
-    const L = Math.max(sumGood, 0);
-    const M = J > 0 ? L / J * 100 : 0;
+    // === QUALITY PER PRODUK ===
+    // Mengisi J/K/L/M per kolom produk (oJ1..oJ3, oK1..oK3, oL1..oL3, oM1..oM3),
+    // lalu menghitung M gabungan tertimbang untuk rumus OEE di bawahnya.
+    let sumJ = 0, sumK = 0, sumL = 0;
 
-    State.el.oJ.textContent = Utils.nf0(J);
-    State.el.oK.textContent = Utils.nf0(K);
-    State.el.oL.textContent = Utils.nf0(L);
-    const oMEl = State.el.oM;
-    oMEl.textContent = Utils.nf2(M);
-    oMEl.style.color = M >= CONFIG.TARGET.QUALITY ? 'var(--green-d)' : 'var(--red)';
-    oMEl.style.fontWeight = '700';
+    for (let i = 1; i <= 3; i++) {
+      const st = prodStats[i - 1];
+      const Ki = st.defect || 0;
+      const Li = Math.max(st.good || 0, 0);
+      const Ji = Ki + Li;
+      const Mi = Ji > 0 ? (Li / Ji) * 100 : 0;
+
+      sumJ += Ji;
+      sumK += Ki;
+      sumL += Li;
+
+      const elJ = document.getElementById('oJ' + i);
+      const elK = document.getElementById('oK' + i);
+      const elL = document.getElementById('oL' + i);
+      const elM = document.getElementById('oM' + i);
+
+      if (elJ) elJ.textContent = Utils.nf0(Ji);
+      if (elK) elK.textContent = Utils.nf0(Ki);
+      if (elL) elL.textContent = Utils.nf0(Li);
+      if (elM) {
+        elM.textContent = Utils.nf2(Mi);
+        elM.style.color = Mi >= (CONFIG.TARGET.QUALITY || 99.5) ? 'var(--green-d)' : 'var(--red)';
+        elM.style.fontWeight = '700';
+      }
+    }
+
+    // Gabungan OEE Quality (Quality total tertimbang)
+    const avgM = sumJ > 0 ? (sumL / sumJ) * 100 : 0;
+    const M = avgM; // ← dipakai rumus OEE & OEE 365 di bawah
+    const J = sumJ; // ← dipakai diagnostik di bawah
 
     // === OEE standar (Availability = E/C vs waktu terencana) ===
     const oee = sF * avgPerfI * M / 10000;
@@ -326,7 +370,7 @@ const Calculation = (() => {
     set365('o365F', Utils.nf2(a365) + ' %', a365 >= CONFIG.TARGET.AVAILABILITY ? 'var(--green-d)' : 'var(--red)');
     set365('o365P', Utils.nf2(avgPerfI) + ' %');
     set365('o365Q', Utils.nf2(M) + ' %');
-    set365('oee365', Utils.nf2(oee365) + '%', oee365 >= (CONFIG.TARGET.OEE365 || 55) ? '#2ee27e' : '#f87171'); // ← DIUBAH
+    set365('oee365', Utils.nf2(oee365) + '%', oee365 >= (CONFIG.TARGET.OEE365 || 55) ? '#2ee27e' : '#f87171');
     if (State.el.rincSub365) {
       let note = '';
       if (jedaDur > 0 || mixingDur > 0) {
@@ -358,7 +402,7 @@ const Calculation = (() => {
       State.el.oee365IndicatorValue.textContent = Utils.nf2(oee365) + '%';
       if (State.el.oee365Indicator) {
         State.el.oee365Indicator.classList.remove('good', 'warn', 'bad');
-        // ← DIUBAH: OEE 365 pakai target khusus 55%, bukan target OEE utama (88%)
+        // OEE 365 pakai target khusus 55%, bukan target OEE utama (88%)
         if (oee365 >= (CONFIG.TARGET.OEE365 || 55)) State.el.oee365Indicator.classList.add('good');
         else if (oee365 >= 45) State.el.oee365Indicator.classList.add('warn');
         else State.el.oee365Indicator.classList.add('bad');
@@ -385,7 +429,7 @@ const Calculation = (() => {
     const kpiPairs = [
       ['sheetKpiA', sF, 90], ['sheetKpiP', avgPerfI, 98], ['sheetKpiQ', M, 99.5], ['sheetKpiOEE', oee, 88],
       ['sheetKpiA365', a365, 56], ['sheetKpiP365', avgPerfI, 98], ['sheetKpiQ365', M, 99.5],
-      ['sheetKpiOEE365', oee365, (CONFIG.TARGET.OEE365 || 55)], // ← DIUBAH: target 55, bukan 88
+      ['sheetKpiOEE365', oee365, (CONFIG.TARGET.OEE365 || 55)],
     ];
     if (typeof UI !== 'undefined' && UI.updateKpiHealthBar) {
       kpiPairs.forEach(([id, val]) => {
@@ -435,4 +479,3 @@ const Calculation = (() => {
 
   return { validateTimeInput, validateAllTimeInputs, recalc };
 })();
-

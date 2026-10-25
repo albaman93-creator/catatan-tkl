@@ -917,7 +917,9 @@ const App = (() => {
 // Boot aplikasi saat DOM siap
 document.addEventListener('DOMContentLoaded', App.init);
 
-// === PENGATURAN TAMBAH & HAPUS PRODUK CADANGAN ===
+// ==========================================
+// 1. PENGATURAN TAMBAH & HAPUS PRODUK CADANGAN
+// ==========================================
 function initProductButton() {
   const grid = document.getElementById('masterProductGrid');
   if (!grid) return;
@@ -927,7 +929,7 @@ function initProductButton() {
   const p2Name = document.getElementById('masterProdName2');
   const p3Name = document.getElementById('masterProdName3');
 
-  // 1. Buat tombol "+ Tambah Produk Cadangan" jika belum ada
+  // Buat tombol tambah produk
   let btnAdd = document.getElementById('btnTambahProduk');
   if (!btnAdd) {
     btnAdd = document.createElement('button');
@@ -938,7 +940,7 @@ function initProductButton() {
     grid.insertAdjacentElement('afterend', btnAdd);
   }
 
-  // 2. Fungsi untuk mengosongkan semua input di dalam box produk
+  // Fungsi kosongkan input saat dihapus
   function resetBox(box) {
     if (!box) return;
     box.querySelectorAll('input, select').forEach((el) => {
@@ -950,7 +952,7 @@ function initProductButton() {
     cekStatusTombol();
   }
 
-  // 3. Tambahkan tombol "✕ Hapus" pada Produk 2 & 3
+  // Fungsi membuat tombol hapus
   function pasangTombolHapus(box, labelText) {
     if (!box || box.querySelector('.btn-del-prod')) return;
     const btnDel = document.createElement('button');
@@ -964,27 +966,19 @@ function initProductButton() {
   pasangTombolHapus(prod2Box, 'Produk 2');
   pasangTombolHapus(prod3Box, 'Produk 3');
 
-  // 4. Buka otomatis jika sudah ada data tersimpan sebelumnya
-  if (p2Name && p2Name.value.trim() !== '' && prod2Box) {
-    prod2Box.classList.add('show-prod');
-  }
-  if (p3Name && p3Name.value.trim() !== '' && prod3Box) {
-    prod3Box.classList.add('show-prod');
-  }
+  // Cek apakah ada data lama tersimpan
+  if (p2Name && p2Name.value.trim() !== '' && prod2Box) prod2Box.classList.add('show-prod');
+  if (p3Name && p3Name.value.trim() !== '' && prod3Box) prod3Box.classList.add('show-prod');
 
-  // 5. Cek visibilitas tombol tambah
+  // Cek tombol aktif/mati
   function cekStatusTombol() {
     const isP2 = prod2Box && prod2Box.classList.contains('show-prod');
     const isP3 = prod3Box && prod3Box.classList.contains('show-prod');
-
-    if (isP2 && isP3) {
-      btnAdd.style.display = 'none';
-    } else {
-      btnAdd.style.display = 'inline-flex';
-    }
+    if (isP2 && isP3) btnAdd.style.display = 'none';
+    else btnAdd.style.display = 'inline-flex';
   }
 
-  // 6. Klik tombol tambah: urutkan Produk 2 dulu, lalu Produk 3
+  // Klik tombol
   btnAdd.onclick = function () {
     if (prod2Box && !prod2Box.classList.contains('show-prod')) {
       prod2Box.classList.add('show-prod');
@@ -999,13 +993,9 @@ function initProductButton() {
   cekStatusTombol();
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initProductButton);
-} else {
-  initProductButton();
-}
-
-// === PENGATURAN SINKRONISASI KOLOM TABEL OEE agar kolom nya mengikuti jumlah produk ada berapa yang di pilih===
+// ==========================================
+// 2. SINKRONISASI KOLOM TABEL OEE
+// ==========================================
 function initMatrixSync() {
   const p2Name = document.getElementById('masterProdName2');
   const p3Name = document.getElementById('masterProdName3');
@@ -1018,44 +1008,41 @@ function initMatrixSync() {
     if (hasP2) colCount = 2;
     if (hasP3) colCount = 3;
 
-    // 1. Ubah rentang kolom (colspan) hanya untuk Availability (A,B,C,D,E,F) dan baris OEE paling bawah
-    const colspanIds = ['oA', 'oB', 'oC', 'oD', 'oE', 'oF'];
+    // 1. AVAILABILITY & OEE BAWAH (Tetap 1 kolom menyatu)
+    const colspanIds = ['oA', 'oB', 'oC', 'oD', 'oE', 'oF', 'oee'];
     colspanIds.forEach(id => {
       const el = document.getElementById(id);
       if (el && el.parentElement && el.parentElement.tagName === 'TD') {
         el.parentElement.colSpan = colCount;
+      } else if (el && el.tagName === 'TD') {
+        el.colSpan = colCount;
       }
     });
 
-    const oeeEl = document.getElementById('oee');
-    if (oeeEl) oeeEl.colSpan = colCount;
-
-    // 2. Sembunyikan/Tampilkan Kolom Produk 2 (Performance & Quality)
+    // 2. PRODUK 2: Sembunyikan/Tampilkan Performance & Quality
     const p2Display = hasP2 ? '' : 'none';
     if (document.getElementById('thProd2')) document.getElementById('thProd2').style.display = p2Display;
-    ['oG2', 'oH2', 'oJ2', 'oK2', 'oL2'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.parentElement.style.display = p2Display;
-    });
-    ['colI2', 'colM2'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = p2Display;
+    if (document.getElementById('oG2')) document.getElementById('oG2').parentElement.style.display = p2Display;
+    if (document.getElementById('oH2')) document.getElementById('oH2').parentElement.style.display = p2Display;
+    if (document.getElementById('colI2')) document.getElementById('colI2').style.display = p2Display;
+    ['colJ2', 'colK2', 'colL2', 'colM2'].forEach(id => {
+       const el = document.getElementById(id);
+       if (el) el.style.display = p2Display;
     });
 
-    // 3. Sembunyikan/Tampilkan Kolom Produk 3 (Performance & Quality)
+    // 3. PRODUK 3: Sembunyikan/Tampilkan Performance & Quality
     const p3Display = hasP3 ? '' : 'none';
     if (document.getElementById('thProd3')) document.getElementById('thProd3').style.display = p3Display;
-    ['oG3', 'oH3', 'oJ3', 'oK3', 'oL3'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.parentElement.style.display = p3Display;
-    });
-    ['colI3', 'colM3'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = p3Display;
+    if (document.getElementById('oG3')) document.getElementById('oG3').parentElement.style.display = p3Display;
+    if (document.getElementById('oH3')) document.getElementById('oH3').parentElement.style.display = p3Display;
+    if (document.getElementById('colI3')) document.getElementById('colI3').style.display = p3Display;
+    ['colJ3', 'colK3', 'colL3', 'colM3'].forEach(id => {
+       const el = document.getElementById(id);
+       if (el) el.style.display = p3Display;
     });
   }
 
-  // Pasang pemantau agar tabel ikut mengecil/membesar saat nama produk diketik atau dihapus
+  // Pasang pemantau saat diketik
   if (p2Name) {
     p2Name.addEventListener('input', syncColumns);
     p2Name.addEventListener('change', syncColumns);
@@ -1065,12 +1052,19 @@ function initMatrixSync() {
     p3Name.addEventListener('change', syncColumns);
   }
 
-  // Eksekusi sekali saat pertama kali dimuat
+  // Eksekusi sekali saat halaman dimuat
   syncColumns();
 }
 
+// ==========================================
+// 3. JALANKAN SEMUA FUNGSI SAAT HALAMAN SIAP
+// ==========================================
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initMatrixSync);
+  document.addEventListener('DOMContentLoaded', () => {
+    initProductButton();
+    initMatrixSync();
+  });
 } else {
+  initProductButton();
   initMatrixSync();
 }
