@@ -152,3 +152,16 @@
     min-width: 680px; /* Memaksa tabel tetap lebar agar muncul slide di layar kecil */
     white-space: nowrap; /* Mencegah judul kolom turun ke baris bawah */
 }
+
+/* Warna latar belakang tipis/transparan untuk 3 kolom waktu (mnt) */
+#oeeSummaryTable td.bg-waktu-ops {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+}
+
+#oeeSummaryTable td.bg-planned-dt {
+  background-color: rgba(217, 119, 6, 0.1) !important;
+}
+
+#oeeSummaryTable td.bg-unplanned-dt {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+}
