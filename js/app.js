@@ -997,62 +997,49 @@ function initProductButton() {
 // 2. SINKRONISASI KOLOM TABEL OEE
 // ==========================================
 function initMatrixSync() {
-  const p2Name = document.getElementById('masterProdName2');
-  const p3Name = document.getElementById('masterProdName3');
+  const $ = id => document.getElementById(id);
+  const val = id => (($(id) || {}).value || '').trim();
+
+  // Slot dianggap aktif bila nama / BN / rate terisi (di Master ATAU di form Sheet)
+  const slotAktif = n =>
+    !!(val('masterProdName' + n) || val('masterProdBn' + n) || val('masterProdRate' + n) ||
+       val('prodName' + n) || val('prodBn' + n) || val('prodRate' + n));
 
   function syncColumns() {
-    const hasP2 = p2Name && p2Name.value.trim() !== '';
-    const hasP3 = p3Name && p3Name.value.trim() !== '';
+    const aktif = { 1: true, 2: slotAktif(2), 3: slotAktif(3) };
+    const colCount = 1 + (aktif[2] ? 1 : 0) + (aktif[3] ? 1 : 0);
 
-    let colCount = 1;
-    if (hasP2) colCount = 2;
-    if (hasP3) colCount = 3;
-
-    // 1. AVAILABILITY & OEE BAWAH (Tetap 1 kolom menyatu)
-    const colspanIds = ['oA', 'oB', 'oC', 'oD', 'oE', 'oF', 'oee'];
-    colspanIds.forEach(id => {
-      const el = document.getElementById(id);
-      if (el && el.parentElement && el.parentElement.tagName === 'TD') {
-        el.parentElement.colSpan = colCount;
-      } else if (el && el.tagName === 'TD') {
-        el.colSpan = colCount;
-      }
+    // Tampil/sembunyikan SEMUA sel produk n di semua baris (header + G..M)
+    [1, 2, 3].forEach(n => {
+      const disp = aktif[n] ? '' : 'none';
+      const cells = [$('thProd' + n)];
+      ['G','H','I','J','K','L','M'].forEach(L => {
+        const sp = $('o' + L + n);
+        cells.push(sp ? sp.closest('td') : null);
+      });
+      cells.forEach(c => { if (c) c.style.display = disp; });
     });
 
-    // 2. PRODUK 2: Sembunyikan/Tampilkan Performance & Quality
-    const p2Display = hasP2 ? '' : 'none';
-    if (document.getElementById('thProd2')) document.getElementById('thProd2').style.display = p2Display;
-    if (document.getElementById('oG2')) document.getElementById('oG2').parentElement.style.display = p2Display;
-    if (document.getElementById('oH2')) document.getElementById('oH2').parentElement.style.display = p2Display;
-    if (document.getElementById('colI2')) document.getElementById('colI2').style.display = p2Display;
-    ['colJ2', 'colK2', 'colL2', 'colM2'].forEach(id => {
-       const el = document.getElementById(id);
-       if (el) el.style.display = p2Display;
+    // Baris A-F & OEE melebar sesuai jumlah kolom produk aktif
+    ['oA','oB','oC','oD','oE','oF','oee'].forEach(id => {
+      const el = $(id);
+      const td = el && el.closest('td');
+      if (td) td.colSpan = colCount;
     });
-
-    // 3. PRODUK 3: Sembunyikan/Tampilkan Performance & Quality
-    const p3Display = hasP3 ? '' : 'none';
-    if (document.getElementById('thProd3')) document.getElementById('thProd3').style.display = p3Display;
-    if (document.getElementById('oG3')) document.getElementById('oG3').parentElement.style.display = p3Display;
-    if (document.getElementById('oH3')) document.getElementById('oH3').parentElement.style.display = p3Display;
-    if (document.getElementById('colI3')) document.getElementById('colI3').style.display = p3Display;
-    ['colJ3', 'colK3', 'colL3', 'colM3'].forEach(id => {
-       const el = document.getElementById(id);
-       if (el) el.style.display = p3Display;
-    });
+    document.querySelectorAll('.oee-matrix-tbl .sec-header td').forEach(td => td.colSpan = 2 + colCount);
   }
 
-  // Pasang pemantau saat diketik
-  if (p2Name) {
-    p2Name.addEventListener('input', syncColumns);
-    p2Name.addEventListener('change', syncColumns);
-  }
-  if (p3Name) {
-    p3Name.addEventListener('input', syncColumns);
-    p3Name.addEventListener('change', syncColumns);
-  }
+  window.syncOeeColumns = syncColumns;
 
-  // Eksekusi sekali saat halaman dimuat
+  // Pantau semua input produk (master + sheet), bukan hanya nama produk 2/3
+  const ids = [];
+  [1, 2, 3].forEach(n => ['masterProdName','masterProdBn','masterProdRate','prodName','prodBn','prodRate']
+    .forEach(p => ids.push(p + n)));
+  ids.forEach(id => {
+    const el = $(id);
+    if (el) ['input', 'change'].forEach(ev => el.addEventListener(ev, syncColumns));
+  });
+
   syncColumns();
 }
 
