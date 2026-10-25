@@ -282,12 +282,14 @@ const Calculation = (() => {
     badge.style.color = avgPerfI >= CONFIG.TARGET.PERFORMANCE ? 'var(--green-d)' : 'var(--red)';
     badge.style.borderColor = avgPerfI >= CONFIG.TARGET.PERFORMANCE ? 'rgba(18,161,80,0.3)' : 'rgba(220,38,38,0.3)';
 
-    // === RINGKASAN PRODUK (tabel modern di atas matrix OEE) ===
-    // Tidak mengubah rumus OEE — hanya menampilkan ringkasan per slot produk aktif.
-    // === RINGKASAN PRODUK (tabel modern di atas matrix OEE) ===  
+// === RINGKASAN PRODUK (tabel modern di atas matrix OEE) ===  
   const summaryBody = document.getElementById('oeeSummaryBody');  
   if (summaryBody) {  
     const rows = [];  
+    
+    // Fungsi bantuan untuk mengubah angka 0 menjadi N/A
+    const formatNA = (val) => (val === 0) ? 'N/A' : Utils.nf0(val);
+
     for (let i = 0; i < 3; i++) {  
       const st = prodStats[i];  
       const label = pLabels[i];  
@@ -297,27 +299,27 @@ const Calculation = (() => {
       const gTarget = st.target > 0 ? st.target : (st.dur * st.rate);  
       const defectCls = st.defect > 0 ? ' class="defect-val"' : ''; 
       
-      //HITUNG WAKTU TOTAL SHIFT
+      // HITUNG WAKTU TOTAL SHIFT
       const waktuTotal = st.dur + st.planned + st.unplanned;
       
       rows.push(  
         `<tr>` +  
         `<td><span class="prod-icon">📦</span>${Utils.escapeHtml ? Utils.escapeHtml(label) : label}</td>` +
-        `<td class="highight-text bg-waktu-total"><b>${Utils.nf0(waktuTotal)}</b></td>` +
-        `<td class="highlight-text bg-waktu-ops">${Utils.nf0(st.dur)}</td>` +  
-        `<td class="bg-planned-dt">${Utils.nf0(st.planned)}</td>` +  
-        `<td class="bg-unplanned-dt">${Utils.nf0(st.unplanned)}</td>` +  
-        `<td>${Utils.nf0(st.rate)}</td>` +  
-        `<td>${Utils.nf0(gTarget)}</td>` +  
-        `<td>${Utils.nf0(st.actual)}</td>` +  
-        `<td>${Utils.nf0(st.good)}</td>` +  
-        `<td${defectCls}>${Utils.nf0(st.defect)}</td>` +  
+        `<td class="highlight-text bg-waktu-total"><b>${formatNA(waktuTotal)}</b></td>` +
+        `<td class="highlight-text bg-waktu-ops">${formatNA(st.dur)}</td>` +  
+        `<td class="bg-planned-dt">${formatNA(st.planned)}</td>` +  
+        `<td class="bg-unplanned-dt">${formatNA(st.unplanned)}</td>` +  
+        `<td>${formatNA(st.rate)}</td>` +  
+        `<td>${formatNA(gTarget)}</td>` +  
+        `<td>${formatNA(st.actual)}</td>` +  
+        `<td>${formatNA(st.good)}</td>` +  
+        `<td${defectCls}>${formatNA(st.defect)}</td>` +  
         `</tr>`  
       );  
     }  
     summaryBody.innerHTML = rows.length  
       ? rows.join('')  
-      : `<tr class="oee-summary-empty"><td colspan="9">Belum ada data produk pada shift ini</td></tr>`;  
+      : `<tr class="oee-summary-empty"><td colspan="10">Belum ada data produk pada shift ini</td></tr>`;  
   }
 
     // === QUALITY PER PRODUK ===

@@ -139,12 +139,13 @@
   }
 }
 
-/* Membuat tabel ringkasan produk OEE bisa digeser (slide/scroll horizontal) */
+/* 1. Membuat tabel ringkasan produk OEE bisa digeser (slide/scroll horizontal) */
 #oeeSummaryWrap .modern-table-container {
     overflow-x: auto;
     overflow-y: hidden;
     width: 100%;
     -webkit-overflow-scrolling: touch; /* Biar licin saat digeser di HP */
+    border: 1px solid #000000 !important; /* Garis luar tabel */
 }
 
 #oeeSummaryTable.modern-table {
@@ -153,7 +154,7 @@
     white-space: nowrap; /* Mencegah judul kolom turun ke baris bawah */
 }
 
-/* Warna latar belakang tipis/transparan untuk 3 kolom waktu (mnt) */
+/* 2. Warna latar belakang untuk kolom waktu */
 #oeeSummaryTable td.bg-waktu-ops {
   background-color: rgba(34, 197, 94, 0.1) !important;
 }
@@ -168,26 +169,36 @@
 
 /* Waktu Shift Total = Biru tipis */
 #oeeSummaryTable td.bg-waktu-total {
-  background-color: rgba(62, 64, 66, 0.1) !important; /* Biru pudar */
-  color: #1e3a8a; /* Warna teks biru tua agar kontras */
+  background-color: rgba(62, 64, 66, 0.1) !important; 
+  color: #1e3a8a !important; 
 }
 
-/* Mengubah background header tabel ringkasan OEE menjadi Platinum */
+/* 3. Header Tabel (Warna Platinum) */
 #oeeSummaryTable th {
-  background-color: #f2f3f4 !important; /* Warna Platinum */
-  color: #1f2937 !important; /* Teks abu-abu gelap agar tetap kontras dan terbaca */
-  border-bottom: 2px solid #080704 !important; /* Garis bawah platinum yang sedikit digelapkan agar terlihat rapi */
-  border-right: 1px solid #080704 !important; /* Garis kanan platinum yang sedikit digelapkan agar terlihat rapi */
-  border
+  background: linear-gradient(to bottom, #4a5568, #2d3748) !important; /* Warna Gelap */
+  color: #f8fafc !important; /* Teks Putih */
+  border-bottom: 2px solid #1a202c !important; 
+  border-right: 1px solid #1a202c !important;
+  text-transform: capitalize !important; /* Atau uppercase jika mau kapital semua */
+  font-weight: 600;
+  padding: 12px 10px;
 }
 
-/* Mengubah warna garis luar (kotak luar) tabel ringkasan OEE */
-#oeeSummaryWrap .modern-table-container {
-  border: 1px solid #000000 !important; /* Ganti #000000 dengan warna yang Anda inginkan */
-}
-
-/* Mengubah warna garis pembatas pada isi tabel (sel data / td) */
+/* 4. Garis pembatas pada isi tabel (sel data / td) */
 #oeeSummaryTable td {
   border-bottom: 1px solid #808080 !important; /* Garis horizontal (bawah) antar baris */
   border-right: 1px solid #dcdcdc !important;  /* Garis vertikal (kanan) antar kolom */
+  padding: 10px;
+}
+
+/* --- Warna Teks Kolom Output Baik (Hijau) --- */
+#oeeSummaryTable td:nth-child(9) {
+  color: #16a34a !important; /* Warna hijau yang tegas */
+  font-weight: 700 !important; /* Dibuat tebal agar menonjol */
+}
+
+/* --- Warna Teks Kolom Output Defect (Merah) --- */
+#oeeSummaryTable td:nth-child(10) {
+  color: #dc2626 !important; /* Warna merah */
+  font-weight: 700 !important; /* Dibuat tebal agar menonjol */
 }
