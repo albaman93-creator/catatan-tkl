@@ -1,40 +1,182 @@
 /* Auto-paired 1:1 with js/wizard.js — edit styles for that module here */
 
-.wizard-modal { max-width: 480px; }
+/* === Modern Light Theme — White + Green === */
+:root {
+  --wiz-bg: #ffffff;
+  --wiz-bg-soft: #f4fbf7;          /* putih dengan hint hijau */
+  --wiz-border: #dcefe4;
+  --wiz-border-strong: #bfe3cf;
+  --wiz-ink: #0f2a1c;              /* hijau sangat gelap, bukan hitam pekat */
+  --wiz-ink-soft: #3f5d4e;
+  --wiz-mut: #7a9486;
+  --wiz-accent: #12a150;           /* hijau utama */
+  --wiz-accent-strong: #0d8a43;    /* hijau ditekan */
+  --wiz-accent-bg: #e8f8ee;        /* hijau sangat muda */
+  --wiz-accent-glow: rgba(18, 161, 80, 0.18);
+  --wiz-radius: 14px;
+
+  /* Shadow berlapis untuk efek timbul */
+  --wiz-shadow-sm: 0 1px 2px rgba(15, 42, 28, 0.06),
+                   0 2px 4px rgba(15, 42, 28, 0.05);
+  --wiz-shadow-md: 0 2px 4px rgba(15, 42, 28, 0.06),
+                   0 6px 12px -4px rgba(15, 42, 28, 0.12);
+  --wiz-shadow-lg: 0 4px 8px rgba(15, 42, 28, 0.06),
+                   0 16px 32px -12px rgba(15, 42, 28, 0.20);
+  --wiz-shadow-inset: inset 0 1px 2px rgba(15, 42, 28, 0.08);
+}
+
+.wizard-modal {
+  max-width: 480px;
+  background: var(--wiz-bg);
+  border: 1px solid var(--wiz-border);
+  border-radius: var(--wiz-radius);
+  box-shadow: var(--wiz-shadow-lg);
+  color: var(--wiz-ink);
+}
 
 .wiz-progress { margin-bottom: 16px; }
 
-.wiz-progress span { font: 700 11px var(--mono); color: var(--mut); letter-spacing: .4px; }
+.wiz-progress span {
+  font: 700 11px var(--mono);
+  color: var(--wiz-mut);
+  letter-spacing: .4px;
+}
 
-.wiz-bar { height: 5px; background: var(--line2); border-radius: 99px; margin-top: 6px; overflow: hidden; }
+.wiz-bar {
+  height: 6px;
+  background: var(--wiz-bg-soft);
+  border-radius: 99px;
+  margin-top: 6px;
+  overflow: hidden;
+  box-shadow: var(--wiz-shadow-inset);
+}
 
-.wiz-bar-fill { height: 100%; background: var(--green-d); border-radius: 99px; transition: width .25s ease; }
+.wiz-bar-fill {
+  height: 100%;
+  background: linear-gradient(180deg, #19c464, #12a150);
+  border-radius: 99px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset,
+              0 -1px 0 rgba(0, 0, 0, 0.06) inset;
+  transition: width .25s ease;
+}
 
-.wiz-shift-grid, .wiz-stage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
+.wiz-shift-grid, .wiz-stage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
 
-.wiz-op-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 4px; }
+.wiz-op-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 4px;
+}
 
+/* === Choice button — timbul + hover hijau === */
 .wiz-choice {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  border: 1.5px solid var(--line); background: #fff; color: var(--ink2);
-  font: 700 12.5px var(--mono); padding: 14px 6px; border-radius: 10px; cursor: pointer;
-  transition: .15s; text-align: center; line-height: 1.4;
+  border: 1.5px solid var(--wiz-border);
+  background: linear-gradient(180deg, #ffffff, #fbfefc);
+  color: var(--wiz-ink-soft);
+  font: 700 12.5px var(--mono);
+  padding: 14px 6px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .18s ease,
+              border-color .15s ease, background .15s ease, color .15s ease;
+  text-align: center; line-height: 1.4;
+  box-shadow: var(--wiz-shadow-sm);
+  user-select: none;
 }
 
-.wiz-choice small { font-weight: 500; color: var(--mut); }
+.wiz-choice small { font-weight: 500; color: var(--wiz-mut); }
 
-.wiz-choice:hover { border-color: #b8c6d0; transform: translateY(-1px); }
+/* Hover: terangkat + hint hijau */
+.wiz-choice:hover {
+  border-color: #a8ddbe;
+  background: linear-gradient(180deg, #ffffff, #f1fbf5);
+  color: var(--wiz-accent-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--wiz-shadow-md);
+}
 
+/* Active: ditekan */
+.wiz-choice:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: var(--wiz-shadow-inset);
+  transition-duration: .06s;
+}
+
+/* Terpilih: hijau penuh + glow */
 .wiz-choice.on {
-  border-color: var(--green-d); background: var(--green-bg); color: var(--green-d);
-  box-shadow: 0 0 0 3px rgba(18,161,80,.12);
+  border-color: var(--wiz-accent);
+  background: linear-gradient(180deg, #f4fdf8, #e8f8ee);
+  color: var(--wiz-accent-strong);
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 3px var(--wiz-accent-glow),
+    0 4px 10px -4px rgba(18, 161, 80, 0.35),
+    0 2px 4px rgba(15, 42, 28, 0.06);
 }
 
-.wiz-choice-icon { font-size: 20px; display: block; margin-bottom: 2px; }
+.wiz-choice.on:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 3px rgba(18, 161, 80, 0.22),
+    0 8px 18px -6px rgba(18, 161, 80, 0.45),
+    0 2px 4px rgba(15, 42, 28, 0.06);
+}
 
-.wiz-date-input { width: 100%; margin-bottom: 4px; font-size: 16px; padding: 12px 14px; }
+.wiz-choice.on:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 0 0 3px rgba(18, 161, 80, 0.22),
+    var(--wiz-shadow-inset);
+}
 
-.wiz-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; gap: 8px; }
+.wiz-choice-icon {
+  font-size: 20px;
+  display: block;
+  margin-bottom: 2px;
+  transition: transform .18s ease;
+}
+
+.wiz-choice:hover .wiz-choice-icon { transform: scale(1.1); }
+
+/* === Input === */
+.wiz-date-input {
+  width: 100%;
+  margin-bottom: 4px;
+  font-size: 16px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--wiz-border);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--wiz-ink);
+  box-shadow: var(--wiz-shadow-inset);
+  transition: border-color .15s ease, box-shadow .18s ease, transform .12s ease;
+}
+
+.wiz-date-input:hover { border-color: var(--wiz-border-strong); }
+
+.wiz-date-input:focus {
+  outline: none;
+  border-color: var(--wiz-accent);
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 4px var(--wiz-accent-glow),
+    0 4px 12px -4px rgba(18, 161, 80, 0.30);
+}
+
+.wiz-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  gap: 8px;
+}
 
 .wiz-actions-right { display: flex; gap: 8px; }
 
@@ -44,25 +186,27 @@
   margin-bottom: 8px;
 }
 
-.wiz-inline-row input[data-prod-name] {
-  flex: 2;
-  min-width: 0;
-}
+.wiz-inline-row input[data-prod-name] { flex: 2; min-width: 0; }
 
-.wiz-inline-row input[data-prod-rate] {
-  flex: 1;
-  min-width: 0;
-}
+.wiz-inline-row input[data-prod-rate] { flex: 1; min-width: 0; }
 
+/* === Confirm card === */
 .wiz-confirm-card {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 14px;
+  padding: 16px;
   border-radius: 12px;
-  border: 1px solid var(--line, #e8e8ed);
-  background: var(--card, #fff);
+  border: 1px solid var(--wiz-border);
+  background: linear-gradient(180deg, #ffffff, #f6fcf8);
   margin-bottom: 12px;
+  box-shadow: var(--wiz-shadow-sm);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+
+.wiz-confirm-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--wiz-shadow-md);
 }
 
 .wiz-confirm-row {
@@ -73,36 +217,96 @@
   font: 500 13px var(--body, system-ui, sans-serif);
 }
 
-.wiz-confirm-label {
-  color: var(--mut, #6b8093);
-  flex: none;
-}
+.wiz-confirm-label { color: var(--wiz-mut); flex: none; }
 
 .wiz-confirm-value {
-  color: var(--ink, #0f2437);
+  color: var(--wiz-ink);
   font-weight: 600;
   text-align: right;
   word-break: break-word;
 }
 
+/* === Override terang untuk data-theme="dark" === */
 [data-theme="dark"] .wiz-confirm-card {
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(255,255,255,0.1);
+  background: linear-gradient(180deg, #ffffff, #f6fcf8);
+  border-color: #dcefe4;
+  box-shadow: 0 1px 2px rgba(15, 42, 28, 0.06),
+              0 2px 4px rgba(15, 42, 28, 0.05);
 }
 
-[data-theme="dark"] .wiz-confirm-value { color: #f5f5f7; }
+[data-theme="dark"] .wiz-confirm-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(15, 42, 28, 0.06),
+              0 6px 12px -4px rgba(15, 42, 28, 0.12);
+}
 
-[data-theme="dark"] .wiz-confirm-label { color: #8e8e93; }
+[data-theme="dark"] .wiz-confirm-value { color: #0f2a1c; }
+[data-theme="dark"] .wiz-confirm-label { color: #7a9486; }
 
 [data-theme="dark"] .modal,
 [data-theme="dark"] .wizard-modal,
 [data-theme="dark"] .wizard-panel {
-  background: #161618 !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: #f5f5f7;
+  background: #ffffff !important;
+  border: 1px solid #dcefe4 !important;
+  border-radius: 14px !important;
+  color: #0f2a1c;
+  box-shadow:
+    0 4px 8px rgba(15, 42, 28, 0.06),
+    0 16px 32px -12px rgba(15, 42, 28, 0.20) !important;
+}
+
+[data-theme="dark"] .wiz-choice {
+  background: linear-gradient(180deg, #ffffff, #fbfefc);
+  border-color: #dcefe4;
+  color: #3f5d4e;
+  box-shadow: 0 1px 2px rgba(15, 42, 28, 0.06),
+              0 2px 4px rgba(15, 42, 28, 0.05);
+}
+
+[data-theme="dark"] .wiz-choice:hover {
+  background: linear-gradient(180deg, #ffffff, #f1fbf5);
+  border-color: #a8ddbe;
+  color: #0d8a43;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(15, 42, 28, 0.06),
+              0 6px 12px -4px rgba(15, 42, 28, 0.12);
+}
+
+[data-theme="dark"] .wiz-choice:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: inset 0 1px 2px rgba(15, 42, 28, 0.08);
+}
+
+[data-theme="dark"] .wiz-choice.on {
+  background: linear-gradient(180deg, #f4fdf8, #e8f8ee);
+  border-color: #12a150;
+  color: #0d8a43;
+  box-shadow:
+    0 0 0 3px rgba(18, 161, 80, 0.18),
+    0 4px 10px -4px rgba(18, 161, 80, 0.35);
+}
+
+[data-theme="dark"] .wiz-date-input {
+  background: #ffffff;
+  border-color: #dcefe4;
+  color: #0f2a1c;
+  box-shadow: inset 0 1px 2px rgba(15, 42, 28, 0.08);
+}
+
+[data-theme="dark"] .wiz-date-input:focus {
+  border-color: #12a150;
+  box-shadow:
+    0 0 0 4px rgba(18, 161, 80, 0.18),
+    0 4px 12px -4px rgba(18, 161, 80, 0.30);
+}
+
+[data-theme="dark"] .wiz-bar {
+  background: #eef8f2;
+  box-shadow: inset 0 1px 2px rgba(15, 42, 28, 0.08);
 }
 
 [data-theme="dark"] .modal-backdrop,
 [data-theme="dark"] .wizard-overlay {
-  background: rgba(0, 0, 0, 0.65) !important;
+  background: rgba(15, 42, 28, 0.32) !important;
+  backdrop-filter: blur(2px);
 }

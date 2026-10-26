@@ -1202,3 +1202,32 @@ body.wd-resizing {
 .weekly-nav-item .wn-icon { opacity: .85; }
 .weekly-nav-item.is-active .wn-icon, .weekly-nav-item:hover .wn-icon { opacity: 1; }
 @media (max-width: 1023px) { .weekly-nav-item .wn-icon svg { width: 16px; height: 16px; } }
+
+/* Tombol ISSUE: teks dan ikon SVG merah */
+.weekly-nav-item[data-weekly-page="issue"] {
+  color: #ef4444; /* Merah cerah */
+}
+
+.weekly-nav-item[data-weekly-page="issue"] .wn-icon svg {
+  stroke: #ef4444;
+}
+
+/* Saat disorot (hover) */
+.weekly-nav-item[data-weekly-page="issue"]:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+.weekly-nav-item[data-weekly-page="issue"]:hover .wn-icon svg {
+  stroke: #f87171;
+}
+
+/* Saat menu ISSUE sedang aktif diklik */
+.weekly-nav-item[data-weekly-page="issue"].is-active {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.weekly-nav-item[data-weekly-page="issue"].is-active .wn-icon svg {
+  stroke: #ffffff !important;
+}
