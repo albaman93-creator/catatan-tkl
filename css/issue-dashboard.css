@@ -196,8 +196,8 @@
 
 .issue-table tbody tr.issue-row:hover td,
 .issue-table tbody tr:hover td {
-  background-color: #EFF6FF !important;
-  color: #111827 !important;
+  background-color: #fef3c7 !important;
+  color: #d63007 !important;
 }
 
 /* Perataan Kolom Otomatis & Class Helper */
