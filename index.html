@@ -2532,8 +2532,19 @@
                   <div class="weekly-hero-badge">Kumpulan PICA Breakdown &amp; Minor · Open / Closed</div>
                 </div>
                 <div class="oee-filter oee-filter-extended" id="issueFilterBar">
-                  <div class="field"><label for="issueFrom">Dari Tanggal</label><input type="date" id="issueFrom"></div>
-                  <div class="field"><label for="issueTo">Sampai Tanggal</label><input type="date" id="issueTo"></div>
+                  <!-- Quick period presets (mengganti input tanggal manual) -->
+                  <div class="field issue-period-field">
+                    <label>Periode</label>
+                    <div class="issue-period-btns" role="group" aria-label="Periode issue">
+                      <button type="button" class="btn btn-ghost btn-sm issue-period-btn is-on" data-period="all" id="issuePeriodAll" title="Tampilkan semua issue">Semua</button>
+                      <button type="button" class="btn btn-ghost btn-sm issue-period-btn" data-period="day" id="issuePeriodDay" title="Hari ini">Hari</button>
+                      <button type="button" class="btn btn-ghost btn-sm issue-period-btn" data-period="week" id="issuePeriodWeek" title="Minggu ini">Minggu</button>
+                      <button type="button" class="btn btn-ghost btn-sm issue-period-btn" data-period="month" id="issuePeriodMonth" title="Bulan ini (tanggal 1 s/d akhir bulan)">Bulan</button>
+                    </div>
+                  </div>
+                  <!-- Date inputs disembunyikan; diisi otomatis oleh tombol periode -->
+                  <input type="hidden" id="issueFrom">
+                  <input type="hidden" id="issueTo">
                   <div class="field">
                     <label for="issueLine">Line</label>
                     <select id="issueLine">

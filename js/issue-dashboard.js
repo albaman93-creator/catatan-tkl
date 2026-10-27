@@ -17,6 +17,7 @@ const IssueDashboard = (() => {
   let allIssues = []; // setelah filter Line/Tahapan/Shift/Mesin/Produk
   let filterTab = 'open'; // open | closed | all
   let pendingIssue = null;
+  let currentPeriod = 'all'; // all | day | week | month  (default: all agar issue terlihat saat buka)
 
   const esc = (s) => {
     if (typeof Utils !== 'undefined' && Utils.escapeHtml) return Utils.escapeHtml(String(s ?? ''));
@@ -421,20 +422,67 @@ const IssueDashboard = (() => {
       allIssues = applyFilters(rawIssues);
       render();
       const c = counts();
-      say(`✓ ${c.total} issue · Open ${c.open} · Closed ${c.closed} · dari ${records.length} record (mentah ${rawIssues.length})`);
+      const periodLabel = { all: 'Semua', day: 'Hari ini', week: 'Minggu ini', month: 'Bulan ini' }[currentPeriod] || currentPeriod;
+      say(`✓ ${c.total} issue · Open ${c.open} · Closed ${c.closed} · ${periodLabel} (${from} → ${to}) · ${records.length} record`);
     } catch (e) {
       console.warn(e);
       say('Gagal memuat: ' + (e.message || e), true);
     }
   };
 
+  const isoDate = (d) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  /** Hitung rentang tanggal berdasarkan periode cepat */
+  const rangeForPeriod = (period) => {
+    const today = new Date();
+    today.setHours(12, 0, 0, 0); // hindari masalah timezone
+    let from = new Date(today);
+    let to = new Date(today);
+
+    if (period === 'day') {
+      // hari ini
+    } else if (period === 'week') {
+      // Senin minggu ini s/d hari ini (atau Minggu jika ingin full week)
+      const day = today.getDay(); // 0=Minggu, 1=Senin, ...
+      const diffToMonday = day === 0 ? 6 : day - 1;
+      from = new Date(today);
+      from.setDate(today.getDate() - diffToMonday);
+      // to = akhir minggu (Minggu)
+      to = new Date(from);
+      to.setDate(from.getDate() + 6);
+    } else if (period === 'month') {
+      // tanggal 1 s/d akhir bulan ini
+      from = new Date(today.getFullYear(), today.getMonth(), 1);
+      to = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    } else {
+      // all — rentang lebar agar semua issue tampil
+      from = new Date(2020, 0, 1);
+      to = new Date(today);
+      to.setDate(to.getDate() + 1); // sedikit ke depan
+    }
+    return { from: isoDate(from), to: isoDate(to) };
+  };
+
+  /** Set tombol periode aktif + isi hidden date + (opsional) load */
+  const setPeriod = (period, doLoad = true) => {
+    currentPeriod = period || 'all';
+    document.querySelectorAll('.issue-period-btn').forEach((b) => {
+      b.classList.toggle('is-on', b.dataset.period === currentPeriod);
+    });
+    const { from, to } = rangeForPeriod(currentPeriod);
+    if ($('issueFrom')) $('issueFrom').value = from;
+    if ($('issueTo')) $('issueTo').value = to;
+    if (doLoad) load();
+  };
+
+  /** Default: Semua issue (supaya terlihat saat pertama buka / weekly meeting) */
   const defaultDates = () => {
-    const to = new Date();
-    const from = new Date();
-    from.setDate(to.getDate() - 13);
-    const iso = (d) => d.toISOString().slice(0, 10);
-    if ($('issueFrom') && !$('issueFrom').value) $('issueFrom').value = iso(from);
-    if ($('issueTo') && !$('issueTo').value) $('issueTo').value = iso(to);
+    setPeriod(currentPeriod || 'all', false);
   };
 
   const findIssueByIkey = (ikey) => {
@@ -537,7 +585,8 @@ const IssueDashboard = (() => {
   };
 
   const open = () => {
-    defaultDates();
+    // Default ke "Semua" agar issue terlihat saat pertama buka / weekly meeting
+    setPeriod(currentPeriod || 'all', false);
     if (!allIssues.length) load();
     else render();
   };
@@ -545,7 +594,7 @@ const IssueDashboard = (() => {
   /** Refresh badge saja (dipakai saat buka weekly) */
   const refreshBadge = async () => {
     try {
-      defaultDates();
+      setPeriod(currentPeriod || 'all', false);
       const from = $('issueFrom')?.value;
       const to = $('issueTo')?.value;
       if (!from || !to) return;
@@ -564,16 +613,23 @@ const IssueDashboard = (() => {
   const bind = () => {
     $('issueApply')?.addEventListener('click', load);
     $('issueReset')?.addEventListener('click', () => {
-      if ($('issueFrom')) $('issueFrom').value = '';
-      if ($('issueTo')) $('issueTo').value = '';
       if ($('issueLine')) $('issueLine').value = '';
       if ($('issueStage')) $('issueStage').value = '';
       if ($('issueShift')) $('issueShift').value = 'all';
       if ($('issueMesin')) $('issueMesin').value = '';
       if ($('issueProduk')) $('issueProduk').value = '';
-      defaultDates();
-      load();
+      // Reset periode ke default "Semua"
+      setPeriod('all', true);
     });
+
+    // Tombol periode cepat: Semua / Hari / Minggu / Bulan
+    document.querySelectorAll('.issue-period-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const period = btn.dataset.period || 'all';
+        setPeriod(period, true);
+      });
+    });
+
     document.querySelectorAll('.issue-tab').forEach((b) => {
       b.addEventListener('click', () => {
         filterTab = b.dataset.issueTab || 'open';
