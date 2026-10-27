@@ -21,3 +21,12 @@
 #picaOverlay .pica-modal input,
 #picaOverlay .pica-modal textarea,
 #picaOverlay .pica-modal select { }
+
+/* Field Produk/Batch/Problem readonly saat dibuka dari Breakdown (data dari log sheet) */
+#picaOverlay .pica-modal input[data-ro="1"],
+#picaOverlay .pica-modal textarea[data-ro="1"] {
+  opacity: 0.92;
+  background: rgba(15, 23, 42, 0.65);
+  cursor: default;
+  color: #e2e8f0;
+}

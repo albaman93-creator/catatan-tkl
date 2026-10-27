@@ -375,53 +375,43 @@ const Pica = (() => {
   const openFormBreakdown = (i) => {
     const p = listBd[i];
     if (!p) return;
-    formMode = 'breakdown';
-    current = p;
-    const a = analysis[fullKey(p)];
-    const mf = $('picaMinorFields');
-    if (mf) mf.hidden = true;
-    const title = $('picaModalTitle');
-    if (title) title.textContent = '✍️ Form Why-Why / PICA (Breakdown)';
-    $('picaCtx').innerHTML =
-      `<div class="pica-ctx-row"><b>${esc(p.produk)}</b> · Batch ${esc(p.batch || '—')} · ${fmtD(p.date)} · S${p.shift} · Line ${p.line} · ${esc(p.stage)}</div>`
-      + `<div class="pica-ctx-row">Problem: ${esc(p.problem)} (${p.dur || 0} mnt)</div>`;
-    $('picaWhy1').value = a?.why1 ?? '';
-    $('picaWhy2').value = a?.why2 ?? '';
-    $('picaWhy3').value = a?.why3 ?? '';
-    $('picaCorrective').value = a?.corrective ?? '';
-    $('picaPreventive').value = a?.preventive ?? '';
-    $('picaPic').value = a?.pic ?? '';
-    $('picaStatus').value = a?.status || 'Open';
-    $('picaOverlay').classList.remove('hide');
-    setTimeout(() => $('picaWhy1')?.focus(), 30);
+    // pakai openIssue agar prefill Produk/Batch/Problem konsisten
+    const a = analysis[fullKey(p)] || {};
+    openIssue({ ...p, kind: 'breakdown', why1: a.why1, why2: a.why2, why3: a.why3, corrective: a.corrective, preventive: a.preventive, pic: a.pic, status: a.status || 'Open' }, null);
   };
 
   const openFormMinor = (i) => {
-    formMode = 'minor';
     const isNew = i == null || i < 0;
-    const p = isNew ? null : listMs[i];
-    current = isNew
-      ? { id: 'ms_' + Date.now(), produk: '', batch: '', problem: '', freq: 1, status: 'Open', kind: 'minor', date: '' }
-      : p;
-    const mf = $('picaMinorFields');
-    if (mf) mf.hidden = false;
-    const title = $('picaModalTitle');
-    if (title) title.textContent = isNew ? '➕ Tambah Minor Stop' : '✍️ Edit Minor Stop';
-    $('picaCtx').innerHTML =
-      `<div class="pica-ctx-row">Minor Stop · Line ${esc(metaCtx.line)} · ${esc(metaCtx.stage)} — <b>input manual</b> (bukan dari log sheet)</div>`;
-    if ($('msProduk')) $('msProduk').value = current.produk || '';
-    if ($('msBatch')) $('msBatch').value = current.batch || '';
-    if ($('msProblem')) $('msProblem').value = current.problem || '';
-    if ($('msFreq')) $('msFreq').value = String(current.freq || 1);
-    $('picaWhy1').value = current.why1 || '';
-    $('picaWhy2').value = current.why2 || '';
-    $('picaWhy3').value = current.why3 || '';
-    $('picaCorrective').value = current.corrective || '';
-    $('picaPreventive').value = current.preventive || '';
-    $('picaPic').value = current.pic || '';
-    $('picaStatus').value = current.status || 'Open';
-    $('picaOverlay').classList.remove('hide');
-    setTimeout(() => ($('msProduk') || $('picaWhy1'))?.focus(), 30);
+    const p = isNew
+      ? { id: 'ms_' + Date.now(), produk: '', batch: '', problem: '', freq: 1, status: 'Open', kind: 'minor', date: '', line: metaCtx.line, stage: metaCtx.stage }
+      : { ...listMs[i], kind: 'minor' };
+    if (isNew) {
+      // form kosong untuk tambah baru
+      formMode = 'minor';
+      current = p;
+      metaCtx = { line: current.line || metaCtx.line, stage: current.stage || metaCtx.stage };
+      const mf = $('picaMinorFields');
+      if (mf) { mf.hidden = false; mf.style.display = ''; }
+      const title = $('picaModalTitle');
+      if (title) title.textContent = '➕ Tambah Minor Stop';
+      if ($('picaCtx')) {
+        $('picaCtx').innerHTML =
+          `<div class="pica-ctx-row">Minor Stop · Line ${esc(metaCtx.line)} · ${esc(metaCtx.stage)} — <b>input manual</b> (bukan dari log sheet)</div>`;
+      }
+      ['msProduk', 'msBatch', 'msProblem', 'msFreq', 'picaWhy1', 'picaWhy2', 'picaWhy3', 'picaCorrective', 'picaPreventive', 'picaPic'].forEach((id) => {
+        const el = $(id);
+        if (!el) return;
+        el.readOnly = false;
+        el.removeAttribute('data-ro');
+        if (id === 'msFreq') el.value = '1';
+        else el.value = '';
+      });
+      if ($('picaStatus')) $('picaStatus').value = 'Open';
+      $('picaOverlay')?.classList.remove('hide');
+      setTimeout(() => ($('msProduk') || $('picaWhy1'))?.focus(), 30);
+    } else {
+      openIssue(p, null);
+    }
   };
 
   const openForm = openFormBreakdown;
@@ -688,8 +678,13 @@ const Pica = (() => {
     // pastikan metaCtx ikut line/stage issue agar save minor ke store yang benar
     metaCtx = { line: current.line, stage: current.stage };
 
+    // Tampilkan field Produk/Batch/Problem/Frekuensi agar data issue terlihat & bisa dilanjutkan.
+    // Breakdown: readonly (data dari log sheet). Minor: bisa diedit.
     const mf = $('picaMinorFields');
-    if (mf) mf.hidden = !isMinor;
+    if (mf) {
+      mf.hidden = false;
+      mf.style.display = '';
+    }
     const title = $('picaModalTitle');
     if (title) {
       title.textContent = isMinor
@@ -704,12 +699,24 @@ const Pica = (() => {
         `<div class="pica-ctx-row"><b>${esc(current.produk)}</b> · Batch ${esc(current.batch || '—')} · ${fmtD(current.date)} · S${esc(current.shift)} · Line ${esc(current.line)} · ${esc(current.stage)}</div>`
         + `<div class="pica-ctx-row">Problem: ${esc(current.problem)} (${durTxt})</div>`;
     }
-    if (isMinor) {
-      if ($('msProduk')) $('msProduk').value = current.produk || '';
-      if ($('msBatch')) $('msBatch').value = current.batch || '';
-      if ($('msProblem')) $('msProblem').value = current.problem || '';
-      if ($('msFreq')) $('msFreq').value = String(current.freq || 1);
-    }
+
+    // Prefill SELALU dari data issue (baik breakdown maupun minor)
+    const setVal = (id, val, readOnly) => {
+      const el = $(id);
+      if (!el) return;
+      el.value = val == null ? '' : String(val);
+      if (readOnly != null) {
+        el.readOnly = !!readOnly;
+        el.disabled = false;
+        if (readOnly) el.setAttribute('data-ro', '1');
+        else el.removeAttribute('data-ro');
+      }
+    };
+    setVal('msProduk', current.produk || '', !isMinor);
+    setVal('msBatch', current.batch || '', !isMinor);
+    setVal('msProblem', current.problem || '', !isMinor);
+    setVal('msFreq', current.freq || (isMinor ? 1 : ''), !isMinor);
+
     if ($('picaWhy1')) $('picaWhy1').value = issue.why1 || '';
     if ($('picaWhy2')) $('picaWhy2').value = issue.why2 || '';
     if ($('picaWhy3')) $('picaWhy3').value = issue.why3 || '';
