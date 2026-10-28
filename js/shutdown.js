@@ -225,14 +225,12 @@ const Shutdown = (() => {
         : `${fmtDateId(meta.from)} – ${fmtDateId(meta.to)}`;
       parts.push(range);
     }
-    if (meta.days != null) parts.push(`${meta.days} hari produksi`);
     if (meta.shiftLabel) parts.push(meta.shiftLabel);
     if (meta.stage && meta.line) {
       const stg = String(meta.stage).charAt(0).toUpperCase() + String(meta.stage).slice(1);
       parts.push(`${stg} Line ${meta.line}`);
     }
     if (meta.product) parts.push(meta.product);
-    if (meta.updatedAt) parts.push(`diperbarui ${meta.updatedAt}`);
     return parts.join(' · ');
   };
 

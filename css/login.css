@@ -833,8 +833,43 @@
 }
 
 
-/* Ukuran card login tema Nature: ramping & proporsional (~25% lebar layar) agar ilustrasi kiri/kanan terlihat */
+/* Ukuran card login tema Nature: kompak agar ilustrasi terlihat & tidak terpotong di layar pendek */
 #loginOverlay.login-theme-santai .login-card {
   width: 100%;
-  max-width: clamp(340px, 25.6vw, 500px);
+  max-width: clamp(320px, 24vw, 420px) !important;
+  padding: 16px 18px 12px !important;
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  scrollbar-width: none;
 }
+
+#loginOverlay.login-theme-santai .login-card::-webkit-scrollbar { display: none; }
+
+#loginOverlay.login-theme-santai .login-header { margin-bottom: 8px !important; text-align: center !important; }
+
+#loginOverlay.login-theme-santai .login-card .login-logo--img { margin: 0 auto 4px !important; max-width: 64px !important; }
+
+#loginOverlay.login-theme-santai .login-card .login-logo--img img { max-height: 48px !important; }
+
+#loginOverlay.login-theme-santai .login-header h2 { font-size: 17px !important; letter-spacing: .5px; }
+
+#loginOverlay.login-theme-santai .login-header p { font-size: 11px !important; }
+
+#loginOverlay.login-theme-santai .login-theme-setting { padding: 7px 9px !important; margin-bottom: 8px !important; }
+
+#loginOverlay.login-theme-santai .login-theme-setting-label { margin-bottom: 4px !important; }
+
+#loginOverlay.login-theme-santai .login-theme-option { padding: 5px 6px !important; font-size: 10.5px !important; }
+
+#loginOverlay.login-theme-santai .login-form .field { margin-bottom: 8px !important; }
+
+#loginOverlay.login-theme-santai .login-form .field label { font-size: 10px !important; margin-bottom: 3px !important; }
+
+#loginOverlay.login-theme-santai .login-form .field input { padding: 8px 10px !important; font-size: 14px !important; letter-spacing: 3px !important; }
+
+#loginOverlay.login-theme-santai .login-btn { padding: 9px !important; font-size: 13px !important; }
+
+#loginOverlay.login-theme-santai .login-offline-divider { margin: 8px 0 6px !important; font-size: 11px !important; }
+
+#loginOverlay.login-theme-santai .login-offline-hint,
+#loginOverlay.login-theme-santai .login-hint { font-size: 10.5px !important; line-height: 1.35 !important; }

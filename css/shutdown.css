@@ -34,6 +34,7 @@
 }
 
 .shutdown-ctx {
+  display: none; /* tampil hanya saat cetak */
   font: 400 12px var(--font-sans, 'IBM Plex Sans', sans-serif);
   color: var(--text-muted, #94a3b8);
   margin-bottom: 10px;
@@ -207,6 +208,7 @@
     color: #0f172a !important;
   }
   .shutdown-ctx {
+    display: block !important;
     color: #475569 !important;
   }
   .shutdown-pager,
