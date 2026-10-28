@@ -278,6 +278,37 @@
   animation: riverShineFlow 3.2s linear infinite;
 }
 
+.login-theme-santai .river-bank { fill: none; stroke: #2f7a35; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
+
+.login-theme-santai .river-ripple {
+  fill: none; stroke: rgba(255,255,255,.6); stroke-width: 3; stroke-linecap: round;
+  stroke-dasharray: 70 38;
+  animation: riverRippleFlow 3.4s linear infinite;
+}
+
+.login-theme-santai .river-ripple:nth-of-type(4) { animation-duration: 4.2s; animation-delay: -1s; }
+
+.login-theme-santai .river-ripple:nth-of-type(5) { animation-duration: 2.8s; animation-delay: -2s; }
+
+.login-theme-santai .river-ripple:nth-of-type(6) { animation-duration: 3.8s; animation-delay: -.5s; }
+
+@keyframes riverRippleFlow { to { stroke-dashoffset: -108; } }
+
+/* Mata air: tumpukan batu hitam di hulu sungai */
+.login-theme-santai .spring-shadow { fill: rgba(10, 25, 15, .25); }
+
+.login-theme-santai .spring-rock { fill: #1b1b1f; stroke: #0e0e11; stroke-width: 1.5; stroke-linejoin: round; }
+
+.login-theme-santai .spring-rock-hi { fill: #34343a; opacity: .9; }
+
+.login-theme-santai #bgScene.scene--night #riverSpring { filter: brightness(.7); }
+
+@media (prefers-reduced-motion: reduce) { .login-theme-santai .river-ripple { animation: none; } }
+
+.login-theme-santai #bgScene.scene--night .river-bank { opacity: .55; }
+
+.login-theme-santai #bgScene.scene--night .river-ripple { stroke: rgba(255,255,255,.28); }
+
 #bgScene.scene--sunrise .river-body,
 .login-theme-santai #bgScene.scene--sunset  .river-body { filter: hue-rotate(-8deg) brightness(.92); }
 
@@ -332,15 +363,17 @@
 
 .login-theme-santai .hut-roof { fill: #7c3c29; stroke: #5c2c1d; stroke-width: 2; transition: fill 2s ease; }
 
-.login-theme-santai .hut-chimney { fill: #8d8d8d; }
+.login-theme-santai .hut-chimney { fill: #8a5a44; stroke: #5c3a2a; stroke-width: 1.5; }
+
+.login-theme-santai .hut-chimney-cap { fill: #6b4433; stroke: #4a2d20; stroke-width: 1; }
 
 .login-theme-santai .hut-door { fill: #5c3b22; stroke: #3c2513; stroke-width: 1.5; }
 
 .login-theme-santai .hut-knob { fill: #d9b04c; }
 
-.login-theme-santai .hut-window { fill: #bfe4f1; stroke: #5c3b22; stroke-width: 2; transition: fill 1.5s ease, filter 1.5s ease; }
+.login-theme-santai .hut-window { fill: #ffd86b; stroke: #5c3b22; stroke-width: 3; transition: fill 1.5s ease, filter 1.5s ease; }
 
-.login-theme-santai .hut-window-x { stroke: #5c3b22; stroke-width: 1.4; }
+.login-theme-santai .hut-window-x { stroke: #5c3b22; stroke-width: 2; }
 
 .login-theme-santai #bgScene.scene--night .hut-wall { fill: #5b4230; }
 
@@ -348,11 +381,11 @@
 
 .login-theme-santai .tent-shadow { fill: rgba(15, 35, 20, .18); }
 
-.login-theme-santai .tent-body { fill: #f2c34d; stroke: #c99a2e; stroke-width: 2; transition: fill 2s ease, stroke 2s ease; }
+.login-theme-santai .tent-side  { fill: #e8832a; stroke: #b9651c; stroke-width: 1.5; stroke-linejoin: round; transition: fill 2s ease; }
 
-.login-theme-santai .tent-shade { fill: #d9a93a; transition: fill 2s ease; }
+.login-theme-santai .tent-front { fill: #f7b52e; stroke: #d98f1c; stroke-width: 1.5; stroke-linejoin: round; transition: fill 2s ease; }
 
-.login-theme-santai .tent-stripe { fill: #e2574c; opacity: .85; transition: fill 2s ease, opacity 2s ease; }
+.login-theme-santai .tent-ridge { stroke: #a85a18; stroke-width: 2; stroke-linecap: round; opacity: .7; }
 
 .login-theme-santai .tent-door { fill: #6b4321; stroke: #4a2d15; stroke-width: 1.5; }
 
@@ -360,14 +393,13 @@
 
 .login-theme-santai .tent-peg { stroke: #6b5237; stroke-width: 2; }
 
-#bgScene.scene--sunrise .tent-body,
-.login-theme-santai #bgScene.scene--sunset  .tent-body { filter: saturate(.85) brightness(.94); }
+#bgScene.scene--sunrise .tent-side, #bgScene.scene--sunrise .tent-front,
+.login-theme-santai #bgScene.scene--sunset .tent-side,
+.login-theme-santai #bgScene.scene--sunset .tent-front { filter: saturate(.85) brightness(.94); }
 
-.login-theme-santai #bgScene.scene--night .tent-body { fill: #8a6a2e; }
+.login-theme-santai #bgScene.scene--night .tent-side  { fill: #7a4a1c; }
 
-.login-theme-santai #bgScene.scene--night .tent-shade { fill: #6b5323; }
-
-.login-theme-santai #bgScene.scene--night .tent-stripe { opacity: .5; }
+.login-theme-santai #bgScene.scene--night .tent-front { fill: #8a6a2e; }
 
 .login-theme-santai .fire-shadow { fill: rgba(15, 35, 20, .18); }
 
@@ -784,4 +816,11 @@
 }
 #loginOverlay .login-card .login-logo--img img {
   display: block; width: 100%; height: auto; max-height: 72px; object-fit: contain;
+}
+
+
+/* Ukuran card login tema Nature: ramping & proporsional (~25% lebar layar) agar ilustrasi kiri/kanan terlihat */
+#loginOverlay.login-theme-santai .login-card {
+  width: 100%;
+  max-width: clamp(340px, 25.6vw, 500px);
 }
