@@ -1,0 +1,380 @@
+/* =========================================================================
+   WEEKLY-THEME.CSS — Tema Gelap / Terang untuk Weekly Meeting
+   Dimuat SETELAH weekly-dashboard.css, weekly-filter.css, rincian-produk.css,
+   issue-dashboard.css. Atribut tema dipasang oleh js/weekly-theme.js pada
+   <html data-wd-theme="dark|light"> (portal seperti .speed-menu ikut berubah).
+   Warna SVG grafik (hardcode di JS) ditimpa lewat selector atribut.
+   ========================================================================= */
+
+/* ---------- 1. TOKEN ---------- */
+:root[data-wd-theme="dark"] {
+  --wd-bg:            #071426;
+  --wd-bg-side:       #08182f;
+  --wd-card:          #0e2545;
+  --wd-card-2:        #0a1d3a;
+  --wd-border:        #234777;
+  --wd-border-soft:   #14305a;
+  --wd-text:          #d6e3f7;
+  --wd-text-strong:   #f4f8ff;
+  --wd-text-mute:     #8fa9cc;
+  --wd-text-dim:      #7893b8;
+  --wd-text-faint:    #5f7ca3;
+  --wd-hover:         #102c52;
+  --wd-hover-2:       #17396a;
+  --wd-accent:        #2a6df4;
+  --wd-accent-text:   #ffffff;
+  --wd-link:          #5eb4ff;
+  --wd-grid:          #1b3a66;
+  --wd-axis:          #8fa9cc;
+  --wd-axis-soft:     #6f8cb3;
+  --wd-plot:          #071426;
+  --wd-stripe-a:      rgba(42, 109, 244, .07);
+  --wd-stripe-b:      rgba(7, 20, 38, .45);
+  --wd-row-hover:     rgba(42, 109, 244, .22);
+  --wd-hero-1:        #0b2142;
+  --wd-hero-2:        #0d2d5a;
+  --wd-hero-border:   #234777;
+  --wd-note-border:   #2d5088;
+  --wd-menu-bg:       #0c2243;
+  --wd-menu-border:   #234777;
+  --wd-menu-hover:    #123260;
+  --wd-chip-bg:       #0e2a4d;
+  --wd-chip-border:   #234777;
+  --wd-chip-text:     #cfe0f7;
+  --wd-chip-hover:    #123260;
+  --wd-oee-ope:       #2ee6a6;
+  --wd-oee-365:       #38bdf8;
+  --wd-shadow:        0 14px 34px rgba(0, 5, 20, .55);
+
+  --wdt-page:         radial-gradient(1000px 460px at 80% -8%, rgba(40, 120, 220, .24), transparent 62%),
+                      radial-gradient(760px 420px at 6% 100%, rgba(20, 184, 166, .11), transparent 60%),
+                      #071426;
+  --wdt-side:         linear-gradient(180deg, #0a2142 0%, #071a34 100%);
+  --wdt-panel:        linear-gradient(180deg, rgba(20, 52, 100, .72) 0%, rgba(10, 31, 62, .74) 100%);
+  --wdt-panel-bd:     rgba(70, 135, 225, .30);
+  --wdt-panel-sh:     0 10px 28px rgba(0, 8, 24, .45), inset 0 1px 0 rgba(140, 190, 255, .08);
+  --wdt-inset:        rgba(6, 18, 36, .55);
+  --wdt-gauge-ope:    #2ee6a6;
+  --wdt-gauge-365:    #2dd4bf;
+  --wdt-glow:         drop-shadow(0 0 6px rgba(46, 230, 166, .55));
+  --wdt-input-bg:     #0a1d3a;
+  --wdt-input-bd:     #26497d;
+  --wdt-input-tx:     #e4eeff;
+  --wdt-btn:          #14b8a6;
+  --wdt-btn-tx:       #031a18;
+  --wdt-btn-hover:    #2dd4bf;
+  --wdt-shift-on:     linear-gradient(180deg, #38a9ff 0%, #1f6feb 100%);
+  --wdt-nav-on-bg:    linear-gradient(90deg, #2a6df4 0%, #1f5bd8 100%);
+  --wdt-nav-on-fg:    #ffffff;
+  --wdt-hero-bar:     linear-gradient(180deg, #2ee6a6, #3b82f6);
+  --wdt-switch-on:    #14b8a6;
+  --wdt-th-bg:        #0f2a4f;
+  --wdt-th-fg:        #cfe0f7;
+  --wdt-td-bg:        #0c2243;
+  --wdt-td-bg2:       #0f2a50;
+  --wdt-td-fg:        #dbe7fb;
+  --wdt-td-bd:        rgba(70, 135, 225, .18);
+}
+
+:root[data-wd-theme="light"] {
+  --wd-bg:            #eef4f9;
+  --wd-bg-side:       #ffffff;
+  --wd-card:          #ffffff;
+  --wd-card-2:        #f3f7fb;
+  --wd-border:        #d9e3ee;
+  --wd-border-soft:   #e5ecf4;
+  --wd-text:          #1e293b;
+  --wd-text-strong:   #0f172a;
+  --wd-text-mute:     #526176;
+  --wd-text-dim:      #6b7a8f;
+  --wd-text-faint:    #8b99ab;
+  --wd-hover:         #eef3f8;
+  --wd-hover-2:       #e2e9f1;
+  --wd-accent:        #16a34a;
+  --wd-accent-text:   #ffffff;
+  --wd-link:          #2563eb;
+  --wd-grid:          #dde6ef;
+  --wd-axis:          #5d6c80;
+  --wd-axis-soft:     #7a879a;
+  --wd-plot:          #ffffff;
+  --wd-hero-1:        #ffffff;
+  --wd-hero-2:        #f6faf8;
+  --wd-hero-border:   #d9e3ee;
+
+  --wdt-page:         #eef4f9;
+  --wdt-side:         #ffffff;
+  --wdt-panel:        #ffffff;
+  --wdt-panel-bd:     #dce5ef;
+  --wdt-panel-sh:     0 1px 2px rgba(15, 23, 42, .04), 0 6px 18px rgba(15, 23, 42, .05);
+  --wdt-inset:        #ffffff;
+  --wdt-gauge-ope:    #3b82f6;
+  --wdt-gauge-365:    #22c55e;
+  --wdt-glow:         none;
+  --wdt-input-bg:     #ffffff;
+  --wdt-input-bd:     #cfd9e5;
+  --wdt-input-tx:     #0f172a;
+  --wdt-btn:          #16a34a;
+  --wdt-btn-tx:       #ffffff;
+  --wdt-btn-hover:    #15803d;
+  --wdt-shift-on:     linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  --wdt-nav-on-bg:    #e3f5ec;
+  --wdt-nav-on-fg:    #0f7a47;
+  --wdt-hero-bar:     linear-gradient(180deg, #22c55e, #16a34a);
+  --wdt-switch-on:    #16a34a;
+  --wdt-th-bg:        #f1f5f9;
+  --wdt-th-fg:        #334155;
+  --wdt-td-bg:        #ffffff;
+  --wdt-td-bg2:       #f8fafc;
+  --wdt-td-fg:        #1e293b;
+  --wdt-td-bd:        #e5ecf4;
+}
+
+/* ---------- 2. RANGKA ---------- */
+.weekly-layout {
+  background: var(--wdt-page, var(--wd-bg));
+}
+:root[data-wd-theme="dark"]  .weekly-layout { color-scheme: dark; }
+:root[data-wd-theme="light"] .weekly-layout { color-scheme: light; }
+
+.weekly-layout .weekly-main { background: transparent; }
+.weekly-layout .weekly-sidebar { background: var(--wdt-side, var(--wd-bg-side)); }
+
+.weekly-layout .weekly-hero::before { background: var(--wdt-hero-bar, linear-gradient(180deg, #3b82f6, #8b5cf6)); }
+
+.weekly-layout .weekly-nav-item.is-active {
+  background: var(--wdt-nav-on-bg, var(--wd-accent));
+  color: var(--wdt-nav-on-fg, var(--wd-accent-text));
+}
+:root[data-wd-theme="light"] .weekly-layout .weekly-nav-item.is-active { box-shadow: inset 3px 0 0 #16a34a; }
+:root[data-wd-theme="dark"]  .weekly-layout .weekly-nav-item.is-active { box-shadow: 0 6px 16px -6px rgba(42, 109, 244, .65); }
+
+/* ---------- 3. KARTU / PANEL ---------- */
+.weekly-layout .oee-panel,
+.weekly-layout .oee-trend-card,
+.weekly-layout .oee-bar-card,
+.weekly-layout .weekly-card,
+.weekly-layout .wd-tot-card {
+  background: var(--wdt-panel);
+  border: 1px solid var(--wdt-panel-bd);
+  box-shadow: var(--wdt-panel-sh);
+}
+:root[data-wd-theme="dark"] .weekly-layout .oee-panel,
+:root[data-wd-theme="dark"] .weekly-layout .oee-trend-card,
+:root[data-wd-theme="dark"] .weekly-layout .oee-bar-card,
+:root[data-wd-theme="dark"] .weekly-layout .weekly-card,
+:root[data-wd-theme="dark"] .weekly-layout .wd-tot-card {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.weekly-layout .oee-panel-head,
+.weekly-layout .oee-panel-head small,
+.weekly-layout .oee-gauge-title { color: var(--wd-text-mute); }
+.weekly-layout .oee-gauge-title { color: var(--wd-text); }
+.weekly-layout .oee-target-label,
+.weekly-layout .oee-actual-sub { color: var(--wd-text-dim); }
+.weekly-layout .oee-actual { color: var(--wd-text-strong); }
+
+.weekly-layout .oee-apq-item {
+  background: var(--wdt-inset);
+  border-color: var(--wdt-panel-bd);
+}
+.weekly-layout .oee-apq-item.over  { border-color: rgba(34, 197, 94, .45); }
+.weekly-layout .oee-apq-item.under { border-color: rgba(248, 113, 113, .45); }
+.weekly-layout .oee-apq-label { color: var(--wd-text-mute); }
+.weekly-layout .oee-apq-label span { color: var(--wd-text-dim); }
+.weekly-layout .oee-apq-val { color: var(--wd-text-strong); }
+:root[data-wd-theme="light"] .weekly-layout .oee-apq-item.over  .oee-apq-val { color: #15803d; }
+:root[data-wd-theme="light"] .weekly-layout .oee-apq-item.under .oee-apq-val { color: #dc2626; }
+
+.weekly-layout .oee-track { stroke: var(--wd-grid); }
+.weekly-layout .oee-fill-blue  { stroke: var(--wdt-gauge-ope); filter: var(--wdt-glow); }
+.weekly-layout .oee-fill-green { stroke: var(--wdt-gauge-365); filter: var(--wdt-glow); }
+
+.weekly-layout .oee-trend-legend { color: var(--wd-text); }
+.weekly-layout .sd-leg-item { color: var(--wd-text-mute); }
+.weekly-layout .mch-batch-chart {
+  background: var(--wdt-inset);
+  border-color: var(--wdt-panel-bd);
+}
+
+/* Halaman Yield */
+.weekly-layout .wb-track { background: var(--wd-card-2); }
+.weekly-layout .wb-label { color: var(--wd-text-mute); }
+.weekly-layout .wb-val { color: var(--wd-text-strong); }
+.weekly-layout .wk-label { color: var(--wd-text-dim); }
+.weekly-layout .wk-value { color: var(--wd-text-strong); }
+.weekly-layout .wk-value.small { color: var(--wd-text-mute); }
+:root[data-wd-theme="light"] .weekly-layout .wk-value.good { color: #15803d; }
+
+/* ---------- 4. KARTU RINGKASAN (wd-tot-card) ---------- */
+.weekly-layout .wd-tot-label { color: var(--wd-text-mute); }
+.weekly-layout .wd-tot-val   { color: var(--wd-text-strong); }
+.weekly-layout .wd-tot-unit  { color: var(--wd-text-dim); }
+
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotD),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotD),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotDefect),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotDefect) {
+  background: linear-gradient(180deg, rgba(120, 28, 52, .45), rgba(70, 16, 34, .5)) !important;
+  border: 1px solid rgba(251, 113, 133, .42) !important;
+}
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotD) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotD) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotDefect) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotDefect) .wd-tot-label { color: #fda4af !important; }
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotD) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotD) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotDefect) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotDefect) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotD) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotD) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotDefect) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotDefect) .wd-tot-unit { color: #ff8da1 !important; }
+
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotE),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotE),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotGood),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotGood) {
+  background: linear-gradient(180deg, rgba(14, 92, 74, .42), rgba(8, 56, 52, .5)) !important;
+  border: 1px solid rgba(52, 211, 153, .42) !important;
+}
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotE) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotE) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotGood) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotGood) .wd-tot-label { color: #86efac !important; }
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotE) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotE) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotGood) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotGood) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotE) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotE) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotGood) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotGood) .wd-tot-unit { color: #4ade80 !important; }
+
+/* ---------- 5. FILTER ---------- */
+.weekly-layout .oee-filter-extended .field label { color: var(--wd-text-dim); }
+.weekly-layout .oee-filter-extended input[type="date"],
+.weekly-layout .oee-filter-extended select {
+  background: var(--wdt-input-bg);
+  border-color: var(--wdt-input-bd);
+  color: var(--wdt-input-tx);
+}
+.weekly-layout .oee-filter-extended input:focus,
+.weekly-layout .oee-filter-extended select:focus {
+  outline: none;
+  border-color: var(--wd-link);
+  box-shadow: 0 0 0 3px rgba(94, 180, 255, .18);
+}
+.weekly-layout .mch-shift-group { background: var(--wdt-input-bg); border-color: var(--wdt-input-bd); }
+.weekly-layout .mch-shift-btn { color: var(--wd-text-mute); }
+.weekly-layout .mch-shift-btn + .mch-shift-btn { border-left-color: var(--wdt-input-bd); }
+.weekly-layout .mch-shift-btn:hover { background: var(--wd-hover-2); color: var(--wd-text-strong); }
+.weekly-layout .mch-shift-btn.on { background: var(--wdt-shift-on); color: #fff; }
+
+.weekly-layout .oee-filter-extended .btn-primary,
+.weekly-layout .oee-filter .btn-primary {
+  background: var(--wdt-btn); border-color: var(--wdt-btn); color: var(--wdt-btn-tx); font-weight: 700;
+}
+.weekly-layout .oee-filter-extended .btn-primary:hover,
+.weekly-layout .oee-filter .btn-primary:hover { background: var(--wdt-btn-hover); border-color: var(--wdt-btn-hover); }
+.weekly-layout .oee-filter-extended .btn-ghost,
+.weekly-layout .oee-filter .btn-ghost {
+  background: transparent; border: 1px solid var(--wdt-input-bd); color: var(--wd-text);
+}
+.weekly-layout .oee-filter-extended .btn-ghost:hover,
+.weekly-layout .oee-filter .btn-ghost:hover { background: var(--wd-hover-2); }
+
+/* ---------- 6. GRAFIK SVG (warna hardcode di JS) ---------- */
+.weekly-layout svg [stroke="#334155"] { stroke: var(--wd-grid); }
+.weekly-layout svg [fill="#64748b"]   { fill: var(--wd-axis-soft); }
+.weekly-layout svg [fill="#94a3b8"]   { fill: var(--wd-axis); }
+.weekly-layout svg [fill="#e2e8f0"]   { fill: var(--wd-text); }
+.weekly-layout svg [fill="#f8fafc"]   { fill: var(--wd-text-strong); }
+.weekly-layout svg [stroke="#f8fafc"] { stroke: var(--wd-text-strong); }
+
+/* ---------- 7. TABEL (Rincian Produk & Issue) ---------- */
+.weekly-layout .rp-table thead th,
+.weekly-layout .issue-table thead th {
+  background-color: var(--wdt-th-bg) !important;
+  color: var(--wdt-th-fg) !important;
+  border-color: var(--wdt-td-bd) !important;
+}
+.weekly-layout .rp-table tbody td,
+.weekly-layout .issue-table tbody td {
+  color: var(--wdt-td-fg) !important;
+  border-color: var(--wdt-td-bd) !important;
+}
+.weekly-layout .issue-table tbody tr:nth-child(odd) td  { background-color: var(--wdt-td-bg) !important; }
+.weekly-layout .issue-table tbody tr:nth-child(even) td { background-color: var(--wdt-td-bg2) !important; }
+.weekly-layout .issue-table tbody tr:hover td { background-color: var(--wd-row-hover, rgba(37, 99, 235, .10)) !important; }
+.weekly-layout .issue-table-wrap { background-color: var(--wdt-td-bg); border-color: var(--wdt-panel-bd); }
+.weekly-layout .issue-table,
+.weekly-layout .rp-table { background-color: var(--wdt-td-bg); }
+
+:root[data-wd-theme="light"] .weekly-layout .issue-period-btn,
+:root[data-wd-theme="light"] .weekly-layout .issue-tab {
+  background: #fff !important; border-color: #cfd9e5 !important; color: #334155 !important;
+}
+:root[data-wd-theme="light"] .weekly-layout .issue-period-btn.is-on,
+:root[data-wd-theme="light"] .weekly-layout .issue-tab.is-on {
+  background: #2563eb !important; border-color: #2563eb !important; color: #fff !important;
+}
+:root[data-wd-theme="light"] .weekly-layout .issue-panel-title { color: #0f172a; }
+
+/* ---------- 8. SWITCH TEMA (matahari / bulan) ---------- */
+.weekly-topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: -10px 0 10px;
+}
+.wd-theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--wdt-panel-bd);
+  background: var(--wdt-panel);
+  box-shadow: var(--wdt-panel-sh);
+}
+.wd-ts-ico {
+  width: 16px; height: 16px;
+  fill: none; stroke: currentColor; stroke-width: 1.9;
+  stroke-linecap: round; stroke-linejoin: round;
+  color: var(--wd-text-faint);
+  opacity: .55;
+  transition: color .2s, opacity .2s;
+}
+:root[data-wd-theme="light"] .wd-ts-sun  { color: #f59e0b; opacity: 1; }
+:root[data-wd-theme="dark"]  .wd-ts-moon { color: #8ec9ff; opacity: 1; }
+
+.wd-switch {
+  position: relative;
+  width: 40px; height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #cbd5e1;
+  cursor: pointer;
+  transition: background .2s;
+}
+.wd-switch[aria-checked="true"] { background: var(--wdt-switch-on); }
+.wd-switch-knob {
+  position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .35);
+  transition: transform .2s cubic-bezier(.3, .8, .3, 1);
+}
+.wd-switch[aria-checked="true"] .wd-switch-knob { transform: translateX(18px); }
+.wd-switch:focus-visible { outline: 2px solid var(--wd-link); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wd-switch, .wd-switch-knob, .wd-ts-ico { transition: none; }
+}
+@media print {
+  .weekly-topbar { display: none; }
+}
