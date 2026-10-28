@@ -1231,3 +1231,68 @@ body.wd-resizing {
 .weekly-nav-item[data-weekly-page="issue"].is-active .wn-icon svg {
   stroke: #ffffff !important;
 }
+
+/* ========================================================
+   WARNA AKSEN KARTU RINGKASAN (WEEKLY DASHBOARD)
+   ======================================================== */
+
+/* 1. Merah tipis: Waktu Breakdown (D) & Output Defect */
+.wd-tot-card:has(#oeeTotD),
+.wd-tot-card:has(#mchTotD),
+.wd-tot-card:has(#oeeTotDefect),
+.wd-tot-card:has(#mchTotDefect) {
+  background-color: #fef2f2 !important; /* Latar merah lembut */
+  border: 1px solid #fecaca !important;
+}
+
+.wd-tot-card:has(#oeeTotD) .wd-tot-label,
+.wd-tot-card:has(#mchTotD) .wd-tot-label,
+.wd-tot-card:has(#oeeTotDefect) .wd-tot-label,
+.wd-tot-card:has(#mchTotDefect) .wd-tot-label {
+  color: #991b1b !important;
+}
+
+.wd-tot-card:has(#oeeTotD) .wd-tot-val,
+.wd-tot-card:has(#mchTotD) .wd-tot-val,
+.wd-tot-card:has(#oeeTotDefect) .wd-tot-val,
+.wd-tot-card:has(#mchTotDefect) .wd-tot-val {
+  color: #b91c1c !important;
+}
+
+.wd-tot-card:has(#oeeTotD) .wd-tot-unit,
+.wd-tot-card:has(#mchTotD) .wd-tot-unit,
+.wd-tot-card:has(#oeeTotDefect) .wd-tot-unit,
+.wd-tot-card:has(#mchTotDefect) .wd-tot-unit {
+  color: #b91c1c !important;
+}
+
+
+/* 2. Hijau tipis: Waktu Operasional (E) & Output Baik */
+.wd-tot-card:has(#oeeTotE),
+.wd-tot-card:has(#mchTotE),
+.wd-tot-card:has(#oeeTotGood),
+.wd-tot-card:has(#mchTotGood) {
+  background-color: #f0fdf4 !important; /* Latar hijau lembut */
+  border: 1px solid #bbf7d0 !important;
+}
+
+.wd-tot-card:has(#oeeTotE) .wd-tot-label,
+.wd-tot-card:has(#mchTotE) .wd-tot-label,
+.wd-tot-card:has(#oeeTotGood) .wd-tot-label,
+.wd-tot-card:has(#mchTotGood) .wd-tot-label {
+  color: #166534 !important;
+}
+
+.wd-tot-card:has(#oeeTotE) .wd-tot-val,
+.wd-tot-card:has(#mchTotE) .wd-tot-val,
+.wd-tot-card:has(#oeeTotGood) .wd-tot-val,
+.wd-tot-card:has(#mchTotGood) .wd-tot-val {
+  color: #15803d !important;
+}
+
+.wd-tot-card:has(#oeeTotE) .wd-tot-unit,
+.wd-tot-card:has(#mchTotE) .wd-tot-unit,
+.wd-tot-card:has(#oeeTotGood) .wd-tot-unit,
+.wd-tot-card:has(#mchTotGood) .wd-tot-unit {
+  color: #15803d !important;
+}
