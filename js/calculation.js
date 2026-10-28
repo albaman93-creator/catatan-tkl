@@ -140,8 +140,8 @@ const Calculation = (() => {
       const durEl = tr.querySelector('.dur-v');
       const durInput = tr.querySelector('[data-f="durasi"]');
 
-      const gVal = parseFloat(g('good').replace(',', '.')) || 0;
-      const dVal = parseFloat(g('defect').replace(',', '.')) || 0;
+      const gVal = Utils.parseArithmeticExpression(g('good')) ?? 0;
+      const dVal = Utils.parseArithmeticExpression(g('defect')) ?? 0;
       const rowActual = gVal + dVal;
 
       sumGood += gVal;
@@ -181,7 +181,7 @@ const Calculation = (() => {
 
       const c = Utils.catOf(kode);
       const si = Utils.shiftOf(mulai);
-      if (si === State.evalShift) nShift++;
+      if (si === State.evalShift && c) nShift++;
 
       if (c === 'planned') {
         B += dur;
@@ -237,6 +237,8 @@ const Calculation = (() => {
     const sD = sh[State.evalShift].D;
     const sE = Math.max(sC - sD, 0);
     const sF = sC > 0 ? sE / sC * 100 : 0;
+    const hasShiftData = nShift > 0;
+    const hasAvailabilityData = hasShiftData && sC > 0;
 
     State.el.oA.textContent = Utils.nf0(sA);
     State.el.oB.textContent = Utils.nf0(sB);
@@ -245,8 +247,10 @@ const Calculation = (() => {
     State.el.oE.textContent = Utils.nf0(sE);
 
     const oFEl = State.el.oF;
-    oFEl.textContent = Utils.nf2(sF);
-    oFEl.style.color = sF >= CONFIG.TARGET.AVAILABILITY ? 'var(--green-d)' : 'var(--red)';
+    oFEl.textContent = hasAvailabilityData ? Utils.nf2(sF) : '—';
+    oFEl.style.color = hasAvailabilityData
+      ? (sF >= CONFIG.TARGET.AVAILABILITY ? 'var(--green-d)' : 'var(--red)')
+      : '#94a3b8';
     oFEl.style.fontWeight = '700';
 
     // === PERFORMANCE PER PRODUK ===
@@ -383,6 +387,7 @@ const Calculation = (() => {
     const a365Base = Math.max(sA - jedaDur - mixingDur, 0);
     // E tetap sama: sE = sA − B − D
     const a365 = a365Base > 0 ? (sE / a365Base) * 100 : 0;
+    const hasAvailability365Data = hasShiftData && a365Base > 0;
     const oee365 = a365 * avgPerfI * M / 10000;
 
     const set365 = (key, text, color) => {
@@ -394,7 +399,13 @@ const Calculation = (() => {
     };
     set365('o365A', Utils.nf0(a365Base));
     set365('o365E', Utils.nf0(sE));
-    set365('o365F', Utils.nf2(a365) + ' %', a365 >= CONFIG.TARGET.AVAILABILITY ? 'var(--green-d)' : 'var(--red)');
+    set365(
+      'o365F',
+      hasAvailability365Data ? Utils.nf2(a365) : '—',
+      hasAvailability365Data
+        ? (a365 >= CONFIG.TARGET.AVAILABILITY ? 'var(--green-d)' : 'var(--red)')
+        : '#94a3b8'
+    );
     set365('o365P', Utils.nf2(avgPerfI) + ' %');
     set365('o365Q', Utils.nf2(M) + ' %');
     set365('oee365', Utils.nf2(oee365) + '%');
@@ -404,7 +415,10 @@ const Calculation = (() => {
       oee365Result.classList.toggle('is-good', nShift > 0 && oee365 >= (CONFIG.TARGET.OEE365 || 55));
       oee365Result.classList.toggle('is-bad', nShift > 0 && oee365 < (CONFIG.TARGET.OEE365 || 55));
     }
-    if (State.el.rincSub365) {
+    if (State.el.rincSub365 && !hasAvailability365Data) {
+      State.el.rincSub365.textContent =
+        `Shift ${State.evalShift + 1} · Belum ada data untuk menghitung Availability 365`;
+    } else if (State.el.rincSub365) {
       let note = '';
       if (jedaDur > 0 || mixingDur > 0) {
         note = (jedaDur > 0 ? ` − Jeda ${Utils.nf0(jedaDur)}` : '') +
@@ -414,9 +428,10 @@ const Calculation = (() => {
         `Shift ${State.evalShift + 1} · A₃₆₅ = ${Utils.nf0(a365Base)} mnt (${sA}${note}) · E = ${Utils.nf0(sE)} mnt · A365 = ${Utils.nf2(a365)}%`;
     }
     if (State.el.diag365) {
-      State.el.diag365.innerHTML =
-        `<div class="d-item ok">OEE 365 = ${Utils.nf2(a365)}% × ${Utils.nf2(avgPerfI)}% × ${Utils.nf2(M)}% = <b>${Utils.nf2(oee365)}%</b>
-         <br><small>Availability 365 = E ÷ Time Available Filling.</small></div>`;
+      State.el.diag365.innerHTML = hasAvailability365Data
+        ? `<div class="d-item ok">OEE 365 = ${Utils.nf2(a365)}% × ${Utils.nf2(avgPerfI)}% × ${Utils.nf2(M)}% = <b>${Utils.nf2(oee365)}%</b>
+           <br><small>Availability 365 = E ÷ Time Available Filling.</small></div>`
+        : `<div class="d-item">Belum ada data pada Shift ${State.evalShift + 1} untuk menghitung OEE 365.</div>`;
     }
 
     // Badge %OEE mini di toolbar atas — biar kelihatan real-time tanpa
@@ -432,13 +447,15 @@ const Calculation = (() => {
       }
     }
     if (State.el.oee365IndicatorValue) {
-      State.el.oee365IndicatorValue.textContent = Utils.nf2(oee365) + '%';
+      State.el.oee365IndicatorValue.textContent = hasShiftData ? Utils.nf2(oee365) + '%' : '—';
       if (State.el.oee365Indicator) {
         State.el.oee365Indicator.classList.remove('good', 'warn', 'bad');
         // OEE 365 pakai target khusus 55%, bukan target OEE utama (88%)
-        if (oee365 >= (CONFIG.TARGET.OEE365 || 55)) State.el.oee365Indicator.classList.add('good');
-        else if (oee365 >= 45) State.el.oee365Indicator.classList.add('warn');
-        else State.el.oee365Indicator.classList.add('bad');
+        if (hasShiftData) {
+          if (oee365 >= (CONFIG.TARGET.OEE365 || 55)) State.el.oee365Indicator.classList.add('good');
+          else if (oee365 >= 45) State.el.oee365Indicator.classList.add('warn');
+          else State.el.oee365Indicator.classList.add('bad');
+        }
       }
     }
 
@@ -449,26 +466,33 @@ const Calculation = (() => {
       if (!el) { el = document.getElementById(key); if (el) State.el[key] = el; }
       if (el) el.textContent = text;
     };
-    setKpi('sheetKpiA', Utils.nf2(sF) + '%');
+    setKpi('sheetKpiA', hasAvailabilityData ? Utils.nf2(sF) + '%' : '—');
     setKpi('sheetKpiP', Utils.nf2(avgPerfI) + '%');
     setKpi('sheetKpiQ', Utils.nf2(M) + '%');
     setKpi('sheetKpiOEE', Utils.nf2(oee) + '%');
     // Baris OEE 365 (A365 = E ÷ basis shift − Mixing; P & Q sama dengan OPE)
-    setKpi('sheetKpiA365', Utils.nf2(a365) + '%');
+    setKpi('sheetKpiA365', hasAvailability365Data ? Utils.nf2(a365) + '%' : '—');
     setKpi('sheetKpiP365', Utils.nf2(avgPerfI) + '%');
     setKpi('sheetKpiQ365', Utils.nf2(M) + '%');
     setKpi('sheetKpiOEE365', Utils.nf2(oee365) + '%');
     // Health-bar warna (jika UI tersedia)
     const kpiPairs = [
-      ['sheetKpiA', sF, 90], ['sheetKpiP', avgPerfI, 98], ['sheetKpiQ', M, 99.5], ['sheetKpiOEE', oee, 88],
-      ['sheetKpiA365', a365, 56], ['sheetKpiP365', avgPerfI, 98], ['sheetKpiQ365', M, 99.5],
+      ['sheetKpiA', hasAvailabilityData ? sF : null, 90], ['sheetKpiP', avgPerfI, 98], ['sheetKpiQ', M, 99.5], ['sheetKpiOEE', oee, 88],
+      ['sheetKpiA365', hasAvailability365Data ? a365 : null, 56], ['sheetKpiP365', avgPerfI, 98], ['sheetKpiQ365', M, 99.5],
       ['sheetKpiOEE365', oee365, (CONFIG.TARGET.OEE365 || 55)],
     ];
     if (typeof UI !== 'undefined' && UI.updateKpiHealthBar) {
       kpiPairs.forEach(([id, val]) => {
         const node = State.el[id] || document.getElementById(id);
         const card = node && node.closest ? node.closest('.sheet-kpi') : null;
-        if (card) UI.updateKpiHealthBar(card, String(val));
+        if (!card) return;
+        if (val === null) {
+          card.querySelector('.kpi-fill')?.style.setProperty('width', '0%');
+          card.removeAttribute('data-state');
+          card.classList.remove('kpi-achieved');
+          return;
+        }
+        UI.updateKpiHealthBar(card, String(val));
       });
     } else {
       kpiPairs.forEach(([id, val, tgt]) => {
@@ -476,6 +500,12 @@ const Calculation = (() => {
         const card = node && node.closest ? node.closest('.sheet-kpi') : null;
         if (!card) return;
         const fill = card.querySelector('.kpi-fill');
+        if (val === null) {
+          if (fill) fill.style.width = '0%';
+          card.removeAttribute('data-state');
+          card.classList.remove('kpi-achieved');
+          return;
+        }
         if (fill) fill.style.width = Math.max(0, Math.min(100, (val / tgt) * 100)) + '%';
         card.removeAttribute('data-state');
         if (val >= tgt) card.setAttribute('data-state', 'ok');

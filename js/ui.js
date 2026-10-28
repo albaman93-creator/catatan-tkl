@@ -223,6 +223,10 @@ const UI = (() => {
     const stageVal = State.el.fStage ? State.el.fStage.value : 'filling';
     const lineVal = State.el.fLine ? String(State.el.fLine.value) : '1';
     const dateVal = State.el.fDate ? State.el.fDate.value : '';
+    const formatPercent = value => {
+      const raw = String(value ?? '').trim();
+      return raw === '—' ? '—' : `${raw.replace(/\s*%$/, '')}%`;
+    };
 
     const root = State.el.sheetUnifiedControl;
     if (root) root.dataset.stage = stageVal;
@@ -245,26 +249,15 @@ const UI = (() => {
     if (State.el.sheetDateText) State.el.sheetDateText.textContent = formatSheetDate(dateVal);
 
     // KPI mini-bar membaca elemen kalkulasi resmi sehingga tidak ada state ganda.
-    if (State.el.sheetKpiA && State.el.oF) State.el.sheetKpiA.textContent = `${State.el.oF.textContent}%`;
-    if (State.el.sheetKpiP && State.el.oITotal) State.el.sheetKpiP.textContent = `${State.el.oITotal.textContent}%`;
-    if (State.el.sheetKpiQ && State.el.oM) State.el.sheetKpiQ.textContent = `${State.el.oM.textContent}%`;
+    if (State.el.sheetKpiA && State.el.oF) State.el.sheetKpiA.textContent = formatPercent(State.el.oF.textContent);
+    if (State.el.sheetKpiP && State.el.oITotal) State.el.sheetKpiP.textContent = formatPercent(State.el.oITotal.textContent);
+    if (State.el.sheetKpiQ && State.el.oM) State.el.sheetKpiQ.textContent = formatPercent(State.el.oM.textContent);
     if (State.el.sheetKpiOEE && State.el.oee) State.el.sheetKpiOEE.textContent = State.el.oee.textContent;
 
     // KPI OEE 365 (A365 / P / Q / OEE365)
-    if (State.el.sheetKpiA365 && State.el.o365F) State.el.sheetKpiA365.textContent = State.el.o365F.textContent.replace(/\s*%?\s*$/, '') + (State.el.o365F.textContent.includes('%') ? '' : '%');
-    // o365F sudah berisi "xx,xx %"; normalisasi agar format seragam
-    if (State.el.sheetKpiA365 && State.el.o365F) {
-      const raw = String(State.el.o365F.textContent || '').replace('%', '').trim();
-      State.el.sheetKpiA365.textContent = raw ? raw + '%' : '0,00%';
-    }
-    if (State.el.sheetKpiP365 && State.el.o365P) {
-      const raw = String(State.el.o365P.textContent || '').replace('%', '').trim();
-      State.el.sheetKpiP365.textContent = raw ? raw + '%' : '0,00%';
-    }
-    if (State.el.sheetKpiQ365 && State.el.o365Q) {
-      const raw = String(State.el.o365Q.textContent || '').replace('%', '').trim();
-      State.el.sheetKpiQ365.textContent = raw ? raw + '%' : '0,00%';
-    }
+    if (State.el.sheetKpiA365 && State.el.o365F) State.el.sheetKpiA365.textContent = formatPercent(State.el.o365F.textContent);
+    if (State.el.sheetKpiP365 && State.el.o365P) State.el.sheetKpiP365.textContent = formatPercent(State.el.o365P.textContent);
+    if (State.el.sheetKpiQ365 && State.el.o365Q) State.el.sheetKpiQ365.textContent = formatPercent(State.el.o365Q.textContent);
     if (State.el.sheetKpiOEE365 && State.el.oee365) {
       State.el.sheetKpiOEE365.textContent = State.el.oee365.textContent;
     }
@@ -292,7 +285,14 @@ const UI = (() => {
     if (!fillEl) return;
 
     const target = parseFloat(kpiEl.getAttribute('data-target'));
-    const value = parseFloat(String(rawValueText || '0').replace(',', '.'));
+    const rawValue = String(rawValueText ?? '').trim();
+    if (rawValue === '—') {
+      fillEl.style.width = '0%';
+      kpiEl.removeAttribute('data-state');
+      kpiEl.classList.remove('kpi-achieved');
+      return;
+    }
+    const value = parseFloat(String(rawValue || '0').replace(',', '.'));
 
     if (!isFinite(target) || target <= 0 || !isFinite(value)) {
       fillEl.style.width = '0%';
