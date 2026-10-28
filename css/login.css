@@ -295,11 +295,25 @@
 @keyframes riverRippleFlow { to { stroke-dashoffset: -108; } }
 
 /* Mata air: tumpukan batu hitam di hulu sungai */
-.login-theme-santai .spring-shadow { fill: rgba(10, 25, 15, .25); }
+.login-theme-santai .spring-shadow { fill: rgba(10, 25, 15, .28); }
 
-.login-theme-santai .spring-rock { fill: #1b1b1f; stroke: #0e0e11; stroke-width: 1.5; stroke-linejoin: round; }
+.login-theme-santai .spring-rock { fill: #2a2a30; stroke: #0f0f12; stroke-width: 1.6; stroke-linejoin: round; }
 
-.login-theme-santai .spring-rock-hi { fill: #34343a; opacity: .9; }
+.login-theme-santai .spring-rock-dark { fill: #151519; }
+
+.login-theme-santai .spring-rock-lit { fill: #4a4a53; opacity: .85; }
+
+.login-theme-santai .spring-grass path { fill: none; stroke: #3f9a3c; stroke-width: 2.2; stroke-linecap: round; }
+
+.login-theme-santai .river-soil { fill: none; stroke: #7b5a38; stroke-width: 7; stroke-linecap: round; opacity: .6; }
+
+.login-theme-santai #bgScene.scene--night .river-soil { opacity: .3; }
+
+.login-theme-santai .spring-moss { fill: #4c8a3a; opacity: .85; }
+
+.login-theme-santai .spring-pebble { fill: #3a3a41; stroke: #1c1c20; stroke-width: 1; }
+
+.login-theme-santai .spring-foam { fill: rgba(255, 255, 255, .55); }
 
 .login-theme-santai #bgScene.scene--night #riverSpring { filter: brightness(.7); }
 
