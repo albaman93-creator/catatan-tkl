@@ -67,6 +67,7 @@
   <link rel="stylesheet" href="./css/card-photo.css">
   <link rel="stylesheet" href="./css/card-csv.css">
   <link rel="stylesheet" href="./css/profile-avatar.css">
+  <link rel="stylesheet" href="./css/login-pro.css">
 
 
   <!-- Supabase SDK -->
@@ -645,8 +646,8 @@
           <span>Pilih tampilan login</span>
         </div>
         <div class="login-theme-toggle" id="loginThemeToggle" role="group" aria-label="Pilih tema login">
-<button type="button" class="login-theme-option active" data-login-theme="santai" aria-pressed="true">🌿 Nature</button>
-          <button type="button" class="login-theme-option" data-login-theme="professional" aria-pressed="false">⚡ Default</button>
+<button type="button" class="login-theme-option active" data-login-theme="santai" aria-pressed="true"><svg class="ico ico-leaf" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5C4 10 9 4 20 4c0 11-6 16-14 16z" fill="#43a047"/><path d="M5 19.5 14 10" stroke="#1b5e20" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg><span>Nature</span></button>
+          <button type="button" class="login-theme-option" data-login-theme="professional" aria-pressed="false"><svg class="ico ico-bolt" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4.5 13.5h6L9.5 22l9-11.5h-6z" fill="#f6a81a" stroke="#c97a00" stroke-width="1" stroke-linejoin="round"/></svg><span>Default</span></button>
         </div>
       </div>
       <div id="loginError" class="login-error">Email atau password salah. Silakan coba lagi.</div>
@@ -656,19 +657,19 @@
       <form id="loginForm" class="login-form">
         <div class="field">
           <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" placeholder="" required autofocus autocomplete="username">
+          <div class="input-wrap"><svg class="field-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7.5 8.5 6 8.5-6"/></svg><input type="email" id="loginEmail" placeholder="operator@pabrik.com" required autofocus autocomplete="username"></div>
         </div>
           <div class="field">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+          <div class="input-wrap"><svg class="field-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><input type="password" id="loginPassword" placeholder="Masukkan password" required autocomplete="current-password"><button type="button" class="pw-toggle" id="loginPwToggle" aria-label="Tampilkan password" aria-pressed="false"><svg class="ico-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="ico-eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.9 5.2A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.1 6.6A17 17 0 0 0 2 12s3.6 7 10 7a9.8 9.8 0 0 0 4.3-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/></svg></button></div>
             </div>
-        <button type="submit" class="login-btn" id="loginBtn">Masuk Aplikasi</button>
+        <button type="submit" class="login-btn" id="loginBtn"><svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/></svg><span class="btn-label">Masuk Aplikasi</span></button>
       </form>
       <div class="login-offline-divider">
         <span>atau</span>
       </div>
       <button type="button" class="login-btn login-btn-offline" id="loginOfflineBtn" title="Masuk tanpa login — data hanya tersimpan lokal">
-        📶 Mode Offline
+        <svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8a15 15 0 0 0-9.4-4.7M5 12.9a10 10 0 0 1 5.2-2.7M19 12.9a10 10 0 0 0-2.4-1.9M8.5 16.4a5 5 0 0 1 7 0"/><circle cx="12" cy="20" r=".6"/><path d="M3 3l18 18"/></svg><span class="btn-label">Mode Offline</span>
       </button>
       <div class="login-hint">Produksi-2026</div>
           </div>
@@ -2912,6 +2913,7 @@
   <script src="./js/suggest.js"></script>
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
+  <script src="./js/login-ui.js"></script>
   <script src="./js/ui.js"></script>
   <script src="./js/rows.js"></script>
   <script src="./js/navigation.js"></script>

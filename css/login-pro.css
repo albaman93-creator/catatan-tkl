@@ -1,0 +1,305 @@
+/* =========================================================
+   LOGIN-PRO.CSS — Tampilan login "Default / Professional"
+   Dimuat PALING AKHIR agar menimpa aturan login lama.
+   Hanya aktif pada: #loginOverlay.login-theme-professional
+   Tema Nature (santai) tidak berubah.
+   ========================================================= */
+
+/* ---------- Elemen baru: aman untuk kedua tema ---------- */
+.login-theme-option { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.login-theme-option .ico { width: 14px; height: 14px; flex: none; }
+.input-wrap { position: relative; }
+
+/* Ikon baru disembunyikan di tema Nature (tampilan lama dipertahankan) */
+#loginOverlay:not(.login-theme-professional) .field-ico,
+#loginOverlay:not(.login-theme-professional) .pw-toggle,
+#loginOverlay:not(.login-theme-professional) .btn-ico { display: none; }
+
+/* ---------- Latar belakang ---------- */
+#loginOverlay.login-theme-professional {
+  color: #0b2447;
+  font-family: var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif);
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 42%, rgba(18, 104, 196, .95) 0%, rgba(11, 70, 140, .85) 38%, rgba(5, 38, 86, 0) 75%),
+    linear-gradient(180deg, #06285a 0%, #041b42 55%, #021030 100%);
+}
+
+/* Gelombang cahaya di bagian bawah */
+#loginOverlay.login-theme-professional::before {
+  content: "";
+  position: absolute; inset: 0;
+  width: auto; height: auto; left: 0; top: 0; border-radius: 0;
+  background: url('../icons/bg-login-wave.svg') center bottom / cover no-repeat;
+  filter: none; opacity: 1;
+  animation: none;
+}
+
+/* Cahaya lembut di belakang kartu */
+#loginOverlay.login-theme-professional::after {
+  content: "";
+  position: absolute; inset: 0;
+  width: auto; height: auto; right: auto; bottom: auto; border-radius: 0;
+  background: radial-gradient(circle at 50% 45%, rgba(70, 160, 255, .22), transparent 45%);
+  filter: none; opacity: 1;
+  animation: none;
+}
+
+/* ---------- Kartu ---------- */
+#loginOverlay.login-theme-professional .login-card {
+  width: 100% !important;
+  max-width: 350px !important;
+  min-height: 0 !important;
+  padding: 22px 22px 16px !important;
+  justify-content: flex-start;
+  border: 1px solid rgba(255, 255, 255, .55);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #f3f7fd 100%);
+  box-shadow:
+    0 30px 70px -18px rgba(0, 12, 40, .65),
+    0 6px 18px rgba(0, 20, 60, .25),
+    inset 0 1px 0 #fff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+#loginOverlay.login-theme-professional .login-card > * { flex-shrink: 0; }
+#loginOverlay.login-theme-professional .login-card::before { display: none; }
+
+/* ---------- Header ---------- */
+#loginOverlay.login-theme-professional .login-header { margin-bottom: 13px !important; text-align: center !important; }
+
+#loginOverlay.login-theme-professional .login-card .login-logo.login-logo--img {
+  max-width: 70px !important;
+  margin: 0 auto 6px !important;
+}
+#loginOverlay.login-theme-professional .login-card .login-logo--img img { max-height: 52px !important; }
+
+#loginOverlay.login-theme-professional .login-header h2 {
+  margin: 0;
+  font: 700 18px/1.2 var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif) !important;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #0b2a57;
+}
+#loginOverlay.login-theme-professional .login-header p {
+  margin: 5px 0 0;
+  font: 500 11px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif) !important;
+  color: #3d5170;
+}
+
+/* ---------- Kotak "Tema Login" ---------- */
+#loginOverlay.login-theme-professional .login-theme-setting {
+  display: block;
+  margin: 0 0 12px !important;
+  padding: 8px 10px 10px !important;
+  text-align: center;
+  background: rgba(255, 255, 255, .7);
+  border: 1px solid #dbe4f1;
+  border-radius: 10px;
+}
+#loginOverlay.login-theme-professional .login-theme-setting-label { margin-bottom: 6px !important; }
+#loginOverlay.login-theme-professional .login-theme-setting-label strong {
+  display: block;
+  font: 700 11px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif);
+  letter-spacing: .6px; text-transform: uppercase; color: #0b2447;
+}
+#loginOverlay.login-theme-professional .login-theme-setting-label span {
+  display: block; margin-top: 2px;
+  font: 500 10px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif);
+  color: #4a5d78;
+}
+#loginOverlay.login-theme-professional .login-theme-toggle {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  padding: 0; background: transparent; border: 0; border-radius: 0;
+}
+#loginOverlay.login-theme-professional .login-theme-option {
+  padding: 5px 8px !important;
+  font: 600 11px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif) !important;
+  color: #0b2447;
+  background: #fff;
+  border: 1px solid #d3deee;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(11, 36, 71, .05);
+  transition: background .15s, border-color .15s, color .15s, box-shadow .15s;
+}
+#loginOverlay.login-theme-professional .login-theme-option:hover { background: #f1f6fe; color: #0b2447; }
+#loginOverlay.login-theme-professional .login-theme-option.active {
+  background: #dce9fd;
+  border-color: #8db3ec;
+  color: #1456b8;
+  box-shadow: inset 0 0 0 1px rgba(20, 86, 184, .12);
+}
+#loginOverlay.login-theme-professional .login-theme-option:focus-visible {
+  outline: 2px solid #1d6fd1; outline-offset: 2px;
+}
+
+/* ---------- Pesan error ---------- */
+#loginOverlay.login-theme-professional #loginError {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b42318;
+  border-radius: 8px;
+  font: 500 12px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif);
+}
+#loginOverlay.login-theme-professional #loginOfflineNote {
+  color: #fff3c4;
+  border: 0;
+  border-radius: 8px;
+  font: 500 12px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif);
+}
+
+/* ---------- Form ---------- */
+#loginOverlay.login-theme-professional .login-form .field { margin-bottom: 10px !important; }
+
+#loginOverlay.login-theme-professional .login-form .field label {
+  display: block;
+  margin-bottom: 4px !important;
+  font: 700 10px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif) !important;
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  color: #0b2447;
+}
+
+#loginOverlay.login-theme-professional .field-ico {
+  position: absolute; left: 13px; top: 50%;
+  width: 16px; height: 16px; transform: translateY(-50%);
+  fill: none; stroke: #4a5d78; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+  pointer-events: none;
+}
+
+#loginOverlay.login-theme-professional .login-form .field input {
+  width: 100%;
+  height: 38px;
+  box-sizing: border-box;
+  padding: 0 14px 0 40px !important;
+  border: 1px solid #dfe7f3;
+  border-radius: 10px;
+  background: #eaf0fb;
+  color: #0b2447;
+  font: 500 13px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif) !important;
+  letter-spacing: 0 !important;
+  text-align: left !important;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+#loginOverlay.login-theme-professional .login-form .field #loginPassword { padding-right: 44px !important; }
+#loginOverlay.login-theme-professional .login-form .field input::placeholder { color: #97a8c2; letter-spacing: 0; }
+#loginOverlay.login-theme-professional .login-form .field input:hover { background: #e4ecf9; border-color: #c9d8ee; }
+#loginOverlay.login-theme-professional .login-form .field input:focus {
+  outline: none;
+  background: #fff;
+  border-color: #1d6fd1;
+  box-shadow: 0 0 0 4px rgba(29, 111, 209, .16);
+}
+
+/* Tombol mata (tampil/sembunyi password) */
+#loginOverlay.login-theme-professional .pw-toggle {
+  position: absolute; right: 6px; top: 50%;
+  width: 34px; height: 34px; transform: translateY(-50%);
+  display: grid; place-items: center;
+  padding: 0; border: 0; border-radius: 8px;
+  background: transparent; color: #2c3e5c; cursor: pointer;
+}
+#loginOverlay.login-theme-professional .pw-toggle:hover { background: rgba(29, 111, 209, .1); }
+#loginOverlay.login-theme-professional .pw-toggle:focus-visible { outline: 2px solid #1d6fd1; outline-offset: 0; }
+#loginOverlay.login-theme-professional .pw-toggle svg {
+  width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+#loginOverlay.login-theme-professional .pw-toggle .ico-eye-off { display: none; }
+#loginOverlay.login-theme-professional .pw-toggle.on .ico-eye { display: none; }
+#loginOverlay.login-theme-professional .pw-toggle.on .ico-eye-off { display: block; }
+
+/* ---------- Tombol ---------- */
+#loginOverlay.login-theme-professional .login-btn {
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  width: 100%;
+  height: 42px;
+  margin-top: 4px;
+  padding: 0 16px !important;
+  border: 0;
+  border-radius: 10px;
+  font: 700 13px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif) !important;
+  letter-spacing: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform .15s, box-shadow .15s, filter .15s, background .15s;
+}
+#loginOverlay.login-theme-professional .login-btn .btn-ico {
+  width: 17px; height: 17px; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* Primer: biru tua → teal */
+#loginOverlay.login-theme-professional #loginBtn {
+  color: #fff;
+  background: linear-gradient(90deg, #0a4a8a 0%, #0a74a8 55%, #0b8fb0 100%) !important;
+  box-shadow: 0 10px 22px -8px rgba(8, 90, 150, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+#loginOverlay.login-theme-professional #loginBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.07);
+  box-shadow: 0 14px 26px -8px rgba(8, 90, 150, .7), inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+#loginOverlay.login-theme-professional #loginBtn:active { transform: translateY(0); }
+#loginOverlay.login-theme-professional #loginBtn:disabled { opacity: .7; cursor: wait; transform: none; filter: none; }
+#loginOverlay.login-theme-professional #loginBtn:focus-visible,
+#loginOverlay.login-theme-professional #loginOfflineBtn:focus-visible { outline: 3px solid rgba(29, 111, 209, .4); outline-offset: 2px; }
+
+/* Sekunder (Mode Offline): putih, garis biru */
+#loginOverlay.login-theme-professional #loginOfflineBtn {
+  margin-top: 0;
+  color: #0b5ccf;
+  background: #fff !important;
+  border: 1.5px solid #3b82e6;
+  box-shadow: 0 2px 6px rgba(11, 92, 207, .08);
+}
+#loginOverlay.login-theme-professional #loginOfflineBtn:hover {
+  background: #eef5ff !important;
+  filter: none;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px -6px rgba(11, 92, 207, .35);
+}
+
+/* ---------- Pemisah "atau" & footer ---------- */
+#loginOverlay.login-theme-professional .login-offline-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 10px 0 !important;
+  font: 500 10.5px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif) !important;
+  color: #5b6f8c;
+}
+#loginOverlay.login-theme-professional .login-offline-divider::before,
+#loginOverlay.login-theme-professional .login-offline-divider::after {
+  content: ""; flex: 1; height: 1px; background: #d3deee;
+}
+#loginOverlay.login-theme-professional .login-hint {
+  margin-top: 12px;
+  font: 500 10.5px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif) !important;
+  color: #5b6f8c;
+}
+
+/* ---------- Responsif ---------- */
+@media (max-width: 520px) {
+  #loginOverlay.login-theme-professional { padding: 14px; }
+  #loginOverlay.login-theme-professional .login-card {
+    max-width: 100% !important;
+    padding: 22px 18px 16px !important;
+    border-radius: 18px;
+  }
+  #loginOverlay.login-theme-professional .login-header h2 { font-size: 18px !important; }
+}
+
+@media (max-height: 560px) {
+  #loginOverlay.login-theme-professional .login-card { padding-top: 14px !important; padding-bottom: 12px !important; }
+  #loginOverlay.login-theme-professional .login-card .login-logo--img img { max-height: 40px !important; }
+  #loginOverlay.login-theme-professional .login-header { margin-bottom: 6px !important; }
+  #loginOverlay.login-theme-professional .login-theme-setting { margin-bottom: 8px !important; padding: 6px 8px 8px !important; }
+  #loginOverlay.login-theme-professional .login-form .field { margin-bottom: 7px !important; }
+  #loginOverlay.login-theme-professional .login-offline-divider { margin: 7px 0 !important; }
+  #loginOverlay.login-theme-professional .login-hint { margin-top: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #loginOverlay.login-theme-professional .login-btn,
+  #loginOverlay.login-theme-professional .login-form .field input { transition: none; }
+}

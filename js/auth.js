@@ -28,7 +28,8 @@ const Auth = (() => {
   const setLoading = (loading) => {
     if (!State.el.loginBtn) return;
     State.el.loginBtn.disabled = loading;
-    State.el.loginBtn.textContent = loading ? 'Memeriksa…' : 'Masuk Aplikasi';
+    const lbl = State.el.loginBtn.querySelector('.btn-label') || State.el.loginBtn;
+    lbl.textContent = loading ? 'Memeriksa…' : 'Masuk Aplikasi';
   };
 
   /**
