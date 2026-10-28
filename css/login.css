@@ -144,7 +144,12 @@
 
 .login-theme-santai .scene { transition: background-color 2s ease; }
 
-.login-theme-santai .scene--night { --sky-top:#091830; --sky-mid:#0f2c50; --sky-bot:#184066; --hill-far:#153a30; --hill-mid:#102e25; --hill-near:#0b241c; --tree-leaf:#0d2c22; --tree-leaf-front:#0a2419; --tree-trunk:#3a2818; --cloud:#2c4a70; --grass:#0a241c; --bird-stroke:#2c4a70; --dim:.52; }
+.login-theme-santai .scene--night {
+  --sky-top:#091830; --sky-mid:#0f2c50; --sky-bot:#184066;
+  --hill-distant:#1a4538; --hill-far:#153a30; --hill-mid:#102e25; --hill-near:#0b241c;
+  --tree-leaf:#0d2c22; --tree-leaf-front:#0a2419; --tree-trunk:#3a2818;
+  --cloud:#2c4a70; --grass:#0a241c; --bird-stroke:#2c4a70; --dim:.52;
+}
 
 .login-theme-santai .sky-stop-top { stop-color: var(--sky-top); transition: stop-color 2s ease; }
 
@@ -152,12 +157,14 @@
 
 .login-theme-santai .sky-stop-bot { stop-color: var(--sky-bot); transition: stop-color 2s ease; }
 
-.login-theme-santai .hill-far, .login-theme-santai .hill-mid, .login-theme-santai .hill-near { transition: fill 2s ease; }
+.login-theme-santai .hill-distant,
+.login-theme-santai .hill-far,
+.login-theme-santai .hill-mid,
+.login-theme-santai .hill-near { transition: fill 2s ease; }
 
+.login-theme-santai .hill-distant { fill: var(--hill-distant, #c5e8c0); }
 .login-theme-santai .hill-far { fill: var(--hill-far); }
-
 .login-theme-santai .hill-mid { fill: var(--hill-mid); }
-
 .login-theme-santai .hill-near { fill: var(--hill-near); }
 
 .login-theme-santai .tree-leaf { fill: var(--tree-leaf);       transition: fill 2s ease; }
@@ -768,13 +775,13 @@
 
 .login-theme-option:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 1px; }
 
-/* Logo FIMA pada kartu login (menggantikan teks "TKL") — latar transparan */
+/* Logo FIMA pada kartu login — diperkecil agar card tidak mendominasi */
 #loginOverlay .login-card .login-logo.login-logo--img {
-  width: auto; height: auto; max-width: 132px;   /* lebar maksimal logo */
-  padding: 0; margin: 0 auto 16px;
+  width: auto; height: auto; max-width: 96px;
+  padding: 0; margin: 0 auto 10px;
   display: block; background: transparent; border: 0;
   border-radius: 0; box-shadow: none;
 }
 #loginOverlay .login-card .login-logo--img img {
-  display: block; width: 100%; height: auto; max-height: 116px; object-fit: contain;
+  display: block; width: 100%; height: auto; max-height: 72px; object-fit: contain;
 }

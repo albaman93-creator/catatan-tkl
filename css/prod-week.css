@@ -1,0 +1,196 @@
+/* ===== Production week calendar (cutoff Rabu) — mockup solid chips ===== */
+.prod-week-cal {
+  position: fixed;
+  z-index: 5000;
+  width: 300px;
+  background: #fff;
+  border: 1px solid #e8edf3;
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.16), 0 2px 8px rgba(15, 23, 42, 0.05);
+  padding: 14px 14px 12px;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  user-select: none;
+}
+
+.pwc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.pwc-title {
+  flex: 1;
+  text-align: center;
+  font: 600 13.5px/1.2 system-ui, sans-serif;
+  color: #0f172a;
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f1f5f9;
+}
+
+.pwc-nav {
+  width: 34px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  color: #64748b;
+  line-height: 1;
+}
+.pwc-nav:hover { background: #f1f5f9; color: #0f172a; }
+
+.pwc-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.pwc-leg {
+  font: 700 10px/1 system-ui, sans-serif;
+  padding: 4px 7px;
+  border-radius: 5px;
+  color: #fff;
+}
+.pwc-leg.week-1 { background: #3b82f6; }
+.pwc-leg.week-2 { background: #eab308; color: #1c1917; }
+.pwc-leg.week-3 { background: #22c55e; }
+.pwc-leg.week-4 { background: #78716c; }
+.pwc-leg-note {
+  margin-left: auto;
+  font: 500 10px system-ui, sans-serif;
+  color: #94a3b8;
+}
+
+.pwc-dow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.pwc-dow span {
+  font: 600 11px system-ui, sans-serif;
+  color: #94a3b8;
+  padding: 4px 0;
+}
+.pwc-dow span:first-child,
+.pwc-dow span:last-child { color: #f87171; }
+
+.pwc-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+/* Solid rounded chips — seperti mockup */
+.pwc-day {
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--pw-bg, #e2e8f0);
+  color: var(--pw-fg, #0f172a);
+  font: 700 12.5px/1 system-ui, sans-serif;
+  cursor: pointer;
+  transition: transform .1s, box-shadow .12s, filter .12s;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+.pwc-day:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+.pwc-day:active { transform: translateY(0); }
+
+/* Tanggal di luar bulan: netral abu, tanpa chip warna */
+.pwc-day.pwc-out {
+  background: transparent !important;
+  color: #cbd5e1 !important;
+  box-shadow: none;
+  font-weight: 500;
+}
+.pwc-day.pwc-out:hover {
+  background: #f8fafc !important;
+  filter: none;
+  transform: none;
+}
+
+/* Hari ini: cincin tipis */
+.pwc-day.is-today:not(.is-selected) {
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35), 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+/* Selected: biru tua + cincin kuning (seperti mockup tgl 28) */
+.pwc-day.is-selected {
+  background: #1d4ed8 !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 2.5px #fbbf24, 0 2px 6px rgba(29, 78, 216, 0.35);
+  font-weight: 800;
+  z-index: 1;
+}
+
+.pwc-foot {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+.pwc-clear, .pwc-today {
+  flex: 1;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font: 600 12.5px system-ui, sans-serif;
+  color: #475569;
+  cursor: pointer;
+}
+.pwc-clear:hover, .pwc-today:hover { background: #f8fafc; color: #0f172a; }
+.pwc-today { border-color: #bfdbfe; background: #eff6ff; color: #1d4ed8; }
+
+/* Sheet toolbar badge — solid chip */
+.sheet-week-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 11px;
+  border-radius: 8px;
+  border: 0;
+  font: 700 11.5px/1 system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="dark"] .prod-week-cal {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+[data-theme="dark"] .pwc-title {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+[data-theme="dark"] .pwc-nav { color: #94a3b8; }
+[data-theme="dark"] .pwc-nav:hover { background: #0f172a; color: #f1f5f9; }
+[data-theme="dark"] .pwc-day.pwc-out { color: #475569 !important; }
+[data-theme="dark"] .pwc-day.pwc-out:hover { background: #0f172a !important; }
+[data-theme="dark"] .pwc-clear,
+[data-theme="dark"] .pwc-today {
+  background: #0f172a;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+[data-theme="dark"] .pwc-foot { border-top-color: #334155; }
+
+@media (max-width: 480px) {
+  .prod-week-cal { width: min(300px, calc(100vw - 16px)); }
+  .pwc-day { height: 32px; font-size: 12px; }
+}

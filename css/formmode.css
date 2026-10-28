@@ -96,11 +96,27 @@
 
 .login-theme-option.active { background:#fff; color:var(--green-d); box-shadow:0 2px 7px rgba(15,23,42,.12); }
 
-.login-theme-santai .scene--day { --sky-top:#68c1f5; --sky-mid:#b3e1f9; --sky-bot:#e9f8ff; --hill-far:#a8dda6; --hill-mid:#6fc46f; --hill-near:#3d9440; --tree-leaf:#2a6d2e; --tree-leaf-front:#1c5520; --tree-trunk:#5a3a1f; --cloud:#ffffff; --grass:#26732a; --bird-stroke:#2c5f7c; --dim:.3; }
+/* Atmospheric perspective: distant pucat → near lebih dalam */
+.login-theme-santai .scene--day {
+  --sky-top:#6ec4f5; --sky-mid:#b8e4fa; --sky-bot:#eaf8ff;
+  --hill-distant:#c5e8c0; --hill-far:#9fd49a; --hill-mid:#62b85f; --hill-near:#348a38;
+  --tree-leaf:#2a6d2e; --tree-leaf-front:#1c5520; --tree-trunk:#5a3a1f;
+  --cloud:#ffffff; --grass:#26732a; --bird-stroke:#2c5f7c; --dim:.28;
+}
 
-.login-theme-santai .scene--sunrise { --sky-top:#7e96e8; --sky-mid:#f7b878; --sky-bot:#ffe3b5; --hill-far:#b8cf9a; --hill-mid:#82ab5e; --hill-near:#56824a; --tree-leaf:#3e7045; --tree-leaf-front:#2f5d35; --tree-trunk:#5a3a1f; --cloud:#fff1e0; --grass:#4a7e3a; --bird-stroke:#4a4a6a; --dim:.28; }
+.login-theme-santai .scene--sunrise {
+  --sky-top:#7e96e8; --sky-mid:#f7b878; --sky-bot:#ffe3b5;
+  --hill-distant:#d0e0b8; --hill-far:#b8cf9a; --hill-mid:#82ab5e; --hill-near:#56824a;
+  --tree-leaf:#3e7045; --tree-leaf-front:#2f5d35; --tree-trunk:#5a3a1f;
+  --cloud:#fff1e0; --grass:#4a7e3a; --bird-stroke:#4a4a6a; --dim:.28;
+}
 
-.login-theme-santai .scene--sunset { --sky-top:#4a3e86; --sky-mid:#e5714b; --sky-bot:#ffc872; --hill-far:#6a5c7a; --hill-mid:#4e4254; --hill-near:#2d2430; --tree-leaf:#2a2736; --tree-leaf-front:#1c1a26; --tree-trunk:#3a2818; --cloud:#f8c48a; --grass:#2e2630; --bird-stroke:#2a1f38; --dim:.45; }
+.login-theme-santai .scene--sunset {
+  --sky-top:#4a3e86; --sky-mid:#e5714b; --sky-bot:#ffc872;
+  --hill-distant:#7a6c8a; --hill-far:#6a5c7a; --hill-mid:#4e4254; --hill-near:#2d2430;
+  --tree-leaf:#2a2736; --tree-leaf-front:#1c1a26; --tree-trunk:#3a2818;
+  --cloud:#f8c48a; --grass:#2e2630; --bird-stroke:#2a1f38; --dim:.45;
+}
 
 .login-theme-santai .star { fill: #fff; animation: twinkle 2.8s ease-in-out infinite; }
 

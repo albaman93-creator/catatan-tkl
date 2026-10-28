@@ -154,7 +154,8 @@
 }
 
 .oee365-val-accent {
-  color: #dc2626 !important;
+  /* samakan dengan warna OEE standar (calculation.js: #f87171 / #2ee27e) */
+  color: #f87171 !important;
   font-weight: 700;
 }
 
@@ -167,7 +168,16 @@
 
 .oee365-val-result {
   font: 800 17px system-ui, sans-serif !important;
-  color: #dc2626;
+  /* default = merah OEE standar; JS menimpa ke hijau jika ≥ target */
+  color: #f87171 !important;
+}
+
+.oee365-val-result.is-good {
+  color: #2ee27e !important;
+}
+
+.oee365-result-row .oee365-code {
+  color: inherit;
 }
 
 /* ---- Kotak formula (brushed green metal) ---- */
@@ -240,6 +250,17 @@
 
 [data-theme="dark"] .oee365-val {
   border-left-color: #64748b;
+}
+
+/* Tetap pakai warna OEE standar (jangan diganti putih tema gelap) */
+[data-theme="dark"] .oee365-val-result {
+  color: #f87171 !important;
+}
+[data-theme="dark"] .oee365-val-result.is-good {
+  color: #2ee27e !important;
+}
+[data-theme="dark"] .oee365-val-accent {
+  color: #f87171 !important;
 }
 
 [data-theme="dark"] .oee365-formula {

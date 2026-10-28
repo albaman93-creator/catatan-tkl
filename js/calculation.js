@@ -397,7 +397,15 @@ const Calculation = (() => {
     set365('o365F', Utils.nf2(a365) + ' %', a365 >= CONFIG.TARGET.AVAILABILITY ? 'var(--green-d)' : 'var(--red)');
     set365('o365P', Utils.nf2(avgPerfI) + ' %');
     set365('o365Q', Utils.nf2(M) + ' %');
-    set365('oee365', Utils.nf2(oee365) + '%', oee365 >= (CONFIG.TARGET.OEE365 || 55) ? '#2ee27e' : '#f87171');
+    // Warna sama dengan #oee (OEE standar): hijau #2ee27e / merah #f87171
+    const oee365Ok = oee365 >= (CONFIG.TARGET.OEE365 || 55);
+    const oee365Color = oee365Ok ? '#2ee27e' : '#f87171';
+    set365('oee365', Utils.nf2(oee365) + '%', oee365Color);
+    const oee365El = State.el.oee365 || document.getElementById('oee365');
+    if (oee365El) {
+      oee365El.classList.toggle('is-good', oee365Ok);
+      oee365El.style.setProperty('color', oee365Color, 'important');
+    }
     if (State.el.rincSub365) {
       let note = '';
       if (jedaDur > 0 || mixingDur > 0) {

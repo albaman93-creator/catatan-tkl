@@ -924,6 +924,7 @@ function initProductButton() {
   const grid = document.getElementById('masterProductGrid');
   if (!grid) return;
 
+  const prod1Box = grid.querySelector('div.field:nth-child(1)');
   const prod2Box = grid.querySelector('div.field:nth-child(2)');
   const prod3Box = grid.querySelector('div.field:nth-child(3)');
   const p2Name = document.getElementById('masterProdName2');
@@ -940,37 +941,64 @@ function initProductButton() {
     grid.insertAdjacentElement('afterend', btnAdd);
   }
 
-  // Fungsi kosongkan input saat dihapus
-  function resetBox(box) {
+  // Kosongkan input master + mirror ke field sheet (prodName/Bn/Rate/…)
+  function resetBox(box, hideAfter) {
     if (!box) return;
     box.querySelectorAll('input, select').forEach((el) => {
       el.value = '';
       el.dispatchEvent(new Event('input', { bubbles: true }));
       el.dispatchEvent(new Event('change', { bubbles: true }));
+      // Sinkron ke field sheet lewat data-sync
+      const targetId = el.getAttribute('data-sync');
+      if (targetId) {
+        const target = (typeof State !== 'undefined' && State.el && State.el[targetId])
+          || document.getElementById(targetId);
+        if (target) {
+          target.value = '';
+          target.dispatchEvent(new Event('input', { bubbles: true }));
+          target.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
     });
-    box.classList.remove('show-prod');
+    if (hideAfter) box.classList.remove('show-prod');
     cekStatusTombol();
+    // Paksa update kolom matrix OEE
+    if (typeof window.syncOeeColumns === 'function') window.syncOeeColumns();
   }
 
-  // Fungsi membuat tombol hapus
-  function pasangTombolHapus(box, labelText) {
-    if (!box || box.querySelector('.btn-del-prod')) return;
-    const btnDel = document.createElement('button');
-    btnDel.type = 'button';
-    btnDel.className = 'btn-del-prod';
-    btnDel.innerHTML = '✕ Hapus ' + labelText;
-    btnDel.onclick = () => resetBox(box);
-    box.appendChild(btnDel);
+  // Tombol hapus / bersihkan
+  function pasangTombolHapus(box, labelText, hideAfter) {
+    if (!box) return;
+    // Pastikan field bisa memposisikan tombol absolut
+    if (getComputedStyle(box).position === 'static') box.style.position = 'relative';
+    let btnDel = box.querySelector('.btn-del-prod');
+    if (!btnDel) {
+      btnDel = document.createElement('button');
+      btnDel.type = 'button';
+      btnDel.className = 'btn-del-prod';
+      box.appendChild(btnDel);
+    }
+    btnDel.innerHTML = hideAfter ? ('✕ Hapus ' + labelText) : ('✕ Bersihkan ' + labelText);
+    btnDel.title = hideAfter
+      ? ('Hapus dan sembunyikan ' + labelText)
+      : ('Kosongkan data ' + labelText);
+    btnDel.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      resetBox(box, !!hideAfter);
+    };
   }
 
-  pasangTombolHapus(prod2Box, 'Produk 2');
-  pasangTombolHapus(prod3Box, 'Produk 3');
+  // Produk 1: bisa dibersihkan (slot tetap tampil)
+  pasangTombolHapus(prod1Box, 'Produk 1', false);
+  // Produk 2 & 3: hapus + sembunyikan
+  pasangTombolHapus(prod2Box, 'Produk 2', true);
+  pasangTombolHapus(prod3Box, 'Produk 3', true);
 
   // Cek apakah ada data lama tersimpan
   if (p2Name && p2Name.value.trim() !== '' && prod2Box) prod2Box.classList.add('show-prod');
   if (p3Name && p3Name.value.trim() !== '' && prod3Box) prod3Box.classList.add('show-prod');
 
-  // Cek tombol aktif/mati
   function cekStatusTombol() {
     const isP2 = prod2Box && prod2Box.classList.contains('show-prod');
     const isP3 = prod3Box && prod3Box.classList.contains('show-prod');
@@ -978,7 +1006,6 @@ function initProductButton() {
     else btnAdd.style.display = 'inline-flex';
   }
 
-  // Klik tombol
   btnAdd.onclick = function () {
     if (prod2Box && !prod2Box.classList.contains('show-prod')) {
       prod2Box.classList.add('show-prod');

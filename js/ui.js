@@ -411,20 +411,36 @@ const UI = (() => {
     });
 
     if (State.el.sheetDateTrigger && State.el.fDate) {
-      State.el.sheetDateTrigger.addEventListener('click', () => {
-        try {
-          if (typeof State.el.fDate.showPicker === 'function') State.el.fDate.showPicker();
-          else { State.el.fDate.focus(); State.el.fDate.click(); }
-        } catch (e) {
-          State.el.fDate.focus();
-          State.el.fDate.click();
+      State.el.sheetDateTrigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Custom calendar ber-warna week (ProdWeek); fallback native
+        if (typeof ProdWeek !== 'undefined' && ProdWeek.open) {
+          ProdWeek.open(State.el.fDate, State.el.sheetDateTrigger, () => {
+            updateUnifiedControl();
+            if (ProdWeek.updateSheetBadge) ProdWeek.updateSheetBadge();
+          });
+        } else {
+          try {
+            if (typeof State.el.fDate.showPicker === 'function') State.el.fDate.showPicker();
+            else { State.el.fDate.focus(); State.el.fDate.click(); }
+          } catch (err) {
+            State.el.fDate.focus();
+            State.el.fDate.click();
+          }
         }
       });
     }
 
     if (State.el.fDate) {
-      State.el.fDate.addEventListener('input', updateUnifiedControl);
-      State.el.fDate.addEventListener('change', updateUnifiedControl);
+      State.el.fDate.addEventListener('input', () => {
+        updateUnifiedControl();
+        if (typeof ProdWeek !== 'undefined' && ProdWeek.updateSheetBadge) ProdWeek.updateSheetBadge();
+      });
+      State.el.fDate.addEventListener('change', () => {
+        updateUnifiedControl();
+        if (typeof ProdWeek !== 'undefined' && ProdWeek.updateSheetBadge) ProdWeek.updateSheetBadge();
+      });
     }
 
     updateUnifiedControl();

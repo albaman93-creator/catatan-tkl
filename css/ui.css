@@ -337,6 +337,10 @@ textarea.in {
 .field-hint { display: block; margin-top: 6px; font-size: 11px; color: #64748b; line-height: 1.35; }
 
 /* Sembunyikan default form Produk 2 dan Produk 3 */
+#masterProductGrid > div.field {
+  position: relative;
+}
+
 #masterProductGrid > div.field:nth-child(2),
 #masterProductGrid > div.field:nth-child(3) {
   display: none;
@@ -348,11 +352,12 @@ textarea.in {
   display: block !important;
 }
 
-/* Tombol hapus/silang pada kotak produk cadangan */
+/* Tombol hapus/bersihkan produk */
 .btn-del-prod {
   position: absolute;
   top: 0;
   right: 0;
+  z-index: 2;
   background: transparent;
   border: none;
   color: #d9383a;

@@ -95,47 +95,65 @@ kbd {
 #loginOverlay .login-card {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 340px; /* lebih ramping agar ilustrasi nature terlihat */
   background: var(--bg-surface) !important;
   border: var(--card-border) !important;
   border-radius: 14px !important;
   box-shadow: var(--shadow-overlay) !important;
-  padding: 32px 28px 24px !important;
+  padding: 22px 20px 18px !important;
   backdrop-filter: none !important;
+  z-index: 2;
 }
-#loginOverlay .login-header { text-align: left; margin-bottom: 20px; }
+/* Nature theme: panel login "mengambang" di atas pemandangan */
+#loginOverlay.login-theme-santai .login-card {
+  max-width: 340px;
+  padding: 22px 20px 18px !important;
+  box-shadow:
+    0 4px 6px rgba(15, 23, 42, 0.04),
+    0 12px 28px rgba(15, 23, 42, 0.10),
+    0 28px 56px rgba(15, 23, 42, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.65) !important;
+}
+#loginOverlay .login-header { text-align: left; margin-bottom: 12px; }
 #loginOverlay .login-logo {
-  width: 44px; height: 44px; border-radius: 12px;
+  width: 36px; height: 36px; border-radius: 10px;
   display: grid; place-items: center;
   background: var(--brand-600) !important; color: #fff !important;
-  font: 700 15px var(--font-sans); letter-spacing: 0;
+  font: 700 13px var(--font-sans); letter-spacing: 0;
   box-shadow: none !important;
-  margin: 0 0 16px !important;
+  margin: 0 0 10px !important;
 }
 #loginOverlay .login-header h2 {
-  font: 600 20px/1.25 var(--font-sans) !important;
+  font: 600 17px/1.25 var(--font-sans) !important;
   letter-spacing: -0.015em !important;
   text-transform: none !important;
   color: var(--text-primary) !important;
-  margin: 0 0 4px;
+  margin: 0 0 2px;
 }
-#loginOverlay .login-header p { font-size: 13.5px; color: var(--text-secondary) !important; }
+#loginOverlay .login-header p { font-size: 12.5px; color: var(--text-secondary) !important; margin-top: 0; }
 #loginOverlay .login-theme-setting {
-  background: transparent !important; border: 0 !important; padding: 0 !important; margin: 0 0 16px !important;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: transparent !important; border: 0 !important; padding: 0 !important; margin: 0 0 12px !important;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
 }
-#loginOverlay .login-theme-setting-label strong { font: 500 12.5px var(--font-sans); letter-spacing: 0; text-transform: none; color: var(--text-secondary); }
+#loginOverlay .login-theme-setting-label strong { font: 500 12px var(--font-sans); letter-spacing: 0; text-transform: none; color: var(--text-secondary); }
 #loginOverlay .login-theme-setting-label span { display: none; }
-#loginOverlay .login-theme-setting button { font-family: var(--font-sans); letter-spacing: 0; text-transform: none; }
+#loginOverlay .login-theme-setting button { font-family: var(--font-sans); letter-spacing: 0; text-transform: none; padding: 6px 8px; }
 #loginOverlay .login-theme-setting button.on { color: var(--brand-700) !important; border-color: var(--brand-100) !important; }
 #loginOverlay .field label {
-  font: 500 12.5px var(--font-sans) !important; letter-spacing: 0 !important; text-transform: none !important;
-  color: var(--text-secondary) !important; margin-bottom: 6px;
+  font: 500 12px var(--font-sans) !important; letter-spacing: 0 !important; text-transform: none !important;
+  color: var(--text-secondary) !important; margin-bottom: 4px;
+}
+#loginOverlay .login-form .field { margin-bottom: 12px; }
+#loginOverlay .login-form .field input {
+  padding: 10px 12px !important;
+  font-size: 15px !important;
+  height: 40px;
+  box-sizing: border-box;
 }
 #loginOverlay .login-btn {
-  height: 42px; border-radius: 10px !important;
+  height: 40px; border-radius: 10px !important;
   background: var(--brand-600) !important; color: #fff !important;
-  font: 600 14px var(--font-sans) !important;
+  font: 600 13.5px var(--font-sans) !important;
   border: 0 !important; box-shadow: none !important;
   transition: background var(--transition-fast);
 }

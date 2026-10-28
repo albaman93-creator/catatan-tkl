@@ -43,6 +43,7 @@
   <link rel="stylesheet" href="./css/wizard.css">
   <link rel="stylesheet" href="./css/verify-agent.css">
   <link rel="stylesheet" href="./css/oee365.css">
+  <link rel="stylesheet" href="./css/prod-week.css">
   <link rel="stylesheet" href="./css/calculation.css">
   <link rel="stylesheet" href="./css/dashboard.css">
   <link rel="stylesheet" href="./css/weekly-dashboard.css">
@@ -152,9 +153,10 @@
             <stop offset="55%"  class="sky-stop-mid"/>
             <stop offset="100%" class="sky-stop-bot"/>
           </linearGradient>
+          <!-- Glow matahari lebih halus (flat style) -->
           <radialGradient id="sunGlow" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0%"   stop-color="#fff2a8" stop-opacity="1"/>
-            <stop offset="40%"  stop-color="#ffd97a" stop-opacity="0.6"/>
+            <stop offset="0%"   stop-color="#fff8d0" stop-opacity="0.55"/>
+            <stop offset="55%"  stop-color="#ffe56b" stop-opacity="0.18"/>
             <stop offset="100%" stop-color="#ffd97a" stop-opacity="0"/>
           </radialGradient>
           <radialGradient id="moonGlow" cx="0.5" cy="0.5" r="0.5">
@@ -217,9 +219,9 @@
         </g>
 
         <g id="sun" transform="translate(1550 220)">
-          <circle r="180" fill="url(#sunGlow)"/>
-          <circle r="80" fill="#ffe56b"/>
-          <circle r="60" fill="#fff3a8"/>
+          <circle r="140" fill="url(#sunGlow)"/>
+          <circle r="58" fill="#ffe56b"/>
+          <circle r="48" fill="#fff4b0"/>
         </g>
 
         <g id="birds" fill="none" stroke="var(--bird-stroke, #2c5f7c)" stroke-width="2.5" stroke-linecap="round" opacity="0.55">
@@ -270,18 +272,20 @@
           <path d="M 500,900 A 460,460 0 0 1 1420,900" stroke="#b26dff" stroke-width="8" fill="none" opacity="0.75"/>
         </g>
 
+        <!-- Lapisan bukit: distant → far → mid → near (atmospheric perspective) -->
+        <path class="hill-distant" d="M0,620 C180,540 360,580 540,560 C760,535 980,590 1200,555 C1420,520 1650,560 1920,580 L1920,1080 L0,1080 Z"/>
         <path class="hill-far"  d="M0,680 C200,560 380,610 560,640 C780,675 950,590 1180,620 C1380,645 1580,580 1920,650 L1920,1080 L0,1080 Z"/>
         <path class="hill-mid"  d="M0,780 C220,660 420,720 640,730 C860,740 1020,670 1280,710 C1500,745 1700,680 1920,740 L1920,1080 L0,1080 Z"/>
         <path class="hill-near" d="M0,900 C260,820 520,870 760,860 C1000,850 1220,790 1480,840 C1700,880 1850,840 1920,860 L1920,1080 L0,1080 Z"/>
 
         <g class="trees-back">
-          <g class="tree" transform="translate(120, 700) scale(.9)">
+          <g class="tree" transform="translate(120, 700) scale(1.05)">
             <polygon class="tree-leaf" points="0,0 -28,90 28,90"/>
             <polygon class="tree-leaf" points="0,-30 -24,60 24,60"/>
             <polygon class="tree-leaf" points="0,-55 -18,30 18,30"/>
             <rect class="tree-trunk" x="-5" y="90" width="10" height="25"/>
           </g>
-          <g class="tree" transform="translate(200, 710) scale(.85)">
+          <g class="tree" transform="translate(195, 715) scale(.72)">
             <polygon class="tree-leaf" points="0,0 -24,80 24,80"/>
             <polygon class="tree-leaf" points="0,-26 -20,55 20,55"/>
             <polygon class="tree-leaf" points="0,-48 -15,26 15,26"/>
@@ -299,7 +303,7 @@
             <polygon class="tree-leaf" points="0,-52 -16,28 16,28"/>
             <rect class="tree-trunk" x="-4" y="88" width="8" height="24"/>
           </g>
-          <g class="tree" transform="translate(1720, 705) scale(.82)">
+          <g class="tree" transform="translate(1740, 700) scale(.95)">
             <polygon class="tree-leaf" points="0,0 -22,78 22,78"/>
             <polygon class="tree-leaf" points="0,-24 -18,52 18,52"/>
             <polygon class="tree-leaf" points="0,-45 -13,24 13,24"/>
@@ -367,7 +371,7 @@
 
         <!-- NATURE EXTRAS -->
         <g id="natureExtra">
-          <g id="windmill" transform="translate(1520, 770)">
+          <g id="windmill" transform="translate(1520, 755) scale(1.18)">
             <rect class="wm-pole" x="-6" y="0" width="12" height="122"/>
             <rect class="wm-pole-shade" x="0" y="0" width="6" height="122"/>
             <g id="windmillBlades" class="wm-blades">
@@ -404,7 +408,7 @@
               <circle class="rt-leaf"      cx="29"  cy="12" r="21"/>
             </g>
                 </g>
-          <g id="hut" transform="translate(1560, 845)">
+          <g id="hut" transform="translate(1560, 830) scale(1.15)">
             <rect class="hut-wall" x="-58" y="-6" width="116" height="66" rx="2"/>
             <line class="hut-plank" x1="-58" y1="14" x2="58" y2="14"/>
             <line class="hut-plank" x1="-58" y1="34" x2="58" y2="34"/>
@@ -449,7 +453,7 @@
             </g>
             </g>
           <g id="sunflowers">
-            <g class="sunflower" transform="translate(230, 990)">
+            <g class="sunflower" transform="translate(230, 1005) scale(0.72)">
               <path class="sf-stem" d="M0,0 C-6,-30 6,-55 0,-85"/>
               <path class="sf-leaf" d="M0,-40 C-20,-35 -32,-48 -30,-30"/>
               <g id="sf1Anchor" transform="translate(0,-85)">
@@ -466,7 +470,7 @@
             </g>
           </g>
           </g>
-            <g class="sunflower" transform="translate(300, 1015) scale(.7)">
+            <g class="sunflower" transform="translate(300, 1025) scale(.55)">
               <path class="sf-stem" d="M0,0 C-6,-30 6,-55 0,-85"/>
               <g id="sf2Anchor" transform="translate(0,-85)">
                 <g id="sf2Head" class="sf-head">
@@ -484,7 +488,7 @@
             </g>
             </g>
           <g id="roseGarden">
-            <g class="rose" transform="translate(200, 950)">
+            <g class="rose" transform="translate(200, 965) scale(0.75)">
               <path class="rose-stem" d="M0,0 C-5,-30 5,-55 0,-80"/>
               <path class="rose-leaf" d="M0,-40 C-15,-35 -25,-45 -22,-25"/>
               <path class="rose-leaf" d="M0,-55 C15,-50 25,-60 22,-40"/>
@@ -494,7 +498,7 @@
               <circle class="rose-petal-light" cx="0" cy="-94" r="9"/>
               <circle class="rose-center" cx="0" cy="-80" r="4"/>
             </g>
-            <g class="rose" transform="translate(320, 920)">
+            <g class="rose" transform="translate(320, 945) scale(0.7)">
               <path class="rose-stem" d="M0,0 C-6,-28 6,-52 0,-76"/>
               <path class="rose-leaf" d="M0,-38 C-16,-33 -26,-44 -23,-24"/>
               <path class="rose-leaf" d="M0,-52 C16,-47 26,-58 23,-38"/>
@@ -504,7 +508,7 @@
               <circle class="rose-petal-light" cx="0" cy="-88" r="8"/>
               <circle class="rose-center" cx="0" cy="-76" r="3.5"/>
           </g>
-            <g class="rose" transform="translate(1600, 960)">
+            <g class="rose" transform="translate(1600, 970) scale(0.8)">
               <path class="rose-stem" d="M0,0 C-5,-30 5,-55 0,-80"/>
               <path class="rose-leaf" d="M0,-40 C-15,-35 -25,-45 -22,-25"/>
               <path class="rose-leaf" d="M0,-55 C15,-50 25,-60 22,-40"/>
@@ -514,7 +518,7 @@
               <circle class="rose-petal-light" cx="0" cy="-94" r="8"/>
               <circle class="rose-center" cx="0" cy="-80" r="3.5"/>
           </g>
-            <g class="rose" transform="translate(1720, 930)">
+            <g class="rose" transform="translate(1720, 950) scale(0.75)">
               <path class="rose-stem" d="M0,0 C-5,-28 5,-52 0,-74"/>
               <path class="rose-leaf" d="M0,-36 C-14,-31 -24,-42 -21,-22"/>
               <path class="rose-leaf" d="M0,-50 C14,-45 24,-56 21,-36"/>
@@ -2881,6 +2885,7 @@
   <script src="./js/settings.js"></script>
   <script src="./js/verify-agent.js"></script>
   <script src="./js/profile-avatar.js"></script>
+  <script src="./js/prod-week.js"></script>
   <script src="./js/app.js"></script>
   <script src="./js/sheet-op-sync.js"></script>
   <script src="./js/sheet-mesin-sync.js"></script>
