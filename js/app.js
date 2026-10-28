@@ -681,7 +681,7 @@ const App = (() => {
       rawDate: document.getElementById('cmTargetDate')?.value || '',
       shift: Number(document.getElementById('cmTargetShift')?.value || 1),
       line: document.getElementById('cmTargetLine')?.value || '1',
-      stage: document.getElementById('cmTargetStage')?.value || 'mixing',
+      stage: document.getElementById('cmTargetStage')?.value || 'filling',
     });
     const updateCmWarn = () => {
       const warn = document.getElementById('cmWarn');

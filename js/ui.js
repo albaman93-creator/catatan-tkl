@@ -103,7 +103,7 @@ const UI = (() => {
     fillMachineName();
   };
   const applyStageUI = () => {
-    const val = State.el.fStage ? State.el.fStage.value : 'mixing';
+    const val = State.el.fStage ? State.el.fStage.value : 'filling';
     document.querySelectorAll('#fStageSel [data-stage]').forEach(b => {
       b.classList.toggle('on', b.getAttribute('data-stage') === val);
     });
@@ -124,7 +124,7 @@ const UI = (() => {
   };
 
   const currentMachineKey = () =>
-    String(State.el.fStage?.value || 'mixing').toLowerCase() + '|' + String(State.el.fLine?.value || '1');
+    String(State.el.fStage?.value || 'filling').toLowerCase() + '|' + String(State.el.fLine?.value || '1');
 
   /**
    * Isi Nama Mesin sesuai tahapan + line (dipanggil saat tombol Line/Tahapan berganti).
@@ -220,7 +220,7 @@ const UI = (() => {
   };
 
   const updateUnifiedControl = () => {
-    const stageVal = State.el.fStage ? State.el.fStage.value : 'mixing';
+    const stageVal = State.el.fStage ? State.el.fStage.value : 'filling';
     const lineVal = State.el.fLine ? String(State.el.fLine.value) : '1';
     const dateVal = State.el.fDate ? State.el.fDate.value : '';
 

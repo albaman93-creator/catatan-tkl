@@ -913,15 +913,15 @@
           </div>
           <div class="field"><label>Tahapan Proses</label>
             <div class="shiftsel stagesel" id="fStageSel" title="Tahapan proses">
-              <button type="button" data-stage="mixing" class="on">Mixing</button>
-              <button type="button" data-stage="filling">Filling</button>
+              <button type="button" data-stage="mixing">Mixing</button>
+              <button type="button" data-stage="filling" class="on">Filling</button>
               <button type="button" data-stage="steril">Steril</button>
               <button type="button" data-stage="visual">Visual</button>
               <button type="button" data-stage="kemas">Kemas</button>
             </div>
             <select id="fStage" class="sr-only" aria-hidden="true" tabindex="-1">
-              <option value="mixing" selected>Mixing</option>
-              <option value="filling">Filling</option>
+              <option value="mixing">Mixing</option>
+              <option value="filling" selected>Filling</option>
               <option value="steril">Steril</option>
               <option value="visual">Visual</option>
               <option value="kemas">Kemas</option>
@@ -1015,7 +1015,7 @@
       <!-- Section: Log Sheet Harian -->
       <section class="sec" data-screen="logsheet">
         <!-- HEADER SHEET KOMPAK: satu baris, semua pengaturan dapat digulung -->
-        <div class="sheet-unified-control compact-sheet-control" id="sheetUnifiedControl" data-stage="mixing">
+        <div class="sheet-unified-control compact-sheet-control" id="sheetUnifiedControl" data-stage="filling">
           <div class="compact-main-row">
             <!-- Tanggal -->
             <div class="compact-control compact-date-control">
@@ -1027,7 +1027,7 @@
             <!-- Tahapan -->
             <div class="compact-control">
               <button type="button" class="compact-trigger" aria-expanded="false" aria-controls="compactStagePanel">
-                <span id="compactStageValue">Mixing</span><span class="compact-chevron">▾</span>
+                <span id="compactStageValue">Filling</span><span class="compact-chevron">▾</span>
               </button>
               <div class="compact-popover compact-choice-panel" id="compactStagePanel">
                 <div class="compact-popover-head"><b>Tahapan Proses</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>

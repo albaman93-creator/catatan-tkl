@@ -590,7 +590,7 @@ const Suggest = (() => {
       const on = document.querySelector('.sheet-stage-btn.on, .sheet-stage-btn[aria-selected="true"]');
       if (on) stage = on.getAttribute('data-sheet-stage') || '';
     }
-    return stage || 'mixing';
+    return stage || 'filling';
   };
 
   const FALLBACK_PRODUCT_CODES = {

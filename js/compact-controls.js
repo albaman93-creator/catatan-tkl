@@ -95,7 +95,7 @@
   const setText = (id, text) => { const e = document.getElementById(id); if (e) e.textContent = text; };
 
   function syncSummary() {
-    const stage = $('#fStage')?.value || 'mixing';
+    const stage = $('#fStage')?.value || 'filling';
     const stageBtn = $(`[data-sheet-stage="${CSS.escape(stage)}"]`);
     // Tahapan di luar Filling/Kemas (mis. Mixing/Steril/Visual) tidak lagi
     // punya tombol di header Log Sheet — tetap tampilkan labelnya dengan rapi.
