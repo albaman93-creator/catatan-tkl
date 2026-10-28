@@ -154,7 +154,6 @@ const WeeklyDashboard = (() => {
     const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
     set(prefix + 'TotE', fmt(t.E));
     set(prefix + 'TotC', fmt(t.C));
-    set(prefix + 'TotD', fmt(t.D));           // Waktu Breakdown (D)
     set(prefix + 'TotAvail', fmt(t.availBase));
     set(prefix + 'TotRate', fmt(t.rateTotal));
     set(prefix + 'TotActual', fmt(t.actual));

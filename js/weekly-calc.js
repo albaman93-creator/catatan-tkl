@@ -256,7 +256,6 @@ const WeeklyCalc = (() => {
         o: so != null ? so : re.O,
         C: re.C,
         E: re.E,
-        D: re.D,                                 // waktu breakdown / unplanned (menit)
         good: re.info.reduce((s, r) => s + r.g, 0),
         defect: re.info.reduce((s, r) => s + r.d, 0),
         ideal: re.sumIdealE,                     // rate × E (Excel batch)
@@ -303,7 +302,6 @@ const WeeklyCalc = (() => {
       a: aa, p, q, o: (aa * p * q) / 10000,
       C: re.C,
       E: re.E,
-      D: re.D,                                   // waktu breakdown / unplanned (menit)
       good: g,
       defect: d,
       ideal,
@@ -343,11 +341,10 @@ const WeeklyCalc = (() => {
 
     // --- Agregasi total Σ (Issue #12) — dipakai untuk Semua produk & filter produk ---
     // A = ΣE / ΣC · P = Σaktual / Σ(rate×E) · Q = Σbaik / Σaktual
-    let sumC = 0, sumE = 0, sumD = 0, sumGood = 0, sumDefect = 0, sumIdeal = 0, sumAvail = 0, sumRate = 0;
+    let sumC = 0, sumE = 0, sumGood = 0, sumDefect = 0, sumIdeal = 0, sumAvail = 0, sumRate = 0;
     ms.forEach((m) => {
       sumC += Number(m.C) || 0;
       sumE += Number(m.E) || 0;
-      sumD += Number(m.D) || 0;
       sumGood += Number(m.good) || 0;
       sumDefect += Number(m.defect) || 0;
       sumIdeal += Number(m.ideal) || 0;
@@ -402,7 +399,7 @@ const WeeklyCalc = (() => {
     });
 
     const totals = {
-      C: sumC, E: sumE, D: sumD, good: sumGood, defect: sumDefect, actual,
+      C: sumC, E: sumE, good: sumGood, defect: sumDefect, actual,
       ideal: sumIdeal, availBase: sumAvail, rateTotal: sumRate,
       a: aBatch, p: pBatch, q: qBatch, oee: oBatch,
       a365: a365Batch, oee365: o365Batch,
@@ -476,5 +473,3 @@ const WeeklyCalc = (() => {
     filterShift, productView, productOptions,
   };
 })();
-
-G
