@@ -212,6 +212,10 @@ const App = (() => {
       if (e.target.getAttribute('data-f') === 'batch') {
         Rows.applyWoFromBatch(e.target.closest('tr'));
       }
+      if (['good', 'defect'].includes(e.target.getAttribute('data-f'))) {
+        e.target.classList.remove('invalid');
+        e.target.title = 'Bisa hitung rumus, contoh =10+10+15';
+      }
       // Kolom OP: angka saja, 1 digit per baris.
       // Ketik "234" → baris ini=2, baris berikutnya=3, dst.
       if (e.target.getAttribute('data-f') === 'op') {
@@ -278,6 +282,20 @@ const App = (() => {
     // ============================================================
     State.el.tbody.addEventListener('focusout', (e) => {
       const t = e.target;
+      const field = t.getAttribute('data-f');
+      if (field === 'good' || field === 'defect') {
+        const raw = t.value.trim();
+        const result = Utils.parseArithmeticExpression(raw);
+        if (raw && result === null) {
+          t.classList.add('invalid');
+          t.title = 'Rumus tidak valid. Gunakan angka dan operator +, -, *, /, tanda kurung.';
+        } else {
+          t.classList.remove('invalid');
+          t.removeAttribute('title');
+          if (raw) t.value = String(result);
+        }
+        Calculation.recalc();
+      }
       if (t.classList && t.classList.contains('t-time')) {
         const n = Utils.normTime(t.value);
         if (t.value.trim() !== '' && n === null) t.classList.add('invalid');

@@ -121,8 +121,8 @@ const WeeklyOee = (() => {
         else return;
       }
 
-      const gVal = parseFloat(String(r.good || '0').replace(',', '.')) || 0;
-      const dVal = parseFloat(String(r.defect || '0').replace(',', '.')) || 0;
+      const gVal = Utils.parseArithmeticExpression(r.good) ?? 0;
+      const dVal = Utils.parseArithmeticExpression(r.defect) ?? 0;
       sumGood += gVal;
       sumDefect += dVal;
 

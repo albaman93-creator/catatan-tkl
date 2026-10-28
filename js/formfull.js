@@ -76,6 +76,22 @@ const FormModeFull = (() => {
     return el.value;
   };
 
+  const commitCountField = (id, field) => {
+    const input = State.el[id];
+    const raw = input.value.trim();
+    const result = Utils.parseArithmeticExpression(raw);
+    if (raw && result === null) {
+      input.classList.add('invalid');
+      input.title = 'Rumus tidak valid. Gunakan angka dan operator +, -, *, /, tanda kurung.';
+      return false;
+    }
+    input.classList.remove('invalid');
+    input.removeAttribute('title');
+    input.value = raw ? String(result) : '';
+    writeField(field, input.value);
+    return true;
+  };
+
   const applyFormCat = () => {
     const tr = currentRow();
     if (!State.el.formFullPanel) return;
@@ -141,6 +157,7 @@ const FormModeFull = (() => {
     writeField('panggil', State.el.ffPanggil.value, { commit: true });
     writeField('teknik', State.el.ffTeknik.value, { commit: true });
     writeField('selesai', State.el.ffSelesai.value, { commit: true });
+    return commitCountField('ffGood', 'good') && commitCountField('ffDefect', 'defect');
   };
 
   /**
@@ -165,19 +182,19 @@ const FormModeFull = (() => {
   // ====== BINDINGS ======
   const bindNav = () => {
     State.el.ffPrev.addEventListener('click', () => {
-      commitCurrent();
+      if (!commitCurrent()) return;
       goTo(currentIndex - 1);
       focusField('ffKode');
     });
     State.el.ffNext.addEventListener('click', () => {
       if (!validateBeforeNext()) return;
-      commitCurrent();
+      if (!commitCurrent()) return;
       goTo(currentIndex + 1, { create: true });
       focusField('ffKode');
     });
     State.el.ffSave.addEventListener('click', () => {
       if (!validateBeforeNext()) return;
-      commitCurrent();
+      if (!commitCurrent()) return;
       goTo(currentIndex + 1, { create: true });
       focusField('ffKode');
       UI.toast('Baris tersimpan · lanjut ke baris berikutnya');
@@ -247,8 +264,14 @@ const FormModeFull = (() => {
 
     State.el.ffWo.addEventListener('input', () => writeField('wo', State.el.ffWo.value));
     State.el.ffBatch.addEventListener('change', () => writeField('batch', State.el.ffBatch.value));
-    State.el.ffGood.addEventListener('input', () => writeField('good', State.el.ffGood.value));
-    State.el.ffDefect.addEventListener('input', () => writeField('defect', State.el.ffDefect.value));
+    [['ffGood', 'good'], ['ffDefect', 'defect']].forEach(([id, field]) => {
+      State.el[id].addEventListener('input', () => {
+        State.el[id].classList.remove('invalid');
+        State.el[id].removeAttribute('title');
+        writeField(field, State.el[id].value);
+      });
+      State.el[id].addEventListener('blur', () => commitCountField(id, field));
+    });
 
     State.el.formFullPanel.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;

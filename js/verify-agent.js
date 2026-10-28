@@ -79,8 +79,8 @@ const VerifyAgent = (() => {
       const mulai = g('mulai');
       const selesai = g('selesai');
       const batch = g('batch');
-      const good = parseFloat(String(g('good') || '0').replace(',', '.')) || 0;
-      const defect = parseFloat(String(g('defect') || '0').replace(',', '.')) || 0;
+      const good = Utils.parseArithmeticExpression(g('good')) ?? 0;
+      const defect = Utils.parseArithmeticExpression(g('defect')) ?? 0;
       const n = idx + 1;
 
       if (!kode && !mulai && !selesai) return;

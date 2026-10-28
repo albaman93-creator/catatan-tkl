@@ -288,8 +288,8 @@ const RincianProduk = (() => {
       e.breakdownUnplanned += Number(r.breakdownUnplanned) || 0;
       e.waktuOperasional += Number(r.waktuOperasional) || 0;
       e.standartOutput += Number(r.standartOutput) || 0;
-      e.good += Number(r.good) || 0;
-      e.defect += Number(r.defect) || 0;
+      e.good += Utils.parseArithmeticExpression(r.good) ?? 0;
+      e.defect += Utils.parseArithmeticExpression(r.defect) ?? 0;
     });
     return [...map.values()]
       .map((e) => ({ ...e, tglLabel: fmtDateRange(e.dates) }))

@@ -302,8 +302,8 @@ const CsvImport = (() => {
         }];
       }
       const totalDur = slices.reduce((s, x) => s + x.dur, 0) || 1;
-      const good = parseFloat(String(r.good || '0').replace(',', '.')) || 0;
-      const defect = parseFloat(String(r.defect || '0').replace(',', '.')) || 0;
+      const good = Utils.parseArithmeticExpression(r.good) ?? 0;
+      const defect = Utils.parseArithmeticExpression(r.defect) ?? 0;
       slices.forEach((sl, idx) => {
         const share = sl.dur / totalDur;
         built.push({

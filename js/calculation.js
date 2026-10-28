@@ -447,15 +447,13 @@ const Calculation = (() => {
       }
     }
     if (State.el.oee365IndicatorValue) {
-      State.el.oee365IndicatorValue.textContent = hasShiftData ? Utils.nf2(oee365) + '%' : '—';
+      State.el.oee365IndicatorValue.textContent = Utils.nf2(oee365) + '%';
       if (State.el.oee365Indicator) {
         State.el.oee365Indicator.classList.remove('good', 'warn', 'bad');
         // OEE 365 pakai target khusus 55%, bukan target OEE utama (88%)
-        if (hasShiftData) {
-          if (oee365 >= (CONFIG.TARGET.OEE365 || 55)) State.el.oee365Indicator.classList.add('good');
-          else if (oee365 >= 45) State.el.oee365Indicator.classList.add('warn');
-          else State.el.oee365Indicator.classList.add('bad');
-        }
+        if (oee365 >= (CONFIG.TARGET.OEE365 || 55)) State.el.oee365Indicator.classList.add('good');
+        else if (oee365 >= 45) State.el.oee365Indicator.classList.add('warn');
+        else State.el.oee365Indicator.classList.add('bad');
       }
     }
 

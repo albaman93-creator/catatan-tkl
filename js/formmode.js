@@ -59,6 +59,22 @@ const FormMode = (() => {
     return el.value;
   };
 
+  const commitCountField = (id, field) => {
+    const input = State.el[id];
+    const raw = input.value.trim();
+    const result = Utils.parseArithmeticExpression(raw);
+    if (raw && result === null) {
+      input.classList.add('invalid');
+      input.title = 'Rumus tidak valid. Gunakan angka dan operator +, -, *, /, tanda kurung.';
+      return false;
+    }
+    input.classList.remove('invalid');
+    input.removeAttribute('title');
+    input.value = raw ? String(result) : '';
+    writeField(field, input.value);
+    return true;
+  };
+
   const applyFormCat = () => {
     const tr = currentRow();
     if (!State.el.formPanel) return;
@@ -103,9 +119,10 @@ const FormMode = (() => {
     render();
   };
 
-  /** Pastikan nilai jam mulai dinormalisasi (spt saat blur) sebelum pindah baris. */
+  /** Pastikan input dinormalisasi sebelum pindah baris atau menyimpan. */
   const commitCurrent = () => {
     writeField('mulai', State.el.fpMulai.value, { commit: true });
+    return commitCountField('fpGood', 'good') && commitCountField('fpDefect', 'defect');
   };
 
   /**
@@ -130,19 +147,19 @@ const FormMode = (() => {
   // ====== BINDINGS ======
   const bindNav = () => {
     State.el.fpPrev.addEventListener('click', () => {
-      commitCurrent();
+      if (!commitCurrent()) return;
       goTo(currentIndex - 1);
       focusField('fpKode');
     });
     State.el.fpNext.addEventListener('click', () => {
       if (!validateBeforeNext()) return;
-      commitCurrent();
+      if (!commitCurrent()) return;
       goTo(currentIndex + 1, { create: true });
       focusField('fpKode');
     });
     State.el.fpSave.addEventListener('click', () => {
       if (!validateBeforeNext()) return;
-      commitCurrent();
+      if (!commitCurrent()) return;
       goTo(currentIndex + 1, { create: true });
       focusField('fpKode');
       UI.toast('Baris tersimpan · lanjut ke baris berikutnya');
@@ -188,10 +205,19 @@ const FormMode = (() => {
     });
 
     State.el.fpGood.addEventListener('input', () => {
+      State.el.fpGood.classList.remove('invalid');
+      State.el.fpGood.removeAttribute('title');
       writeField('good', State.el.fpGood.value);
     });
     State.el.fpDefect.addEventListener('input', () => {
+      State.el.fpDefect.classList.remove('invalid');
+      State.el.fpDefect.removeAttribute('title');
       writeField('defect', State.el.fpDefect.value);
+    });
+    [['fpGood', 'good'], ['fpDefect', 'defect']].forEach(([id, field]) => {
+      State.el[id].addEventListener('blur', () => {
+        commitCountField(id, field);
+      });
     });
 
     // Enter di field manapun (kecuali textarea Kegiatan) → simpan & lanjut baris

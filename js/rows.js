@@ -344,8 +344,8 @@ const Rows = (() => {
       <td class="col-desc"><textarea data-f="description" data-nav class="in" placeholder="Keterangan bebas…" aria-label="Description" rows="1" title="Catatan acak operator: downtime, trial, dll."></textarea></td>
       <td class="col-wo"><textarea data-f="wo" data-nav class="in mono wo-wrap" placeholder="No WO " aria-label="Nomor WO" rows="1"></textarea></td>
       <td class="col-batch"><select data-f="batch" data-nav class="in mono" aria-label="Produk & Batch">${optionsHtml}</select></td>
-      <td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Good"></td>
-      <td class="col-defect"><input data-f="defect" data-nav class="in mono ctr" inputmode="decimal" placeholder="0" aria-label="Defect"></td>
+      <td class="col-good"><input data-f="good" data-nav class="in mono ctr" inputmode="text" placeholder="0" aria-label="Good" title="Bisa hitung rumus, contoh =10+10+15"></td>
+      <td class="col-defect"><input data-f="defect" data-nav class="in mono ctr" inputmode="text" placeholder="0" aria-label="Defect" title="Bisa hitung rumus, contoh =10+10+15"></td>
     `;
 
     if (data) {
@@ -556,8 +556,8 @@ const Rows = (() => {
       const mulai = Utils.parseTime(g('mulai'));
       const selesai = Utils.parseTime(g('selesai'));
       const prodName = g('batch');
-      const goodVal = parseFloat(String(g('good') || '0').replace(',', '.')) || 0;
-      const defectVal = parseFloat(String(g('defect') || '0').replace(',', '.')) || 0;
+      const goodVal = Utils.parseArithmeticExpression(g('good')) ?? 0;
+      const defectVal = Utils.parseArithmeticExpression(g('defect')) ?? 0;
       const rowActual = goodVal + defectVal;
 
       if (mulai == null || selesai == null) return;

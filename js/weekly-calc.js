@@ -346,8 +346,8 @@ const WeeklyCalc = (() => {
     ms.forEach((m) => {
       sumC += Number(m.C) || 0;
       sumE += Number(m.E) || 0;
-      sumGood += Number(m.good) || 0;
-      sumDefect += Number(m.defect) || 0;
+      sumGood += Utils.parseArithmeticExpression(m.good) ?? 0;
+      sumDefect += Utils.parseArithmeticExpression(m.defect) ?? 0;
       sumIdeal += Number(m.ideal) || 0;
       sumAvail += Number(m.availBase) || 0;
       const r = Number(m.rate) || 0;
@@ -382,8 +382,8 @@ const WeeklyCalc = (() => {
       list.forEach((m) => {
         c += Number(m.C) || 0;
         e += Number(m.E) || 0;
-        g += Number(m.good) || 0;
-        d += Number(m.defect) || 0;
+        g += Utils.parseArithmeticExpression(m.good) ?? 0;
+        d += Utils.parseArithmeticExpression(m.defect) ?? 0;
         ideal += Number(m.ideal) || 0;
         avail += Number(m.availBase) || 0;
       });
