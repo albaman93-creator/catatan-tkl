@@ -244,7 +244,7 @@ const WeeklyCalc = (() => {
       const outAll = re.info.reduce((s, r) => s + r.g + r.d, 0);
       if (!(re.tAll > 0) && !(outAll > 0)) return null;
 
-      // Rate mesin: jumlah rate semua slot aktif di record ini (untuk total Speed Standar)
+      // Rate mesin: jumlah rate semua slot aktif di record ini (speed standar record)
       let rateSum = 0;
       re.slots.forEach((s, i) => {
         if (re.perSlot[i].active) rateSum += (re.perSlot[i].rate || s.rate || 0);
@@ -341,7 +341,8 @@ const WeeklyCalc = (() => {
 
     // --- Agregasi total Σ (Issue #12) — dipakai untuk Semua produk & filter produk ---
     // A = ΣE / ΣC · P = Σaktual / Σ(rate×E) · Q = Σbaik / Σaktual
-    let sumC = 0, sumE = 0, sumGood = 0, sumDefect = 0, sumIdeal = 0, sumAvail = 0, sumRate = 0;
+    // Speed Standar: tampilkan rate representatif (rata-rata), BUKAN Σ rate antar record
+    let sumC = 0, sumE = 0, sumGood = 0, sumDefect = 0, sumIdeal = 0, sumAvail = 0, sumRate = 0, nRate = 0;
     ms.forEach((m) => {
       sumC += Number(m.C) || 0;
       sumE += Number(m.E) || 0;
@@ -349,8 +350,10 @@ const WeeklyCalc = (() => {
       sumDefect += Number(m.defect) || 0;
       sumIdeal += Number(m.ideal) || 0;
       sumAvail += Number(m.availBase) || 0;
-      sumRate += Number(m.rate) || 0;
+      const r = Number(m.rate) || 0;
+      if (r > 0) { sumRate += r; nRate += 1; }
     });
+    const rateAvg = nRate > 0 ? sumRate / nRate : 0;
     const actual = sumGood + sumDefect;
     const aBatch = sumC > 0 ? (sumE / sumC) * 100 : null;
     const pBatch = sumIdeal > 0 ? (actual / sumIdeal) * 100 : null;
@@ -400,7 +403,7 @@ const WeeklyCalc = (() => {
 
     const totals = {
       C: sumC, E: sumE, good: sumGood, defect: sumDefect, actual,
-      ideal: sumIdeal, availBase: sumAvail, rateTotal: sumRate,
+      ideal: sumIdeal, availBase: sumAvail, rateTotal: rateAvg,
       a: aBatch, p: pBatch, q: qBatch, oee: oBatch,
       a365: a365Batch, oee365: o365Batch,
     };

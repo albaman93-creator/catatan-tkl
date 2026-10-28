@@ -151,11 +151,18 @@ const WeeklyDashboard = (() => {
   const setTotals = (all, prefix) => {
     const t = (all && all.totals) || {};
     const fmt = (n) => (n == null || !Number.isFinite(Number(n))) ? '—' : Number(n).toLocaleString('id-ID');
+    // Speed Standar: tampilkan angka rate (bukan total Σ), max 2 desimal jika perlu
+    const fmtRate = (n) => {
+      if (n == null || !Number.isFinite(Number(n))) return '—';
+      const v = Number(n);
+      const rounded = Math.abs(v - Math.round(v)) < 1e-9 ? Math.round(v) : Math.round(v * 100) / 100;
+      return rounded.toLocaleString('id-ID');
+    };
     const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
     set(prefix + 'TotE', fmt(t.E));
     set(prefix + 'TotC', fmt(t.C));
     set(prefix + 'TotAvail', fmt(t.availBase));
-    set(prefix + 'TotRate', fmt(t.rateTotal));
+    set(prefix + 'TotRate', fmtRate(t.rateTotal));
     set(prefix + 'TotActual', fmt(t.actual));
     set(prefix + 'TotIdeal', fmt(t.ideal));
     set(prefix + 'TotGood', fmt(t.good));
