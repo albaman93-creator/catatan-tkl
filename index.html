@@ -685,10 +685,39 @@
         </button>
 
         <div class="app-bar-badges">
-          <span class="shift-indicator" id="shiftIndicator" title="Shift &amp; tanggal yang sedang Anda isi saat ini">
+          <button type="button" class="shift-indicator compact-trigger" id="shiftIndicator" title="Jelajahi data berdasarkan tanggal, shift, dan tahapan" aria-haspopup="dialog" aria-controls="shiftNavigatorPanel" aria-expanded="false">
             <span class="si-dot"></span>
             <span id="shiftIndicatorText">SHIFT 1 · 12 AUG 2026</span>
-          </span>
+          </button>
+          <div class="compact-popover compact-choice-panel shift-navigator-panel" id="shiftNavigatorPanel" role="dialog" aria-label="Navigasi data">
+            <div class="shift-nav-view" data-shift-nav-view="menu">
+              <div class="compact-popover-head"><b>Jelajahi Data</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
+              <div class="compact-choice-list">
+                <button type="button" data-shift-nav-action="date">Kalender · <span id="shiftNavDateLabel">Tanggal</span></button>
+                <button type="button" data-shift-nav-action="shift">Pilih Shift · <span id="shiftNavShiftLabel">Shift 1</span></button>
+                <button type="button" data-shift-nav-action="stage">Pilih Tahapan · <span id="shiftNavStageLabel">Filling</span></button>
+              </div>
+            </div>
+            <div class="shift-nav-view" data-shift-nav-view="shift" hidden>
+              <div class="compact-popover-head"><button type="button" class="shift-nav-back" aria-label="Kembali">‹ Kembali</button><b>Pilih Shift</b></div>
+              <div class="compact-choice-list compact-choice-3">
+                <button type="button" data-nav-shift="1">Shift 1</button>
+                <button type="button" data-nav-shift="2">Shift 2</button>
+                <button type="button" data-nav-shift="3">Shift 3</button>
+              </div>
+            </div>
+            <div class="shift-nav-view" data-shift-nav-view="stage" hidden>
+              <div class="compact-popover-head"><button type="button" class="shift-nav-back" aria-label="Kembali">‹ Kembali</button><b>Pilih Tahapan Proses</b></div>
+              <div class="compact-choice-list">
+                <button type="button" data-nav-stage="mixing">Mixing</button>
+                <button type="button" data-nav-stage="filling">Filling</button>
+                <button type="button" data-nav-stage="steril">Steril</button>
+                <button type="button" data-nav-stage="visual">Visual</button>
+                <button type="button" data-nav-stage="kemas">Kemas</button>
+              </div>
+            </div>
+          </div>
+          <input type="date" id="shiftNavigatorDate" hidden aria-hidden="true" tabindex="-1">
           <span class="oee-indicator" id="oeeIndicator" title="%OEE standar (A×P×Q, Availability vs waktu terencana) — klik untuk rincian">
             <span class="oi-label">OEE</span>
             <span id="oeeIndicatorValue">0,00%</span>

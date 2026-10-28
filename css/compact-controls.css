@@ -521,6 +521,38 @@ body > .compact-popover {
 
 .compact-trigger[aria-expanded="true"] { transform: scale(0.97); box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); border-color: #3b82f6; }
 
+.app-bar-badges > .shift-indicator.compact-trigger {
+  min-height: 28px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.shift-navigator-panel { min-width: 230px; }
+
+.shift-nav-back {
+  border: 0;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.shift-nav-back:hover { background: rgba(100, 116, 139, .12); }
+
+.shift-navigator-panel [data-nav-shift].on,
+.shift-navigator-panel [data-nav-stage].on {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.shift-navigator-panel [data-nav-shift],
+.shift-navigator-panel [data-nav-stage] {
+  text-align: center;
+}
+
 .compact-control:nth-child(1) .compact-trigger { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
 
 .compact-control:nth-child(2) .compact-trigger { background: #faf5ff; border-color: #e9d5ff; color: #581c87; }

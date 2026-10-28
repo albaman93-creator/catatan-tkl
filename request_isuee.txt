@@ -708,3 +708,57 @@ jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fS
 jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[4] set to //*[@id="fMesinNama"] NIKKA DENSOK                
 jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[5] set to //*[@id="fMesinNama"] Mesin Overwrapping Machine Plumat OW 834
 
+
+
+
+<div class="oee-filter oee-filter-extended" id="issueFilterBar">
+                  <tombol "Moon"> = set filter issue dari tanggal 1 sampai akhir di bulan ini
+                  <tombol "week"> set filter issue di minggu ini
+                  <tombol "day> set filter issue hari ini 
+                  <All isue> tampilkan semua isue ( dan jadikan ini sebagai default pada aplikasi akan mendeteksi semua issue) aktif ketika aplikasi pertama kali di buka atau ketika buka dashboard weekly meeting  tujuan agar isue terlihat 
+                  
+                    <label for="issueLine">Line</label>
+                    <select id="issueLine">
+                      <option value="">Semua line</option>
+                      <option value="1">Line 1</option>
+                      <option value="2">Line 2</option>
+                      <option value="4">Line 4</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="issueStage">Tahapan</label>
+                    <select id="issueStage">
+                      <option value="">Semua tahapan</option>
+                      <option value="filling">Filling</option>
+                      <option value="kemas">Kemas</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="issueShift">Shift</label>
+                    <select id="issueShift">
+                      <option value="all">Semua shift</option>
+                      <option value="1">Shift 1</option>
+                      <option value="2">Shift 2</option>
+                      <option value="3">Shift 3</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="issueMesin">Mesin</label>
+                    <select id="issueMesin">
+                      <option value="">Semua mesin</option>
+                      <option value="filling|1">F1 · Filling L1</option>
+                      <option value="filling|2">F2 · Filling L2</option>
+                      <option value="filling|4">F4 · Filling L4</option>
+                      <option value="kemas|1">K1 · Kemas L1</option>
+                      <option value="kemas|2">K2 · Kemas L2</option>
+                      <option value="kemas|4">K4 · Kemas L4</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="issueProduk">Produk</label>
+                    <select id="issueProduk"><option value="">Semua produk</option></select>
+                  </div>
+                  <button type="button" class="btn btn-primary btn-sm" id="issueApply">Terapkan</button>
+                  <button type="button" class="btn btn-ghost btn-sm" id="issueReset">Reset</button>
+                </div>
+

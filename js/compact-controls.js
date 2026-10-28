@@ -112,6 +112,98 @@
 
     const products = [1,2,3].map(i => $('#prodName' + i)?.value.trim()).filter(Boolean);
     setText('compactProductValue', products.length ? (products.length === 1 ? products[0] : `Produk ${products.length}`) : 'Produk');
+
+    const date = $('#fDate')?.value || '';
+    setText('shiftNavDateLabel', date ? Utils.formatDateText(date) : 'Pilih tanggal');
+    setText('shiftNavShiftLabel', `Shift ${shift}`);
+    setText('shiftNavStageLabel', stageBtn?.textContent?.trim() || (stage.charAt(0).toUpperCase() + stage.slice(1)));
+    $$('[data-nav-shift]').forEach(button => {
+      const selected = Number(button.getAttribute('data-nav-shift')) === shift;
+      button.classList.toggle('on', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+    $$('[data-nav-stage]').forEach(button => {
+      const selected = button.getAttribute('data-nav-stage') === stage;
+      button.classList.toggle('on', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+  }
+
+  function wireShiftNavigator() {
+    const trigger = $('#shiftIndicator');
+    const panel = $('#shiftNavigatorPanel');
+    if (!trigger || !panel) return;
+
+    const showView = (view) => {
+      panel.querySelectorAll('[data-shift-nav-view]').forEach(section => {
+        section.hidden = section.getAttribute('data-shift-nav-view') !== view;
+      });
+      if (view !== 'menu') {
+        positionPanel(trigger, panel);
+        panel.querySelector(`[data-shift-nav-view="${view}"] button:not(.compact-close)`)?.focus();
+      }
+    };
+
+    panel.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button || !panel.contains(button)) return;
+
+      const action = button.getAttribute('data-shift-nav-action');
+      if (action === 'shift' || action === 'stage') {
+        showView(action);
+        return;
+      }
+
+      if (button.classList.contains('shift-nav-back')) {
+        showView('menu');
+        panel.querySelector('[data-shift-nav-action="shift"]')?.focus();
+        return;
+      }
+
+      if (action === 'date') {
+        event.stopPropagation();
+        const dateInput = $('#shiftNavigatorDate');
+        const currentDate = $('#fDate')?.value || '';
+        if (!dateInput || typeof ProdWeek === 'undefined' || !ProdWeek.open) {
+          if (typeof UI !== 'undefined') UI.toast('Kalender tidak tersedia.', true, 'warn');
+          return;
+        }
+
+        dateInput.value = currentDate;
+        closeAll(null);
+        ProdWeek.open(dateInput, trigger, (date) => {
+          if (!date || typeof UI === 'undefined' || !UI.openRecord) return;
+          UI.openRecord({
+            date,
+            shift: State.evalShift + 1,
+            line: $('#fLine')?.value || '1',
+            stage: $('#fStage')?.value || 'filling',
+            stayOnScreen: true,
+          });
+        });
+        return;
+      }
+
+      const shift = button.getAttribute('data-nav-shift');
+      const stage = button.getAttribute('data-nav-stage');
+      if (shift === null && stage === null) return;
+
+      const date = $('#fDate')?.value || '';
+      if (!date) {
+        if (typeof UI !== 'undefined') UI.toast('Pilih tanggal terlebih dahulu.', true, 'warn');
+        return;
+      }
+      if (typeof UI === 'undefined' || !UI.openRecord) return;
+
+      closeAll(null);
+      UI.openRecord({
+        date,
+        shift: shift === null ? State.evalShift + 1 : Number(shift),
+        line: $('#fLine')?.value || '1',
+        stage: stage || $('#fStage')?.value || 'filling',
+        stayOnScreen: true,
+      });
+    });
   }
 
   function wireTriggers() {
@@ -136,7 +228,7 @@
     document.addEventListener('click', (e) => {
       // Jangan tutup panel Produk saat user klik item sugesti nama produk
       if (e.target.closest('.prod-suggest-drop, .kegiatan-suggest-drop, .bn-suggest-drop, .prod-suggest-item, .kegiatan-suggest-item, .bn-suggest-item')) return;
-      if (!e.target.closest('.compact-control') && !e.target.closest('.compact-popover')) closeAll(null);
+      if (!e.target.closest('.compact-control, .compact-trigger') && !e.target.closest('.compact-popover')) closeAll(null);
     });
 
     // Panel pilihan di-portal ke <body>, sehingga event delegation di
@@ -206,6 +298,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     if (!$('#sheetUnifiedControl')) return;
     wireTriggers();
+    wireShiftNavigator();
     syncSummary();
 
     // Popover diposisikan fixed saat dibuka agar tidak terpotong oleh

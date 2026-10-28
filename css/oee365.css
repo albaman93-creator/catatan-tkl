@@ -160,20 +160,26 @@
 }
 
 .oee365-result-row td {
-  background: rgba(255, 255, 255, 0.75) !important;
-  border-bottom: 2px solid #94a3b8;
+  background: #fff !important;
+  color: #374151 !important;
+  border-bottom: 2px solid #374151;
   padding-top: 14px;
   padding-bottom: 14px;
 }
 
 .oee365-val-result {
   font: 800 17px system-ui, sans-serif !important;
-  /* default = merah OEE standar; JS menimpa ke hijau jika ≥ target */
-  color: #f87171 !important;
+  color: inherit !important;
 }
 
-.oee365-val-result.is-good {
-  color: #2ee27e !important;
+.oee365-result-row.is-good td {
+  background: #16a34a !important;
+  color: #fff !important;
+}
+
+.oee365-result-row.is-bad td {
+  background: #dc2626 !important;
+  color: #fff !important;
 }
 
 .oee365-result-row .oee365-code {
@@ -252,12 +258,8 @@
   border-left-color: #64748b;
 }
 
-/* Tetap pakai warna OEE standar (jangan diganti putih tema gelap) */
 [data-theme="dark"] .oee365-val-result {
-  color: #f87171 !important;
-}
-[data-theme="dark"] .oee365-val-result.is-good {
-  color: #2ee27e !important;
+  color: inherit !important;
 }
 [data-theme="dark"] .oee365-val-accent {
   color: #f87171 !important;

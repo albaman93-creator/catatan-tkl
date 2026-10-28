@@ -101,15 +101,16 @@
 .sec[data-screen="oee365"] .oee365-formula {
   margin: 0.85rem 1rem 1rem;
   padding: 0.75rem 1rem;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
+  background: #161817; /* Warna latar hijau neon/lime muda */
+  border: 1px solid #080808; /* Warna garis tepi hijau */
   border-radius: 0.65rem;
   font-size: 0.8rem;
-  color: #166534;
+  color: #852006; /* Teks hijau tua pekat */
   line-height: 1.45;
 }
 
 .sec[data-screen="oee365"] .oee365-formula strong {
   display: block;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.35rem; /* Memberi sedikit jarak ekstra ke bawah */
+  color: #064e3b; 
 }

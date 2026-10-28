@@ -397,14 +397,12 @@ const Calculation = (() => {
     set365('o365F', Utils.nf2(a365) + ' %', a365 >= CONFIG.TARGET.AVAILABILITY ? 'var(--green-d)' : 'var(--red)');
     set365('o365P', Utils.nf2(avgPerfI) + ' %');
     set365('o365Q', Utils.nf2(M) + ' %');
-    // Warna sama dengan #oee (OEE standar): hijau #2ee27e / merah #f87171
-    const oee365Ok = oee365 >= (CONFIG.TARGET.OEE365 || 55);
-    const oee365Color = oee365Ok ? '#2ee27e' : '#f87171';
-    set365('oee365', Utils.nf2(oee365) + '%', oee365Color);
-    const oee365El = State.el.oee365 || document.getElementById('oee365');
-    if (oee365El) {
-      oee365El.classList.toggle('is-good', oee365Ok);
-      oee365El.style.setProperty('color', oee365Color, 'important');
+    set365('oee365', Utils.nf2(oee365) + '%');
+    const oee365Result = (State.el.oee365 || document.getElementById('oee365'))
+      ?.closest('.oee365-result-row');
+    if (oee365Result) {
+      oee365Result.classList.toggle('is-good', nShift > 0 && oee365 >= (CONFIG.TARGET.OEE365 || 55));
+      oee365Result.classList.toggle('is-bad', nShift > 0 && oee365 < (CONFIG.TARGET.OEE365 || 55));
     }
     if (State.el.rincSub365) {
       let note = '';

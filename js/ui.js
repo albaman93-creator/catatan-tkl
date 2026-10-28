@@ -521,9 +521,9 @@ const UI = (() => {
   };
 
   // ====== BUKA RECORD TERTENTU DI LOG SHEET (dipakai Weekly Dashboard) ======
-  // Mengisi filter tanggal / shift / line / tahapan lalu memuat data record itu
-  // dan pindah ke layar Log Sheet — sama seperti user mengganti filter manual.
-  const openRecord = async ({ date, shift, line, stage } = {}) => {
+  // Mengisi filter tanggal / shift / line / tahapan lalu memuat data record itu.
+  // Pemanggil bisa mempertahankan layar aktif untuk navigasi dari toolbar.
+  const openRecord = async ({ date, shift, line, stage, stayOnScreen = false } = {}) => {
     if (!date || !State.el.fDate || !State.el.fLine || !State.el.fStage) return false;
     // Amankan isi sheet yang sedang terbuka (auto-save lokal) sebelum diganti.
     try { if (typeof Storage !== 'undefined' && Storage.autoSaveLocal) Storage.autoSaveLocal(); } catch (e) {}
@@ -535,7 +535,7 @@ const UI = (() => {
     try { localStorage.setItem(CONFIG.EVAL_SHIFT_KEY, String(sh)); } catch (e) {}
     applyShiftUI(); applyLineUI(); applyStageUI();
     updateShiftIndicator(); updateUnifiedControl();
-    showScreen('logsheet');
+    if (!stayOnScreen) showScreen('logsheet');
     if (typeof Storage !== 'undefined' && Storage.loadRecord) await Storage.loadRecord();
     toast(`Log sheet ${formatSheetDate(date)} · Shift ${sh + 1} · Line ${State.el.fLine.value} · ${State.el.fStage.value}`);
     return true;
