@@ -184,8 +184,8 @@
 .weekly-layout .oee-apq-label { color: var(--wd-text-mute); }
 .weekly-layout .oee-apq-label span { color: var(--wd-text-dim); }
 .weekly-layout .oee-apq-val { color: var(--wd-text-strong); }
-:root[data-wd-theme="light"] .weekly-layout .oee-apq-item.over  .oee-apq-val { color: #15803d; }
-:root[data-wd-theme="light"] .weekly-layout .oee-apq-item.under .oee-apq-val { color: #dc2626; }
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .oee-apq-item.over  .oee-apq-val { color: #15803d; }
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .oee-apq-item.under .oee-apq-val { color: #dc2626; }
 
 .weekly-layout .oee-track { stroke: var(--wd-grid); }
 .weekly-layout .oee-fill-blue  { stroke: var(--wdt-gauge-ope); filter: var(--wdt-glow); }
@@ -205,7 +205,7 @@
 .weekly-layout .wk-label { color: var(--wd-text-dim); }
 .weekly-layout .wk-value { color: var(--wd-text-strong); }
 .weekly-layout .wk-value.small { color: var(--wd-text-mute); }
-:root[data-wd-theme="light"] .weekly-layout .wk-value.good { color: #15803d; }
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .wk-value.good { color: #15803d; }
 
 /* ---------- 4. KARTU RINGKASAN (wd-tot-card) ---------- */
 .weekly-layout .wd-tot-label { color: var(--wd-text-mute); }
@@ -312,17 +312,146 @@
 .weekly-layout .issue-table,
 .weekly-layout .rp-table { background-color: var(--wdt-td-bg); }
 
-:root[data-wd-theme="light"] .weekly-layout .issue-period-btn,
-:root[data-wd-theme="light"] .weekly-layout .issue-tab {
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .issue-period-btn,
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .issue-tab {
   background: #fff !important; border-color: #cfd9e5 !important; color: #334155 !important;
 }
-:root[data-wd-theme="light"] .weekly-layout .issue-period-btn.is-on,
-:root[data-wd-theme="light"] .weekly-layout .issue-tab.is-on {
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .issue-period-btn.is-on,
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .issue-tab.is-on {
   background: #2563eb !important; border-color: #2563eb !important; color: #fff !important;
 }
-:root[data-wd-theme="light"] .weekly-layout .issue-panel-title { color: #0f172a; }
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .issue-panel-title { color: #0f172a; }
 
-/* ---------- 8. SWITCH TEMA (matahari / bulan) ---------- */
+/* ---------- TEMA PINK (elegan, profesional, modern) ---------- */
+:root[data-wd-theme="pink"] {
+  --wd-bg:            #fdf3f7;
+  --wd-bg-side:       #ffffff;
+  --wd-card:          #ffffff;
+  --wd-card-2:        #fcebf2;
+  --wd-border:        #f0cfdd;
+  --wd-border-soft:   #f7e1ea;
+  --wd-text:          #4a2236;
+  --wd-text-strong:   #34101f;
+  --wd-text-mute:     #7a4a61;
+  --wd-text-dim:      #94677d;
+  --wd-text-faint:    #b08a9c;
+  --wd-hover:         #fbe6ee;
+  --wd-hover-2:       #f7d6e3;
+  --wd-accent:        #be185d;
+  --wd-accent-text:   #ffffff;
+  --wd-link:          #be185d;
+  --wd-grid:          #f3dbe5;
+  --wd-axis:          #8a5a72;
+  --wd-axis-soft:     #a47b90;
+  --wd-plot:          #ffffff;
+  --wd-stripe-a:      rgba(190, 24, 93, 0.04);
+  --wd-stripe-b:      rgba(252, 235, 242, 0.7);
+  --wd-row-hover:     rgba(190, 24, 93, 0.10);
+  --wd-hero-1:        #ffffff;
+  --wd-hero-2:        #fdeaf2;
+  --wd-hero-border:   #f0cfdd;
+  --wd-note-border:   #ecc3d4;
+  --wd-menu-bg:       #ffffff;
+  --wd-menu-border:   #f0cfdd;
+  --wd-menu-hover:    #fbe6ee;
+  --wd-chip-bg:       #fbe6ee;
+  --wd-chip-border:   #ecc3d4;
+  --wd-chip-text:     #5c2a43;
+  --wd-chip-hover:    #f7d6e3;
+  --wd-chip-on:       #be185d;
+  --wd-chip-on-bd:    #be185d;
+  --wd-chart-line:    #d6336c;
+  --wd-chart-line-lt: #be185d;
+  --wd-chart-green:   #8e3a8f;
+  --wd-chart-green-lt:#702a71;
+  --wd-chart-red:     #e11d48;
+  --wd-chart-red-lt:  #be123c;
+  --wd-chart-amber:   #c8963e;
+  --wd-chart-amber-lt:#a87a2c;
+  --wd-chart-cyan:    #f08fb3;
+  --wd-chart-cyan-lt: #d6336c;
+  --wd-oee-ope:       #d6336c;
+  --wd-oee-365:       #8e3a8f;
+  --wd-shadow:        0 12px 30px rgba(120, 30, 70, .16);
+
+  --wd-pica-open-bg:      #fee2e2;
+  --wd-pica-open-bd:      #fca5a5;
+  --wd-pica-open-fg:      #991b1b;
+  --wd-pica-progress-bg:  #fef3c7;
+  --wd-pica-progress-bd:  #fcd34d;
+  --wd-pica-progress-fg:  #92400e;
+  --wd-pica-closed-bg:    #dcfce7;
+  --wd-pica-closed-bd:    #86efac;
+  --wd-pica-closed-fg:    #166534;
+  --wd-pica-null:         #b9a3ae;
+
+  --wdt-page:         radial-gradient(900px 420px at 88% -10%, rgba(244, 143, 183, .28), transparent 62%),
+                      radial-gradient(700px 380px at 0% 100%, rgba(190, 24, 93, .07), transparent 60%),
+                      #fdf3f7;
+  --wdt-side:         linear-gradient(180deg, #ffffff 0%, #fff6fa 100%);
+  --wdt-panel:        #ffffff;
+  --wdt-panel-bd:     #f2d6e2;
+  --wdt-panel-sh:     0 1px 2px rgba(120, 30, 70, .05), 0 10px 24px -8px rgba(190, 24, 93, .14);
+  --wdt-inset:        #fff8fb;
+  --wdt-gauge-ope:    #d6336c;
+  --wdt-gauge-365:    #8e3a8f;
+  --wdt-glow:         none;
+  --wdt-input-bg:     #ffffff;
+  --wdt-input-bd:     #ecc3d4;
+  --wdt-input-tx:     #34101f;
+  --wdt-btn:          #be185d;
+  --wdt-btn-tx:       #ffffff;
+  --wdt-btn-hover:    #9d174d;
+  --wdt-shift-on:     linear-gradient(180deg, #ec4899 0%, #be185d 100%);
+  --wdt-nav-on-bg:    linear-gradient(90deg, #fbd5e5 0%, #fde6ef 100%);
+  --wdt-nav-on-fg:    #9d174d;
+  --wdt-hero-bar:     linear-gradient(180deg, #ec4899, #8e3a8f);
+  --wdt-th-bg:        #fcebf2;
+  --wdt-th-fg:        #5c2a43;
+  --wdt-td-bg:        #ffffff;
+  --wdt-td-bg2:       #fff7fa;
+  --wdt-td-fg:        #4a2236;
+  --wdt-td-bd:        #f5dde7;
+}
+
+:root[data-wd-theme="pink"] .weekly-layout .weekly-nav-item.is-active { box-shadow: inset 3px 0 0 #be185d; }
+:root[data-wd-theme="pink"] .weekly-layout .weekly-hero-badge {
+  background: linear-gradient(90deg, #be185d, #d6336c); color: #fff;
+}
+:root[data-wd-theme="pink"] .weekly-layout .issue-period-btn.is-on,
+:root[data-wd-theme="pink"] .weekly-layout .issue-tab.is-on {
+  background: #be185d !important; border-color: #be185d !important; color: #fff !important;
+}
+:root[data-wd-theme="pink"] .weekly-layout .speed-table td:last-child,
+:root[data-wd-theme="pink"] .weekly-layout .speed-table th { color: #9d174d; }
+
+/* Warna grafik (hardcode di JS) -> palet pink: biru→mawar, hijau→plum, amber→emas, cyan→pink muda */
+:root[data-wd-theme="pink"] .weekly-layout svg [fill="#3b82f6"]   { fill: #d6336c; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stroke="#3b82f6"] { stroke: #d6336c; }
+:root[data-wd-theme="pink"] .weekly-layout svg [fill="#22c55e"]   { fill: #8e3a8f; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stroke="#22c55e"] { stroke: #8e3a8f; }
+:root[data-wd-theme="pink"] .weekly-layout svg [fill="#f59e0b"]   { fill: #c8963e; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stroke="#f59e0b"] { stroke: #c8963e; }
+:root[data-wd-theme="pink"] .weekly-layout svg [fill="#22d3ee"]   { fill: #f08fb3; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stroke="#22d3ee"] { stroke: #f08fb3; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#3b82f6"],
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#93c5fd"] { stop-color: #f19ab8; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#22c55e"],
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#86efac"] { stop-color: #c77dc7; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#f59e0b"],
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#fcd34d"] { stop-color: #e6c27a; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#22d3ee"],
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#a5f3fc"] { stop-color: #f7c0d4; }
+:root[data-wd-theme="pink"] .weekly-layout .ot-dot.ot-blue,
+:root[data-wd-theme="pink"] .weekly-layout .ob-swatch.ob-lime { background: #d6336c; box-shadow: 0 0 0 3px rgba(214, 51, 108, .22); }
+:root[data-wd-theme="pink"] .weekly-layout .ot-dot.ot-green,
+:root[data-wd-theme="pink"] .weekly-layout .ob-swatch.ob-green { background: #8e3a8f; box-shadow: none; }
+:root[data-wd-theme="pink"] .weekly-layout .ot-dot.ot-green { box-shadow: 0 0 0 3px rgba(142, 58, 143, .22); }
+:root[data-wd-theme="pink"] .weekly-layout .ob-swatch.ob-amber { background: #c8963e; }
+:root[data-wd-theme="pink"] .weekly-layout .ob-swatch.ob-cyan  { background: #f08fb3; }
+:root[data-wd-theme="pink"] .weekly-layout .ob-swatch.ob-teal  { background: #8e3a8f; }
+
+/* ---------- 8. PEMILIH TEMA (terang / gelap / pink) ---------- */
 .weekly-topbar {
   display: flex;
   justify-content: flex-end;
@@ -332,49 +461,42 @@
 .wd-theme-switch {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 11px;
+  gap: 2px;
+  padding: 3px;
   border-radius: 999px;
   border: 1px solid var(--wdt-panel-bd);
   background: var(--wdt-panel);
   box-shadow: var(--wdt-panel-sh);
 }
-.wd-ts-ico {
-  width: 16px; height: 16px;
+.wd-tbtn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 26px; padding: 0 10px;
+  border: 0; border-radius: 999px;
+  background: transparent;
+  color: var(--wd-text-mute);
+  font: 600 11px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif);
+  cursor: pointer;
+  transition: background .18s, color .18s, box-shadow .18s;
+}
+.wd-tbtn:hover { background: var(--wd-hover); color: var(--wd-text-strong); }
+.wd-tbtn svg {
+  width: 14px; height: 14px; flex: none;
   fill: none; stroke: currentColor; stroke-width: 1.9;
   stroke-linecap: round; stroke-linejoin: round;
-  color: var(--wd-text-faint);
-  opacity: .55;
-  transition: color .2s, opacity .2s;
 }
-:root[data-wd-theme="light"] .wd-ts-sun  { color: #f59e0b; opacity: 1; }
-:root[data-wd-theme="dark"]  .wd-ts-moon { color: #8ec9ff; opacity: 1; }
+.wd-tbtn[data-wd-mode="light"] svg { color: #f59e0b; }
+.wd-tbtn[data-wd-mode="dark"]  svg { color: #7cb7ff; }
+.wd-tbtn[data-wd-mode="pink"]  svg { color: #ec4899; fill: rgba(236, 72, 153, .25); }
+.wd-tbtn[aria-checked="true"] {
+  background: var(--wd-hover-2);
+  color: var(--wd-text-strong);
+  box-shadow: inset 0 0 0 1px var(--wdt-panel-bd);
+}
+.wd-tbtn:focus-visible { outline: 2px solid var(--wd-link); outline-offset: 1px; }
 
-.wd-switch {
-  position: relative;
-  width: 40px; height: 22px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: #cbd5e1;
-  cursor: pointer;
-  transition: background .2s;
-}
-.wd-switch[aria-checked="true"] { background: var(--wdt-switch-on); }
-.wd-switch-knob {
-  position: absolute; top: 3px; left: 3px;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .35);
-  transition: transform .2s cubic-bezier(.3, .8, .3, 1);
-}
-.wd-switch[aria-checked="true"] .wd-switch-knob { transform: translateX(18px); }
-.wd-switch:focus-visible { outline: 2px solid var(--wd-link); outline-offset: 2px; }
+@media (max-width: 560px) { .wd-tbtn span { display: none; } .wd-tbtn { padding: 0 9px; } }
+@media (prefers-reduced-motion: reduce) { .wd-tbtn { transition: none; } }
+@media print { .weekly-topbar { display: none; } }
 
-@media (prefers-reduced-motion: reduce) {
-  .wd-switch, .wd-switch-knob, .wd-ts-ico { transition: none; }
-}
-@media print {
-  .weekly-topbar { display: none; }
-}
+:root[data-wd-theme="pink"] .weekly-layout .weekly-brand-icon { color: #be185d; background: #fde6ef; border-color: #f5c6d9; }
+:root[data-wd-theme="pink"] .weekly-layout .weekly-brand-icon svg { stroke: #be185d; }
