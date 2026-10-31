@@ -93,7 +93,7 @@ const CONFIG = Object.freeze({
 
   // ====== LABEL KOLOM (untuk indikator posisi) ======
   FIELD_LABELS: {
-    kode: 'KODE', op: 'OP', ms: 'MINOR STOP (x)', mulai: 'JAM MULAI', panggil: 'PANGGIL TEKNIK',
+    kode: 'KODE', op: 'MAN POWER', ms: 'FREKUENSI MINOR STOP (x)', mulai: 'JAM MULAI', panggil: 'PANGGIL TEKNIK',
     teknik: 'TEKNIK DATANG', selesai: 'JAM SELESAI', durasi: 'DURASI (MENIT)',
     kegiatan: 'KEGIATAN',
     masalah: 'MASALAH', disposisi: 'DISPOSISI', description: 'DESCRIPTION',

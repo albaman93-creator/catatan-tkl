@@ -94,7 +94,10 @@ const ProdWeek = (() => {
 
     document.addEventListener('click', (e) => {
       if (!popup || popup.hidden) return;
-      if (popup.contains(e.target)) return;
+      // render() mengganti innerHTML → e.target (tombol ‹ ›) sudah lepas dari DOM,
+      // sehingga popup.contains() salah mengira klik di luar. Pakai composedPath.
+      const path = typeof e.composedPath === 'function' ? e.composedPath() : [];
+      if (path.includes(popup) || popup.contains(e.target)) return;
       if (e.target.closest('[data-prod-week-trigger], #sheetDateTrigger, #fDate')) return;
       close();
     });
@@ -167,7 +170,8 @@ const ProdWeek = (() => {
       </div>`;
 
     el.querySelectorAll('[data-nav]').forEach((btn) => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
         const dir = Number(btn.getAttribute('data-nav'));
         viewMonth += dir;
         if (viewMonth < 0) { viewMonth = 11; viewYear--; }

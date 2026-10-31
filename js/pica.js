@@ -321,7 +321,7 @@ const Pica = (() => {
     const body = $('msBody');
     if (!body) return;
     if (!listMs.length) {
-      body.innerHTML = '<tr><td colspan="15">Belum ada minor stop — isi kolom <b>MS</b> (angka) di log sheet, lalu buka lagi halaman ini.</td></tr>';
+      body.innerHTML = '<tr><td colspan="15">Belum ada minor stop — isi kolom <b>Frekuensi Minor Stop</b> (angka) di log sheet, lalu buka lagi halaman ini.</td></tr>';
       return;
     }
     body.innerHTML = listMs.map((p, i) => {
@@ -483,8 +483,13 @@ const Pica = (() => {
         why1: $('picaWhy1').value.trim(), why2: $('picaWhy2').value.trim(), why3: $('picaWhy3').value.trim(),
         corrective: $('picaCorrective').value.trim(), preventive: $('picaPreventive').value.trim(),
         pic: $('picaPic').value.trim(), status: $('picaStatus').value || 'Open',
+        source: 'app',
       };
-      const { error } = await c.from('pica_analysis').upsert(rec, { onConflict: 'rec_date,shift,line,tahapan,row_key' });
+      let { error } = await c.from('pica_analysis').upsert(rec, { onConflict: 'rec_date,shift,line,tahapan,row_key' });
+      if (error && /source/i.test(error.message || '')) { // kolom `source` belum ada → ulangi tanpa kolom itu
+        delete rec.source;
+        ({ error } = await c.from('pica_analysis').upsert(rec, { onConflict: 'rec_date,shift,line,tahapan,row_key' }));
+      }
       if (error) throw error;
       analysis[fullKey(p)] = rec;
       renderBdTable(); closeForm();
@@ -503,7 +508,7 @@ const Pica = (() => {
     if (!st) return;
     const n = listMs.length;
     const f = listMs.reduce((s, p) => s + (p.freq || 1), 0);
-    st.textContent = n ? `✓ ${n} problem minor · total frekuensi ${f} (dari kolom MS di sheet)` : 'Belum ada minor — isi kolom MS (angka) di log sheet';
+    st.textContent = n ? `✓ ${n} problem minor · total frekuensi ${f} (dari kolom Frekuensi Minor Stop di sheet)` : 'Belum ada minor — isi kolom Frekuensi Minor Stop (angka) di log sheet';
     st.className = 'oee-filter-status';
   };
 

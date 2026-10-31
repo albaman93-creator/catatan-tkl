@@ -33,6 +33,12 @@ const Storage = (() => {
     return `${date}|S${State.evalShift + 1}|L${State.el.fLine.value}|${State.el.fStage.value}`;
   };
 
+  // Baca teks elemen hasil hitung; aman jika elemen tidak ada (tidak melempar error)
+  const txtOf = (id) => {
+    const el = State.el[id] || document.getElementById(id);
+    return el ? el.textContent : '0';
+  };
+
   const labelFilter = () => {
     const rawDate = State.el.fDate.value || Utils.todayLocal();
     return `${Utils.formatDateText(rawDate)} · Shift ${State.evalShift + 1} · Line ${State.el.fLine.value} · ${State.el.fStage.value.toUpperCase()}`;
@@ -80,10 +86,13 @@ const Storage = (() => {
     },
     // Jumlah TKL hasil input manual disimpan sebagai bagian dari record Sheet.
     summary: {
-      availability: State.el.oF.textContent,
-      performance:  State.el.oITotal.textContent,
-      quality:      State.el.oM.textContent,
-      oee:          State.el.oee.textContent,
+      availability: txtOf('oF'),
+      performance:  txtOf('oITotal'),
+      quality:      txtOf('oM'),
+      oee:          txtOf('oee'),
+      ope:    (State.lastCalc && State.lastCalc.ope) || null,
+      oee365: (State.lastCalc && State.lastCalc.oee365) || null,
+      produk: (State.lastCalc && State.lastCalc.produk) || [],
     },
     rows: Rows.rows().map(tr => {
       const g = (f) => { const el = tr.querySelector(`[data-f="${f}"]`); return el ? el.value : ''; };
@@ -206,6 +215,12 @@ const Storage = (() => {
     Calculation.validateAllTimeInputs();
     UI.updateEditChip(d);
 
+    // Record hasil input dari Google Sheets belum punya ringkasan OEE → hitung ulang (recalc di atas)
+    // lalu simpan balik otomatis supaya Supabase & Spreadsheet ikut terisi.
+    if (d && d.meta && d.meta.needsRecalc) {
+      setTimeout(() => { saveData({ silent: true }).catch(() => {}); }, 400);
+    }
+
     // Kalau Mode Form sedang aktif, sinkronkan kartu form ke baris pertama
     // dari data yang baru saja dimuat (data tabel baru saja diganti total).
     if (typeof FormMode !== 'undefined' && State.el.formPanel && !State.el.formPanel.hidden) {
@@ -260,6 +275,7 @@ const Storage = (() => {
       payload: rec,
       updatedAt: new Date().toISOString(),
       schemaVersion: CONFIG.SCHEMA_VERSION || 1,
+      source: 'app', // dibedakan dari input via Google Sheets (source = 'sheet')
 
       availability: parseIdNumber(rec.summary && rec.summary.availability),
       performance:  parseIdNumber(rec.summary && rec.summary.performance),
@@ -484,7 +500,7 @@ const Storage = (() => {
     const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
     const head = [
       'No', 'Tanggal', 'Shift', 'Line', 'Tahapan',
-      'Kode', 'OP', 'Mulai', 'Panggil', 'Teknik', 'Selesai', 'Durasi',
+      'Kode', 'Man Power', 'Mulai', 'Panggil', 'Teknik', 'Selesai', 'Durasi',
       'Kegiatan', 'Masalah', 'Disposisi', 'WO', 'Produk', 'Good', 'Defect',
       'Availability%', 'Performance%', 'Quality%', 'OEE%',
     ];

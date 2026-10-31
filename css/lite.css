@@ -1,0 +1,31 @@
+/* =====================================================
+   MODE RINGAN — matikan efek paling berat untuk GPU/CPU
+   (blur kaca, filter, animasi tanpa henti, background fixed).
+   Aktif otomatis di perangkat dengan ≤4 core / RAM ≤4 GB,
+   atau manual lewat tombol di footer / ?lite=1.
+   ===================================================== */
+html.lite *, html.lite *::before, html.lite *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+  animation-duration: .001s !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .001s !important;
+  transition-delay: 0s !important;
+}
+html.lite { scroll-behavior: auto !important; }
+html.lite body {
+  background: linear-gradient(180deg, #f4faff 0%, #e9f2f7 48%, #e1ece4 100%) !important;
+  background-attachment: scroll !important;
+}
+
+/* Layar login: animasi (bintang, api unggun, sayap) dijeda saat sudah login, jalan lagi saat logout */
+#loginOverlay.hide, #loginOverlay.hide * { animation-play-state: paused !important; }
+
+/* Tombol pengalih Mode Ringan */
+.lite-toggle {
+  font: inherit; font-size: 11px; padding: 3px 9px; border-radius: 999px; cursor: pointer;
+  border: 1px solid rgba(100, 116, 139, .45); background: rgba(255, 255, 255, .7); color: #334155;
+}
+.lite-toggle:hover { background: #fff; }

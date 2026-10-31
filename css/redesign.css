@@ -783,7 +783,7 @@ body .log tfoot tr { background: var(--slate-50); }
 /* kolom teks panjang tidak boleh terpotong per huruf */
 body .log col.col-masalah, body .log th.col-masalah, body .log td.col-masalah { min-width: 120px; }
 body .log col.col-disposisi, body .log th.col-disposisi, body .log td.col-disposisi { min-width: 120px; }
-body .log th.col-ms, body .log td.col-ms { min-width: 44px; }
+body .log th.col-ms, body .log td.col-ms { min-width: 66px; }
 body .log col.col-desc, body .log th.col-desc, body .log td.col-desc { min-width: 140px; }
 body .log td.col-ms .in { text-align: center; }
 

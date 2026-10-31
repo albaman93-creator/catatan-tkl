@@ -69,6 +69,7 @@
   <link rel="stylesheet" href="./css/profile-avatar.css">
   <link rel="stylesheet" href="./css/weekly-theme.css">
   <link rel="stylesheet" href="./css/login-pro.css">
+  <link rel="stylesheet" href="./css/lite.css">
 
 
   <!-- Supabase SDK -->
@@ -141,6 +142,7 @@
   
 
 </style>
+<script src="./js/lite.js"></script>
 </head>
 <body>
 
@@ -1260,7 +1262,7 @@
             <div class="col-toggle-bar" id="colToggleBar" hidden>
               <label><input type="checkbox" data-col="col-num" checked> #</label>
               <label><input type="checkbox" data-col="col-kode" checked> Kode</label>
-              <label><input type="checkbox" data-col="col-op" checked> OP</label>
+              <label><input type="checkbox" data-col="col-op" checked> Man Power</label>
               <label><input type="checkbox" data-col="col-mulai" checked> Jam Mulai</label>
               <label><input type="checkbox" data-col="col-panggil" checked> Panggil Teknik</label>
               <label><input type="checkbox" data-col="col-teknik" checked> Teknik Datang</label>
@@ -1268,7 +1270,7 @@
               <label><input type="checkbox" data-col="col-durasi" checked> Durasi</label>
               <label><input type="checkbox" data-col="col-kegiatan" checked> Kegiatan</label>
               <label><input type="checkbox" data-col="col-masalah" checked> Masalah</label>
-              <label><input type="checkbox" data-col="col-ms" checked> MS</label>
+              <label><input type="checkbox" data-col="col-ms" checked> Frekuensi Minor Stop</label>
               <label><input type="checkbox" data-col="col-disposisi" checked> Disposisi</label>
               <label><input type="checkbox" data-col="col-desc" checked> Description</label>
               <label><input type="checkbox" data-col="col-wo" checked> No. WO</label>
@@ -1402,7 +1404,7 @@
                   Kode
                   <button type="button" class="th-bulk-btn" data-bulk-col="kode" title="Isi Kode masal (notepad)">📥</button>
                 </th>
-                <th class="col-op" rowspan="2" title="Jumlah orang (man power) per baris — dipakai hitung rate Kemas L1/L2">OP</th>
+                <th class="col-op" rowspan="2" title="Jumlah orang (man power) per baris — dipakai hitung rate Kemas L1/L2">Man<br>Power</th>
                 <th class="col-mulai" rowspan="2">
                   Mulai
                   <button type="button" class="th-bulk-btn" data-bulk-col="mulai" title="Isi Jam Mulai masal (notepad)">📥</button>
@@ -1422,7 +1424,7 @@
                   <button type="button" class="th-bulk-btn" data-bulk-col="kegiatan" title="Isi Kegiatan masal (notepad)">📥</button>
                 </th>
                 <th class="col-masalah" rowspan="2">Masalah</th>
-                <th class="col-ms" rowspan="2" title="Minor Stop — isi angka frekuensi (kali) pada baris ini">MS</th>
+                <th class="col-ms" rowspan="2" title="Minor Stop — isi angka frekuensi (kali) pada baris ini">Frekuensi<br>Minor Stop</th>
                 <th class="col-disposisi" rowspan="2">Disposisi</th>
                 <th class="col-desc" rowspan="2" title="Keterangan bebas operator (downtime, trial, catatan acak)">Description</th>
                 <th class="col-wo" rowspan="2">WO</th>
@@ -1596,6 +1598,10 @@
   </tbody>
 </table>
         </div>
+        <!-- Total gabungan Quality (J/K/L/M) — diisi calculation.js, dibaca storage.js/ui.js/whatsapp.js -->
+        <span hidden aria-hidden="true">
+          <span id="oJ">0</span><span id="oK">0</span><span id="oL">0</span><span id="oM">0,00</span>
+        </span>
         <div class="diag" id="diag"></div>
       </section>
 
@@ -2955,6 +2961,7 @@
   <script src="./js/profile-avatar.js"></script>
   <script src="./js/prod-week.js"></script>
   <script src="./js/app.js"></script>
+  <script src="./js/backfill.js"></script>
   <script src="./js/sheet-op-sync.js"></script>
   <script src="./js/sheet-mesin-sync.js"></script>
   <script src="./js/compact-controls.js"></script>

@@ -9,7 +9,7 @@ const PhotoImport = (() => {
 
   const FIELDS = [
     { key: 'kode', label: 'Kode', width: '44px' },
-    { key: 'op', label: 'OP', width: '44px' },
+    { key: 'op', label: 'Man Power', width: '60px' },
     { key: 'mulai', label: 'Mulai', width: '64px' },
     { key: 'panggil', label: 'Panggil', width: '64px' },
     { key: 'teknik', label: 'Teknik', width: '64px' },

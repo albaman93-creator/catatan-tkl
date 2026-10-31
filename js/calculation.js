@@ -362,6 +362,16 @@ const Calculation = (() => {
     const M = avgM; // ← dipakai rumus OEE & OEE 365 di bawah
     const J = sumJ; // ← dipakai diagnostik di bawah
 
+    // Tulis total gabungan ke elemen agregat (oJ/oK/oL/oM) — dibaca saat SIMPAN & KPI sheet
+    const setAgg = (id, txt) => {
+      const el = State.el[id] || document.getElementById(id);
+      if (el) { State.el[id] = el; el.textContent = txt; }
+    };
+    setAgg('oJ', Utils.nf0(sumJ));
+    setAgg('oK', Utils.nf0(sumK));
+    setAgg('oL', Utils.nf0(sumL));
+    setAgg('oM', Utils.nf2(avgM));
+
     // === OEE standar (Availability = E/C vs waktu terencana) ===
     const oee = sF * avgPerfI * M / 10000;
     const oeeEl = State.el.oee;
@@ -389,6 +399,30 @@ const Calculation = (() => {
     const a365 = a365Base > 0 ? (sE / a365Base) * 100 : 0;
     const hasAvailability365Data = hasShiftData && a365Base > 0;
     const oee365 = a365 * avgPerfI * M / 10000;
+
+    // Ringkasan lengkap (OPE, OEE 365, tabel per produk) → ikut disimpan di payload.summary
+    // dan dipakai sinkron Google Sheets (tab "ringkasan shift" & "ringkasan produk").
+    const r2 = (v) => Math.round((Number(v) || 0) * 100) / 100;
+    State.lastCalc = {
+      ope:    { a: r2(hasAvailabilityData ? sF : 0), p: r2(avgPerfI), q: r2(M), oee: r2(oee) },
+      oee365: { a: r2(hasAvailability365Data ? a365 : 0), p: r2(avgPerfI), q: r2(M), oee: r2(oee365) },
+      produk: [0, 1, 2]
+        .filter((i) => {
+          const st = prodStats[i];
+          return pLabels[i] && (st.dur > 0 || st.actual > 0 || st.target > 0 || st.rate > 0 || st.planned > 0 || st.unplanned > 0);
+        })
+        .map((i) => {
+          const st = prodStats[i];
+          const tgt = st.target > 0 ? st.target : (st.dur * st.rate);
+          return {
+            nama: pLabels[i],
+            waktuShift: r2(st.dur + st.planned + st.unplanned),
+            operasional: r2(st.dur), planned: r2(st.planned), unplanned: r2(st.unplanned),
+            speedStd: r2(st.rate), outputStd: r2(tgt), outputAktual: r2(st.actual),
+            outputBaik: r2(st.good), outputDefect: r2(st.defect),
+          };
+        }),
+    };
 
     const set365 = (key, text, color) => {
       let el = State.el[key];

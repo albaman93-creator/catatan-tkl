@@ -321,6 +321,7 @@
     window.visualViewport?.addEventListener('scroll', repositionOpen, { passive: true });
 
     // Field asli dapat diubah oleh Storage/app tanpa event.
-    setInterval(syncSummary, 700);
+    if (typeof Perf !== 'undefined') Perf.every(700, syncSummary); // berhenti saat tab disembunyikan
+    else setInterval(syncSummary, 700);
   });
 })();

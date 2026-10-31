@@ -429,7 +429,7 @@ const CsvImport = (() => {
           <div id="csvImportPreview" style="overflow:auto;max-height:320px;border:1px solid #1e3a5f;border-radius:8px;display:none">
             <table class="pica-table" style="width:100%;font-size:11.5px">
               <thead><tr>
-                <th>Shift</th><th>Mulai</th><th>Selesai</th><th>Dur</th><th>Kode</th><th>Kegiatan</th><th>OP</th><th>Good</th><th>Defect</th><th>Desc</th>
+                <th>Shift</th><th>Mulai</th><th>Selesai</th><th>Dur</th><th>Kode</th><th>Kegiatan</th><th>Man Power</th><th>Good</th><th>Defect</th><th>Desc</th>
               </tr></thead>
               <tbody id="csvImportBody"></tbody>
             </table>
