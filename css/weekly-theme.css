@@ -6,74 +6,126 @@
    Warna SVG grafik (hardcode di JS) ditimpa lewat selector atribut.
    ========================================================================= */
 
-/* ---------- 1. TOKEN ---------- */
+/* =========================================================================
+   1. DARK / DEFAULT THEME TOKENS — PREMIUM MODERN GLASSMORPHISM
+   ========================================================================= */
+:root,
 :root[data-wd-theme="dark"] {
-  --wd-bg:            #071426;
-  --wd-bg-side:       #08182f;
-  --wd-card:          #0e2545;
-  --wd-card-2:        #0a1d3a;
-  --wd-border:        #234777;
-  --wd-border-soft:   #14305a;
-  --wd-text:          #d6e3f7;
-  --wd-text-strong:   #f4f8ff;
-  --wd-text-mute:     #8fa9cc;
-  --wd-text-dim:      #7893b8;
-  --wd-text-faint:    #5f7ca3;
-  --wd-hover:         #102c52;
-  --wd-hover-2:       #17396a;
-  --wd-accent:        #2a6df4;
-  --wd-accent-text:   #ffffff;
-  --wd-link:          #5eb4ff;
-  --wd-grid:          #1b3a66;
-  --wd-axis:          #8fa9cc;
-  --wd-axis-soft:     #6f8cb3;
-  --wd-plot:          #071426;
-  --wd-stripe-a:      rgba(42, 109, 244, .07);
-  --wd-stripe-b:      rgba(7, 20, 38, .45);
-  --wd-row-hover:     rgba(42, 109, 244, .22);
-  --wd-hero-1:        #0b2142;
-  --wd-hero-2:        #0d2d5a;
-  --wd-hero-border:   #234777;
-  --wd-note-border:   #2d5088;
-  --wd-menu-bg:       #0c2243;
-  --wd-menu-border:   #234777;
-  --wd-menu-hover:    #123260;
-  --wd-chip-bg:       #0e2a4d;
-  --wd-chip-border:   #234777;
-  --wd-chip-text:     #cfe0f7;
-  --wd-chip-hover:    #123260;
-  --wd-oee-ope:       #2ee6a6;
-  --wd-oee-365:       #38bdf8;
-  --wd-shadow:        0 14px 34px rgba(0, 5, 20, .55);
+  /* Base & Surfaces (Deep Navy / Charcoal + Translucent Glass) */
+  --wd-bg:            #060b16;
+  --wd-bg-side:       rgba(10, 18, 34, 0.78);
+  --wd-card:          rgba(15, 25, 45, 0.65);
+  --wd-card-2:        rgba(12, 20, 38, 0.55);
 
-  --wdt-page:         radial-gradient(1000px 460px at 80% -8%, rgba(40, 120, 220, .24), transparent 62%),
-                      radial-gradient(760px 420px at 6% 100%, rgba(20, 184, 166, .11), transparent 60%),
-                      #071426;
-  --wdt-side:         linear-gradient(180deg, #0a2142 0%, #071a34 100%);
-  --wdt-panel:        linear-gradient(180deg, rgba(20, 52, 100, .72) 0%, rgba(10, 31, 62, .74) 100%);
-  --wdt-panel-bd:     rgba(70, 135, 225, .30);
-  --wdt-panel-sh:     0 10px 28px rgba(0, 8, 24, .45), inset 0 1px 0 rgba(140, 190, 255, .08);
-  --wdt-inset:        rgba(6, 18, 36, .55);
-  --wdt-gauge-ope:    #2ee6a6;
-  --wdt-gauge-365:    #2dd4bf;
-  --wdt-glow:         drop-shadow(0 0 6px rgba(46, 230, 166, .55));
-  --wdt-input-bg:     #0a1d3a;
-  --wdt-input-bd:     #26497d;
-  --wdt-input-tx:     #e4eeff;
-  --wdt-btn:          #14b8a6;
-  --wdt-btn-tx:       #031a18;
-  --wdt-btn-hover:    #2dd4bf;
-  --wdt-shift-on:     linear-gradient(180deg, #38a9ff 0%, #1f6feb 100%);
-  --wdt-nav-on-bg:    linear-gradient(90deg, #2a6df4 0%, #1f5bd8 100%);
-  --wdt-nav-on-fg:    #ffffff;
-  --wdt-hero-bar:     linear-gradient(180deg, #2ee6a6, #3b82f6);
+  /* Glass Borders (Thin Semi-Transparent White/Cyan) */
+  --wd-border:        rgba(255, 255, 255, 0.12);
+  --wd-border-soft:   rgba(255, 255, 255, 0.07);
+  --wd-note-border:   rgba(56, 189, 248, 0.28);
+
+  /* High-Contrast Typography */
+  --wd-text:          #e2e8f0;
+  --wd-text-strong:   #f8fafc;
+  --wd-text-mute:     #94a3b8;
+  --wd-text-dim:      #64748b;
+  --wd-text-faint:    #475569;
+
+  /* Interactive Hover States */
+  --wd-hover:         rgba(56, 189, 248, 0.08);
+  --wd-hover-2:       rgba(56, 189, 248, 0.15);
+
+  /* Primary Accents (Electric Blue / Cyan-Teal) */
+  --wd-accent:        #0ea5e9;
+  --wd-accent-text:   #ffffff;
+  --wd-link:          #38bdf8;
+
+  /* Hero Banner (Electric Blue to Violet/Purple Accent) */
+  --wd-hero-1:        rgba(15, 28, 55, 0.72);
+  --wd-hero-2:        rgba(38, 22, 68, 0.68);
+  --wd-hero-border:   rgba(139, 92, 246, 0.28);
+
+  /* Context Menu / Speed Menu */
+  --wd-menu-bg:       rgba(12, 20, 38, 0.88);
+  --wd-menu-border:   rgba(255, 255, 255, 0.14);
+  --wd-menu-hover:    rgba(56, 189, 248, 0.16);
+
+  /* Filter Chips */
+  --wd-chip-bg:       rgba(15, 26, 48, 0.65);
+  --wd-chip-border:   rgba(255, 255, 255, 0.11);
+  --wd-chip-text:     #cbd5e1;
+  --wd-chip-hover:    rgba(56, 189, 248, 0.14);
+  --wd-chip-on:       #0ea5e9;
+  --wd-chip-on-bd:    #38bdf8;
+
+  /* Natural Depth Shadow */
+  --wd-shadow:        0 12px 32px -4px rgba(2, 6, 23, 0.65),
+                      0 4px 12px -2px rgba(2, 6, 23, 0.45);
+
+  /* Grid, Axis & Table Striping */
+  --wd-grid:          rgba(148, 163, 184, 0.14);
+  --wd-axis:          #94a3b8;
+  --wd-axis-soft:     #64748b;
+  --wd-plot:          rgba(6, 11, 22, 0.45);
+  --wd-stripe-a:      rgba(255, 255, 255, 0.02);
+  --wd-stripe-b:      rgba(6, 11, 22, 0.35);
+  --wd-row-hover:     rgba(14, 165, 233, 0.14);
+
+  /* Semantic & Chart Colors (High Contrast, Non-Neon) */
+  --wd-oee-ope:        #2dd4bf; /* Cyan-Teal */
+  --wd-oee-365:        #38bdf8; /* Electric Sky Blue */
+  --wd-chart-line:     #38bdf8;
+  --wd-chart-line-lt:  #7dd3fc;
+  --wd-chart-green:    #10b981; /* Good / Closed */
+  --wd-chart-green-lt: #34d399;
+  --wd-chart-amber:    #f59e0b; /* Progress / Warning */
+  --wd-chart-amber-lt: #fbbf24;
+  --wd-chart-red:      #f43f5e; /* Breakdown / Open / Issue */
+  --wd-chart-red-lt:   #fb7185;
+  --wd-chart-cyan:     #06b6d4;
+  --wd-chart-cyan-lt:  #22d3ee;
+
+  /* Status PICA Semantic Tokens */
+  --wd-pica-open-bg:     rgba(244, 63, 94, 0.16);
+  --wd-pica-open-bd:     rgba(244, 63, 94, 0.40);
+  --wd-pica-open-fg:     #fda4af;
+  --wd-pica-progress-bg: rgba(245, 158, 11, 0.16);
+  --wd-pica-progress-bd: rgba(245, 158, 11, 0.40);
+  --wd-pica-progress-fg: #fcd34d;
+  --wd-pica-closed-bg:   rgba(16, 185, 129, 0.16);
+  --wd-pica-closed-bd:   rgba(16, 185, 129, 0.40);
+  --wd-pica-closed-fg:   #6ee7b7;
+  --wd-pica-null:        #64748b;
+
+  /* Extended Theme Tokens (--wdt-*) untuk kompatibilitas weekly-theme.css */
+  --wdt-page:         radial-gradient(960px 480px at 85% -5%, rgba(14, 165, 233, 0.16), transparent 65%),
+                      radial-gradient(800px 440px at 10% 105%, rgba(139, 92, 246, 0.12), transparent 65%),
+                      radial-gradient(650px 380px at 50% 40%, rgba(20, 184, 166, 0.06), transparent 70%),
+                      linear-gradient(180deg, #060b16 0%, #091122 100%);
+  --wdt-side:         linear-gradient(180deg, rgba(12, 21, 40, 0.84) 0%, rgba(7, 13, 26, 0.90) 100%);
+  --wdt-panel:        linear-gradient(165deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 35%, rgba(13, 23, 42, 0.68) 100%);
+  --wdt-panel-bd:     rgba(255, 255, 255, 0.11);
+  --wdt-panel-sh:     0 10px 28px -4px rgba(2, 6, 23, 0.55),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  --wdt-inset:        rgba(6, 11, 22, 0.55);
+  --wdt-gauge-ope:    #2dd4bf;
+  --wdt-gauge-365:    #38bdf8;
+  --wdt-glow:         drop-shadow(0 0 5px rgba(45, 212, 191, 0.35));
+  --wdt-input-bg:     rgba(10, 18, 34, 0.75);
+  --wdt-input-bd:     rgba(255, 255, 255, 0.14);
+  --wdt-input-tx:     #f1f5f9;
+  --wdt-btn:          #0ea5e9;
+  --wdt-btn-tx:       #ffffff;
+  --wdt-btn-hover:    #38bdf8;
+  --wdt-shift-on:     linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  --wdt-nav-on-bg:    linear-gradient(90deg, rgba(14, 165, 233, 0.24) 0%, rgba(139, 92, 246, 0.14) 100%);
+  --wdt-nav-on-fg:    #f8fafc;
+  --wdt-hero-bar:     linear-gradient(180deg, #2dd4bf 0%, #0ea5e9 50%, #8b5cf6 100%);
   --wdt-switch-on:    #14b8a6;
-  --wdt-th-bg:        #0f2a4f;
-  --wdt-th-fg:        #cfe0f7;
-  --wdt-td-bg:        #0c2243;
-  --wdt-td-bg2:       #0f2a50;
-  --wdt-td-fg:        #dbe7fb;
-  --wdt-td-bd:        rgba(70, 135, 225, .18);
+  --wdt-th-bg:        rgba(15, 26, 48, 0.88);
+  --wdt-th-fg:        #e2e8f0;
+  --wdt-td-bg:        rgba(10, 18, 34, 0.60);
+  --wdt-td-bg2:       rgba(14, 24, 44, 0.65);
+  --wdt-td-fg:        #e2e8f0;
+  --wdt-td-bd:        rgba(255, 255, 255, 0.08);
 }
 
 :root[data-wd-theme="light"] {
@@ -500,3 +552,135 @@
 
 :root[data-wd-theme="pink"] .weekly-layout .weekly-brand-icon { color: #be185d; background: #fde6ef; border-color: #f5c6d9; }
 :root[data-wd-theme="pink"] .weekly-layout .weekly-brand-icon svg { stroke: #be185d; }
+
+/* =========================================================================
+   2. GLASSMORPHISM SURFACES & SOLID FALLBACK (DARK THEME ONLY)
+   ========================================================================= */
+
+/* --- A. Solid Fallback (Browser tanpa dukungan backdrop-filter) --- */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-sidebar {
+  background: #0a1222;
+  border-right: 1px solid var(--wd-border);
+}
+
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-card,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-panel,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-trend-card,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-bar-card {
+  background: #0f192d;
+  border: 1px solid var(--wd-border);
+  box-shadow: var(--wd-shadow);
+}
+
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-hero {
+  background: linear-gradient(135deg, #0f1c37 0%, #20153d 100%);
+  border: 1px solid var(--wd-hero-border);
+  box-shadow: var(--wd-shadow);
+}
+
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .speed-menu,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .pica-modal {
+  background: #0d1629;
+  border: 1px solid var(--wd-menu-border);
+  box-shadow: 0 20px 45px rgba(2, 6, 23, 0.78);
+}
+
+/* --- B. Progressive Enhancement: Modern Glassmorphism --- */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+
+  /* 1. Sidebar Glass */
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-sidebar {
+    background: linear-gradient(
+      180deg,
+      rgba(15, 25, 45, 0.78) 0%,
+      rgba(8, 14, 28, 0.86) 100%
+    );
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid rgba(255, 255, 255, 0.09);
+    box-shadow: 4px 0 24px rgba(2, 6, 23, 0.45);
+  }
+
+  /* 2. Kartu Utama, Panel OEE & Kartu Total KPI */
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-card,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-panel,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-trend-card,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-bar-card {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0) 42%),
+      var(--wd-card);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--wd-border);
+    box-shadow:
+      var(--wd-shadow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.11);
+  }
+
+  /* Hover halus pada kartu ringkasan KPI */
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:hover {
+    border-color: rgba(56, 189, 248, 0.28);
+    background:
+      linear-gradient(180deg, rgba(56, 189, 248, 0.08) 0%, rgba(255, 255, 255, 0) 50%),
+      rgba(17, 29, 52, 0.72);
+  }
+
+  /* 3. Weekly Hero (Electric Blue + Subtle Violet Glass) */
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-hero {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 45%),
+      linear-gradient(135deg, var(--wd-hero-1) 0%, var(--wd-hero-2) 100%);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--wd-hero-border);
+    box-shadow:
+      var(--wd-shadow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  /* 4. Context Menu (.speed-menu) & Modal (.pica-modal) */
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .speed-menu,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .pica-modal {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 35%),
+      var(--wd-menu-bg);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--wd-menu-border);
+    box-shadow:
+      0 20px 48px rgba(2, 6, 23, 0.75),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+}
+
+/* --- C. Penyesuaian Navigasi & Kartu Semantic Total (Good vs Defect) --- */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .weekly-nav-item.is-active {
+  background: var(--wdt-nav-on-bg);
+  color: var(--wdt-nav-on-fg);
+  border: 1px solid rgba(56, 189, 248, 0.30);
+  box-shadow: inset 3px 0 0 #38bdf8, 0 4px 14px -4px rgba(14, 165, 233, 0.35);
+}
+
+/* Kartu Total Defect / Loss (Semantic Rose-Red Glass) */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#oeeTotD),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#mchTotD),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#oeeTotDefect),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#mchTotDefect) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    linear-gradient(180deg, rgba(136, 19, 55, 0.42), rgba(76, 5, 25, 0.52)) !important;
+  border: 1px solid rgba(251, 113, 133, 0.36) !important;
+}
+
+/* Kartu Total Good / Yield (Semantic Emerald-Teal Glass) */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#oeeTotE),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#mchTotE),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#oeeTotGood),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#mchTotGood) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    linear-gradient(180deg, rgba(6, 95, 70, 0.42), rgba(6, 78, 59, 0.52)) !important;
+  border: 1px solid rgba(52, 211, 153, 0.36) !important;
+}
