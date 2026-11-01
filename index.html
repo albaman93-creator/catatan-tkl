@@ -46,6 +46,7 @@
   <link rel="stylesheet" href="./css/prod-week.css">
   <link rel="stylesheet" href="./css/calculation.css">
   <link rel="stylesheet" href="./css/dashboard.css">
+  <link rel="stylesheet" href="./css/speed-standar.css">
   <link rel="stylesheet" href="./css/weekly-dashboard.css">
   <link rel="stylesheet" href="./css/rincian-produk.css">
   <link rel="stylesheet" href="./css/issue-dashboard.css">
@@ -732,6 +733,24 @@
             <span class="oi-label ab-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>
             <span>Meeting</span>
           </button>
+          <!-- Tombol Spread Sheet (Buka Link Tab Baru) -->
+          <a href="https://docs.google.com/spreadsheets/d/1YHo0TnihmpSm1KZD1lh0geMQ1lUn8HVNM-6IOUrNUh8/edit?gid=1670377067#gid=1670377067"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="oee-indicator spreadsheet-indicator"
+             id="btnSpreadsheet"
+             title="Buka Google Spreadsheet">
+            <span class="oi-label ab-icon">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" aria-hidden="true" focusable="false">
+                <!-- Kotak spreadsheet nuansa hijau -->
+                <rect x="3" y="3" width="18" height="18" rx="3" fill="#10b981" fill-opacity="0.2" stroke="#10b981" stroke-width="1.8"/>
+                <!-- Garis tabel -->
+                <path d="M3 9.5h18M3 15.5h18" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M9.5 3v18" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span>Spread Sheet</span>
+          </a>
         </div>
 
         <!-- Ikon profil (pojok kanan atas) -->
@@ -936,8 +955,24 @@
       <button type="button" class="screen-tab bn-item" data-screen="oee365">
         <span class="bn-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="M17 14h-6"/><path d="M13 18H7"/><path d="M7 14h.01"/><path d="M17 18h.01"/></svg></span><span class="bn-label">OEE 365</span>
       </button>
-      <button type="button" class="screen-tab bn-item" data-screen="dashboard">
+      <button type="button" class="screen-tab bn-item" data-screen="weekly">
         <span class="bn-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span><span class="bn-label">Dashboard</span>
+      </button>
+      <button type="button" class="screen-tab bn-item" data-screen="speed-standar">
+        <span class="bn-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <!-- Lingkaran speedometer bergaris amber -->
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" fill="#f59e0b" opacity="0.3"/>
+            <path d="M12 4a8 8 0 0 0-8 8c0 2.21.9 4.21 2.34 5.66l1.42-1.42A6 6 0 1 1 18 12h2a8 8 0 0 0-8-8z" fill="#f59e0b"/>
+            <!-- Jarum indikator dengan warna merah/oranye terang -->
+            <path d="M12 12l4-4" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="2" fill="#ef4444"/>
+            <!-- Titik penanda kecepatan -->
+            <circle cx="8" cy="8.5" r="1" fill="#fbbf24"/>
+            <circle cx="16" cy="8.5" r="1" fill="#fbbf24"/>
+          </svg>
+        </span>
+        <span class="bn-label">Speed Standar</span>
       </button>
     </nav>
 
@@ -1835,6 +1870,80 @@
           </div>
           <div class="dash-pagination" id="dashPagination"></div>
         </article>
+      </section>
+
+      <!-- Section: Speed Standar Produk -->
+      <section class="sec" data-screen="speed-standar">
+        <div class="ss-panel">
+          <header class="ss-head">
+            <div class="ss-head-text">
+              <h2>⚡ Speed Standar</h2>
+              <p class="ss-sub">Data speed standar dari input produksi (bulan terpilih) dan master manual admin</p>
+            </div>
+            <button type="button" class="btn btn-ghost ss-refresh" id="ssRefresh" title="Muat ulang data">🔄 Refresh</button>
+          </header>
+
+          <!-- Filter bulan -->
+          <div class="ss-month-nav" id="ssMonthNav">
+            <button type="button" class="ss-month-btn" id="ssPrevMonth" aria-label="Bulan sebelumnya">&lt;&lt;</button>
+            <span class="ss-month-label" id="ssMonthLabel">November 2026</span>
+            <button type="button" class="ss-month-btn" id="ssNextMonth" aria-label="Bulan berikutnya">&gt;&gt;</button>
+          </div>
+
+          <div class="ss-status" id="ssStatus"></div>
+
+          <!-- ===== TABEL 1: Data nyata dari Supabase ===== -->
+          <div class="ss-block">
+            <div class="ss-block-head">
+              <h3 class="ss-block-title">Tabel 1 · Speed Standar Produk <span class="ss-badge">dari database</span></h3>
+              <p class="ss-block-sub">Nilai unik Line + Produk yang tercatat di bulan ini (Supabase)</p>
+            </div>
+            <div class="ss-table-wrap">
+              <table class="ss-table ss-table-bordered" id="ssTable1">
+                <thead>
+                  <tr>
+                    <th class="ss-col-no">No</th>
+                    <th class="ss-col-line">Line</th>
+                    <th class="ss-col-produk">Produk</th>
+                    <th class="ss-col-speed">Speed Standar</th>
+                  </tr>
+                </thead>
+                <tbody id="ssTbody1">
+                  <tr class="ss-empty-row">
+                    <td colspan="4">Pilih bulan lalu data akan dimuat…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ===== TABEL 2: Input manual admin ===== -->
+          <div class="ss-block">
+            <div class="ss-block-head">
+              <h3 class="ss-block-title">Tabel 2 · Speed Standar Produk <span class="ss-badge ss-badge-admin">input admin</span></h3>
+              <p class="ss-block-sub">Isi manual referensi speed standar (disimpan di Supabase cloud)</p>
+            </div>
+            <div class="ss-table-wrap">
+              <table class="ss-table ss-table-bordered ss-table-edit" id="ssTable2">
+                <thead>
+                  <tr>
+                    <th class="ss-col-no">No</th>
+                    <th class="ss-col-line">Line</th>
+                    <th class="ss-col-produk">Produk</th>
+                    <th class="ss-col-speed">Speed Standar</th>
+                    <th class="ss-col-act"></th>
+                  </tr>
+                </thead>
+                <tbody id="ssTbody2"></tbody>
+              </table>
+            </div>
+            <div class="ss-admin-actions">
+              <button type="button" class="btn btn-ghost" id="ssAddRow">＋ Tambah baris</button>
+              <button type="button" class="btn btn-primary" id="ssSaveManual">💾 Simpan</button>
+              <span class="ss-save-hint" id="ssSaveHint"></span>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- Section: Weekly Meeting Dashboard (mirip Looker Studio) -->
@@ -2933,6 +3042,7 @@
   <script src="./js/sync.js"></script>
   <script src="./js/storage.js"></script>
   <script src="./js/dashboard.js"></script>
+  <script src="./js/speed-standar.js"></script>
   <script src="./js/weekly-calc.js"></script>
   <script src="./js/weekly-filter.js"></script>
   <script src="./js/weekly-dashboard.js"></script>

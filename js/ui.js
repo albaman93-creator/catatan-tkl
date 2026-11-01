@@ -504,6 +504,8 @@ const UI = (() => {
   // ====== SCREEN NAV ======
   const showScreen = (screenId, silent) => {
     if (!screenId) return;
+    // Dashboard OEE 360° diganti: buka Weekly Meeting (sama seperti tombol Meeting)
+    if (screenId === 'dashboard') screenId = 'weekly';
     document.querySelectorAll('.sheet > .sec[data-screen]').forEach(sec => {
       sec.classList.toggle('active', sec.getAttribute('data-screen') === screenId);
     });
@@ -511,9 +513,9 @@ const UI = (() => {
       tab.classList.toggle('on', tab.getAttribute('data-screen') === screenId);
     });
     try { localStorage.setItem(CONFIG.ACTIVE_SCREEN_KEY, screenId); } catch(e){}
-    // Dashboard baru menarik data dari Supabase saat tabnya benar-benar dibuka
-    if (screenId === 'dashboard' && typeof Dashboard !== 'undefined') Dashboard.open();
+    // Tarik data saat tab benar-benar dibuka
     if (screenId === 'weekly' && typeof WeeklyDashboard !== 'undefined') WeeklyDashboard.open();
+    if (screenId === 'speed-standar' && typeof SpeedStandar !== 'undefined') SpeedStandar.open();
     if (!silent) {
       const sheet = document.querySelector('.sheet');
       if (sheet) sheet.scrollIntoView({ behavior: 'smooth', block: 'start' });

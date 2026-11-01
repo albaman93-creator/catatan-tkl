@@ -11,6 +11,7 @@ const CONFIG = Object.freeze({
 
   // Nama tabel Supabase tempat data OEE disimpan (lihat supabase-setup.sql)
   DB_TABLE: 'oee_data',
+  DB_SPEED_STANDAR_TABLE: 'speed_standar',
   SCHEMA_VERSION: 1,
 
   // ====== AUTENTIKASI ======

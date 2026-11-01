@@ -290,6 +290,31 @@
   stroke-linecap: round; stroke-linejoin: round;
 }
 .meeting-indicator .ab-icon svg { width: 15px; height: 15px; }
+
+/* Tombol Spread Sheet (link ke Google Sheets) */
+a.spreadsheet-indicator {
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 6px;
+  border-color: rgba(16, 185, 129, 0.4);
+  transition: all 0.2s ease;
+  color: inherit;
+}
+a.spreadsheet-indicator:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10b981;
+}
+a.spreadsheet-indicator .ab-icon svg {
+  width: 15px;
+  height: 15px;
+  /* SVG spreadsheet pakai fill/stroke sendiri (hijau), bukan currentColor */
+  fill: unset;
+  stroke: unset;
+}
+
 #toolbarToggleIcon .ab-ico-close { display: none; }
 body.sidebar-open #toolbarToggleIcon .ab-ico-menu { display: none; }
 body.sidebar-open #toolbarToggleIcon .ab-ico-close { display: block; }
