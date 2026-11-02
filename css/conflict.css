@@ -1,0 +1,51 @@
+/* Banner "sedang dibuka orang lain" + dialog bentrok data */
+.presence-banner {
+  margin: 6px 0 8px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  color: #78350f;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.presence-banner[hidden] { display: none; }
+[data-theme="dark"] .presence-banner {
+  background: rgba(245, 158, 11, .16);
+  border-color: rgba(245, 158, 11, .45);
+  color: #fcd34d;
+}
+
+.conflict-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, .55);
+}
+.conflict-box {
+  width: min(460px, 100%);
+  padding: 18px 18px 14px;
+  border-radius: 16px;
+  background: var(--bg-surface, #fff);
+  color: var(--text-primary, #0f172a);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .35);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.conflict-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+.conflict-box p { margin: 0 0 12px; }
+.conflict-note { font-size: 12px; color: var(--text-muted, #64748b); margin: 10px 0 0 !important; }
+.conflict-actions { display: flex; flex-direction: column; gap: 8px; }
+.conflict-btn {
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-default, #cbd5e1);
+  background: var(--bg-surface-hover, #f1f5f9);
+  color: inherit;
+  font: inherit; font-weight: 700;
+  cursor: pointer;
+}
+.conflict-btn.primary { background: #2563eb; border-color: #2563eb; color: #fff; }
+.conflict-btn.danger  { background: #fff1f2; border-color: #fda4af; color: #be123c; }
+[data-theme="dark"] .conflict-btn.danger { background: rgba(244, 63, 94, .16); border-color: rgba(244, 63, 94, .5); color: #fda4af; }
+.conflict-btn:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
