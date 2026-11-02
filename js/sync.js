@@ -21,12 +21,6 @@ const Sync = (() => {
 
   const queueLength = () => getQueue().length;
 
-  // Hook: dipanggil setiap kali satu row sukses terkirim (dipakai Storage untuk
-  // mencatat versi cloud terakhir milik perangkat ini → deteksi bentrok).
-  let onPushed = null;
-  const setOnPushed = (fn) => { onPushed = typeof fn === 'function' ? fn : null; };
-  const notifyPushed = (row) => { try { if (onPushed) onPushed(row); } catch (_) {} };
-
   /**
    * Simpan/replace item di antrean berdasarkan `key` (satu item terbaru
    * per kombinasi date|shift|line|tahapan, tidak menumpuk duplikat).
@@ -57,7 +51,7 @@ const Sync = (() => {
       ({ error } = await client.from(CONFIG.DB_TABLE).upsert(row, { onConflict: 'key' }));
     }
 
-    if (!error) { notifyPushed(row); return; }
+    if (!error) return;
 
     // 409 / 23505: baris untuk (date, shift, line, tahapan) yang sama sudah ada dengan `key` berbeda.
     // Upsert via `key` tidak menemukannya → UPDATE langsung berdasarkan 4 kolom itu.
@@ -72,7 +66,6 @@ const Sync = (() => {
       .select('key');
     if (err2) throw err2;
     if (!data || !data.length) throw error; // tidak ada baris ter-update (mis. RLS) → laporkan error asli
-    notifyPushed(row);
   };
 
   /**
@@ -111,5 +104,5 @@ const Sync = (() => {
   if (typeof Perf !== 'undefined') Perf.every(30000, flushQueue);
   else setInterval(flushQueue, 30000);
 
-  return { queuePush, queueLength, pushRow, flushQueue, setOnPushed };
+  return { queuePush, queueLength, pushRow, flushQueue };
 })();

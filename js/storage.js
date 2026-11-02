@@ -293,109 +293,6 @@ const Storage = (() => {
     };
   };
 
-  // ====== DETEKSI BENTROK (2 orang mengedit shift yang sama) ======
-  // _base[key] = waktu "updatedAt" versi cloud yang menjadi dasar data di perangkat ini
-  // (dari saat memuat, atau dari push terakhir yang sukses). Sebelum mengirim, kita
-  // cek apakah cloud sudah berubah sejak itu — kalau ya, tanya user dulu.
-  const _base = {};
-  const _hold = {};            // key → true bila user memilih "Nanti" (auto-save ditahan)
-  let _conflictOpen = false;
-  const tsOf = (v) => { const t = v ? Date.parse(v) : NaN; return Number.isFinite(t) ? t : 0; };
-  const keyOf = (f) => `${f.rawDate}|S${f.shift}|L${f.line}|${f.stage}`;
-
-  if (typeof Sync !== 'undefined' && Sync.setOnPushed) {
-    Sync.setOnPushed((row) => { if (row && row.key) _base[row.key] = tsOf(row.updatedAt); });
-  }
-
-  // Cek ringan: hanya kolom updatedAt (bukan seluruh payload).
-  const checkConflict = async (filter) => {
-    const client = SupabaseClient.getClient();
-    const { data, error } = await client
-      .from(CONFIG.DB_TABLE)
-      .select('"updatedAt"')
-      .eq('date', filter.rawDate)
-      .eq('shift', filter.shift)
-      .eq('line', String(filter.line))
-      .eq('tahapan', filter.stage)
-      .maybeSingle();
-    if (error) throw error;
-    if (!data) return null;
-    const cloudTs = tsOf(data.updatedAt);
-    return cloudTs > (_base[keyOf(filter)] || 0) ? { cloudTs } : null;
-  };
-
-  const showConflictDialog = (filter, cloudTs) => new Promise((resolve) => {
-    const when = cloudTs
-      ? new Date(cloudTs).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' })
-      : '—';
-    const label = `Shift ${filter.shift} · Line ${filter.line} · ${String(filter.stage).toUpperCase()}`;
-    const wrap = document.createElement('div');
-    wrap.className = 'conflict-overlay';
-    wrap.setAttribute('role', 'alertdialog');
-    wrap.setAttribute('aria-modal', 'true');
-    wrap.innerHTML =
-      '<div class="conflict-box">' +
-        '<div class="conflict-title">⚠ Data ini sudah diubah orang lain</div>' +
-        `<p><b>${Utils.escapeHtml(label)}</b> diperbarui di cloud pada <b>${Utils.escapeHtml(when)}</b>, setelah Anda membukanya. ` +
-        'Jika Anda menyimpan sekarang, perubahan tersebut akan <b>tertimpa</b>.</p>' +
-        '<div class="conflict-actions">' +
-          '<button type="button" class="conflict-btn primary" data-c="load">Muat versi terbaru</button>' +
-          '<button type="button" class="conflict-btn danger" data-c="overwrite">Timpa dengan versi saya</button>' +
-          '<button type="button" class="conflict-btn" data-c="later">Nanti</button>' +
-        '</div>' +
-        '<p class="conflict-note">“Muat versi terbaru” mengganti isi layar dengan data cloud. ' +
-        'Salinan data Anda yang belum tersimpan disimpan otomatis di perangkat ini.</p>' +
-      '</div>';
-    const done = (c) => { wrap.remove(); resolve(c); };
-    wrap.addEventListener('click', (e) => {
-      const b = e.target.closest('[data-c]');
-      if (b) done(b.dataset.c);
-    });
-    document.body.appendChild(wrap);
-    wrap.querySelector('[data-c="load"]')?.focus();
-  });
-
-  // Muat versi cloud ke layar; salinan lokal user diamankan dulu.
-  const loadCloudOverLocal = async (filter, localRec) => {
-    const key = keyOf(filter);
-    try { localStorage.setItem('tkl_conflict_backup_' + key, JSON.stringify({ at: new Date().toISOString(), rec: localRec })); }
-    catch (_) { /* storage penuh */ }
-    const data = await supabaseSelect(filter);   // juga memperbarui _base
-    if (data) {
-      const db = dbGet(); db[key] = data; dbSet(db);
-      applyRecord(data);
-      markCloudBaseline();
-      UI.setSyncStatus('ok', '✓ versi terbaru dimuat dari Supabase');
-      UI.toast('Versi terbaru dimuat. Salinan data Anda tersimpan di perangkat ini.');
-    }
-  };
-
-  /**
-   * Kirim ke Supabase dengan pengecekan bentrok.
-   * Return: 'ok' (terkirim) | 'loaded' (user memilih memuat versi cloud) | 'pending' (belum terkirim, ditahan).
-   * Error jaringan dilempar seperti biasa (pemanggil yang mengantre).
-   */
-  const pushGuarded = async (row, rec, filter, { force = false } = {}) => {
-    const key = keyOf(filter);
-    if (!force) {
-      let conflict = null;
-      try { conflict = await checkConflict(filter); }
-      catch (e) { console.warn('Cek bentrok gagal (lanjut simpan):', e); }
-      if (conflict) {
-        if (_conflictOpen) return 'pending';
-        _conflictOpen = true;
-        let choice = 'later';
-        try { choice = await showConflictDialog(filter, conflict.cloudTs); }
-        finally { _conflictOpen = false; }
-        if (choice === 'load') { _hold[key] = false; await loadCloudOverLocal(filter, rec); return 'loaded'; }
-        if (choice !== 'overwrite') { _hold[key] = true; return 'pending'; }
-      }
-    }
-    _hold[key] = false;
-    await Sync.pushRow(row);       // hook setOnPushed memperbarui _base
-    return 'ok';
-  };
-
   // ====== SUPABASE: GET (query langsung dengan 4 filter) ======
   const supabaseSelect = async ({ rawDate, shift, line, stage }) => {
     const client = SupabaseClient.getClient();
@@ -408,17 +305,12 @@ const Storage = (() => {
       .eq('tahapan', stage)
       .maybeSingle();
     if (error) throw error;
-    _base[keyOf({ rawDate, shift, line, stage })] = data ? tsOf(data['updatedAt']) : 0;
     return data ? data.payload : null;
   };
 
   // ====== LOAD (GET): tarik data — otomatis dipanggil saat app start & saat filter berubah ======
   const loadRecord = async () => {
     const filter = activeFilter();
-    _hold[keyOf(filter)] = false;
-    if (typeof Presence !== 'undefined' && Presence.join) {
-      try { Presence.join(curKey(), labelFilter()); } catch (_) {}
-    }
 
     // Mode Offline: selalu baca lokal saja, jangan coba Supabase
     const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
@@ -438,7 +330,6 @@ const Storage = (() => {
           db[curKey()] = data;
           dbSet(db);
           applyRecord(data);
-          markCloudBaseline();
           UI.setSyncStatus('ok', '✓ dimuat dari Supabase');
         } else {
           // belum ada di Supabase → cek cache lokal (mis. belum sempat sync)
@@ -472,7 +363,6 @@ const Storage = (() => {
       try { Suggest.rememberFromMaster(); } catch (_) {}
     }
 
-    _lastLocalHash = contentHash(rec);
     State.el.lastSaved.textContent = '✓ tersimpan ' + new Date().toLocaleTimeString('id-ID');
     UI.updateEditChip(rec);
     if (!opts.silent) UI.toast('Data tersimpan lokal ✓');
@@ -497,17 +387,10 @@ const Storage = (() => {
     }
 
     UI.setSyncStatus('sync', 'mengunggah ke Supabase…');
-    _hold[curKey()] = false; // simpan manual = user ingin memutuskan sekarang
     try {
-      const res = await pushGuarded(row, rec, filter);
-      if (res === 'ok') {
-        _lastAutoSupabaseHash = contentHash(rec);
-        UI.setSyncStatus('ok', '✓ tersinkron ke Supabase');
-        if (!opts.silent) UI.toast('Sync Supabase ✓ ' + labelFilter());
-      } else if (res === 'pending') {
-        UI.setSyncStatus('err', '⚠ bentrok dengan versi cloud — belum terkirim');
-        if (!opts.silent) UI.toast('Belum terkirim ke cloud: ada versi lebih baru dari orang lain ⚠', true);
-      }
+      await Sync.pushRow(row);
+      UI.setSyncStatus('ok', '✓ tersinkron ke Supabase');
+      if (!opts.silent) UI.toast('Sync Supabase ✓ ' + labelFilter());
     } catch (err) {
       console.warn('Gagal sync ke Supabase, masuk antrean:', err);
       const n = Sync.queuePush(row);
@@ -516,36 +399,14 @@ const Storage = (() => {
     }
   };
 
-  // Sidik isi sheet (tanpa savedAt & summary turunan) untuk melewati simpan yang tidak perlu.
-  const contentHash = (rec) => JSON.stringify({
-    k: curKey(), p: rec.products, o: rec.operators, m: rec.mesin, r: rec.rows,
-  });
-  let _lastLocalHash = '';
-  let _lastAutoSupabaseHash = '';
-  // Setelah data cloud dimuat ke layar, anggap itu "sudah tersinkron" supaya
-  // sekadar membuka halaman TIDAK mengirim ulang salinan identik (yang akan
-  // mengubah updatedAt dan memicu bentrok palsu di perangkat lain).
-  const markCloudBaseline = () => {
-    setTimeout(() => {
-      try {
-        const h = contentHash(collect());
-        _lastAutoSupabaseHash = h;
-        _lastLocalHash = h;
-      } catch (_) {}
-    }, 800);
-  };
-
   // ====== AUTO-SAVE LOKAL (setiap CONFIG.AUTO_SAVE_INTERVAL_MS, senyap, TIDAK ke Supabase) ======
   const autoSaveLocal = () => {
     try {
       if (!State.el.tbody) return; // app belum siap (masih di layar login)
       const rec = collect();
-      const h = contentHash(rec);
-      if (h === _lastLocalHash) return; // tidak ada perubahan → lewati (hemat baca/tulis localStorage)
       const db = dbGet();
       db[curKey()] = rec;
       dbSet(db);
-      _lastLocalHash = h;
       if (typeof Suggest !== 'undefined' && Suggest.rememberFromMaster) {
         try { Suggest.rememberFromMaster(); } catch (_) {}
       }
@@ -561,6 +422,7 @@ const Storage = (() => {
   // Senyap, tanpa toast. Hanya saat online + bukan Mode Offline.
   // Skip jika payload identik dengan yang terakhir berhasil di-push (hemat bandwidth).
   let _autoSupabaseBusy = false;
+  let _lastAutoSupabaseHash = '';
 
   const autoSaveSupabase = async () => {
     try {
@@ -572,9 +434,15 @@ const Storage = (() => {
       if (!isOnline()) return;
 
       const rec = collect();
-      const hash = contentHash(rec);
-      if (hash === _lastAutoSupabaseHash) return; // isi belum berubah sejak sinkron terakhir
-      if (_hold[curKey()]) return;                // user memilih "Nanti" pada dialog bentrok
+      // Hash ringan: skip upload kalau isi sheet belum berubah sejak auto-save terakhir
+      const hash = JSON.stringify({
+        k: curKey(),
+        rows: rec.rows,
+        products: rec.products,
+        mesin: rec.mesin,
+        summary: rec.summary,
+      });
+      if (hash === _lastAutoSupabaseHash) return;
 
       _autoSupabaseBusy = true;
       // Simpan lokal dulu (sama seperti saveData), lalu push ke Supabase senyap
@@ -587,15 +455,11 @@ const Storage = (() => {
 
       UI.setSyncStatus('sync', 'auto-save Supabase…');
       try {
-        const res = await pushGuarded(row, rec, filter);
-        if (res === 'ok') {
-          _lastAutoSupabaseHash = hash;
-          UI.setSyncStatus('ok', '✓ auto-save Supabase');
-          if (State.el.lastSaved) {
-            State.el.lastSaved.textContent = '☁️ auto-save cloud ' + new Date().toLocaleTimeString('id-ID');
-          }
-        } else if (res === 'pending') {
-          UI.setSyncStatus('err', '⚠ bentrok dengan versi cloud — belum terkirim');
+        await Sync.pushRow(row);
+        _lastAutoSupabaseHash = hash;
+        UI.setSyncStatus('ok', '✓ auto-save Supabase');
+        if (State.el.lastSaved) {
+          State.el.lastSaved.textContent = '☁️ auto-save cloud ' + new Date().toLocaleTimeString('id-ID');
         }
       } catch (err) {
         console.warn('Auto-save Supabase gagal, diantrekan:', err);

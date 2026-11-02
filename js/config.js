@@ -42,10 +42,6 @@ const CONFIG = Object.freeze({
   // Interval lebih jarang dari lokal (10 dtk lokal, 30 dtk cloud) agar tidak membebani jaringan.
   AUTO_SAVE_SUPABASE_INTERVAL_MS: 30000, // 30 detik
 
-  // Peringatan "sedang dibuka orang lain" (Supabase Realtime Presence — ringan,
-  // hanya daftar siapa yang online, bukan sinkron isi data). false = matikan.
-  PRESENCE_ENABLED: true,
-
   // ====== DEFAULTS ======
   // Jumlah baris awal saat sheet kosong. Viewport tabel menampilkan ~10 baris;
   // baris 11–25 (dan tambahan) digulir di dalam .tbl-wrap.
