@@ -317,7 +317,96 @@ const Pica = (() => {
     redrawBdMain(produk);
   };
 
+  // ===== Donat Minor Stoppage — frekuensi per produk (gaya sama dengan donat Shutdown) =====
+  const MS_COLORS = ['#b45309', '#d97706', '#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#fef3c7', '#94a3b8', '#cbd5e1', '#e2e8f0'];
+  const msTextOn = (hex) => {
+    const n = parseInt(hex.slice(1), 16);
+    const lum = 0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255);
+    return lum > 150 ? '#0f172a' : '#f8fafc';
+  };
+  const msDonut = () => {
+    const svg = $('msChartSvg'), leg = $('msChartLegend');
+    if (!svg) return;
+    const byProd = {};
+    listMs.forEach((p) => { byProd[p.produk] = (byProd[p.produk] || 0) + (Number(p.freq) || 1); });
+    const all = Object.entries(byProd).map(([label, v]) => ({ label, v })).sort((a, b) => b.v - a.v);
+    const total = all.reduce((s, x) => s + x.v, 0);
+    const setT = (id, t) => { const el = $(id); if (el) el.textContent = t; };
+    const pct = (v, d) => v.toLocaleString('id-ID', { minimumFractionDigits: d, maximumFractionDigits: d }) + '%';
+    setT('msChartTotal', total ? `${total.toLocaleString('id-ID')} kali` : '—');
+    setT('msChartTop', all[0] ? `${all[0].label} (${all[0].v.toLocaleString('id-ID')} kali)` : '—');
+    if (!total) {
+      svg.innerHTML = '<text x="100" y="100" fill="var(--text-muted, #64748b)" font-size="11" text-anchor="middle">Tidak ada data</text>';
+      if (leg) leg.innerHTML = '';
+      return;
+    }
+    const top = all.slice(0, 9);
+    const rest = all.slice(9).reduce((s, x) => s + x.v, 0);
+    const data = rest > 0 ? [...top, { label: 'Lainnya', v: rest }] : top;
+    const cx = 100, cy = 100, R = 92, r = 50;
+    let a0 = -Math.PI / 2, out = '';
+    data.forEach((d, i) => {
+      const frac = d.v / total;
+      const a1 = a0 + (frac >= 1 ? 0.9999 : frac) * 2 * Math.PI;
+      const large = frac > 0.5 ? 1 : 0;
+      const P = (a, rad) => (cx + Math.cos(a) * rad).toFixed(2) + ',' + (cy + Math.sin(a) * rad).toFixed(2);
+      const col = MS_COLORS[i % MS_COLORS.length];
+      out += `<path d="M ${P(a0, R)} A ${R} ${R} 0 ${large} 1 ${P(a1, R)} L ${P(a1, r)} A ${r} ${r} 0 ${large} 0 ${P(a0, r)} Z" fill="${col}" stroke="var(--bg-surface, #0b1626)" stroke-width="1"><title>${esc(d.label)}: ${d.v} kali</title></path>`;
+      if (frac >= 0.035) {
+        const am = (a0 + a1) / 2, rm = (R + r) / 2;
+        out += `<text x="${(cx + Math.cos(am) * rm).toFixed(1)}" y="${(cy + Math.sin(am) * rm).toFixed(1)}" fill="${msTextOn(col)}" font-size="8.5" font-weight="700" text-anchor="middle" dominant-baseline="middle">${pct(frac * 100, 1)}</text>`;
+      }
+      a0 = a1;
+    });
+    svg.innerHTML = out;
+    if (leg) leg.innerHTML = data.map((d, i) =>
+      `<div class="sd-leg-item" title="${esc(d.label)} · ${d.v} kali">`
+      + `<span class="sd-leg-dot" style="background:${MS_COLORS[i % MS_COLORS.length]}"></span>`
+      + `<span class="sd-leg-label">${esc(d.label)}</span>`
+      + `<span class="sd-leg-meta">${d.v.toLocaleString('id-ID')} kali · ${pct((d.v / total) * 100, 1)}</span></div>`).join('');
+  };
+
+  // ===== Minor Stoppage Activity (agregasi per problem: Frek. + %), 8 baris/halaman =====
+  const MS_PAGE = 8;
+  let msActPage = 0;
+  let msActList = [];
+
+  const buildMsActivity = () => {
+    const norm = (t) => String(t || '').trim().replace(/\s+/g, ' ');
+    const map = new Map();
+    listMs.forEach((p) => {
+      const label = norm(p.problem) || '(minor stop)';
+      const key = label.toLowerCase();
+      if (!map.has(key)) map.set(key, { label, n: 0 });
+      map.get(key).n += Number(p.freq) || 1;
+    });
+    msActList = [...map.values()].sort((a, b) => b.n - a.n);
+  };
+
+  const renderMsActivity = () => {
+    const body = $('msActBody'), info = $('msActPageInfo');
+    if (!body) return;
+    const total = msActList.reduce((s, x) => s + x.n, 0);
+    const pages = Math.max(1, Math.ceil(msActList.length / MS_PAGE));
+    msActPage = Math.max(0, Math.min(msActPage, pages - 1));
+    const start = msActPage * MS_PAGE;
+    const slice = msActList.slice(start, start + MS_PAGE);
+    const fmtPct = (v) => v.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+    body.innerHTML = slice.length
+      ? slice.map((d, i) => `<tr>`
+          + `<td class="ctr">${start + i + 1}.</td>`
+          + `<td>${esc(d.label)}</td>`
+          + `<td class="ctr tabular-nums">${d.n.toLocaleString('id-ID')}</td>`
+          + `<td class="ctr tabular-nums">${fmtPct(total ? (d.n / total) * 100 : 0)}</td></tr>`).join('')
+      : '<tr><td colspan="4">Belum ada minor stop pada rentang ini</td></tr>';
+    if (info) info.textContent = msActList.length
+      ? `${start + 1} – ${Math.min(start + MS_PAGE, msActList.length)} / ${msActList.length}`
+      : '0 / 0';
+  };
+
   const renderMsTable = () => {
+    buildMsActivity();
+    renderMsActivity();
     const body = $('msBody');
     if (!body) return;
     if (!listMs.length) {
@@ -464,9 +553,7 @@ const Pica = (() => {
       closeForm();
       if (typeof UI !== 'undefined' && UI.toast) UI.toast('✓ Minor stop disimpan');
       if (onSavedCb) { try { onSavedCb(rec); } catch (_) {} onSavedCb = null; }
-      const byProd = {};
-      listMs.forEach((p) => { byProd[p.produk] = (byProd[p.produk] || 0) + (p.freq || 1); });
-      barChart('msChartSvg', Object.entries(byProd).map(([label, v]) => ({ label, v })).sort((a, b) => b.v - a.v), 'kali', '#f59e0b');
+      msDonut();
       return;
     }
 
@@ -536,8 +623,9 @@ const Pica = (() => {
   const render = async (records, meta, from, to) => {
     const stg = meta.stage.charAt(0).toUpperCase() + meta.stage.slice(1);
     const set = (id, t) => { const el = $(id); if (el) el.textContent = t; };
-    set('msTitle', `Minor Stoppage OEE ${stg} - Line ${meta.line}`);
-    set('picaTitle', `PICA Problem OEE (Breakdown >10 mnt) ${stg} - Line ${meta.line}`);
+    set('msTitle', `PICA CAPA minor stop - Line ${meta.line} (why why capa)`);
+    set('msActTitle', `Minor Stoppage Activity - Line ${meta.line}`);
+    set('picaTitle', `PICA CAPA UNPLANNED - Line ${meta.line}`);
     set('msChartTitle', `Minor Stoppage — Frekuensi per Produk · ${stg} L${meta.line}`);
     set('bdChartTitle', `Breakdown — Durasi per Produk (mnt) · ${stg} L${meta.line}`);
 
@@ -567,14 +655,13 @@ const Pica = (() => {
     });
 
     // Chart: minor = frekuensi per produk; breakdown = total menit per produk
-    const msByProd = {};
-    listMs.forEach((p) => { msByProd[p.produk] = (msByProd[p.produk] || 0) + (p.freq || 1); });
     const bdByProd = {};
     listBd.forEach((p) => { bdByProd[p.produk] = (bdByProd[p.produk] || 0) + (p.dur || 0); });
-    barChart('msChartSvg', Object.entries(msByProd).map(([label, v]) => ({ label, v })).sort((a, b) => b.v - a.v), 'kali', '#f59e0b');
+    msDonut();
     hideBdDetail();
     redrawBdMain('');
 
+    msActPage = 0;
     renderMsTable();
     renderBdTable();
     updateMsStatus();
@@ -601,6 +688,10 @@ const Pica = (() => {
 
   const bind = () => {
     $('msAddBtn')?.addEventListener('click', () => openFormMinor(-1));
+    $('msActPrev')?.addEventListener('click', () => { if (msActPage > 0) { msActPage--; renderMsActivity(); } });
+    $('msActNext')?.addEventListener('click', () => {
+      if (msActPage < Math.ceil(msActList.length / MS_PAGE) - 1) { msActPage++; renderMsActivity(); }
+    });
     $('msBody')?.addEventListener('click', (e) => {
       const btn = e.target.closest('.ms-edit');
       if (btn) openFormMinor(Number(btn.dataset.i));

@@ -1,0 +1,139 @@
+/* ============================================================
+   KPI OEE OPE vs OEE 365 — dua panel dengan tampilan berbeda
+   OPE  : panel biru, garis solid
+   365  : panel oranye, garis putus-putus
+   ============================================================ */
+.sheet-kpi-stack { gap: 12px; }
+
+.sheet-kpi-stack .sheet-kpi-row-ope,
+.sheet-kpi-stack .sheet-kpi-row-365 {
+  grid-template-columns: 64px repeat(4, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  padding: 10px 12px;
+  border-radius: 16px;
+  align-items: stretch;
+}
+
+/* ---- panel ---- */
+.sheet-kpi-stack .sheet-kpi-row-ope {
+  background: #bfd8fb;
+  border: 2px solid #3b82f6;
+  --pc: #2563eb;
+}
+.sheet-kpi-stack .sheet-kpi-row-365 {
+  background: #ffd5a8;
+  border: 2px dashed #ea580c;
+  --pc: #d97706;
+}
+
+/* ---- label OEE / OPE | OEE / 365 ---- */
+.sheet-kpi-stack .sheet-kpi-row-ope .sheet-kpi-row-label,
+.sheet-kpi-stack .sheet-kpi-row-365 .sheet-kpi-row-label {
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1;
+  border-radius: 12px;
+  border: none;
+  background: var(--pc);
+  color: #fff;
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--pc) 35%, transparent);
+}
+.sheet-kpi-stack .sheet-kpi-row-label b {
+  font-size: 15px; font-weight: 900; letter-spacing: .3px; color: #fff;
+}
+.sheet-kpi-stack .sheet-kpi-row-label small {
+  font-size: 9px; font-weight: 800; letter-spacing: .5px; color: rgba(255,255,255,.9);
+}
+
+/* ---- kartu A / P / Q / OEE ---- */
+.sheet-kpi-stack .sheet-kpi-row-ope .sheet-kpi,
+.sheet-kpi-stack .sheet-kpi-row-365 .sheet-kpi {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--kb);
+  border-radius: 12px;
+  box-shadow: none;
+  min-height: 46px;
+  gap: 6px;
+}
+.sheet-kpi-stack .sheet-kpi-row-ope .sheet-kpi span,
+.sheet-kpi-stack .sheet-kpi-row-ope .sheet-kpi b,
+.sheet-kpi-stack .sheet-kpi-row-365 .sheet-kpi span,
+.sheet-kpi-stack .sheet-kpi-row-365 .sheet-kpi b {
+  color: var(--kt);
+  position: relative;
+  z-index: 1;
+}
+/* pojok berwarna */
+.sheet-kpi-stack .sheet-kpi-row-ope .sheet-kpi::after,
+.sheet-kpi-stack .sheet-kpi-row-365 .sheet-kpi::after {
+  content: '';
+  position: absolute;
+  top: -13px; right: -13px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--kc);
+}
+/* bar capaian tipis di bawah kartu (warna ikut status target) */
+.sheet-kpi-stack .sheet-kpi .kpi-fill {
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 3px;
+  background: var(--kpi-color);
+  opacity: .85;
+  transition: width .4s ease;
+}
+
+/* warna per metrik — OPE */
+.sheet-kpi-row-ope .sheet-kpi[data-kpi="A"]   { --kt:#15803d; --kb:#86efac; --kc:#4ade80; }
+.sheet-kpi-row-ope .sheet-kpi[data-kpi="P"]   { --kt:#1d4ed8; --kb:#bfdbfe; --kc:#60a5fa; }
+.sheet-kpi-row-ope .sheet-kpi[data-kpi="Q"]   { --kt:#6d28d9; --kb:#ddd6fe; --kc:#a78bfa; }
+.sheet-kpi-row-ope .sheet-kpi[data-kpi="OEE"] { --kt:#c2410c; --kb:#fdba74; --kc:#fb923c; background:#fff4ea; }
+
+/* warna per metrik — 365 (nuansa hangat) */
+.sheet-kpi-row-365 .sheet-kpi[data-kpi="A365"],
+.sheet-kpi-row-365 .sheet-kpi[data-kpi="P365"],
+.sheet-kpi-row-365 .sheet-kpi[data-kpi="Q365"] { --kt:#9a3412; --kb:#fed7aa; --kc:#fb923c; }
+.sheet-kpi-row-365 .sheet-kpi[data-kpi="OEE365"] { --kt:#92400e; --kb:#fbbf24; --kc:#f59e0b; background:#fef3c7; }
+
+.sheet-kpi-stack .sheet-kpi-row-ope .sheet-kpi span,
+.sheet-kpi-stack .sheet-kpi-row-365 .sheet-kpi span { font-weight: 900; letter-spacing: .2px; }
+
+/* ---- tema gelap ---- */
+[data-theme="dark"] .sheet-kpi-stack .sheet-kpi-row-ope { background: rgba(37,99,235,.20); border-color: #3b82f6; }
+[data-theme="dark"] .sheet-kpi-stack .sheet-kpi-row-365 { background: rgba(234,88,12,.18); border-color: #f97316; }
+[data-theme="dark"] .sheet-kpi-stack .sheet-kpi-row-ope .sheet-kpi,
+[data-theme="dark"] .sheet-kpi-stack .sheet-kpi-row-365 .sheet-kpi { background: #1c1c1f; border-color: rgba(255,255,255,.12); }
+[data-theme="dark"] .sheet-kpi-row-ope .sheet-kpi[data-kpi="OEE"] { background: rgba(251,146,60,.16); }
+[data-theme="dark"] .sheet-kpi-row-365 .sheet-kpi[data-kpi="OEE365"] { background: rgba(245,158,11,.18); }
+[data-theme="dark"] .sheet-kpi-row-ope .sheet-kpi[data-kpi="A"] span, [data-theme="dark"] .sheet-kpi-row-ope .sheet-kpi[data-kpi="A"] b { color:#4ade80 !important; }
+[data-theme="dark"] .sheet-kpi-row-ope .sheet-kpi[data-kpi="P"] span, [data-theme="dark"] .sheet-kpi-row-ope .sheet-kpi[data-kpi="P"] b { color:#93c5fd !important; }
+[data-theme="dark"] .sheet-kpi-row-ope .sheet-kpi[data-kpi="Q"] span, [data-theme="dark"] .sheet-kpi-row-ope .sheet-kpi[data-kpi="Q"] b { color:#c4b5fd !important; }
+[data-theme="dark"] .sheet-kpi-row-ope .sheet-kpi[data-kpi="OEE"] span, [data-theme="dark"] .sheet-kpi-row-ope .sheet-kpi[data-kpi="OEE"] b { color:#fdba74 !important; }
+[data-theme="dark"] .sheet-kpi-row-365 .sheet-kpi span, [data-theme="dark"] .sheet-kpi-row-365 .sheet-kpi b { color:#fdba74 !important; }
+[data-theme="dark"] .sheet-kpi-row-365 .sheet-kpi[data-kpi="OEE365"] span, [data-theme="dark"] .sheet-kpi-row-365 .sheet-kpi[data-kpi="OEE365"] b { color:#fcd34d !important; }
+
+/* ---- layar kecil ---- */
+@media (max-width: 640px) {
+  .sheet-kpi-stack .sheet-kpi-row-ope,
+  .sheet-kpi-stack .sheet-kpi-row-365 {
+    grid-template-columns: 38px repeat(4, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+    padding: 6px;
+    border-radius: 12px;
+  }
+  .sheet-kpi-stack .sheet-kpi-row-label { width: auto; min-height: 0; justify-content: center; }
+  .sheet-kpi-stack .sheet-kpi-row-label b { font-size: 11px; }
+  .sheet-kpi-stack .sheet-kpi-row-label small { font-size: 7px; }
+  .sheet-kpi-stack .sheet-kpi-row-ope .sheet-kpi,
+  .sheet-kpi-stack .sheet-kpi-row-365 .sheet-kpi { min-height: 36px; border-radius: 8px; }
+  .sheet-kpi-stack .sheet-kpi-row-ope .sheet-kpi::after,
+  .sheet-kpi-stack .sheet-kpi-row-365 .sheet-kpi::after { width: 18px; height: 18px; top: -9px; right: -9px; }
+}
+@media (min-width: 1200px) {
+  .sheet-kpi-stack .sheet-kpi-row-ope .sheet-kpi,
+  .sheet-kpi-stack .sheet-kpi-row-365 .sheet-kpi { min-height: 50px; }
+  .sheet-kpi-stack .sheet-kpi-row-ope,
+  .sheet-kpi-stack .sheet-kpi-row-365 { grid-template-columns: 72px repeat(4, minmax(0, 1fr)) !important; }
+}

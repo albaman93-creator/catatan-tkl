@@ -87,3 +87,9 @@
 .bd-detail-chart { overflow-x: auto; }
 .bd-bar-hit { cursor: pointer; }
 .bd-bar-hit:hover .bd-bar-rect { filter: brightness(1.12); }
+
+
+/* Baris Breakdown: 1 kolom; 2 kolom saat panel detail terbuka */
+.pica-charts-row.bd-row { grid-template-columns: 1fr; }
+.pica-charts-row.bd-row.has-bd-detail { grid-template-columns: 1fr 1fr; }
+.ms-row { margin-top: 14px; margin-bottom: 14px; }

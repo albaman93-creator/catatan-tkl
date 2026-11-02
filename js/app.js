@@ -29,15 +29,15 @@ const App = (() => {
     // Load record pertama
     Storage.loadRecord();
 
-    // Auto-save LOKAL tiap N ms (default 60 dtk) — tidak menyentuh Supabase
-    // Auto-save SUPABASE tiap M ms (default 90 dtk) — hanya saat online
+    // Auto-save LOKAL tiap N ms (default 10 dtk) — tidak menyentuh Supabase
+    // Auto-save SUPABASE tiap M ms (default 30 dtk) — hanya saat online
     // (lewat Perf.every supaya ikut berhenti saat app disembunyikan/background)
     if (typeof Perf !== 'undefined') {
-      Perf.every(CONFIG.AUTO_SAVE_INTERVAL_MS || 60000, Storage.autoSaveLocal);
-      Perf.every(CONFIG.AUTO_SAVE_SUPABASE_INTERVAL_MS || 90000, Storage.autoSaveSupabase);
+      Perf.every(CONFIG.AUTO_SAVE_INTERVAL_MS || 10000, Storage.autoSaveLocal);
+      Perf.every(CONFIG.AUTO_SAVE_SUPABASE_INTERVAL_MS || 30000, Storage.autoSaveSupabase);
     } else {
-      setInterval(Storage.autoSaveLocal, CONFIG.AUTO_SAVE_INTERVAL_MS || 60000);
-      setInterval(() => { Storage.autoSaveSupabase(); }, CONFIG.AUTO_SAVE_SUPABASE_INTERVAL_MS || 90000);
+      setInterval(Storage.autoSaveLocal, CONFIG.AUTO_SAVE_INTERVAL_MS || 10000);
+      setInterval(() => { Storage.autoSaveSupabase(); }, CONFIG.AUTO_SAVE_SUPABASE_INTERVAL_MS || 30000);
     }
 
     // Start clock

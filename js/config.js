@@ -35,12 +35,12 @@ const CONFIG = Object.freeze({
 
   // Auto-save LOKAL (localStorage) setiap N ms. Tidak menyentuh Supabase —
   // hanya menjaga-jaga data tidak hilang kalau browser/tab tertutup tiba-tiba.
-  AUTO_SAVE_INTERVAL_MS: 60000, // 1 menit
+  AUTO_SAVE_INTERVAL_MS: 10000, // 10 detik
 
   // Auto-save ke Supabase setiap N ms (senyap, tanpa tombol Simpan).
   // Hanya jalan saat online + login cloud; skip jika offline / Mode Offline.
-  // Interval lebih jarang dari lokal agar tidak membebani jaringan.
-  AUTO_SAVE_SUPABASE_INTERVAL_MS: 90000, // 90 detik
+  // Interval lebih jarang dari lokal (10 dtk lokal, 30 dtk cloud) agar tidak membebani jaringan.
+  AUTO_SAVE_SUPABASE_INTERVAL_MS: 30000, // 30 detik
 
   // ====== DEFAULTS ======
   // Jumlah baris awal saat sheet kosong. Viewport tabel menampilkan ~10 baris;
