@@ -572,23 +572,34 @@ const WeeklyDashboard = (() => {
       const fetchTo   = (f.month && f.month !== 'all') ? yearRange.to   : calRange.to;
       let rows = await fetchCached(fetchFrom, fetchTo, meta.stage, meta.line);
       if (my !== mchSeq) return;
-      // Filter periode:
-      // 1) Ada prodMonth → harus cocok dengan bulan filter
-      // 2) Tidak ada prodMonth → fallback ke tanggal kalender (week/month)
-      if (f.month && f.month !== 'all') {
-        const m = String(parseInt(f.month, 10));
+      // Filter periode bulan + week.
+      // Bulan: utamakan payload.prodMonth (penanda manual di sheet); fallback tanggal kalender.
+      // Week: pakai nomor week yang sama dengan badge sheet (ProdWeek, cutoff Rabu).
+      const wantMonth = (f.month && f.month !== 'all') ? String(parseInt(f.month, 10)) : null;
+      const wantWeek  = (f.week && f.week !== 'all') ? String(parseInt(f.week, 10)) : null;
+
+      const recordWeek = (r) => {
+        const ymd = String(r.date || '').slice(0, 10);
+        if (typeof ProdWeek !== 'undefined' && ProdWeek.weekNumFromYMD) {
+          return String(ProdWeek.weekNumFromYMD(ymd));
+        }
+        // Fallback: week kalender 1–7 / 8–14 / 15–21 / 22–akhir
+        const day = parseInt(ymd.slice(8, 10), 10) || 1;
+        return String(day <= 7 ? 1 : day <= 14 ? 2 : day <= 21 ? 3 : 4);
+      };
+
+      const recordMonth = (r) => {
+        const pm = r.payload && r.payload.prodMonth != null ? String(r.payload.prodMonth).trim() : '';
+        if (pm) return String(parseInt(pm, 10));
+        const ymd = String(r.date || '').slice(0, 10);
+        return String(parseInt(ymd.slice(5, 7), 10) || 0);
+      };
+
+      if (wantMonth || wantWeek) {
         rows = rows.filter((r) => {
-          const pm = r.payload && r.payload.prodMonth != null ? String(r.payload.prodMonth).trim() : '';
-          if (pm) return pm === m || Number(pm) === Number(m);
-          // fallback: tanggal dalam rentang kalender bulan/week
-          const d = String(r.date || '').slice(0, 10);
-          return d >= calRange.from && d <= calRange.to;
-        });
-      } else if (f.week && f.week !== 'all') {
-        // Bulan all + week spesifik jarang dipakai (week disabled), tapi jaga-jaga
-        rows = rows.filter((r) => {
-          const d = String(r.date || '').slice(0, 10);
-          return d >= calRange.from && d <= calRange.to;
+          if (wantMonth && recordMonth(r) !== wantMonth) return false;
+          if (wantWeek && recordWeek(r) !== wantWeek) return false;
+          return true;
         });
       }
       const from = calRange.from, to = calRange.to;
