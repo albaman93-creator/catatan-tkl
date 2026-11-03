@@ -145,3 +145,28 @@
   background: #1e293b;
   opacity: 0.5;
 }
+
+/* Filter OEE Production — sama seperti mesin */
+#oeeFilter select {
+  min-width: 110px;
+  max-width: 200px;
+}
+#oeeYear {
+  min-width: 88px;
+  max-width: 100px;
+}
+#oeeMonth {
+  min-width: 130px;
+}
+#oeeWeek {
+  min-width: 100px;
+}
+#oeeWeek:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #f1f5f9;
+}
+[data-theme="dark"] #oeeWeek:disabled {
+  background: #1e293b;
+  opacity: 0.5;
+}

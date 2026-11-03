@@ -2119,39 +2119,65 @@
                   <div class="weekly-hero-badge">Weekly OEE OPE · Speed Standar · Weekly OEE 365</div>
                 </div>
                 <div class="oee-filter oee-filter-extended" id="oeeFilter">
-                  <div class="field"><label for="oeeFrom">Dari Tanggal</label><input type="date" id="oeeFrom"></div>
-                  <div class="field"><label for="oeeTo">Sampai Tanggal</label><input type="date" id="oeeTo"></div>
+                  <div class="field">
+                    <label for="oeeYear">Tahun</label>
+                    <select id="oeeYear" title="Pilih tahun"></select>
+                  </div>
+                  <div class="field">
+                    <label for="oeeMonth">Bulan</label>
+                    <select id="oeeMonth" title="Pilih bulan">
+                      <option value="all">Semua bulan</option>
+                      <option value="1">Januari</option>
+                      <option value="2">Februari</option>
+                      <option value="3">Maret</option>
+                      <option value="4">April</option>
+                      <option value="5">Mei</option>
+                      <option value="6">Juni</option>
+                      <option value="7">Juli</option>
+                      <option value="8">Agustus</option>
+                      <option value="9">September</option>
+                      <option value="10">Oktober</option>
+                      <option value="11">November</option>
+                      <option value="12">Desember</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="oeeWeek">Week</label>
+                    <select id="oeeWeek" title="Pilih week">
+                      <option value="all">All</option>
+                      <option value="1">Week 1</option>
+                      <option value="2">Week 2</option>
+                      <option value="3">Week 3</option>
+                      <option value="4">Week 4</option>
+                    </select>
+                  </div>
                   <div class="field">
                     <label for="oeeProduct">Produk &amp; Batch</label>
                     <select id="oeeProduct" title="Filter berdasarkan produk / batch">
                       <option value="">Semua produk</option>
                     </select>
                   </div>
-                  <div class="field mch-shift-field">
-                    <label>Shift</label>
-                    <div class="mch-shift-group" id="oeeShiftGroup" role="group" aria-label="Filter shift">
-                      <button type="button" class="mch-shift-btn on" data-shift="all" title="Semua shift">All</button>
-                      <button type="button" class="mch-shift-btn" data-shift="1" title="Shift 1">S1</button>
-                      <button type="button" class="mch-shift-btn" data-shift="2" title="Shift 2">S2</button>
-                      <button type="button" class="mch-shift-btn" data-shift="3" title="Shift 3">S3</button>
-                    </div>
-                  </div>
                   <button type="button" class="btn btn-primary btn-sm" id="oeeApply">Terapkan</button>
                   <button type="button" class="btn btn-ghost btn-sm" id="oeeReset">Reset</button>
                 </div>
                 <div class="oee-filter-status" id="oeeStatus"></div>
-                <div class="wd-totals" id="oeeTotals" aria-label="Ringkasan waktu dan output per filter">
-                  <div class="wd-tot-card">
-                    <div class="wd-tot-label">Waktu Operasional (E)</div>
+                                <div class="wd-totals" id="oeeTotals" aria-label="Ringkasan waktu dan output per filter">
+                  <div class="wd-tot-card wd-tot-ops">
+                    <div class="wd-tot-label">Waktu Operasional</div>
                     <div class="wd-tot-val" id="oeeTotE">—</div>
                     <div class="wd-tot-unit">menit</div>
                   </div>
-                  <div class="wd-tot-card">
-                    <div class="wd-tot-label">Waktu Produksi Terencana (C)</div>
-                    <div class="wd-tot-val" id="oeeTotC">—</div>
+                  <div class="wd-tot-card wd-tot-plane">
+                    <div class="wd-tot-label">Plane Breakdown</div>
+                    <div class="wd-tot-val" id="oeeTotPlane">—</div>
                     <div class="wd-tot-unit">menit</div>
                   </div>
-                  <div class="wd-tot-card" title="Time Available Filling = shift − jeda − Mixing. Waktu keseluruhan yang dimiliki tahapan Filling (basis OEE 365).">
+                  <div class="wd-tot-card wd-tot-unplane">
+                    <div class="wd-tot-label">Unplane Breakdown</div>
+                    <div class="wd-tot-val" id="oeeTotUnplane">—</div>
+                    <div class="wd-tot-unit">menit</div>
+                  </div>
+                  <div class="wd-tot-card">
                     <div class="wd-tot-label">Time Available</div>
                     <div class="wd-tot-val" id="oeeTotAvail">—</div>
                     <div class="wd-tot-unit">menit</div>
@@ -2162,13 +2188,13 @@
                     <div class="wd-tot-unit">bag/mnt</div>
                   </div>
                   <div class="wd-tot-card">
-                    <div class="wd-tot-label">Output Aktual (Baik+Defect)</div>
-                    <div class="wd-tot-val" id="oeeTotActual">—</div>
+                    <div class="wd-tot-label">Output Standar (rate×E)</div>
+                    <div class="wd-tot-val" id="oeeTotIdeal">—</div>
                     <div class="wd-tot-unit">unit</div>
                   </div>
                   <div class="wd-tot-card">
-                    <div class="wd-tot-label">Output Standar (rate×E)</div>
-                    <div class="wd-tot-val" id="oeeTotIdeal">—</div>
+                    <div class="wd-tot-label">Output Aktual (Baik+Defect)</div>
+                    <div class="wd-tot-val" id="oeeTotActual">—</div>
                     <div class="wd-tot-unit">unit</div>
                   </div>
                   <div class="wd-tot-card">
@@ -2196,9 +2222,9 @@
                         <path class="oee-track" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round"/>
                         <!-- fill (86.78% of 266.9 ≈ 231.6) -->
                         <path class="oee-fill oee-fill-blue" id="oeeOpeFill" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round" stroke-dasharray="266.9" stroke-dashoffset="266.9"/>
-                        <!-- target marker 88% -->
-                        <line class="oee-target-line" x1="185" y1="28" x2="200" y2="20" stroke="#f8fafc" stroke-width="2"/>
-                        <text class="oee-target-text" x="202" y="18" fill="#f8fafc" font-size="9">88%</text>
+                                                <!-- target marker 88% — posisi di arc (bukan pojok kanan atas) -->
+                        <line class="oee-target-line" x1="192.8" y1="82.2" x2="203.9" y2="77.8" stroke="#94a3b8" stroke-width="1.5"/>
+                        <text class="oee-target-text" x="208" y="76" fill="#94a3b8" font-size="9" text-anchor="start">88%</text>
                       </svg>
                       <div class="oee-gauge-center">
                         <div class="oee-actual" id="oeeOpeValue">—</div>
@@ -2245,8 +2271,8 @@
                         <path class="oee-track" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round"/>
                         <!-- fill 47.02% of 266.9 ≈ 125.5 → offset = 266.9 - 125.5 = 141.4 -->
                         <path class="oee-fill oee-fill-green" id="oee365Fill" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round" stroke-dasharray="266.9" stroke-dashoffset="266.9"/>
-                        <line class="oee-target-line" x1="120" y1="22" x2="130" y2="12" stroke="#f8fafc" stroke-width="2"/>
-                        <text class="oee-target-text" x="132" y="12" fill="#f8fafc" font-size="9">55%</text>
+                        <line class="oee-target-line" x1="123.9" y1="27.1" x2="125.8" y2="15.2" stroke="#94a3b8" stroke-width="1.5"/>
+                        <text class="oee-target-text" x="126" y="12" fill="#94a3b8" font-size="9" text-anchor="middle">55%</text>
                       </svg>
                       <div class="oee-gauge-center">
                         <div class="oee-actual" id="oee365Value">—</div>
@@ -2372,18 +2398,23 @@
                   <button type="button" class="btn btn-ghost btn-sm" id="mchReset">Reset</button>
                 </div>
                 <div class="oee-filter-status" id="mchStatus"></div>
-                <div class="wd-totals" id="mchTotals" aria-label="Ringkasan waktu dan output per filter">
-                  <div class="wd-tot-card">
-                    <div class="wd-tot-label">Waktu Operasional (E)</div>
+                                <div class="wd-totals" id="mchTotals" aria-label="Ringkasan waktu dan output per filter">
+                  <div class="wd-tot-card wd-tot-ops">
+                    <div class="wd-tot-label">Waktu Operasional</div>
                     <div class="wd-tot-val" id="mchTotE">—</div>
                     <div class="wd-tot-unit">menit</div>
                   </div>
-                  <div class="wd-tot-card">
-                    <div class="wd-tot-label">Waktu Produksi Terencana (C)</div>
-                    <div class="wd-tot-val" id="mchTotC">—</div>
+                  <div class="wd-tot-card wd-tot-plane">
+                    <div class="wd-tot-label">Plane Breakdown</div>
+                    <div class="wd-tot-val" id="mchTotPlane">—</div>
                     <div class="wd-tot-unit">menit</div>
                   </div>
-                  <div class="wd-tot-card" title="Time Available Filling = shift − jeda − Mixing. Waktu keseluruhan yang dimiliki tahapan Filling (basis OEE 365).">
+                  <div class="wd-tot-card wd-tot-unplane">
+                    <div class="wd-tot-label">Unplane Breakdown</div>
+                    <div class="wd-tot-val" id="mchTotUnplane">—</div>
+                    <div class="wd-tot-unit">menit</div>
+                  </div>
+                  <div class="wd-tot-card">
                     <div class="wd-tot-label">Time Available</div>
                     <div class="wd-tot-val" id="mchTotAvail">—</div>
                     <div class="wd-tot-unit">menit</div>
@@ -2394,13 +2425,13 @@
                     <div class="wd-tot-unit">bag/mnt</div>
                   </div>
                   <div class="wd-tot-card">
-                    <div class="wd-tot-label">Output Aktual (Baik+Defect)</div>
-                    <div class="wd-tot-val" id="mchTotActual">—</div>
+                    <div class="wd-tot-label">Output Standar (rate×E)</div>
+                    <div class="wd-tot-val" id="mchTotIdeal">—</div>
                     <div class="wd-tot-unit">unit</div>
                   </div>
                   <div class="wd-tot-card">
-                    <div class="wd-tot-label">Output Standar (rate×E)</div>
-                    <div class="wd-tot-val" id="mchTotIdeal">—</div>
+                    <div class="wd-tot-label">Output Aktual (Baik+Defect)</div>
+                    <div class="wd-tot-val" id="mchTotActual">—</div>
                     <div class="wd-tot-unit">unit</div>
                   </div>
                   <div class="wd-tot-card">
@@ -2428,9 +2459,9 @@
                         <path class="oee-track" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round"/>
                         <!-- fill (86.78% of 266.9 ≈ 231.6) -->
                         <path class="oee-fill oee-fill-blue" id="mchOpeFill" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round" stroke-dasharray="266.9" stroke-dashoffset="266.9"/>
-                        <!-- target marker 88% -->
-                        <line class="oee-target-line" x1="185" y1="28" x2="200" y2="20" stroke="#f8fafc" stroke-width="2"/>
-                        <text class="oee-target-text" x="202" y="18" fill="#f8fafc" font-size="9">88%</text>
+                                                <!-- target marker 88% — posisi di arc (bukan pojok kanan atas) -->
+                        <line class="oee-target-line" x1="192.8" y1="82.2" x2="203.9" y2="77.8" stroke="#94a3b8" stroke-width="1.5"/>
+                        <text class="oee-target-text" x="208" y="76" fill="#94a3b8" font-size="9" text-anchor="start">88%</text>
                       </svg>
                       <div class="oee-gauge-center">
                         <div class="oee-actual" id="mchOpeValue">—</div>
@@ -2476,8 +2507,8 @@
                         <path class="oee-track" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round"/>
                         <!-- fill 47.02% of 266.9 ≈ 125.5 → offset = 266.9 - 125.5 = 141.4 -->
                         <path class="oee-fill oee-fill-green" id="mch365Fill" d="M 25 115 A 85 85 0 0 1 195 115" fill="none" stroke-width="18" stroke-linecap="round" stroke-dasharray="266.9" stroke-dashoffset="266.9"/>
-                        <line class="oee-target-line" x1="120" y1="22" x2="130" y2="12" stroke="#f8fafc" stroke-width="2"/>
-                        <text class="oee-target-text" x="132" y="12" fill="#f8fafc" font-size="9">55%</text>
+                        <line class="oee-target-line" x1="123.9" y1="27.1" x2="125.8" y2="15.2" stroke="#94a3b8" stroke-width="1.5"/>
+                        <text class="oee-target-text" x="126" y="12" fill="#94a3b8" font-size="9" text-anchor="middle">55%</text>
                       </svg>
                       <div class="oee-gauge-center">
                         <div class="oee-actual" id="mch365Value">—</div>
@@ -2699,35 +2730,42 @@
                   <div class="weekly-hero-badge">Rekap kegiatan &amp; perhitungan per produk · unduh Excel</div>
                 </div>
                 <div class="oee-filter oee-filter-extended" id="rpFilterBar">
-                  <div class="field"><label for="rpFrom">Dari Tanggal</label><input type="date" id="rpFrom"></div>
-                  <div class="field"><label for="rpTo">Sampai Tanggal</label><input type="date" id="rpTo"></div>
                   <div class="field">
-                    <label for="rpLine">Line</label>
-                    <select id="rpLine">
-                      <option value="">Semua line</option>
-                      <option value="1">Line 1</option>
-                      <option value="2">Line 2</option>
-                      <option value="4">Line 4</option>
+                    <label for="rpYear">Tahun</label>
+                    <select id="rpYear" title="Pilih tahun"></select>
+                  </div>
+                  <div class="field">
+                    <label for="rpMonth">Bulan</label>
+                    <select id="rpMonth" title="Pilih bulan">
+                      <option value="all">Semua bulan</option>
+                      <option value="1">Januari</option>
+                      <option value="2">Februari</option>
+                      <option value="3">Maret</option>
+                      <option value="4">April</option>
+                      <option value="5">Mei</option>
+                      <option value="6">Juni</option>
+                      <option value="7">Juli</option>
+                      <option value="8">Agustus</option>
+                      <option value="9">September</option>
+                      <option value="10">Oktober</option>
+                      <option value="11">November</option>
+                      <option value="12">Desember</option>
                     </select>
                   </div>
                   <div class="field">
-                    <label for="rpStage">Tahapan</label>
-                    <select id="rpStage">
-                      <option value="">Semua tahapan</option>
-                      <option value="filling">Filling</option>
-                      <option value="kemas">Kemas</option>
-                      <option value="mixing">Mixing</option>
-                      <option value="steril">Steril</option>
-                      <option value="visual">Visual</option>
+                    <label for="rpWeek">Week</label>
+                    <select id="rpWeek" title="Pilih week">
+                      <option value="all">All</option>
+                      <option value="1">Week 1</option>
+                      <option value="2">Week 2</option>
+                      <option value="3">Week 3</option>
+                      <option value="4">Week 4</option>
                     </select>
                   </div>
                   <div class="field">
-                    <label for="rpShift">Shift</label>
-                    <select id="rpShift">
-                      <option value="all">Semua shift</option>
-                      <option value="1">Shift 1</option>
-                      <option value="2">Shift 2</option>
-                      <option value="3">Shift 3</option>
+                    <label for="rpProduct">Produk &amp; Batch</label>
+                    <select id="rpProduct" title="Filter berdasarkan produk / batch">
+                      <option value="">Semua produk</option>
                     </select>
                   </div>
                   <button type="button" class="btn btn-primary btn-sm" id="rpApply">Terapkan</button>

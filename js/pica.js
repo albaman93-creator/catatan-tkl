@@ -163,7 +163,7 @@ const Pica = (() => {
     const svg = $(svgId);
     if (!svg) return;
     const items = pairs.slice(0, 12);
-    const slot = 72, L = 40, R = 10, T = 22, B = 42, H = 200, ph = H - T - B;
+    const slot = 64, L = 36, R = 10, T = 18, B = 36, H = 140, ph = H - T - B;
     const W = Math.max(280, L + R + Math.max(1, items.length) * slot);
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.style.width = W > 480 ? W + 'px' : '100%';

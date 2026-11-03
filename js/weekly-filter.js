@@ -3,8 +3,8 @@
  * Kontrol filter untuk halaman Weekly OEE Production (scope 'oee')
  * dan halaman detail mesin (scope 'mch').
  *
- * oee  : Produk & Batch + Shift + rentang tanggal (Dari/Sampai)
- * mch  : Tahun + Bulan + Week + Produk (tanpa Shift, tanpa rentang tanggal manual)
+ * Keduanya memakai model yang sama:
+ *   Tahun + Bulan + Week + Produk (tanpa Shift, tanpa rentang tanggal manual)
  *
  * Modul ini HANYA mengurus tampilan filter dan memberi tahu pemakai lewat
  * WeeklyFilter.on(). Pengambilan data & hitungan ada di weekly-dashboard.js + weekly-calc.js.
@@ -13,10 +13,11 @@ const WeeklyFilter = (() => {
   'use strict';
 
   const IDS = {
-    oee: { product: 'oeeProduct', shift: 'oeeShiftGroup' },
+    oee: { product: 'oeeProduct', year: 'oeeYear', month: 'oeeMonth', week: 'oeeWeek' },
     mch: { product: 'mchProduct', year: 'mchYear', month: 'mchMonth', week: 'mchWeek' },
+    rp:  { product: 'rpProduct',  year: 'rpYear',  month: 'rpMonth',  week: 'rpWeek'  },
   };
-  const handlers = { oee: [], mch: [] };
+  const handlers = { oee: [], mch: [], rp: [] };
   let bound = false;
 
   const $ = (id) => document.getElementById(id);
@@ -26,50 +27,27 @@ const WeeklyFilter = (() => {
     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
   ];
 
-  const getShift = (scope) => {
-    if (scope === 'mch') return 'all';
-    const on = document.querySelector(`#${IDS[scope].shift} .mch-shift-btn.on`);
-    return on ? on.getAttribute('data-shift') : 'all';
-  };
-
-  const setShift = (scope, shift) => {
-    if (scope === 'mch') return;
-    document.querySelectorAll(`#${IDS[scope].shift} .mch-shift-btn`).forEach((btn) => {
-      btn.classList.toggle('on', btn.getAttribute('data-shift') === String(shift));
-    });
-  };
-
   /**
-   * Filter aktif.
-   * oee: { product, shift }
-   * mch: { product, shift:'all', year, month, week }
+   * Filter aktif (oee & mch sama):
+   * { product, shift:'all', year, month, week }
    */
   const get = (scope) => {
-    if (scope === 'mch') {
-      return {
-        product: ($(IDS.mch.product) || {}).value || '',
-        shift: 'all',
-        year: ($(IDS.mch.year) || {}).value || String(new Date().getFullYear()),
-        month: ($(IDS.mch.month) || {}).value || 'all',
-        week: ($(IDS.mch.week) || {}).value || 'all',
-      };
-    }
+    const ids = IDS[scope] || IDS.mch;
     return {
-      product: ($(IDS[scope].product) || {}).value || '',
-      shift: getShift(scope),
+      product: ($(ids.product) || {}).value || '',
+      shift: 'all',
+      year: ($(ids.year) || {}).value || String(new Date().getFullYear()),
+      month: ($(ids.month) || {}).value || 'all',
+      week: ($(ids.week) || {}).value || 'all',
     };
   };
 
   const fmtShort = (iso) => (iso ? iso.slice(8, 10) + '/' + iso.slice(5, 7) : '');
   const span = (o) => (o.first === o.last ? fmtShort(o.first) : fmtShort(o.first) + '–' + fmtShort(o.last));
 
-  /**
-   * Isi dropdown dari hasil WeeklyCalc.productOptions().
-   * want: nilai yang ingin dipilih (default: pilihan sebelumnya bila masih ada).
-   * Return nilai yang akhirnya terpilih.
-   */
   const populate = (scope, opts, want) => {
-    const sel = $(IDS[scope].product);
+    const ids = IDS[scope] || IDS.mch;
+    const sel = $(ids.product);
     if (!sel) return '';
     const keep = want != null ? want : sel.value;
     const esc = Utils.escapeHtml;
@@ -88,14 +66,17 @@ const WeeklyFilter = (() => {
   };
 
   const setProduct = (scope, value) => {
-    const sel = $(IDS[scope].product);
+    const ids = IDS[scope] || IDS.mch;
+    const sel = $(ids.product);
     if (!sel) return;
     sel.value = Array.from(sel.options).some((o) => o.value === value) ? value : '';
   };
 
-  /** Isi opsi tahun (tahun berjalan + beberapa tahun sebelumnya). */
-  const initYear = () => {
-    const sel = $(IDS.mch.year);
+  /** Isi opsi tahun untuk satu scope. */
+  const initYearScope = (scope) => {
+    const ids = IDS[scope];
+    if (!ids) return;
+    const sel = $(ids.year);
     if (!sel) return;
     if (sel.options.length) return;
     const cy = new Date().getFullYear();
@@ -107,29 +88,49 @@ const WeeklyFilter = (() => {
     sel.value = String(cy);
   };
 
-  /** Reset filter mesin ke default (tahun berjalan, semua bulan, all week, semua produk). */
-  const resetMch = () => {
-    initYear();
-    const y = $(IDS.mch.year);
-    const m = $(IDS.mch.month);
-    const w = $(IDS.mch.week);
+  const initYear = (scope) => {
+    if (scope) return initYearScope(scope);
+    initYearScope('oee');
+    initYearScope('mch');
+    initYearScope('rp');
+  };
+
+  /** Saat bulan = All, paksa week = All. */
+  const syncWeekEnabled = (scope) => {
+    const scopes = scope ? [scope] : ['oee', 'mch', 'rp'];
+    scopes.forEach((sc) => {
+      const ids = IDS[sc];
+      if (!ids) return;
+      const m = $(ids.month);
+      const w = $(ids.week);
+      if (!m || !w) return;
+      if (m.value === 'all') {
+        w.value = 'all';
+        w.disabled = true;
+      } else {
+        w.disabled = false;
+      }
+    });
+  };
+
+  const resetScope = (scope) => {
+    initYearScope(scope);
+    const ids = IDS[scope];
+    if (!ids) return;
+    const y = $(ids.year);
+    const m = $(ids.month);
+    const w = $(ids.week);
     if (y) y.value = String(new Date().getFullYear());
     if (m) m.value = 'all';
     if (w) { w.value = 'all'; w.disabled = true; }
-    setProduct('mch', '');
+    setProduct(scope, '');
   };
 
-  /** Kembalikan ke default (tanpa memicu handler). */
-  const reset = (scope) => {
-    if (scope === 'mch') return resetMch();
-    setProduct(scope, '');
-    setShift(scope, 'all');
-  };
+  const reset = (scope) => resetScope(scope);
 
   /**
-   * Hitung rentang tanggal ISO (YYYY-MM-DD) dari year + month + week.
-   * Week 1 = tgl 1–7, Week 2 = 8–14, Week 3 = 15–21, Week 4 = 22–akhir bulan.
-   * month='all' → seluruh tahun. week hanya berlaku jika month spesifik.
+   * Hitung rentang tanggal ISO dari year + month + week (kalender).
+   * Week 1 = 1–7, Week 2 = 8–14, Week 3 = 15–21, Week 4 = 22–akhir.
    */
   const toDateRange = (year, month, week) => {
     const y = parseInt(year, 10) || new Date().getFullYear();
@@ -154,7 +155,6 @@ const WeeklyFilter = (() => {
     };
   };
 
-  /** Label ringkas untuk status: "November 2026 · Week 2" dsb. */
   const rangeLabel = (year, month, week) => {
     const y = year || new Date().getFullYear();
     if (!month || month === 'all') return 'Tahun ' + y;
@@ -163,47 +163,29 @@ const WeeklyFilter = (() => {
     return name + ' ' + y + ' · Week ' + week;
   };
 
-  /** Saat bulan = All, paksa week = All (week tidak bermakna lintas bulan). */
-  const syncWeekEnabled = () => {
-    const m = $(IDS.mch.month);
-    const w = $(IDS.mch.week);
-    if (!m || !w) return;
-    if (m.value === 'all') {
-      w.value = 'all';
-      w.disabled = true;
-    } else {
-      w.disabled = false;
-    }
-  };
-
-  /** Daftarkan fungsi yang dipanggil saat user ganti filter. */
   const on = (scope, fn) => { handlers[scope].push(fn); };
   const emit = (scope) => handlers[scope].forEach((fn) => fn(get(scope)));
+
+  // Kompatibilitas API lama (shift sudah dihapus)
+  const setShift = () => {};
+  const getShift = () => 'all';
 
   const bind = () => {
     if (bound) return;
     bound = true;
 
-    // OEE scope: product + shift
-    $(IDS.oee.product)?.addEventListener('change', () => emit('oee'));
-    $(IDS.oee.shift)?.addEventListener('click', (e) => {
-      const btn = e.target.closest('.mch-shift-btn');
-      if (!btn) return;
-      setShift('oee', btn.getAttribute('data-shift'));
-      emit('oee');
+    ['oee', 'mch', 'rp'].forEach((scope) => {
+      const ids = IDS[scope];
+      initYearScope(scope);
+      syncWeekEnabled(scope);
+
+      $(ids.product)?.addEventListener('change', () => emit(scope));
+      // Tahun/Bulan/Week di-handle di weekly-dashboard (load ulang data)
     });
-
-    // MCH scope
-    initYear();
-    syncWeekEnabled();
-
-    // Hanya product yang emit (re-render). Tahun/Bulan/Week di-handle
-    // di weekly-dashboard.js → loadMachine() agar data di-fetch ulang.
-    $(IDS.mch.product)?.addEventListener('change', () => emit('mch'));
   };
 
   return {
-    bind, get, populate, setProduct, setShift, reset, on,
+    bind, get, populate, setProduct, setShift, getShift, reset, on,
     toDateRange, rangeLabel, initYear, syncWeekEnabled, MONTH_NAMES,
   };
 })();

@@ -203,14 +203,49 @@ const RincianProduk = (() => {
   };
 
   const filterLocal = (recs) => {
-    const line = $('rpLine')?.value || '';
-    const stage = $('rpStage')?.value || '';
-    const shift = $('rpShift')?.value || 'all';
+    const f = (typeof WeeklyFilter !== 'undefined') ? WeeklyFilter.get('rp') : {};
+    const product = (f.product || '').trim();
+    const month = f.month || 'all';
+    const week = f.week || 'all';
     return recs.filter((r) => {
-      if (line && String(r.line) !== line) return false;
-      if (stage && String(r.tahapan || '').toLowerCase() !== stage) return false;
-      if (shift !== 'all' && String(r.shift) !== shift) return false;
-      return true;
+      // Filter bulan produksi (prodMonth di payload) bila diset
+      if (month !== 'all') {
+        const pay = r.payload || {};
+        const pm = String(pay.prodMonth || '').trim();
+        const calM = String(r.date || '').slice(5, 7);
+        const want = String(month).padStart(2, '0');
+        // prioritas prodMonth; fallback bulan kalender
+        if (pm) {
+          // prodMonth bisa "11" / "NOV" / "November"
+          const map = { JAN:1,FEB:2,MAR:3,APR:4,MEI:5,MAY:5,JUN:6,JUL:7,AGU:8,AUG:8,SEP:9,OKT:10,OCT:10,NOV:11,DES:12,DEC:12 };
+          let n = parseInt(pm, 10);
+          if (!n) {
+            const key = pm.toUpperCase().slice(0, 3);
+            n = map[key] || 0;
+          }
+          if (n && String(n).padStart(2, '0') !== want) return false;
+        } else if (calM !== want) {
+          return false;
+        }
+      }
+      if (week !== 'all' && typeof ProdWeek !== 'undefined' && ProdWeek.weekNumFromYMD) {
+        const wn = ProdWeek.weekNumFromYMD(String(r.date || '').slice(0, 10));
+        if (wn !== parseInt(week, 10)) return false;
+      }
+      if (!product) return true;
+      // cocokkan kode produk / label batch di payload
+      const pay = r.payload || {};
+      const slots = slotsOf(pay.products);
+      const hitSlot = slots.some((s) => s.label && (
+        s.label === product || s.name === product ||
+        (s.label && s.label.toUpperCase().includes(product.toUpperCase()))
+      ));
+      if (hitSlot) return true;
+      const rows = Array.isArray(pay.rows) ? pay.rows : [];
+      return rows.some((x) => {
+        const raw = String(x.batch || '').trim();
+        return raw === product || raw.toUpperCase().startsWith(product.toUpperCase());
+      });
     });
   };
 
@@ -391,22 +426,61 @@ const RincianProduk = (() => {
     renderDetailTable(detailRows);
     renderSummaryTable(summaryRows);
     renderBatchTable(batchRows);
-    say(`✓ ${filtered.length} record · ${detailRows.length} kegiatan · ${summaryRows.length} rekap produk · ${batchRows.length} rekap batch`);
+    const rangeTxt = ($('rpStatus') && $('rpStatus').dataset.range) || '';
+    say(`✓ ${filtered.length} record · ${detailRows.length} kegiatan · ${summaryRows.length} rekap produk · ${batchRows.length} rekap batch` + (rangeTxt ? ' · ' + rangeTxt : ''));
   };
 
   const load = async () => {
-    const from = $('rpFrom')?.value;
-    const to = $('rpTo')?.value;
-    if (!from || !to) return say('Isi Dari Tanggal dan Sampai Tanggal.', true);
-    if (from > to) return say('Tanggal awal tidak boleh melebihi tanggal akhir.', true);
+    const f = (typeof WeeklyFilter !== 'undefined')
+      ? WeeklyFilter.get('rp')
+      : { year: String(new Date().getFullYear()), month: 'all', week: 'all' };
+    const range = (typeof WeeklyFilter !== 'undefined' && WeeklyFilter.toDateRange)
+      ? WeeklyFilter.toDateRange(f.year, f.month, f.week)
+      : { from: f.year + '-01-01', to: f.year + '-12-31' };
+    const from = range.from;
+    const to = range.to;
     say('Memuat data…');
     try {
       raw = await fetchRows(from, to);
+      // Isi dropdown produk dari data yang dimuat
+      if (typeof WeeklyFilter !== 'undefined' && WeeklyCalc && WeeklyCalc.productOptions) {
+        try {
+          const opts = WeeklyCalc.productOptions(raw);
+          WeeklyFilter.populate('rp', opts);
+        } catch (_) { /* ignore */ }
+      } else {
+        populateProductFallback(raw);
+      }
       refreshView();
+      const label = (typeof WeeklyFilter !== 'undefined' && WeeklyFilter.rangeLabel)
+        ? WeeklyFilter.rangeLabel(f.year, f.month, f.week)
+        : (from + ' – ' + to);
+      // status di-overwrite di refreshView; simpan label di dataset
+      if ($('rpStatus')) $('rpStatus').dataset.range = label;
     } catch (e) {
       console.warn(e);
       say('Gagal memuat: ' + (e.message || e), true);
     }
+  };
+
+  /** Fallback opsi produk bila WeeklyCalc.productOptions tidak ada */
+  const populateProductFallback = (recs) => {
+    const sel = $('rpProduct');
+    if (!sel) return;
+    const keep = sel.value;
+    const set = new Map();
+    recs.forEach((r) => {
+      const slots = slotsOf((r.payload || {}).products);
+      slots.forEach((s) => {
+        if (s.name) set.set(s.name, s.label || s.name);
+      });
+    });
+    let html = '<option value="">Semua produk</option>';
+    [...set.entries()].sort((a, b) => a[0].localeCompare(b[0])).forEach(([code, label]) => {
+      html += `<option value="${esc(code)}">${esc(label || code)}</option>`;
+    });
+    sel.innerHTML = html;
+    if ([...sel.options].some((o) => o.value === keep)) sel.value = keep;
   };
 
   const loadXlsx = () => new Promise((resolve, reject) => {
@@ -490,9 +564,11 @@ const RincianProduk = (() => {
       });
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(batchAoa), 'rekap per batch');
 
-      const from = $('rpFrom')?.value || '';
-      const to = $('rpTo')?.value || '';
-      const name = `rincian-produk_${from}_${to}.xlsx`;
+      const f = (typeof WeeklyFilter !== 'undefined') ? WeeklyFilter.get('rp') : {};
+      const range = (typeof WeeklyFilter !== 'undefined' && WeeklyFilter.toDateRange)
+        ? WeeklyFilter.toDateRange(f.year, f.month, f.week)
+        : { from: 'all', to: 'all' };
+      const name = `rincian-produk_${range.from}_${range.to}.xlsx`;
       XLSX.writeFile(wb, name);
       say(`✓ File diunduh: ${name}`);
     } catch (e) {
@@ -501,17 +577,11 @@ const RincianProduk = (() => {
     }
   };
 
-  const defaultDates = () => {
-    const to = new Date();
-    const from = new Date();
-    from.setDate(to.getDate() - 13);
-    const iso = (d) => d.toISOString().slice(0, 10);
-    if ($('rpFrom') && !$('rpFrom').value) $('rpFrom').value = iso(from);
-    if ($('rpTo') && !$('rpTo').value) $('rpTo').value = iso(to);
-  };
-
   const open = () => {
-    defaultDates();
+    if (typeof WeeklyFilter !== 'undefined') {
+      WeeklyFilter.initYear('rp');
+      WeeklyFilter.syncWeekEnabled('rp');
+    }
     const tab = document.querySelector('.rp-tab.is-on')?.dataset.rpTab || 'detail';
     showTab(tab);
     if (!raw.length) load();
@@ -529,12 +599,19 @@ const RincianProduk = (() => {
   };
 
   const bind = () => {
+    if (typeof WeeklyFilter !== 'undefined') {
+      WeeklyFilter.initYear('rp');
+      WeeklyFilter.syncWeekEnabled('rp');
+    }
     $('rpApply')?.addEventListener('click', load);
     $('rpReset')?.addEventListener('click', () => {
-      if ($('rpLine')) $('rpLine').value = '';
-      if ($('rpStage')) $('rpStage').value = '';
-      if ($('rpShift')) $('rpShift').value = 'all';
-      defaultDates();
+      if (typeof WeeklyFilter !== 'undefined') WeeklyFilter.reset('rp');
+      else {
+        if ($('rpYear')) $('rpYear').value = String(new Date().getFullYear());
+        if ($('rpMonth')) $('rpMonth').value = 'all';
+        if ($('rpWeek')) { $('rpWeek').value = 'all'; $('rpWeek').disabled = true; }
+        if ($('rpProduct')) $('rpProduct').value = '';
+      }
       load();
     });
     $('rpDownload')?.addEventListener('click', downloadExcel);
@@ -545,10 +622,13 @@ const RincianProduk = (() => {
       const tr = e.target.closest('tr.rp-row-link');
       if (tr) openSummaryRow(tr);
     });
-    // Filter lokal tanpa fetch ulang
-    ['rpLine', 'rpStage', 'rpShift'].forEach((id) => {
-      $(id)?.addEventListener('change', () => { if (raw.length) refreshView(); });
+    // Tahun/Bulan/Week → fetch ulang; Produk → filter lokal
+    ['rpYear', 'rpMonth', 'rpWeek'].forEach((id) => {
+      $(id)?.addEventListener('change', () => {
+        if (id === 'rpMonth' && typeof WeeklyFilter !== 'undefined') WeeklyFilter.syncWeekEnabled('rp');
+      });
     });
+    $('rpProduct')?.addEventListener('change', () => { if (raw.length) refreshView(); });
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);

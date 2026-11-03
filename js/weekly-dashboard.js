@@ -31,19 +31,44 @@ const WeeklyDashboard = (() => {
   const fmtPct = (v, d = 2) =>
     Number(v).toLocaleString('id-ID', { minimumFractionDigits: d, maximumFractionDigits: d }) + '%';
 
-  /** Set stroke-dashoffset untuk gauge setengah lingkaran (0% = kosong, 100% = penuh) */
-  const setHalfGauge = (elId, pct, len) => {
+  /**
+   * Set stroke-dashoffset untuk gauge setengah lingkaran (0% = kosong, 100% = penuh).
+   * color (opsional): override stroke; null = biarkan CSS class.
+   */
+  const setHalfGauge = (elId, pct, len, color) => {
     const fill = document.getElementById(elId);
     if (!fill) return;
     const clamped = Math.max(0, Math.min(100, Number(pct) || 0));
-    const offset = len * (1 - clamped / 100);
-    // Reset dulu biar animasi jalan setiap kali
+    // Kompensasi stroke-linecap:round — ujung visual melampaui titik geometris
+    // sepanjang ±½ stroke-width. Stroke gauge OEE = 18 → half ≈ 9.
+    const sw = parseFloat(fill.getAttribute('stroke-width') || '18') || 18;
+    const capPct = len > 0 ? (sw / 2 / len) * 100 : 0;
+    const visual = Math.max(0, Math.min(100, clamped - capPct));
+    const offset = len * (1 - visual / 100);
     fill.style.transition = 'none';
     fill.style.strokeDashoffset = String(len);
-    // Force reflow
+    if (color) fill.style.stroke = color;
     void fill.getBoundingClientRect();
-    fill.style.transition = 'stroke-dashoffset 0.9s ease';
+    fill.style.transition = 'stroke-dashoffset 0.9s ease, stroke 0.4s ease';
     fill.style.strokeDashoffset = String(offset);
+  };
+
+  /** Warna gauge OEE OPE: <70 crimson, 70–87 orange, >87 default theme */
+  const colorOpe = (pct) => {
+    const v = Number(pct);
+    if (!Number.isFinite(v)) return 'var(--wdt-gauge-ope)';
+    if (v < 70) return '#DC143C';
+    if (v <= 87) return '#FF8C00';
+    return 'var(--wdt-gauge-ope)';
+  };
+
+  /** Warna gauge OEE 365: <40 crimson, 40–54 orange, ≥55 default theme */
+  const color365 = (pct) => {
+    const v = Number(pct);
+    if (!Number.isFinite(v)) return 'var(--wdt-gauge-365)';
+    if (v < 40) return '#DC143C';
+    if (v < 55) return '#FF8C00';
+    return 'var(--wdt-gauge-365)';
   };
 
   const setYieldGauge = (pct) => {
@@ -139,8 +164,10 @@ const WeeklyDashboard = (() => {
   };
 
   const setOeeGauges = (all, pf = 'oee') => {
-    setHalfGauge(pf + 'OpeFill', all.ope.oee ?? 0, OEE_GAUGE_LEN);
-    setHalfGauge(pf + '365Fill', all.o365.oee ?? 0, OEE_GAUGE_LEN);
+    const opePct = all.ope.oee ?? 0;
+    const o365Pct = all.o365.oee ?? 0;
+    setHalfGauge(pf + 'OpeFill', opePct, OEE_GAUGE_LEN, colorOpe(opePct));
+    setHalfGauge(pf + '365Fill', o365Pct, OEE_GAUGE_LEN, color365(o365Pct));
     $(pf + 'OpeValue').textContent = f2(all.ope.oee);
     $(pf + '365Value').textContent = f2(all.o365.oee);
     setApq(pf + 'OpeA', all.ope.a, TGT_OPE.a); setApq(pf + 'OpeP', all.ope.p, TGT_OPE.p); setApq(pf + 'OpeQ', all.ope.q, TGT_OPE.q);
@@ -160,11 +187,12 @@ const WeeklyDashboard = (() => {
     };
     const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
     set(prefix + 'TotE', fmt(t.E));
-    set(prefix + 'TotC', fmt(t.C));
+    set(prefix + 'TotPlane', fmt(t.B));
+    set(prefix + 'TotUnplane', fmt(t.D));
     set(prefix + 'TotAvail', fmt(t.availBase));
     set(prefix + 'TotRate', fmtRate(t.rateTotal));
-    set(prefix + 'TotActual', fmt(t.actual));
     set(prefix + 'TotIdeal', fmt(t.ideal));
+    set(prefix + 'TotActual', fmt(t.actual));
     set(prefix + 'TotGood', fmt(t.good));
     set(prefix + 'TotDefect', fmt(t.defect));
   };
@@ -274,7 +302,7 @@ const WeeklyDashboard = (() => {
     if (!oeeRng) return;
     const { from, to } = oeeRng;
     const f = WeeklyFilter.get('oee');
-    const recs = WeeklyCalc.filterShift(oeeRaw, f.shift);
+    const recs = oeeRaw; // shift dihapus — semua shift
     const all = calcFor(recs, f, dayDiff(from, to));
     setOeeGauges(all);
     setTotals(all, 'oee');
@@ -290,24 +318,53 @@ const WeeklyDashboard = (() => {
     const items = (st) => OEE_MACHINES[st].map((m) => { const p = all.per[st + '|' + m.line]; return { ...m, ope: p?.ope ?? null, o365: p?.o365 ?? null }; });
     barSvg('oeeBarFfs', items('filling'), '#22c55e', '#86efac', '#f59e0b', '#fcd34d', 'Automatic Form Fill Seal Machine');
     barSvg('oeeBarOw', items('kemas'), '#f43f5e', '#fda4af', '#22d3ee', '#a5f3fc', 'Overwrapping Machine');
-    const info = `${f.product || 'Semua produk'} · ${shiftText(f)} · ${fmtD(from)} – ${fmtD(to)}`;
+    const period = WeeklyFilter.rangeLabel(f.year, f.month, f.week);
+    const info = `${f.product || 'Semua produk'} · ${period}`;
     if (all.n) say('oeeStatus', `✓ ${all.n} record · Filling & Kemas Line 1, 2, 4 · ${info}`);
     else say('oeeStatus', `⚠ Tidak ada data untuk filter ini · ${info}`, true);
   };
 
   const loadOee = async () => {
-    const from = $('oeeFrom')?.value, to = $('oeeTo')?.value;
-    if (!from || !to) return say('oeeStatus', 'Isi Dari Tanggal dan Sampai Tanggal.', true);
-    if (from > to) return say('oeeStatus', 'Tanggal awal tidak boleh melebihi tanggal akhir.', true);
+    WeeklyFilter.initYear('oee');
+    WeeklyFilter.syncWeekEnabled('oee');
+    const f = WeeklyFilter.get('oee');
+    const yearRange = WeeklyFilter.toDateRange(f.year, 'all', 'all');
+    const calRange = WeeklyFilter.toDateRange(f.year, f.month, f.week);
     if (!navigator.onLine) return say('oeeStatus', '⚠ Tidak ada koneksi — data OEE diambil dari Supabase.', true);
     const my = ++oeeSeq;
-    say('oeeStatus', 'Memuat data…');
+    const period = WeeklyFilter.rangeLabel(f.year, f.month, f.week);
+    say('oeeStatus', `Memuat data · ${period}…`);
     try {
       rowsCache.clear();
-      const rows = await fetchCached(from, to);
+      const fetchFrom = (f.month && f.month !== 'all') ? yearRange.from : calRange.from;
+      const fetchTo   = (f.month && f.month !== 'all') ? yearRange.to   : calRange.to;
+      let rows = await fetchCached(fetchFrom, fetchTo);
       if (my !== oeeSeq) return;
+
+      const wantMonth = (f.month && f.month !== 'all') ? String(parseInt(f.month, 10)) : null;
+      const wantWeek  = (f.week && f.week !== 'all') ? String(parseInt(f.week, 10)) : null;
+      const recordWeek = (r) => {
+        const ymd = String(r.date || '').slice(0, 10);
+        if (typeof ProdWeek !== 'undefined' && ProdWeek.weekNumFromYMD) return String(ProdWeek.weekNumFromYMD(ymd));
+        const day = parseInt(ymd.slice(8, 10), 10) || 1;
+        return String(day <= 7 ? 1 : day <= 14 ? 2 : day <= 21 ? 3 : 4);
+      };
+      const recordMonth = (r) => {
+        const pm = r.payload && r.payload.prodMonth != null ? String(r.payload.prodMonth).trim() : '';
+        if (pm) return String(parseInt(pm, 10));
+        const ymd = String(r.date || '').slice(0, 10);
+        return String(parseInt(ymd.slice(5, 7), 10) || 0);
+      };
+      if (wantMonth || wantWeek) {
+        rows = rows.filter((r) => {
+          if (wantMonth && recordMonth(r) !== wantMonth) return false;
+          if (wantWeek && recordWeek(r) !== wantWeek) return false;
+          return true;
+        });
+      }
+
+      const from = calRange.from, to = calRange.to;
       oeeRaw = rows; oeeRng = { from, to };
-      // Dropdown Produk & Batch = riwayat produk/batch pada rentang tanggal ini.
       WeeklyFilter.populate('oee', WeeklyCalc.productOptions(rows));
       renderOee();
     } catch (e) {
@@ -317,16 +374,18 @@ const WeeklyDashboard = (() => {
   };
 
   const initOeeFilter = () => {
-    const f = $('oeeFrom'), t = $('oeeTo');
-    if (!f || !t || (f.value && t.value)) return;
-    const today = Utils.todayLocal();
-    f.value = today.slice(0, 8) + '01';
-    t.value = today;
+    WeeklyFilter.initYear('oee');
+    WeeklyFilter.syncWeekEnabled('oee');
   };
-  const syncMchRange = () => copyRange('oee', 'mch');
+  const syncMchRange = () => {}; // tidak lagi share rentang tanggal
 
   const bindOee = () => {
     $('oeeApply')?.addEventListener('click', loadOee);
+    $('oeeReset')?.addEventListener('click', () => { WeeklyFilter.reset('oee'); loadOee(); });
+    $('oeeYear')?.addEventListener('change', () => { WeeklyFilter.syncWeekEnabled('oee'); loadOee(); });
+    $('oeeMonth')?.addEventListener('change', () => { WeeklyFilter.syncWeekEnabled('oee'); loadOee(); });
+    $('oeeWeek')?.addEventListener('change', () => { loadOee(); });
+
     const sb = $('oeeSpeedBody');
     sb?.addEventListener('click', (e) => { const tr = e.target.closest('tr.speed-row'); if (tr) openSpeedMenu(tr); });
     sb?.addEventListener('keydown', (e) => {
@@ -334,14 +393,13 @@ const WeeklyDashboard = (() => {
       const tr = e.target.closest('tr.speed-row');
       if (tr) { e.preventDefault(); openSpeedMenu(tr); }
     });
-    $('oeeFrom')?.addEventListener('change', () => { loadOee(); });
-    $('oeeTo')?.addEventListener('change', () => { loadOee(); });
+
     $('mchApply')?.addEventListener('click', () => { loadMachine(); });
     $('mchReset')?.addEventListener('click', () => { WeeklyFilter.reset('mch'); loadMachine(); });
-    // Tahun / Bulan / Week → reload data (produk ikut terisi ulang)
-    $('mchYear')?.addEventListener('change', () => { WeeklyFilter.syncWeekEnabled(); loadMachine(); });
-    $('mchMonth')?.addEventListener('change', () => { WeeklyFilter.syncWeekEnabled(); loadMachine(); });
+    $('mchYear')?.addEventListener('change', () => { WeeklyFilter.syncWeekEnabled('mch'); loadMachine(); });
+    $('mchMonth')?.addEventListener('change', () => { WeeklyFilter.syncWeekEnabled('mch'); loadMachine(); });
     $('mchWeek')?.addEventListener('change', () => { loadMachine(); });
+
     const mb = $('mchSpeedBody');
     mb?.addEventListener('click', (e) => { const tr = e.target.closest('tr.speed-row'); if (tr) openSpeedMenu(tr); });
     mb?.addEventListener('keydown', (e) => {
@@ -349,7 +407,6 @@ const WeeklyDashboard = (() => {
       const tr = e.target.closest('tr.speed-row');
       if (tr) { e.preventDefault(); openSpeedMenu(tr); }
     });
-    $('oeeReset')?.addEventListener('click', () => { WeeklyFilter.reset('oee'); $('oeeFrom').value = ''; $('oeeTo').value = ''; initOeeFilter(); loadOee(); });
   };
 
   // ===== HALAMAN DETAIL MESIN (Filling / Kemas · Line 1, 2, 4) =====
@@ -468,7 +525,8 @@ const WeeklyDashboard = (() => {
     svg.removeAttribute('height');
     svg.style.width = L + R + list.length * slot > 560 ? W + 'px' : '100%';
     const top = Math.max(0, ...list.flatMap((b) => [b.ope, b.o365].map((v) => (Number.isFinite(v) ? v : 0))));
-    const max = Math.max(150, Math.ceil(top / 50) * 50);
+    // Skala tetap 0–100% (tanpa 150%)
+    const max = 100;
     const Y = (v) => T + ph - (Math.min(Math.max(v, 0), max) / max) * ph;
     let s = '<g stroke="#334155" stroke-width="1">';
     for (let v = 0; v <= max; v += 50) s += `<line x1="${L}" y1="${Y(v)}" x2="${W - R}" y2="${Y(v)}"/>`;
@@ -484,13 +542,13 @@ const WeeklyDashboard = (() => {
         s += `<rect x="${x}" y="${y}" width="16" height="${T + ph - y}" rx="2" fill="${c}"/>`
           + `<text x="${x + 8}" y="${y - 4}" fill="#e2e8f0" font-size="8" font-weight="600" transform="rotate(-90 ${x + 8} ${y - 4})">${fmtPct(v, 2)}</text>`;
       });
-      // Label: mesin + kode produk + WO/batch, contoh: F2 VPEL1_L027108
+      // Label: kode produk_No batch, contoh: PVAHE2_P2610105 (tanpa prefix mesin)
       const codePart = b.code ? String(b.code).trim() : '';
       const woPart = String(b.wo || '').trim();
       const prodBatch = codePart && woPart
         ? (woPart.toUpperCase().startsWith(codePart.toUpperCase()) ? woPart : codePart + '_' + woPart)
         : (woPart || codePart || '—');
-      const lbl = (b.m ? machineShort(b.m) + ' ' : '') + prodBatch;
+      const lbl = prodBatch;
       s += `<text x="${cx}" y="${T + ph + 13}" fill="#94a3b8" font-size="9" text-anchor="end" transform="rotate(-40 ${cx} ${T + ph + 13})">${Utils.escapeHtml(lbl)}</text>`;
     });
     svg.innerHTML = s;
@@ -722,7 +780,7 @@ const WeeklyDashboard = (() => {
       setTimeout(() => setYieldGauge(100.4), 50);
     } else if (pageId === 'oee-prod') {
       document.getElementById('weeklyPageOee')?.classList.add('is-active');
-      initOeeFilter(); syncMchRange(); loadOee();
+      initOeeFilter(); loadOee();
     } else if (pageId === 'rincian-produk') {
       document.getElementById('weeklyPageRincian')?.classList.add('is-active');
       if (typeof RincianProduk !== 'undefined' && RincianProduk.open) RincianProduk.open();

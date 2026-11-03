@@ -567,7 +567,8 @@
 :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card,
 :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-panel,
 :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-trend-card,
-:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-bar-card {
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-bar-card,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .shutdown-card {
   background: #0f192d;
   border: 1px solid var(--wd-border);
   box-shadow: var(--wd-shadow);
@@ -607,7 +608,8 @@
   :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card,
   :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-panel,
   :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-trend-card,
-  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-bar-card {
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-bar-card,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .shutdown-card {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0) 42%),
       var(--wd-card);
@@ -683,4 +685,55 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
     linear-gradient(180deg, rgba(6, 95, 70, 0.42), rgba(6, 78, 59, 0.52)) !important;
   border: 1px solid rgba(52, 211, 153, 0.36) !important;
+}
+
+/* ========================================================
+   Override redesign.css light tables di weekly dark theme
+   ======================================================== */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-card {
+  background: #0f192d !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-table-wrap,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .pica-table-wrap {
+  background: #0d1629 !important;
+  border-color: #1b3a5c !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-table thead th,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .pica-table thead th,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .speed-table th {
+  background: #10243c !important;
+  color: #dbe7f3 !important;
+  border-color: #24466b !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-table td,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .pica-table td,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .speed-table td {
+  color: #cbd5e1 !important;
+  border-color: #1b3a5c !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-table tbody tr:nth-child(even) td,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .speed-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-title {
+  color: #e2e8f0 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-pager-btn {
+  background: #10243c !important;
+  border-color: #24466b !important;
+  color: #e2e8f0 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-pager-btn:hover {
+  background: #1a3352 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .sd-leg-label {
+  color: #e2e8f0 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .sd-leg-meta,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-summary {
+  color: #94a3b8 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-summary strong {
+  color: #f1f5f9 !important;
 }

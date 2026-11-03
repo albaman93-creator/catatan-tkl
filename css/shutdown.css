@@ -230,3 +230,114 @@
     break-inside: avoid;
   }
 }
+
+/* ========================================================
+   DARK THEME — samakan dengan tabel PICA / panel weekly gelap
+   Mendukung data-theme="dark" dan data-wd-theme weekly
+   ======================================================== */
+:root[data-theme="dark"] .shutdown-card,
+:root[data-wd-theme="dark"] .shutdown-card,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-card {
+  background: #0f192d !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.35);
+}
+
+:root[data-theme="dark"] .shutdown-title,
+:root[data-wd-theme="dark"] .shutdown-title,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-title {
+  color: #e2e8f0 !important;
+}
+
+:root[data-theme="dark"] .shutdown-summary,
+:root[data-wd-theme="dark"] .shutdown-summary,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-summary {
+  color: #94a3b8 !important;
+}
+:root[data-theme="dark"] .shutdown-summary strong,
+:root[data-wd-theme="dark"] .shutdown-summary strong,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-summary strong {
+  color: #f1f5f9 !important;
+}
+:root[data-theme="dark"] .shutdown-summary .sd-top,
+:root[data-wd-theme="dark"] .shutdown-summary .sd-top,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-summary .sd-top {
+  color: #64748b !important;
+}
+
+:root[data-theme="dark"] .sd-leg-item,
+:root[data-wd-theme="dark"] .sd-leg-item,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .sd-leg-item {
+  color: #94a3b8 !important;
+}
+:root[data-theme="dark"] .sd-leg-label,
+:root[data-wd-theme="dark"] .sd-leg-label,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .sd-leg-label {
+  color: #e2e8f0 !important;
+}
+:root[data-theme="dark"] .sd-leg-meta,
+:root[data-wd-theme="dark"] .sd-leg-meta,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .sd-leg-meta {
+  color: #64748b !important;
+}
+
+:root[data-theme="dark"] .shutdown-table-wrap,
+:root[data-wd-theme="dark"] .shutdown-table-wrap,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-table-wrap {
+  background: #0d1629 !important;
+  border-color: #1b3a5c !important;
+}
+
+:root[data-theme="dark"] .shutdown-table thead th,
+:root[data-wd-theme="dark"] .shutdown-table thead th,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-table thead th {
+  background: #10243c !important;
+  color: #dbe7f3 !important;
+  border-bottom-color: #24466b !important;
+}
+
+:root[data-theme="dark"] .shutdown-table td,
+:root[data-wd-theme="dark"] .shutdown-table td,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-table td {
+  color: #cbd5e1 !important;
+  border-bottom-color: #1b3a5c !important;
+  background: transparent !important;
+}
+
+:root[data-theme="dark"] .shutdown-table tbody tr:nth-child(even) td,
+:root[data-wd-theme="dark"] .shutdown-table tbody tr:nth-child(even) td,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+:root[data-theme="dark"] .shutdown-table tbody tr:hover td,
+:root[data-wd-theme="dark"] .shutdown-table tbody tr:hover td,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-table tbody tr:hover td {
+  background: rgba(59, 130, 246, 0.08) !important;
+}
+
+:root[data-theme="dark"] .shutdown-pager,
+:root[data-wd-theme="dark"] .shutdown-pager,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-pager {
+  color: #64748b !important;
+}
+
+:root[data-theme="dark"] .shutdown-pager-btn,
+:root[data-wd-theme="dark"] .shutdown-pager-btn,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-pager-btn {
+  background: #10243c !important;
+  border-color: #24466b !important;
+  color: #e2e8f0 !important;
+}
+:root[data-theme="dark"] .shutdown-pager-btn:hover,
+:root[data-wd-theme="dark"] .shutdown-pager-btn:hover,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-pager-btn:hover {
+  background: #1a3352 !important;
+  border-color: #3b82f6 !important;
+}
+
+:root[data-theme="dark"] .shutdown-empty-note,
+:root[data-wd-theme="dark"] .shutdown-empty-note,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .shutdown-empty-note {
+  color: #fbbf24 !important;
+}

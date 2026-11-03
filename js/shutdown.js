@@ -189,7 +189,7 @@ const Shutdown = (() => {
         }).join('')
       : '<tr><td colspan="6">Tidak ada data pada rentang ini</td></tr>';
     if (info) info.textContent = st.list.length
-      ? `${start + 1} – ${Math.min(start + PAGE_SIZE, st.list.length)} / ${st.list.length}`
+      ? `${st.page + 1}/${pages}`
       : '0 / 0';
   };
 
