@@ -1122,6 +1122,31 @@
                 <span class="compact-icon">▣</span><span id="sheetDateText">04 SEP 2026</span>
               </button>
             </div>
+            <!-- Periode Bulan (penanda manual untuk filter dashboard) -->
+            <div class="compact-control compact-period-control">
+              <button type="button" class="compact-trigger sheet-period-trigger" id="sheetPeriodTrigger" aria-expanded="false" aria-controls="compactPeriodPanel" title="Tandai periode bulan produksi">
+                <span id="sheetPeriodValue" class="sheet-period-value is-empty">Periode bulan</span><span class="compact-chevron">▾</span>
+              </button>
+              <div class="compact-popover compact-choice-panel" id="compactPeriodPanel">
+                <div class="compact-popover-head"><b>Periode Bulan</b><button type="button" class="compact-close" aria-label="Tutup">×</button></div>
+                <div class="compact-choice-list compact-choice-period" id="sheetPeriodList">
+                  <button type="button" class="compact-period-option on" data-period="" aria-selected="true">— Belum ditandai —</button>
+                  <button type="button" class="compact-period-option" data-period="1" data-label="JAN">Januari</button>
+                  <button type="button" class="compact-period-option" data-period="2" data-label="FEB">Februari</button>
+                  <button type="button" class="compact-period-option" data-period="3" data-label="MAR">Maret</button>
+                  <button type="button" class="compact-period-option" data-period="4" data-label="APR">April</button>
+                  <button type="button" class="compact-period-option" data-period="5" data-label="MEI">Mei</button>
+                  <button type="button" class="compact-period-option" data-period="6" data-label="JUN">Juni</button>
+                  <button type="button" class="compact-period-option" data-period="7" data-label="JUL">Juli</button>
+                  <button type="button" class="compact-period-option" data-period="8" data-label="AGU">Agustus</button>
+                  <button type="button" class="compact-period-option" data-period="9" data-label="SEP">September</button>
+                  <button type="button" class="compact-period-option" data-period="10" data-label="OKT">Oktober</button>
+                  <button type="button" class="compact-period-option" data-period="11" data-label="NOV">November</button>
+                  <button type="button" class="compact-period-option" data-period="12" data-label="DES">Desember</button>
+                </div>
+              </div>
+              <input type="hidden" id="sheetProdMonth" value="" title="Periode bulan produksi (1-12)">
+            </div>
 
             <!-- Tahapan -->
             <div class="compact-control">
@@ -2305,22 +2330,43 @@
                   <div class="weekly-hero-badge" id="weeklyMachineBadge">Detail performa mesin</div>
                 </div>
                 <div class="oee-filter oee-filter-extended" id="mchFilterBar">
-                  <div class="field"><label for="mchFrom">Dari Tanggal</label><input type="date" id="mchFrom"></div>
-                  <div class="field"><label for="mchTo">Sampai Tanggal</label><input type="date" id="mchTo"></div>
+                  <div class="field">
+                    <label for="mchYear">Tahun</label>
+                    <select id="mchYear" title="Pilih tahun"></select>
+                  </div>
+                  <div class="field">
+                    <label for="mchMonth">Bulan</label>
+                    <select id="mchMonth" title="Pilih bulan">
+                      <option value="all">Semua bulan</option>
+                      <option value="1">Januari</option>
+                      <option value="2">Februari</option>
+                      <option value="3">Maret</option>
+                      <option value="4">April</option>
+                      <option value="5">Mei</option>
+                      <option value="6">Juni</option>
+                      <option value="7">Juli</option>
+                      <option value="8">Agustus</option>
+                      <option value="9">September</option>
+                      <option value="10">Oktober</option>
+                      <option value="11">November</option>
+                      <option value="12">Desember</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="mchWeek">Week</label>
+                    <select id="mchWeek" title="Pilih week">
+                      <option value="all">All</option>
+                      <option value="1">Week 1</option>
+                      <option value="2">Week 2</option>
+                      <option value="3">Week 3</option>
+                      <option value="4">Week 4</option>
+                    </select>
+                  </div>
                   <div class="field">
                     <label for="mchProduct">Produk &amp; Batch</label>
                     <select id="mchProduct" title="Filter berdasarkan produk / batch">
                       <option value="">Semua produk</option>
                     </select>
-                  </div>
-                  <div class="field mch-shift-field">
-                    <label>Shift</label>
-                    <div class="mch-shift-group" id="mchShiftGroup" role="group" aria-label="Filter shift">
-                      <button type="button" class="mch-shift-btn on" data-shift="all" title="Semua shift">All</button>
-                      <button type="button" class="mch-shift-btn" data-shift="1" title="Shift 1">S1</button>
-                      <button type="button" class="mch-shift-btn" data-shift="2" title="Shift 2">S2</button>
-                      <button type="button" class="mch-shift-btn" data-shift="3" title="Shift 3">S3</button>
-                    </div>
                   </div>
                   <button type="button" class="btn btn-primary btn-sm" id="mchApply">Terapkan</button>
                   <button type="button" class="btn btn-ghost btn-sm" id="mchReset">Reset</button>

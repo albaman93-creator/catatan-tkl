@@ -346,12 +346,12 @@ const WeeklyOee = (() => {
       el.addEventListener('click', () => {
         const page = el.getAttribute('data-weekly-page');
         setTimeout(() => {
-          const from = $('mchFrom')?.value || '';
-          const to = $('mchTo')?.value || '';
-          const product = $('mchProduct')?.value || '';
-          const shiftBtn = document.querySelector('#mchShiftGroup .mch-shift-btn.on');
-          const shift = shiftBtn ? shiftBtn.getAttribute('data-shift') : 'all';
-          render({ page, from, to, product, shift, scope: 'machine' });
+          const f = (typeof WeeklyFilter !== 'undefined') ? WeeklyFilter.get('mch') : {};
+          const range = (typeof WeeklyFilter !== 'undefined' && WeeklyFilter.toDateRange)
+            ? WeeklyFilter.toDateRange(f.year, f.month, f.week)
+            : { from: '', to: '' };
+          const product = f.product || $('mchProduct')?.value || '';
+          render({ page, from: range.from, to: range.to, product, shift: 'all', scope: 'machine' });
         }, 60);
       });
     });

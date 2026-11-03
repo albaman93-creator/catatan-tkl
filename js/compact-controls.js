@@ -288,6 +288,48 @@
       forwardChoice(btn, 'data-sheet-shift');
     }));
 
+    // Periode bulan (penanda manual untuk filter dashboard)
+    const setProdMonth = (value, label) => {
+      const hidden = document.getElementById('sheetProdMonth');
+      const valEl = document.getElementById('sheetPeriodValue');
+      if (hidden) hidden.value = value || '';
+      if (valEl) {
+        if (value) {
+          valEl.textContent = label || value;
+          valEl.classList.remove('is-empty');
+          valEl.classList.add('is-set');
+        } else {
+          valEl.textContent = 'Periode bulan';
+          valEl.classList.add('is-empty');
+          valEl.classList.remove('is-set');
+        }
+      }
+      $$('.compact-period-option').forEach(b => {
+        const on = (b.getAttribute('data-period') || '') === String(value || '');
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      // Trigger autosave bila tersedia
+      if (typeof Storage !== 'undefined' && Storage.autoSaveLocal) {
+        try { Storage.autoSaveLocal(); } catch (_) {}
+      }
+    };
+
+    $$('.compact-period-option').forEach(btn => btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const value = btn.getAttribute('data-period') || '';
+      const label = btn.getAttribute('data-label') || btn.textContent.trim();
+      setProdMonth(value, value ? label : '');
+      closeAll(null);
+    }));
+
+    // Sync tampilan dari hidden saat load record
+    window.SheetPeriod = {
+      set: setProdMonth,
+      get: () => (document.getElementById('sheetProdMonth') || {}).value || '',
+    };
+
     $$('.sheet-op-box, #prodName1, #prodName2, #prodName3, #prodRate1, #prodRate2, #prodRate3, #prodUkuran1, #prodUkuran2, #prodUkuran3, #prodWo1, #prodWo2, #prodWo3')
       .forEach(input => {
         input.addEventListener('input', syncSummary);

@@ -120,3 +120,28 @@
     flex: 1 1 140px;
   }
 }
+
+/* Filter mesin: Tahun / Bulan / Week lebih ringkas */
+#mchFilterBar select {
+  min-width: 110px;
+  max-width: 200px;
+}
+#mchYear {
+  min-width: 88px;
+  max-width: 100px;
+}
+#mchMonth {
+  min-width: 130px;
+}
+#mchWeek {
+  min-width: 100px;
+}
+#mchWeek:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #f1f5f9;
+}
+[data-theme="dark"] #mchWeek:disabled {
+  background: #1e293b;
+  opacity: 0.5;
+}

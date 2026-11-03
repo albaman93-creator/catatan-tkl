@@ -194,3 +194,89 @@
   .prod-week-cal { width: min(300px, calc(100vw - 16px)); }
   .pwc-day { height: 32px; font-size: 12px; }
 }
+
+/* Periode bulan — chip dropdown di toolbar sheet */
+.compact-period-control .sheet-period-trigger {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  font: 700 11.5px/1 system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  color: #64748b;
+  gap: 4px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+.compact-period-control .sheet-period-trigger:hover {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+}
+.sheet-period-value.is-empty {
+  color: #94a3b8;
+  font-weight: 600;
+}
+.sheet-period-value.is-set {
+  color: #0f172a;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.compact-period-control .sheet-period-trigger[aria-expanded="true"] {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+.compact-period-control .sheet-period-trigger[aria-expanded="true"] .sheet-period-value.is-set {
+  color: #1d4ed8;
+}
+.compact-choice-period {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 6px;
+  min-width: 220px;
+}
+.compact-choice-period .compact-period-option:first-child {
+  grid-column: 1 / -1;
+}
+.compact-period-option {
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font: 600 12.5px system-ui, sans-serif;
+  color: #334155;
+  text-align: left;
+  cursor: pointer;
+}
+.compact-period-option:hover {
+  background: #f1f5f9;
+}
+.compact-period-option.on {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+[data-theme="dark"] .compact-period-control .sheet-period-trigger {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+[data-theme="dark"] .sheet-period-value.is-set {
+  color: #e2e8f0;
+}
+[data-theme="dark"] .compact-period-control .sheet-period-trigger[aria-expanded="true"] {
+  background: #1e3a5f;
+  border-color: #3b82f6;
+}
+[data-theme="dark"] .compact-period-option {
+  color: #cbd5e1;
+}
+[data-theme="dark"] .compact-period-option:hover {
+  background: #0f172a;
+}
+[data-theme="dark"] .compact-period-option.on {
+  background: #1e3a5f;
+  color: #93c5fd;
+  border-color: #3b82f6;
+}

@@ -104,6 +104,9 @@ const Storage = (() => {
         wo: g('wo'), batch: g('batch'), good: g('good'), defect: g('defect'),
       };
     }),
+    // Periode bulan produksi (1-12) — penanda manual cutoff bulan untuk filter dashboard.
+    // Diisi user lewat dropdown "Periode bulan" di header sheet.
+    prodMonth: (document.getElementById('sheetProdMonth') || {}).value || '',
     savedAt: new Date().toISOString(),
   });
 
@@ -158,6 +161,33 @@ const Storage = (() => {
       const src = State.el[targetId] || document.getElementById(targetId);
       if (src) el.value = src.value;
     });
+
+    // Periode bulan produksi (penanda manual untuk filter dashboard)
+    {
+      const pm = (d && d.prodMonth != null) ? String(d.prodMonth) : '';
+      const hidden = document.getElementById('sheetProdMonth');
+      if (hidden) hidden.value = pm;
+      if (typeof window.SheetPeriod !== 'undefined' && window.SheetPeriod.set) {
+        const LABELS = { '1':'JAN','2':'FEB','3':'MAR','4':'APR','5':'MEI','6':'JUN',
+          '7':'JUL','8':'AGU','9':'SEP','10':'OKT','11':'NOV','12':'DES' };
+        window.SheetPeriod.set(pm, LABELS[pm] || '');
+      } else {
+        const valEl = document.getElementById('sheetPeriodValue');
+        if (valEl) {
+          const LABELS = { '1':'JAN','2':'FEB','3':'MAR','4':'APR','5':'MEI','6':'JUN',
+            '7':'JUL','8':'AGU','9':'SEP','10':'OKT','11':'NOV','12':'DES' };
+          if (pm && LABELS[pm]) {
+            valEl.textContent = LABELS[pm];
+            valEl.classList.remove('is-empty');
+            valEl.classList.add('is-set');
+          } else {
+            valEl.textContent = 'Periode bulan';
+            valEl.classList.add('is-empty');
+            valEl.classList.remove('is-set');
+          }
+        }
+      }
+    }
 
     // Operators
     if (d && d.operators) {
