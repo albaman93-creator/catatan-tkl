@@ -1,0 +1,146 @@
+/**
+ * oee-ope.css
+ * Screen: OEE OPE (data-screen="oee")
+ * button.screen-tab:nth-child(5)  (setelah Performa yang hidden)
+ */
+
+.sec[data-screen="oee"] {
+  padding: 1rem 1rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Produk summary table (atas) */
+.sec[data-screen="oee"] .produk-output-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.sec[data-screen="oee"] .produk-output-table th {
+  background: #f8fafc;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.sec[data-screen="oee"] .produk-output-table td {
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #0f172a;
+}
+
+.sec[data-screen="oee"] .produk-output-table .empty-msg {
+  text-align: center;
+  color: #94a3b8;
+  padding: 1.25rem;
+  font-size: 0.85rem;
+}
+
+/* APQ breakdown table */
+.sec[data-screen="oee"] .apq-table-wrap {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.sec[data-screen="oee"] .apq-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.sec[data-screen="oee"] .apq-table thead th {
+  background: #334155;
+  color: #fff;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.sec[data-screen="oee"] .apq-table thead th:last-child,
+.sec[data-screen="oee"] .apq-table thead th:nth-last-child(2) {
+  text-align: center;
+  min-width: 90px;
+}
+
+.sec[data-screen="oee"] .apq-table tbody td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.sec[data-screen="oee"] .apq-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.sec[data-screen="oee"] .apq-table .section-row td {
+  background: #f1f5f9;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475569;
+  padding: 0.45rem 0.75rem;
+}
+
+.sec[data-screen="oee"] .apq-table .code-cell {
+  font-weight: 700;
+  color: #0f172a;
+  width: 2rem;
+}
+
+.sec[data-screen="oee"] .apq-table .val-cell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #334155;
+}
+
+.sec[data-screen="oee"] .apq-table .val-cell.pct-good {
+  color: #16a34a;
+}
+
+.sec[data-screen="oee"] .apq-table .val-cell.pct-bad {
+  color: #dc2626;
+}
+
+.sec[data-screen="oee"] .apq-table .val-cell.pct-mid {
+  color: #d97706;
+}
+
+/* Warning banners */
+.sec[data-screen="oee"] .oee-alert {
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.sec[data-screen="oee"] .oee-alert.warn {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.sec[data-screen="oee"] .oee-alert.info {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}

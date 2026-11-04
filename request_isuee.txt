@@ -1,0 +1,764 @@
+atur ulang urutan dashboard weekly meeting menjadi urutan yang sebelum nya pada urutan dashboard
+misal saya pilih Filling
+
+⚙️
+MESIN FILLING LINE 1
+
+MESIN FILLING LINE 1
+Mesin Automatic Form Fill Seal Machine Shinva RSYG2-1-23005
+WEEKLY OEE OPE ,SPEED STANDAR (BAG / MENIT) ,WEEKLY OEE 365
+Planned Shutdown Filling – Line 1
+Planned Shutdown Activity – Line 1
+Unplanned Shutdown Filling – Line 1
+Unplanned Shutdown Activity – Line 1
+Minor Stoppage — Frekuensi per Produk · Filling L1
+Breakdown — Durasi per Produk (mnt) · Filling L1
+Minor Stoppage OEE Filling - Line 1
+PICA Problem OEE (Breakdown >10 mnt) Filling - Line 1
+Capaian OEE OPE & OEE 365 · Semua Produk · Filling Line 1 · Okt 2026
+
+menjadi urutanya
+
+
+⚙️
+MESIN FILLING LINE 1
+
+MESIN FILLING LINE 1
+Mesin Automatic Form Fill Seal Machine Shinva RSYG2-1-23005
+WEEKLY OEE OPE ,SPEED STANDAR (BAG / MENIT) ,WEEKLY OEE 365
+Planned Shutdown Filling – Line 1
+Planned Shutdown Activity – Line 1
+Unplanned Shutdown Filling – Line 1
+Unplanned Shutdown Activity – Line 1
+PICA Problem OEE (Breakdown >10 mnt) Filling - Line 1
+Breakdown — Durasi per Produk (mnt) · Filling L1
+Minor Stoppage — Frekuensi per Produk · Filling L1
+Minor Stoppage OEE Filling - Line 1
+Capaian OEE OPE & OEE 365 · Semua Produk · Filling Line 1 · Okt 2026
+
+
+#2 perbaikan tabel pica 
+pada bagian tabel "PICA Problem OEE (Breakdown >10 mnt) Filling - Line 1"
+tambahkan kolom tabel lagi 
+sebelum nya :
+
+
+No.	Date	Produk	No. Batch	Problem	Durasi (min) 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+1.	12/10	    —	    —	        eror	30		       -     -       -              -                   -               Open
+
+menjadi :
+
+No.	Date  shift	Produk	No. Batch	Problem	Durasi (min) 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+1.	12/10	 2   —	    —	        eror	30		       -     -       -              -                   -               Open
+
+
+dan pada tabel "Minor Stoppage OEE Filling - Line 1" sebelumnya :
+
+No.	Date  shift	Produk	No. Batch	Problem	            Frekuensi 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+1.	12/10	        —	    —	    Filling Lot A	        15		-		 -		 -             -                   -                Open
+
+
+#3 pastikan tabel pica mengambil data yang benar 
+
+ada kesalahan dalam pengambilan data 
+
+PICA Problem OEE (Breakdown >10 mnt) Filling - Line 2
+✓ 2 breakdown · 0 sudah diisi analisis Why-Why
+	No.	Date	Shift	Produk	No. Batch	Problem	Durasi (min) 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+	1.	02/10	1	        VPEL1	L027108	    PMS alarm merah	15							                                            Open
+	2.	02/10	2	        VPEL1	L027108	    Alarm PMS	15	                                                                        Open
+
+    di data oee 
+    tanggal 2/10 shift 1 
+            VPEL1 L027108	
+            % Availability
+            A	Waktu Operasional Pabrik (menit)	510 mnt
+            B	Waktu Berhenti Terencana (kode 5,6,7,8)	220 mnt
+            C	Waktu Produksi Terencana (A − B)	290 mnt
+            D	Waktu Berhenti Tidak Terencana (kode 1,3,4,9)	15 mnt (hanya ada 1 kejadian)
+            E	Waktu Operasional (C − D)	275 mnt
+            F	% A → (E ÷ C)
+            Target 90%	94,83 %
+           kolom MASALAH :PMS alarm merah
+
+   di data oee 
+    tanggal 2/10 shift 2 
+    VPEL1 L027108	
+            % Availability
+            A	Waktu Operasional Pabrik (menit)	480 mnt
+            B	Waktu Berhenti Terencana (kode 5,6,7,8)	80 mnt
+            C	Waktu Produksi Terencana (A − B)	400 mnt
+            D	Waktu Berhenti Tidak Terencana (kode 1,3,4,9)	15 mnt (ada di shift 2)
+            E	Waktu Operasional (C − D)	385 mnt
+            F	% A → (E ÷ C)
+            Target 90%	96,25 %
+        kolom MASALAH :Alarm PMS
+
+ehh sudah benar :
+
+
+
+#4 perbaruan pada tabel "Capaian OEE OPE & OEE 365 · Semua Produk · Filling Line 2 · Okt 2026"
+
+            Capaian OEE OPE & OEE 365 · Semua Produk · Filling Line 2 · Okt 2026
+            Produk
+            Semua produk — klik baris pada tabel Speed Standar untuk memfilter
+            Mesin (boleh pilih banyak)
+            F1 · Filling L1
+            F2 · Filling L2
+            F4 · Filling L4
+            K1 · Kemas L1
+            K2 · Kemas L2
+            K4 · Kemas L4
+            ✓ 2 batch WO ditampilkan
+            OEE
+            OEE_365
+            0%  50% 100%    150%    
+            89,1%   66,7%  F2·L027108   
+            102,3%  62,3%   F2·L027109
+
+            bisakah setiap nama grafik bar per bacth nya di tambahkan nama produk nya jangan no batch saja .
+
+            menjadi :
+
+
+            Capaian OEE OPE & OEE 365 · Semua Produk · Filling Line 2 · Okt 2026
+            Produk
+            Semua produk — klik baris pada tabel Speed Standar untuk memfilter
+            Mesin (boleh pilih banyak)
+            F1 · Filling L1
+            F2 · Filling L2
+            F4 · Filling L4
+            K1 · Kemas L1
+            K2 · Kemas L2
+            K4 · Kemas L4
+            ✓ 2 batch WO ditampilkan
+            OEE
+            OEE_365
+            0%  50% 100%    150%    
+            89,1%   66,7%   F2 VPEL1_L027108   
+            102,3%  62,3%   F2 VPEL1_L027109
+
+    #5 Tambahkan fungsi pada grafik Breakdown — Durasi per Produk (mnt) · Filling L1
+
+ini adalah gambaran daripada grafik 
+
+Breakdown — Durasi per Produk (mnt) · Filling L1
+0 29 58 86 115 
+115 VKAM1 
+50 unknown 
+50 VTTS1
+
+<img width="399" height="441" alt="Image" src="https://github.com/user-attachments/assets/0e43e5bf-adf4-4d0d-a0d6-8301c5622bcd" />
+
+ketika di klik pada bagian batang grarifk , menampilkan grafik batang di sebelah nya 
+grafik batang yang akan merincin dari setiap break down pada produk tersebut 
+misal VTTS1 
+>>>
+detail grafik breakdown (menit)
+produk :VTTS1
+
+bar grafik 
+
+15 alarm PMS  (ketika mouse di dekatkan pada setiap bar grafik akan muncul detail maslah terjadi di produk batch berapa dan tanggal dan shift berapa : misal VTTS1 L030120 10/10/26 s2)
+20 bag melipat 
+10 printingan blur
+50 perbaikan rubber pad
+
+referensi : grafik 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafik Breakdown - VTTS1</title>
+    <!-- Library Chart.js & Datalabels -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        /* --- VARIABEL WARNA (LIGHT MODE DEFAULT) --- */
+        :root {
+            --bg-body: #f4f6f9;
+            --bg-container: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --grid-color: #e0e0e0;
+            --bar-color: #ed405c;
+            --container-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            --border-color: transparent;
+            --tooltip-bg: rgba(255, 255, 255, 0.95);
+            --tooltip-text: #333;
+        }
+
+        /* --- VARIABEL WARNA (DARK MODE) --- */
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-container: rgba(30, 41, 59, 0.7);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --grid-color: rgba(255, 255, 255, 0.08);
+            --bar-color: #ff4d6d;
+            --container-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --tooltip-bg: rgba(15, 23, 42, 0.9);
+            --tooltip-text: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--bg-body);
+            transition: background-color 0.4s ease;
+        }
+
+        /* --- STYLING TOMBOL SWITCH --- */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+            color: var(--text-main);
+            font-weight: 600;
+            transition: color 0.4s ease;
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #ff4d6d;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* --- STYLING CONTAINER GRAFIK --- */
+        .chart-container {
+            width: 85%;
+            max-width: 850px;
+            background: var(--bg-container);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: var(--container-shadow);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: background 0.4s ease, box-shadow 0.4s ease, border 0.4s ease;
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <!-- Tombol Toggle Mode -->
+    <div class="theme-switch-wrapper">
+        <span>☀️ Light</span>
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider"></div>
+        </label>
+        <span>🌙 Dark</span>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script>
+        Chart.register(ChartDataLabels);
+
+        const labels = ['Alarm PMS', 'Bag melipat', 'Printingan blur', 'Perbaikan rubber pad'];
+        const dataValues = [15, 20, 10, 50];
+        
+        const detailData = [
+            'VTTS1 L030120 10/10/26 s2', 
+            'VTTS1 L030145 11/10/26 s1', 
+            'VTTS1 L030210 12/10/26 s3', 
+            'VTTS1 L030315 13/10/26 s1'  
+        ];
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        
+        // Fungsi untuk mendapatkan warna dari CSS Variable
+        function getCssVariable(varName) {
+            return getComputedStyle(document.body).getPropertyValue(varName).trim();
+        }
+
+        // Inisialisasi Grafik
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Durasi',
+                    data: dataValues,
+                    backgroundColor: getCssVariable('--bar-color'),
+                    borderRadius: 6, 
+                    borderSkipped: false,
+                    barPercentage: 0.55
+                }]
+            },
+            options: {
+                responsive: true,
+                layout: { padding: { top: 30 } },
+                plugins: {
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: getCssVariable('--text-main'),
+                        font: { weight: '700', size: 14, family: 'Inter' }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Breakdown Durasi (menit) - Produk VTTS1',
+                        color: getCssVariable('--text-main'),
+                        font: { size: 20, weight: '700', family: 'Inter' },
+                        align: 'start',
+                        padding: { bottom: 25 }
+                    },
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: getCssVariable('--tooltip-bg'),
+                        titleColor: getCssVariable('--text-main'),
+                        bodyColor: getCssVariable('--text-muted'),
+                        borderColor: getCssVariable('--border-color'),
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label + ': ' + context.parsed.y + ' menit';
+                                let detail = detailData[context.dataIndex];
+                                if (detail) {
+                                    label += '\n' + detail;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: 60, 
+                        title: {
+                            display: true,
+                            text: 'Menit',
+                            color: getCssVariable('--text-muted'),
+                            font: { weight: '600', family: 'Inter' }
+                        },
+                        grid: { color: getCssVariable('--grid-color') },
+                        ticks: {
+                            color: getCssVariable('--text-muted'),
+                            font: { family: 'Inter' }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: getCssVariable('--text-muted'),
+                            font: { size: 13, family: 'Inter' }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- LOGIKA TOGGLE MODE GELAP/TERANG ---
+        const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+        
+        function switchTheme(e) {
+            const theme = e.target.checked ? 'dark' : 'light';
+            document.body.setAttribute('data-theme', theme);
+            
+            // Update warna Chart.js secara dinamis
+            setTimeout(() => {
+                myChart.data.datasets[0].backgroundColor = getCssVariable('--bar-color');
+                
+                myChart.options.plugins.datalabels.color = getCssVariable('--text-main');
+                myChart.options.plugins.title.color = getCssVariable('--text-main');
+                
+                myChart.options.plugins.tooltip.backgroundColor = getCssVariable('--tooltip-bg');
+                myChart.options.plugins.tooltip.titleColor = getCssVariable('--text-main');
+                myChart.options.plugins.tooltip.bodyColor = getCssVariable('--text-muted');
+                myChart.options.plugins.tooltip.borderColor = getCssVariable('--border-color');
+                
+                myChart.options.scales.y.title.color = getCssVariable('--text-muted');
+                myChart.options.scales.y.grid.color = getCssVariable('--grid-color');
+                myChart.options.scales.y.ticks.color = getCssVariable('--text-muted');
+                myChart.options.scales.x.ticks.color = getCssVariable('--text-muted');
+                
+                myChart.update();
+            }, 50); // Jeda sedikit agar transisi CSS selesai
+        }
+
+        toggleSwitch.addEventListener('change', switchTheme);
+    </script>
+</body>
+</html>
+
+
+sudah di klik tapi tidak muncul grafik detail grafik breakdown (menit)
+harusnya muncul di samping grafik Breakdown — Durasi per Produk (mnt) · Filling L1
+jadi urutanya 
+Breakdown — Durasi per Produk (mnt) · Filling L1 , 
+grafik detail break down (mnt)
+Minor Stoppage — Frekuensi per Produk · Filling L1
+
+
+
+# membuat data backup di google sheet dengan format yang mudah di baca dan di pahami atau buatkan dashboard baru untuk rekapan semua kegiatan tambahkan tombol untuk membuka dashboard baru "Rincian perperoduk" nanti bisa di download dalamfile excel juga "atau sekedar lihat 
+
+dengan format penyimpanan ke google sheet , perline , nama sheet Line 1.Line 2 Line 4
+
+|Produk|	Batch Number |TGL|	Shift|tahapan proses|Line| jam mulai| jam selesai | kegiatan | durasi|MASALAH|good|defect|operator/inisial|
+
+dan buatkan juga untuk sheet yang perhitungan perproduk 
+name sheet all proses produk (data per produk)
+
+Produk	|batch number|	TGL	| shift | Line | tahapan proses |Time Available | Waktu Produksi Terencana |waktu breakdown tidak terencana| Waktu Operasional |standart output| good|defect|
+
+
+#tambah filter rekapan 
+tambah disampingnya filet rekapan per bacth 
+jadi tombol yang tadinya "Kegiatan (detail)","Rekap per produk","Rekap Per Batch"
+isi dari pada "Rekap Per Batch"
+gabungan dari setiap batch 
+Produk	Batch	    TGL	                                                                   Line	Tahapan 	Time Available	Waktu Produksi Terencana	Breakdown tidak terencana 	Waktu Operasional	Standart    output  	Good	Defect
+VKAM1   26001074     01/10/26(atau jika tanggal nya beda jadikan misal 01/10-02/10/26)     1      Filling        ...                 ...                             ...                     ...             ...       ...           ..      
+
+
+nama button filter "Rekap per produk"
+ganti jadi
+"Rekap batch per shift"
+pada bagian data di dalam nya "Rekap batch per shift"
+ketika salah satu di klik maka akan nge link ke sheet nya misal
+
+
+
+    Produk	Batch	    TGL	        Shift	Line	Tahapan 	Time Available	Waktu ProduksiTerencana	    Breakdown tidak terencana 	Waktu Operasional	Standart output	    Good	   Defect
+    VKAM1 	L050007 	01/10/2026 	1 	        1 	filling 	       510 	                290 	                115 	                    175 	        3150 	        2430 	    8
+
+
+
+tambahkan baru pada dashboard weekly meeting
+
+ 📈 Capaian Yield Produksi
+🎯 OEE PRODUCTION
+📋 Rincian per Produk
+ISSUE terdapat indikator angka di dalam bulatan total issue yang belum terselesaikan
+    tambah dashborad khusus untuk mengumpulkn data issue yang terdapat pada 2 tabel yang terpisah terdapat 2 tabel open dan tabel close
+    ketika masih open akan berada di tabel atas yaitu tabel open , ketika sudah close berpindah ke tabel close 
+    setiap issue ada nomor nya terus juga ada 
+    contoh misal :
+
+    Tab Status (Filter): Di bagian bawahnya terdapat opsi untuk memfilter daftar issue berdasarkan statusnya:
+
+    Sebuah kotak centang (checkbox) kosong di sebelah kiri.
+
+    Tab "Open" dengan indikator angka 6 di dalam lingkaran abu-abu (menunjukkan ada 6 issue yang masih terbuka).
+
+    Tab "Closed" dengan indikator misal angka 9 di dalam lingkaran abu-abu (menunjukkan ada 9 issue yang sudah ditutup). Tulisan "Closed" tercetak tebal (bold), menandakan bahwa filter ini sedang aktif digunakan sesuai dengan kueri di kolom pencarian.
+>> tabel Open. tabel close total terdapat indikator angka total issue yang sudah close
+	No.	Date	Shift	Produk	No. Batch	Problem	Durasi (min) 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+
+
+>>
+tabel close total terdapat indikator angka total issue yang sudah close
+
+No.	Date	Shift	Produk	No. Batch	Problem	Durasi (min) 	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+
+
+pada bagian "ISSUE DASHBOARD" itu tambahkan juga filter 
+Dari Tanggal
+Sampai Tanggal
+Line
+Tahapan
+Shift
+produk
+Mesin
+
+maka pada ISSUE DASHBOARD akan menampilkan issue atau breakdown ataupun minor stop nya 
+Kumpulan PICA Breakdown & Minor · Open / Closed
+Dari Tanggal
+Sampai Tanggal
+✓ 0 issue · Open 0 · Closed 0 · dari 7 record
+Open 0
+Closed 0
+Semua
+
+# ketika di klik pada baris tabel misal selection salah satu issue di tabel akan menampilkan pilihan lihat di log sheet atau buka kolom form why why untuk menyelesaikan issue
+
+✍️ Form Why-Why / PICA (Breakdown) atau form minor stop
+×
+— · Batch — · 07/10/2026 · S1 · Line 1 · filling
+Problem: Filling eror (20 mnt)
+Produk
+No. Batch
+Problem
+Frekuensi (kali)
+Why 1
+Why 2
+Why 3
+Corrective Action
+Preventive Action
+PIC
+Status
+
+data itu ngelink dengan data yang ada kalau di sini di close 
+maka di sana pun bisa di close 
+dengan begitu akan dengan mudah boleh dari pica boleh juga dari dashboard issue , karena dashboard issue adalah untuk memudahkan semua nya , 
+agar terlihat den terfilter dengan nyaman dan mudah dalam hal ini sehingga memudahkan di dalam pengerjaan 
+
+
+pada bagian ini fungsi nya belum berjalan ketika tombol di klik belum ada ngelink ataupun membuka form why why
+
+VTTS1 · Main drive tidak bisa berjalan
+06/10/2026 · S1 · L1 · filling · Breakdown · Open
+📄 Lihat di Log Sheet
+✍️ Buka Form Why-Why / PICA
+Batal
+
+
+dan saya mau menambahkan pada card di itu menjadi
+
+
+VTTS1 L030210 · Main drive tidak bisa berjalan
+06/10/2026 · S1 · L1 · filling · Breakdown · Open
+
+📄 Lihat di Log Sheet (ngelink ke log sheet tersebut)
+✍️ Buka Form Why-Why / PICA (ngelink buka form why why)
+Batal
+
+
+#Tambahkan Line pada dashboard issue
+No.	Date	Shift	Produk	No. Batch	Problem 	Durasi (min)	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+menjadi 
+
+No.	Date	Shift	Produk	No. Batch Line/tahapan	Problem 	Durasi (min)	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+
+
+#tambahkan 
+tambahkan pada bagian ISSUE DASHBOARD
+
+pada bagian masing masing tabel closed dan open 
+sebelum nya 
+No.	Date	Shift	Produk	No. Batch	Problem 	Durasi (min)	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+menjadi 
+
+No.	Date	Shift	Produk	No. Batch line/tahapan	Problem 	Durasi (min)	Why 1	Why 2	Why 3 	Corrective Action	Preventive Action	PIC	Status
+
+menambahkan kolom line dan tahapan supaya tau issue itu ada di mana 
+
+
+#Tambahkan Nama mesin pada bagian logsheet yang ngelink dengan di Data & Penyimpanan di 
+
+di tampilan log sheet oee 
+
+▣22 OCT 2026
+Mixing▾
+Line 1▾
+Shift 2▾
+OPR▾
+Produk▾ 
+Mesin▾ <<(tambahkan ini ])
+bagian itu juga bisa terisi otomatis isi nya :
+jika yang di piling line 1 tahapan filling maka Mesin Automatic Form Fill Seal Machine Shinva RSYG2-1-23005
+jika yang di piling line 2 tahapan filling maka Mesin Automatic Form Fill Seal Machine Plumat FFS 991
+jika yang di piling line 4 tahapan filling maka Mesin Automatic Form Fill Seal Machine Plumat FFS 892
+jika yang di piling line 1 tahapan kemas maka Mesin Overwrapping Machine Sysflex Line 1
+jika yang di piling line 1 tahapan kemas maka  Mesin Overwrapping Machine Sysflex Line 2
+jika yang di piling line 1 tahapan kemas maka  Mesin Overwrapping Machine Plumat OW 834
+
+
+pada bagian dropdown Mixing▾ tahapan proses nya di bagian logsheet yang sebelum nya Tahapan Proses
+×
+Mixing
+Filling
+Steril
+Visual
+Kemas
+
+menjadi :
+
+Tahapan Proses
+×
+Filling
+Kemas
+ saja 
+ namun di Tahapan Proses yang ada di halaman bagian Shift&Produk biarkan saja lengkap jangan di sentuh cukup yang bagian log sheet oee nya saja 
+
+Dan tanam dropdown pada kolom mesin 
+Mixing Olsa PCBS 2500,Mixing Tofflon,Mixing LB4000/1
+
+
+
+Raphkan tulisan supaya lebih rapih dan ringkas 
+
+pada OEE 365
+
+A365 Menit penuh shift (S1 510 / S2 480 / S3 450) Menjadi "A365 waktu terpakai filling"
+
+ Waktu operasional / produktif terpakai
+
+E Waktu operasional / produktif terpakai (C − D) menjadi "Waktu operasional / produktif terpakai"
+F365 % A 365 → (E ÷ A365)
+Berapa % dari shift penuh yang operasional menjadi "F365 % A 365"
+
+OEE 365 = 100,00% × 0,00% × 0,00% = 0,00%
+Availability 365 = E ÷ Time Available Filling (basis OEE 365). Basis = menit penuh shift (480). Bukan ÷ waktu terencana (C)". 
+menjadi
+OEE 365 = 100,00% × 0,00% × 0,00% = 0,00%
+Availability 365 = E ÷ Time Available Filling." 
+
+<span class="bn-label">OEE</span> jadi <span class="bn-label">OEE OPE</span>
+
+<th id="thProd1">Produk 1</th> akan menjadi format <th id="thProd1">Produk 1 = ambil dari nilai //*[@id="masterProdName1"] + //*[@id="masterProdBn1"] </th>
+
+
+
+
+Shift&Produk
+Inisial
+Sheet
+Performa
+OEE OPE
+OEE 365
+Dashboard 
+
+
+menjadi 
+
+
+Shift&Produk
+Inisial
+Sheet
+OEE OPE
+OEE 365
+Dashboard 
+
+#perbaikan 
+
+
+
+BUAT procesudur atau perbaki prosedur yang sudah ada 
+
+jika pada tombol #fStageSel di klik maka otomatis kolom #fMesinNama akan mengisi nama mesin otomatis
+
+
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[1] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[1] set to //*[@id="fMesinNama"] Mixing Tank OLSA PCBS 2500            
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[1] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[2] set to //*[@id="fMesinNama"] Mesin Automatic Form Fill Seal Machine Shinva RSYG2-1-23005
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[1] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[3] set to //*[@id="fMesinNama"] Autoclave Getinge 2          
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[1] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[4] set to //*[@id="fMesinNama"] Mesin Bonfiglioli          
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[1] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[5] set to //*[@id="fMesinNama"] Overwrapping Machine Sysflex Line 1 atau mesin colimatic (ada 2 pilihan mesin bisa jadikan drop down pilihan)           
+
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[2] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[1] set to //*[@id="fMesinNama"] Mixing Tank Tofflon APLS 3500
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[2] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[2] set to //*[@id="fMesinNama"] Mesin Automatic Form Fill Seal Machine Plumat FFS 991  
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[2] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[3] set to //*[@id="fMesinNama"] Autoclave Shinva 
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[2] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[4] set to //*[@id="fMesinNama"] NIKKA DENSOK                
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[2] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[5] set to //*[@id="fMesinNama"] Mesin Overwrapping Machine Sysflex Line 2
+
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[1] set to //*[@id="fMesinNama"] Mixing TANK LB4000/1
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[2] set to //*[@id="fMesinNama"] Mesin Automatic Form Fill Seal Machine Plumat FFS 892  
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[3] set to //*[@id="fMesinNama"] Autoclave Getinge 4
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[4] set to //*[@id="fMesinNama"] NIKKA DENSOK                
+jika //*[@id="fLineSel"] selection //*[@id="fLineSel"]/button[3] and //*[@id="fStageSel"] selection //*[@id="fStageSel"]/button[5] set to //*[@id="fMesinNama"] Mesin Overwrapping Machine Plumat OW 834
+
+
+
+
+<div class="oee-filter oee-filter-extended" id="issueFilterBar">
+                  <tombol "Moon"> = set filter issue dari tanggal 1 sampai akhir di bulan ini
+                  <tombol "week"> set filter issue di minggu ini
+                  <tombol "day> set filter issue hari ini 
+                  <All isue> tampilkan semua isue ( dan jadikan ini sebagai default pada aplikasi akan mendeteksi semua issue) aktif ketika aplikasi pertama kali di buka atau ketika buka dashboard weekly meeting  tujuan agar isue terlihat 
+                  
+                    <label for="issueLine">Line</label>
+                    <select id="issueLine">
+                      <option value="">Semua line</option>
+                      <option value="1">Line 1</option>
+                      <option value="2">Line 2</option>
+                      <option value="4">Line 4</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="issueStage">Tahapan</label>
+                    <select id="issueStage">
+                      <option value="">Semua tahapan</option>
+                      <option value="filling">Filling</option>
+                      <option value="kemas">Kemas</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="issueShift">Shift</label>
+                    <select id="issueShift">
+                      <option value="all">Semua shift</option>
+                      <option value="1">Shift 1</option>
+                      <option value="2">Shift 2</option>
+                      <option value="3">Shift 3</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="issueMesin">Mesin</label>
+                    <select id="issueMesin">
+                      <option value="">Semua mesin</option>
+                      <option value="filling|1">F1 · Filling L1</option>
+                      <option value="filling|2">F2 · Filling L2</option>
+                      <option value="filling|4">F4 · Filling L4</option>
+                      <option value="kemas|1">K1 · Kemas L1</option>
+                      <option value="kemas|2">K2 · Kemas L2</option>
+                      <option value="kemas|4">K4 · Kemas L4</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="issueProduk">Produk</label>
+                    <select id="issueProduk"><option value="">Semua produk</option></select>
+                  </div>
+                  <button type="button" class="btn btn-primary btn-sm" id="issueApply">Terapkan</button>
+                  <button type="button" class="btn btn-ghost btn-sm" id="issueReset">Reset</button>
+                </div>
+

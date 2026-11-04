@@ -1,0 +1,761 @@
+/* =========================================================================
+   WEEKLY-THEME.CSS — Tema Gelap / Terang untuk Weekly Meeting
+   Dimuat SETELAH weekly-dashboard.css, weekly-filter.css, rincian-produk.css,
+   issue-dashboard.css. Atribut tema dipasang oleh js/weekly-theme.js pada
+   <html data-wd-theme="dark|light"> (portal seperti .speed-menu ikut berubah).
+   Warna SVG grafik (hardcode di JS) ditimpa lewat selector atribut.
+   ========================================================================= */
+
+/* =========================================================================
+   1. DARK / DEFAULT THEME TOKENS — PREMIUM MODERN GLASSMORPHISM
+   ========================================================================= */
+:root,
+:root[data-wd-theme="dark"] {
+  /* Base & Surfaces (Deep Navy / Charcoal + Translucent Glass) */
+  --wd-bg:            #060b16;
+  --wd-bg-side:       rgba(10, 18, 34, 0.78);
+  --wd-card:          rgba(15, 25, 45, 0.65);
+  --wd-card-2:        rgba(12, 20, 38, 0.55);
+
+  /* Glass Borders (Thin Semi-Transparent White/Cyan) */
+  --wd-border:        rgba(255, 255, 255, 0.12);
+  --wd-border-soft:   rgba(255, 255, 255, 0.07);
+  --wd-note-border:   rgba(56, 189, 248, 0.28);
+
+  /* High-Contrast Typography */
+  --wd-text:          #e2e8f0;
+  --wd-text-strong:   #f8fafc;
+  --wd-text-mute:     #94a3b8;
+  --wd-text-dim:      #64748b;
+  --wd-text-faint:    #475569;
+
+  /* Interactive Hover States */
+  --wd-hover:         rgba(56, 189, 248, 0.08);
+  --wd-hover-2:       rgba(56, 189, 248, 0.15);
+
+  /* Primary Accents (Electric Blue / Cyan-Teal) */
+  --wd-accent:        #0ea5e9;
+  --wd-accent-text:   #ffffff;
+  --wd-link:          #38bdf8;
+
+  /* Hero Banner (Electric Blue to Violet/Purple Accent) */
+  --wd-hero-1:        rgba(15, 28, 55, 0.72);
+  --wd-hero-2:        rgba(38, 22, 68, 0.68);
+  --wd-hero-border:   rgba(139, 92, 246, 0.28);
+
+  /* Context Menu / Speed Menu */
+  --wd-menu-bg:       rgba(12, 20, 38, 0.88);
+  --wd-menu-border:   rgba(255, 255, 255, 0.14);
+  --wd-menu-hover:    rgba(56, 189, 248, 0.16);
+
+  /* Filter Chips */
+  --wd-chip-bg:       rgba(15, 26, 48, 0.65);
+  --wd-chip-border:   rgba(255, 255, 255, 0.11);
+  --wd-chip-text:     #cbd5e1;
+  --wd-chip-hover:    rgba(56, 189, 248, 0.14);
+  --wd-chip-on:       #0ea5e9;
+  --wd-chip-on-bd:    #38bdf8;
+
+  /* Natural Depth Shadow */
+  --wd-shadow:        0 12px 32px -4px rgba(2, 6, 23, 0.65),
+                      0 4px 12px -2px rgba(2, 6, 23, 0.45);
+
+  /* Grid, Axis & Table Striping */
+  --wd-grid:          rgba(148, 163, 184, 0.14);
+  --wd-axis:          #94a3b8;
+  --wd-axis-soft:     #64748b;
+  --wd-plot:          rgba(6, 11, 22, 0.45);
+  --wd-stripe-a:      rgba(255, 255, 255, 0.02);
+  --wd-stripe-b:      rgba(6, 11, 22, 0.35);
+  --wd-row-hover:     rgba(14, 165, 233, 0.14);
+
+  /* Semantic & Chart Colors (High Contrast, Non-Neon) */
+  --wd-oee-ope:        #2dd4bf; /* Cyan-Teal */
+  --wd-oee-365:        #38bdf8; /* Electric Sky Blue */
+  --wd-chart-line:     #38bdf8;
+  --wd-chart-line-lt:  #7dd3fc;
+  --wd-chart-green:    #10b981; /* Good / Closed */
+  --wd-chart-green-lt: #34d399;
+  --wd-chart-amber:    #f59e0b; /* Progress / Warning */
+  --wd-chart-amber-lt: #fbbf24;
+  --wd-chart-red:      #f43f5e; /* Breakdown / Open / Issue */
+  --wd-chart-red-lt:   #fb7185;
+  --wd-chart-cyan:     #06b6d4;
+  --wd-chart-cyan-lt:  #22d3ee;
+
+  /* Status PICA Semantic Tokens */
+  --wd-pica-open-bg:     rgba(244, 63, 94, 0.16);
+  --wd-pica-open-bd:     rgba(244, 63, 94, 0.40);
+  --wd-pica-open-fg:     #fda4af;
+  --wd-pica-progress-bg: rgba(245, 158, 11, 0.16);
+  --wd-pica-progress-bd: rgba(245, 158, 11, 0.40);
+  --wd-pica-progress-fg: #fcd34d;
+  --wd-pica-closed-bg:   rgba(16, 185, 129, 0.16);
+  --wd-pica-closed-bd:   rgba(16, 185, 129, 0.40);
+  --wd-pica-closed-fg:   #6ee7b7;
+  --wd-pica-null:        #64748b;
+
+  /* Extended Theme Tokens (--wdt-*) untuk kompatibilitas weekly-theme.css */
+  --wdt-page:         radial-gradient(960px 480px at 85% -5%, rgba(14, 165, 233, 0.16), transparent 65%),
+                      radial-gradient(800px 440px at 10% 105%, rgba(139, 92, 246, 0.12), transparent 65%),
+                      radial-gradient(650px 380px at 50% 40%, rgba(20, 184, 166, 0.06), transparent 70%),
+                      linear-gradient(180deg, #060b16 0%, #091122 100%);
+  --wdt-side:         linear-gradient(180deg, rgba(12, 21, 40, 0.84) 0%, rgba(7, 13, 26, 0.90) 100%);
+  --wdt-panel:        linear-gradient(165deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 35%, rgba(13, 23, 42, 0.68) 100%);
+  --wdt-panel-bd:     rgba(255, 255, 255, 0.11);
+  --wdt-panel-sh:     0 10px 28px -4px rgba(2, 6, 23, 0.55),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  --wdt-inset:        rgba(6, 11, 22, 0.55);
+  --wdt-gauge-ope:    #2dd4bf;
+  --wdt-gauge-365:    #38bdf8;
+  --wdt-glow:         drop-shadow(0 0 5px rgba(45, 212, 191, 0.35));
+  --wdt-input-bg:     rgba(10, 18, 34, 0.75);
+  --wdt-input-bd:     rgba(255, 255, 255, 0.14);
+  --wdt-input-tx:     #f1f5f9;
+  --wdt-btn:          #0ea5e9;
+  --wdt-btn-tx:       #ffffff;
+  --wdt-btn-hover:    #38bdf8;
+  --wdt-shift-on:     linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  --wdt-nav-on-bg:    linear-gradient(90deg, rgba(14, 165, 233, 0.24) 0%, rgba(139, 92, 246, 0.14) 100%);
+  --wdt-nav-on-fg:    #f8fafc;
+  --wdt-hero-bar:     linear-gradient(180deg, #2dd4bf 0%, #0ea5e9 50%, #8b5cf6 100%);
+  --wdt-switch-on:    #14b8a6;
+  --wdt-th-bg:        rgba(15, 26, 48, 0.88);
+  --wdt-th-fg:        #e2e8f0;
+  --wdt-td-bg:        rgba(10, 18, 34, 0.60);
+  --wdt-td-bg2:       rgba(14, 24, 44, 0.65);
+  --wdt-td-fg:        #e2e8f0;
+  --wdt-td-bd:        rgba(255, 255, 255, 0.08);
+}
+
+:root[data-wd-theme="light"] {
+  --wd-bg:            #eef4f9;
+  --wd-bg-side:       #ffffff;
+  --wd-card:          #ffffff;
+  --wd-card-2:        #f3f7fb;
+  --wd-border:        #d9e3ee;
+  --wd-border-soft:   #e5ecf4;
+  --wd-text:          #1e293b;
+  --wd-text-strong:   #0f172a;
+  --wd-text-mute:     #526176;
+  --wd-text-dim:      #6b7a8f;
+  --wd-text-faint:    #8b99ab;
+  --wd-hover:         #eef3f8;
+  --wd-hover-2:       #e2e9f1;
+  --wd-accent:        #16a34a;
+  --wd-accent-text:   #ffffff;
+  --wd-link:          #2563eb;
+  --wd-grid:          #dde6ef;
+  --wd-axis:          #5d6c80;
+  --wd-axis-soft:     #7a879a;
+  --wd-plot:          #ffffff;
+  --wd-hero-1:        #ffffff;
+  --wd-hero-2:        #f6faf8;
+  --wd-hero-border:   #d9e3ee;
+
+  --wdt-page:         #eef4f9;
+  --wdt-side:         #ffffff;
+  --wdt-panel:        #ffffff;
+  --wdt-panel-bd:     #dce5ef;
+  --wdt-panel-sh:     0 1px 2px rgba(15, 23, 42, .04), 0 6px 18px rgba(15, 23, 42, .05);
+  --wdt-inset:        #ffffff;
+  --wdt-gauge-ope:    #3b82f6;
+  --wdt-gauge-365:    #22c55e;
+  --wdt-glow:         none;
+  --wdt-input-bg:     #ffffff;
+  --wdt-input-bd:     #cfd9e5;
+  --wdt-input-tx:     #0f172a;
+  --wdt-btn:          #16a34a;
+  --wdt-btn-tx:       #ffffff;
+  --wdt-btn-hover:    #15803d;
+  --wdt-shift-on:     linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  --wdt-nav-on-bg:    #e3f5ec;
+  --wdt-nav-on-fg:    #0f7a47;
+  --wdt-hero-bar:     linear-gradient(180deg, #22c55e, #16a34a);
+  --wdt-switch-on:    #16a34a;
+  --wdt-th-bg:        #f1f5f9;
+  --wdt-th-fg:        #334155;
+  --wdt-td-bg:        #ffffff;
+  --wdt-td-bg2:       #f8fafc;
+  --wdt-td-fg:        #1e293b;
+  --wdt-td-bd:        #e5ecf4;
+}
+
+/* ---------- 2. RANGKA ---------- */
+.weekly-layout {
+  background: var(--wdt-page, var(--wd-bg));
+}
+:root[data-wd-theme="dark"]  .weekly-layout { color-scheme: dark; }
+:root[data-wd-theme="light"] .weekly-layout { color-scheme: light; }
+
+.weekly-layout .weekly-main { background: transparent; }
+.weekly-layout .weekly-sidebar { background: var(--wdt-side, var(--wd-bg-side)); }
+
+.weekly-layout .weekly-hero::before { background: var(--wdt-hero-bar, linear-gradient(180deg, #3b82f6, #8b5cf6)); }
+
+.weekly-layout .weekly-nav-item.is-active {
+  background: var(--wdt-nav-on-bg, var(--wd-accent));
+  color: var(--wdt-nav-on-fg, var(--wd-accent-text));
+}
+:root[data-wd-theme="light"] .weekly-layout .weekly-nav-item.is-active { box-shadow: inset 3px 0 0 #16a34a; }
+:root[data-wd-theme="dark"]  .weekly-layout .weekly-nav-item.is-active { box-shadow: 0 6px 16px -6px rgba(42, 109, 244, .65); }
+
+/* ---------- 3. KARTU / PANEL ---------- */
+.weekly-layout .oee-panel,
+.weekly-layout .oee-trend-card,
+.weekly-layout .oee-bar-card,
+.weekly-layout .weekly-card,
+.weekly-layout .wd-tot-card {
+  background: var(--wdt-panel);
+  border: 1px solid var(--wdt-panel-bd);
+  box-shadow: var(--wdt-panel-sh);
+}
+:root[data-wd-theme="dark"] .weekly-layout .oee-panel,
+:root[data-wd-theme="dark"] .weekly-layout .oee-trend-card,
+:root[data-wd-theme="dark"] .weekly-layout .oee-bar-card,
+:root[data-wd-theme="dark"] .weekly-layout .weekly-card,
+:root[data-wd-theme="dark"] .weekly-layout .wd-tot-card {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.weekly-layout .oee-panel-head,
+.weekly-layout .oee-panel-head small,
+.weekly-layout .oee-gauge-title { color: var(--wd-text-mute); }
+.weekly-layout .oee-gauge-title { color: var(--wd-text); }
+.weekly-layout .oee-target-label,
+.weekly-layout .oee-actual-sub { color: var(--wd-text-dim); }
+.weekly-layout .oee-actual { color: var(--wd-text-strong); }
+
+.weekly-layout .oee-apq-item {
+  background: var(--wdt-inset);
+  border-color: var(--wdt-panel-bd);
+}
+.weekly-layout .oee-apq-item.over  { border-color: rgba(34, 197, 94, .45); }
+.weekly-layout .oee-apq-item.under { border-color: rgba(248, 113, 113, .45); }
+.weekly-layout .oee-apq-label { color: var(--wd-text-mute); }
+.weekly-layout .oee-apq-label span { color: var(--wd-text-dim); }
+.weekly-layout .oee-apq-val { color: var(--wd-text-strong); }
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .oee-apq-item.over  .oee-apq-val { color: #15803d; }
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .oee-apq-item.under .oee-apq-val { color: #dc2626; }
+
+.weekly-layout .oee-track { stroke: var(--wd-grid); }
+.weekly-layout .oee-fill-blue  { stroke: var(--wdt-gauge-ope); filter: var(--wdt-glow); }
+.weekly-layout .oee-fill-green { stroke: var(--wdt-gauge-365); filter: var(--wdt-glow); }
+
+.weekly-layout .oee-trend-legend { color: var(--wd-text); }
+.weekly-layout .sd-leg-item { color: var(--wd-text-mute); }
+.weekly-layout .mch-batch-chart {
+  background: var(--wdt-inset);
+  border-color: var(--wdt-panel-bd);
+}
+
+/* Halaman Yield */
+.weekly-layout .wb-track { background: var(--wd-card-2); }
+.weekly-layout .wb-label { color: var(--wd-text-mute); }
+.weekly-layout .wb-val { color: var(--wd-text-strong); }
+.weekly-layout .wk-label { color: var(--wd-text-dim); }
+.weekly-layout .wk-value { color: var(--wd-text-strong); }
+.weekly-layout .wk-value.small { color: var(--wd-text-mute); }
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .wk-value.good { color: #15803d; }
+
+/* ---------- 4. KARTU RINGKASAN (wd-tot-card) ---------- */
+.weekly-layout .wd-tot-label { color: var(--wd-text-mute); }
+.weekly-layout .wd-tot-val   { color: var(--wd-text-strong); }
+.weekly-layout .wd-tot-unit  { color: var(--wd-text-dim); }
+
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotD),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotD),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotDefect),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotDefect) {
+  background: linear-gradient(180deg, rgba(120, 28, 52, .45), rgba(70, 16, 34, .5)) !important;
+  border: 1px solid rgba(251, 113, 133, .42) !important;
+}
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotD) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotD) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotDefect) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotDefect) .wd-tot-label { color: #fda4af !important; }
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotD) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotD) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotDefect) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotDefect) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotD) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotD) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotDefect) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotDefect) .wd-tot-unit { color: #ff8da1 !important; }
+
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotE),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotE),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotGood),
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotGood) {
+  background: linear-gradient(180deg, rgba(14, 92, 74, .42), rgba(8, 56, 52, .5)) !important;
+  border: 1px solid rgba(52, 211, 153, .42) !important;
+}
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotE) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotE) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotGood) .wd-tot-label,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotGood) .wd-tot-label { color: #86efac !important; }
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotE) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotE) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotGood) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotGood) .wd-tot-val,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotE) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotE) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#oeeTotGood) .wd-tot-unit,
+:root[data-wd-theme="dark"] .wd-tot-card:has(#mchTotGood) .wd-tot-unit { color: #4ade80 !important; }
+
+/* ---------- 5. FILTER ---------- */
+.weekly-layout .oee-filter-extended .field label { color: var(--wd-text-dim); }
+.weekly-layout .oee-filter-extended input[type="date"],
+.weekly-layout .oee-filter-extended select {
+  background: var(--wdt-input-bg);
+  border-color: var(--wdt-input-bd);
+  color: var(--wdt-input-tx);
+}
+.weekly-layout .oee-filter-extended input:focus,
+.weekly-layout .oee-filter-extended select:focus {
+  outline: none;
+  border-color: var(--wd-link);
+  box-shadow: 0 0 0 3px rgba(94, 180, 255, .18);
+}
+.weekly-layout .mch-shift-group { background: var(--wdt-input-bg); border-color: var(--wdt-input-bd); }
+.weekly-layout .mch-shift-btn { color: var(--wd-text-mute); }
+.weekly-layout .mch-shift-btn + .mch-shift-btn { border-left-color: var(--wdt-input-bd); }
+.weekly-layout .mch-shift-btn:hover { background: var(--wd-hover-2); color: var(--wd-text-strong); }
+.weekly-layout .mch-shift-btn.on { background: var(--wdt-shift-on); color: #fff; }
+
+.weekly-layout .oee-filter-extended .btn-primary,
+.weekly-layout .oee-filter .btn-primary {
+  background: var(--wdt-btn); border-color: var(--wdt-btn); color: var(--wdt-btn-tx); font-weight: 700;
+}
+.weekly-layout .oee-filter-extended .btn-primary:hover,
+.weekly-layout .oee-filter .btn-primary:hover { background: var(--wdt-btn-hover); border-color: var(--wdt-btn-hover); }
+.weekly-layout .oee-filter-extended .btn-ghost,
+.weekly-layout .oee-filter .btn-ghost {
+  background: transparent; border: 1px solid var(--wdt-input-bd); color: var(--wd-text);
+}
+.weekly-layout .oee-filter-extended .btn-ghost:hover,
+.weekly-layout .oee-filter .btn-ghost:hover { background: var(--wd-hover-2); }
+
+/* ---------- 6. GRAFIK SVG (warna hardcode di JS) ---------- */
+.weekly-layout svg [stroke="#334155"] { stroke: var(--wd-grid); }
+.weekly-layout svg [fill="#64748b"]   { fill: var(--wd-axis-soft); }
+.weekly-layout svg [fill="#94a3b8"]   { fill: var(--wd-axis); }
+.weekly-layout svg [fill="#e2e8f0"]   { fill: var(--wd-text); }
+.weekly-layout svg [fill="#f8fafc"]   { fill: var(--wd-text-strong); }
+.weekly-layout svg [stroke="#f8fafc"] { stroke: var(--wd-text-strong); }
+
+/* ---------- 7. TABEL (Rincian Produk & Issue) ---------- */
+.weekly-layout .rp-table thead th,
+.weekly-layout .issue-table thead th {
+  background-color: var(--wdt-th-bg) !important;
+  color: var(--wdt-th-fg) !important;
+  border-color: var(--wdt-td-bd) !important;
+}
+.weekly-layout .rp-table tbody td,
+.weekly-layout .issue-table tbody td {
+  color: var(--wdt-td-fg) !important;
+  border-color: var(--wdt-td-bd) !important;
+}
+.weekly-layout .issue-table tbody tr:nth-child(odd) td  { background-color: var(--wdt-td-bg) !important; }
+.weekly-layout .issue-table tbody tr:nth-child(even) td { background-color: var(--wdt-td-bg2) !important; }
+.weekly-layout .issue-table tbody tr:hover td { background-color: var(--wd-row-hover, rgba(37, 99, 235, .10)) !important; }
+.weekly-layout .issue-table-wrap { background-color: var(--wdt-td-bg); border-color: var(--wdt-panel-bd); }
+.weekly-layout .issue-table,
+.weekly-layout .rp-table { background-color: var(--wdt-td-bg); }
+
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .issue-period-btn,
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .issue-tab {
+  background: #fff !important; border-color: #cfd9e5 !important; color: #334155 !important;
+}
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .issue-period-btn.is-on,
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .issue-tab.is-on {
+  background: #2563eb !important; border-color: #2563eb !important; color: #fff !important;
+}
+:root:is([data-wd-theme="light"], [data-wd-theme="pink"]) .weekly-layout .issue-panel-title { color: #0f172a; }
+
+/* ---------- TEMA PINK (elegan, profesional, modern) ---------- */
+:root[data-wd-theme="pink"] {
+  --wd-bg:            #fdf3f7;
+  --wd-bg-side:       #ffffff;
+  --wd-card:          #ffffff;
+  --wd-card-2:        #fcebf2;
+  --wd-border:        #f0cfdd;
+  --wd-border-soft:   #f7e1ea;
+  --wd-text:          #4a2236;
+  --wd-text-strong:   #34101f;
+  --wd-text-mute:     #7a4a61;
+  --wd-text-dim:      #94677d;
+  --wd-text-faint:    #b08a9c;
+  --wd-hover:         #fbe6ee;
+  --wd-hover-2:       #f7d6e3;
+  --wd-accent:        #be185d;
+  --wd-accent-text:   #ffffff;
+  --wd-link:          #be185d;
+  --wd-grid:          #f3dbe5;
+  --wd-axis:          #8a5a72;
+  --wd-axis-soft:     #a47b90;
+  --wd-plot:          #ffffff;
+  --wd-stripe-a:      rgba(190, 24, 93, 0.04);
+  --wd-stripe-b:      rgba(252, 235, 242, 0.7);
+  --wd-row-hover:     rgba(190, 24, 93, 0.10);
+  --wd-hero-1:        #ffffff;
+  --wd-hero-2:        #fdeaf2;
+  --wd-hero-border:   #f0cfdd;
+  --wd-note-border:   #ecc3d4;
+  --wd-menu-bg:       #ffffff;
+  --wd-menu-border:   #f0cfdd;
+  --wd-menu-hover:    #fbe6ee;
+  --wd-chip-bg:       #fbe6ee;
+  --wd-chip-border:   #ecc3d4;
+  --wd-chip-text:     #5c2a43;
+  --wd-chip-hover:    #f7d6e3;
+  --wd-chip-on:       #be185d;
+  --wd-chip-on-bd:    #be185d;
+  --wd-chart-line:    #d6336c;
+  --wd-chart-line-lt: #be185d;
+  --wd-chart-green:   #8e3a8f;
+  --wd-chart-green-lt:#702a71;
+  --wd-chart-red:     #e11d48;
+  --wd-chart-red-lt:  #be123c;
+  --wd-chart-amber:   #c8963e;
+  --wd-chart-amber-lt:#a87a2c;
+  --wd-chart-cyan:    #f08fb3;
+  --wd-chart-cyan-lt: #d6336c;
+  --wd-oee-ope:       #d6336c;
+  --wd-oee-365:       #8e3a8f;
+  --wd-shadow:        0 12px 30px rgba(120, 30, 70, .16);
+
+  --wd-pica-open-bg:      #fee2e2;
+  --wd-pica-open-bd:      #fca5a5;
+  --wd-pica-open-fg:      #991b1b;
+  --wd-pica-progress-bg:  #fef3c7;
+  --wd-pica-progress-bd:  #fcd34d;
+  --wd-pica-progress-fg:  #92400e;
+  --wd-pica-closed-bg:    #dcfce7;
+  --wd-pica-closed-bd:    #86efac;
+  --wd-pica-closed-fg:    #166534;
+  --wd-pica-null:         #b9a3ae;
+
+  --wdt-page:         radial-gradient(900px 420px at 88% -10%, rgba(244, 143, 183, .28), transparent 62%),
+                      radial-gradient(700px 380px at 0% 100%, rgba(190, 24, 93, .07), transparent 60%),
+                      #fdf3f7;
+  --wdt-side:         linear-gradient(180deg, #ffffff 0%, #fff6fa 100%);
+  --wdt-panel:        #ffffff;
+  --wdt-panel-bd:     #f2d6e2;
+  --wdt-panel-sh:     0 1px 2px rgba(120, 30, 70, .05), 0 10px 24px -8px rgba(190, 24, 93, .14);
+  --wdt-inset:        #fff8fb;
+  --wdt-gauge-ope:    #d6336c;
+  --wdt-gauge-365:    #8e3a8f;
+  --wdt-glow:         none;
+  --wdt-input-bg:     #ffffff;
+  --wdt-input-bd:     #ecc3d4;
+  --wdt-input-tx:     #34101f;
+  --wdt-btn:          #be185d;
+  --wdt-btn-tx:       #ffffff;
+  --wdt-btn-hover:    #9d174d;
+  --wdt-shift-on:     linear-gradient(180deg, #ec4899 0%, #be185d 100%);
+  --wdt-nav-on-bg:    linear-gradient(90deg, #fbd5e5 0%, #fde6ef 100%);
+  --wdt-nav-on-fg:    #9d174d;
+  --wdt-hero-bar:     linear-gradient(180deg, #ec4899, #8e3a8f);
+  --wdt-th-bg:        #fcebf2;
+  --wdt-th-fg:        #5c2a43;
+  --wdt-td-bg:        #ffffff;
+  --wdt-td-bg2:       #fff7fa;
+  --wdt-td-fg:        #4a2236;
+  --wdt-td-bd:        #f5dde7;
+}
+
+:root[data-wd-theme="pink"] .weekly-layout .weekly-nav-item.is-active { box-shadow: inset 3px 0 0 #be185d; }
+:root[data-wd-theme="pink"] .weekly-layout .weekly-hero-badge {
+  background: linear-gradient(90deg, #be185d, #d6336c); color: #fff;
+}
+:root[data-wd-theme="pink"] .weekly-layout .issue-period-btn.is-on,
+:root[data-wd-theme="pink"] .weekly-layout .issue-tab.is-on {
+  background: #be185d !important; border-color: #be185d !important; color: #fff !important;
+}
+:root[data-wd-theme="pink"] .weekly-layout .speed-table td:last-child,
+:root[data-wd-theme="pink"] .weekly-layout .speed-table th { color: #9d174d; }
+
+/* Warna grafik (hardcode di JS) -> palet pink: biru→mawar, hijau→plum, amber→emas, cyan→pink muda */
+:root[data-wd-theme="pink"] .weekly-layout svg [fill="#3b82f6"]   { fill: #d6336c; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stroke="#3b82f6"] { stroke: #d6336c; }
+:root[data-wd-theme="pink"] .weekly-layout svg [fill="#22c55e"]   { fill: #8e3a8f; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stroke="#22c55e"] { stroke: #8e3a8f; }
+:root[data-wd-theme="pink"] .weekly-layout svg [fill="#f59e0b"]   { fill: #c8963e; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stroke="#f59e0b"] { stroke: #c8963e; }
+:root[data-wd-theme="pink"] .weekly-layout svg [fill="#22d3ee"]   { fill: #f08fb3; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stroke="#22d3ee"] { stroke: #f08fb3; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#3b82f6"],
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#93c5fd"] { stop-color: #f19ab8; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#22c55e"],
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#86efac"] { stop-color: #c77dc7; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#f59e0b"],
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#fcd34d"] { stop-color: #e6c27a; }
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#22d3ee"],
+:root[data-wd-theme="pink"] .weekly-layout svg [stop-color="#a5f3fc"] { stop-color: #f7c0d4; }
+:root[data-wd-theme="pink"] .weekly-layout .ot-dot.ot-blue,
+:root[data-wd-theme="pink"] .weekly-layout .ob-swatch.ob-lime { background: #d6336c; box-shadow: 0 0 0 3px rgba(214, 51, 108, .22); }
+:root[data-wd-theme="pink"] .weekly-layout .ot-dot.ot-green,
+:root[data-wd-theme="pink"] .weekly-layout .ob-swatch.ob-green { background: #8e3a8f; box-shadow: none; }
+:root[data-wd-theme="pink"] .weekly-layout .ot-dot.ot-green { box-shadow: 0 0 0 3px rgba(142, 58, 143, .22); }
+:root[data-wd-theme="pink"] .weekly-layout .ob-swatch.ob-amber { background: #c8963e; }
+:root[data-wd-theme="pink"] .weekly-layout .ob-swatch.ob-cyan  { background: #f08fb3; }
+:root[data-wd-theme="pink"] .weekly-layout .ob-swatch.ob-teal  { background: #8e3a8f; }
+
+/* ---------- 8. PEMILIH TEMA (terang / gelap / pink) ---------- */
+.weekly-topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: -10px 0 10px;
+}
+.wd-theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--wdt-panel-bd);
+  background: var(--wdt-panel);
+  box-shadow: var(--wdt-panel-sh);
+}
+.wd-tbtn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 26px; padding: 0 10px;
+  border: 0; border-radius: 999px;
+  background: transparent;
+  color: var(--wd-text-mute);
+  font: 600 11px var(--font-sans, 'IBM Plex Sans', system-ui, sans-serif);
+  cursor: pointer;
+  transition: background .18s, color .18s, box-shadow .18s;
+}
+.wd-tbtn:hover { background: var(--wd-hover); color: var(--wd-text-strong); }
+.wd-tbtn svg {
+  width: 14px; height: 14px; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 1.9;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.wd-tbtn[data-wd-mode="light"] svg { color: #f59e0b; }
+.wd-tbtn[data-wd-mode="dark"]  svg { color: #7cb7ff; }
+.wd-tbtn[data-wd-mode="pink"]  svg { color: #ec4899; fill: rgba(236, 72, 153, .25); }
+.wd-tbtn[aria-checked="true"] {
+  background: var(--wd-hover-2);
+  color: var(--wd-text-strong);
+  box-shadow: inset 0 0 0 1px var(--wdt-panel-bd);
+}
+.wd-tbtn:focus-visible { outline: 2px solid var(--wd-link); outline-offset: 1px; }
+
+@media (max-width: 560px) { .wd-tbtn span { display: none; } .wd-tbtn { padding: 0 9px; } }
+@media (prefers-reduced-motion: reduce) { .wd-tbtn { transition: none; } }
+@media print { .weekly-topbar { display: none; } }
+
+:root[data-wd-theme="pink"] .weekly-layout .weekly-brand-icon { color: #be185d; background: #fde6ef; border-color: #f5c6d9; }
+:root[data-wd-theme="pink"] .weekly-layout .weekly-brand-icon svg { stroke: #be185d; }
+
+/* =========================================================================
+   2. GLASSMORPHISM SURFACES & SOLID FALLBACK (DARK THEME ONLY)
+   ========================================================================= */
+
+/* --- A. Solid Fallback (Browser tanpa dukungan backdrop-filter) --- */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-sidebar {
+  background: #0a1222;
+  border-right: 1px solid var(--wd-border);
+}
+
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-card,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-panel,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-trend-card,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-bar-card,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .shutdown-card {
+  background: #0f192d;
+  border: 1px solid var(--wd-border);
+  box-shadow: var(--wd-shadow);
+}
+
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-hero {
+  background: linear-gradient(135deg, #0f1c37 0%, #20153d 100%);
+  border: 1px solid var(--wd-hero-border);
+  box-shadow: var(--wd-shadow);
+}
+
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .speed-menu,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .pica-modal {
+  background: #0d1629;
+  border: 1px solid var(--wd-menu-border);
+  box-shadow: 0 20px 45px rgba(2, 6, 23, 0.78);
+}
+
+/* --- B. Progressive Enhancement: Modern Glassmorphism --- */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+
+  /* 1. Sidebar Glass */
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-sidebar {
+    background: linear-gradient(
+      180deg,
+      rgba(15, 25, 45, 0.78) 0%,
+      rgba(8, 14, 28, 0.86) 100%
+    );
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid rgba(255, 255, 255, 0.09);
+    box-shadow: 4px 0 24px rgba(2, 6, 23, 0.45);
+  }
+
+  /* 2. Kartu Utama, Panel OEE & Kartu Total KPI */
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-card,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-panel,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-trend-card,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .oee-bar-card,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .shutdown-card {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0) 42%),
+      var(--wd-card);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--wd-border);
+    box-shadow:
+      var(--wd-shadow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.11);
+  }
+
+  /* Hover halus pada kartu ringkasan KPI */
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:hover {
+    border-color: rgba(56, 189, 248, 0.28);
+    background:
+      linear-gradient(180deg, rgba(56, 189, 248, 0.08) 0%, rgba(255, 255, 255, 0) 50%),
+      rgba(17, 29, 52, 0.72);
+  }
+
+  /* 3. Weekly Hero (Electric Blue + Subtle Violet Glass) */
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-hero {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 45%),
+      linear-gradient(135deg, var(--wd-hero-1) 0%, var(--wd-hero-2) 100%);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--wd-hero-border);
+    box-shadow:
+      var(--wd-shadow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  /* 4. Context Menu (.speed-menu) & Modal (.pica-modal) */
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .speed-menu,
+  :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .pica-modal {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 35%),
+      var(--wd-menu-bg);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--wd-menu-border);
+    box-shadow:
+      0 20px 48px rgba(2, 6, 23, 0.75),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+}
+
+/* --- C. Penyesuaian Navigasi & Kartu Semantic Total (Good vs Defect) --- */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .weekly-layout .weekly-nav-item.is-active {
+  background: var(--wdt-nav-on-bg);
+  color: var(--wdt-nav-on-fg);
+  border: 1px solid rgba(56, 189, 248, 0.30);
+  box-shadow: inset 3px 0 0 #38bdf8, 0 4px 14px -4px rgba(14, 165, 233, 0.35);
+}
+
+/* Kartu Total Defect / Loss (Semantic Rose-Red Glass) */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#oeeTotD),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#mchTotD),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#oeeTotDefect),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#mchTotDefect) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    linear-gradient(180deg, rgba(136, 19, 55, 0.42), rgba(76, 5, 25, 0.52)) !important;
+  border: 1px solid rgba(251, 113, 133, 0.36) !important;
+}
+
+/* Kartu Total Good / Yield (Semantic Emerald-Teal Glass) */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#oeeTotE),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#mchTotE),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#oeeTotGood),
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) .wd-tot-card:has(#mchTotGood) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    linear-gradient(180deg, rgba(6, 95, 70, 0.42), rgba(6, 78, 59, 0.52)) !important;
+  border: 1px solid rgba(52, 211, 153, 0.36) !important;
+}
+
+/* ========================================================
+   Override redesign.css light tables di weekly dark theme
+   ======================================================== */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-card {
+  background: #0f192d !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-table-wrap,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .pica-table-wrap {
+  background: #0d1629 !important;
+  border-color: #1b3a5c !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-table thead th,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .pica-table thead th,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .speed-table th {
+  background: #10243c !important;
+  color: #dbe7f3 !important;
+  border-color: #24466b !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-table td,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .pica-table td,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .speed-table td {
+  color: #cbd5e1 !important;
+  border-color: #1b3a5c !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-table tbody tr:nth-child(even) td,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .speed-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-title {
+  color: #e2e8f0 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-pager-btn {
+  background: #10243c !important;
+  border-color: #24466b !important;
+  color: #e2e8f0 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-pager-btn:hover {
+  background: #1a3352 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .sd-leg-label {
+  color: #e2e8f0 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .sd-leg-meta,
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-summary {
+  color: #94a3b8 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-summary strong {
+  color: #f1f5f9 !important;
+}
+
+/* Rincian per Produk — tabel gelap transparan (override redesign abu-abu) */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .rp-table-wrap {
+  background: rgba(15, 25, 45, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .rp-table thead th {
+  background: rgba(16, 36, 60, 0.92) !important;
+  color: #dbe7f3 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .rp-table td {
+  color: #e2e8f0 !important;
+  background: transparent !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .rp-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .rp-table tbody tr.rp-shift-sep td {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(248, 113, 113, 0.35) !important;
+  height: 14px;
+}

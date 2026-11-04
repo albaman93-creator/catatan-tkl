@@ -92,6 +92,11 @@ const Navigation = (() => {
     flash(c.el);
     updatePos(c);
     hlColumn(c);
+    // Pastikan sel terlihat di dalam .tbl-wrap (bukan hanya window)
+    if (typeof Rows !== 'undefined' && Rows.scrollRowIntoView) {
+      const tr = c.el.closest('tr.log-row');
+      if (tr) Rows.scrollRowIntoView(tr, { behavior: 'auto' });
+    }
   };
 
   // ====== COLUMN VISIBILITY ======
@@ -111,14 +116,21 @@ const Navigation = (() => {
       chk.addEventListener('change', () => {
         syncColumnVisibility();
         try { localStorage.setItem(CONFIG.COL_PRESET_KEY, 'custom'); } catch(e){}
+        document.querySelectorAll('.col-preset-btn').forEach(b => b.classList.remove('on'));
+        const table = document.querySelector('table.log');
+        if (table) table.classList.remove('preset-quick');
       });
     });
   };
 
   // ====== PRESET KOLOM: Mode Hitung Cepat / Mode Lengkap ======
-  // Kolom yang tetap tampil di "Mode Hitung Cepat" — cukup buat menghitung
-  // OEE saja: Kode, Jam Mulai, Jam Selesai, Durasi, Good, Defect (+ Aksi).
-  const QUICK_PRESET_COLS = ['col-num', 'col-kode', 'col-mulai', 'col-selesai', 'col-durasi', 'col-good', 'col-defect', 'col-aksi'];
+  // Kolom yang tetap tampil di "Mode Hitung Cepat":
+  // Kode, Mulai, Selesai, Durasi, Kegiatan, Produk, Good, Defect (+ Aksi).
+  const QUICK_PRESET_COLS = [
+    'col-num', 'col-kode', 'col-mulai', 'col-selesai', 'col-durasi',
+    'col-kegiatan', 'col-batch',
+    'col-good', 'col-defect', 'col-aksi'
+  ];
 
   const applyColumnPreset = (preset) => {
     document.querySelectorAll('.col-toggle-bar input[type="checkbox"]').forEach(chk => {
@@ -130,6 +142,12 @@ const Navigation = (() => {
     document.querySelectorAll('.col-preset-btn').forEach(b => b.classList.remove('on'));
     const activeBtn = document.getElementById(preset === 'quick' ? 'presetQuick' : 'presetFull');
     if (activeBtn) activeBtn.classList.add('on');
+
+    // Kelas pada tabel agar CSS bisa merapatkan kolom di Mode Hitung Cepat
+    const table = document.querySelector('table.log');
+    if (table) {
+      table.classList.toggle('preset-quick', preset === 'quick');
+    }
   };
 
   const bindColumnPresets = () => {
@@ -179,8 +197,10 @@ const Navigation = (() => {
           Calculation.recalc();
           const nc = navCells();
           const kodeCell = nc.find(c => c.f === 'kode' && c.ri === Rows.rows().length - 1);
+          if (Rows.markRowEnter) Rows.markRowEnter(tr);
+          if (Rows.scrollRowIntoView) Rows.scrollRowIntoView(tr, { behavior: 'smooth' });
+          else tr.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
           if (kodeCell) focusCell(kodeCell);
-          tr.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
           return;
         }
         if (idx < last) focusCell(cells[idx + 1]);

@@ -20,6 +20,83 @@ const Utils = (() => {
   };
 
   /**
+   * Evaluate a simple arithmetic expression from a production count field.
+   * Supports an optional Excel-style leading "=", decimals, parentheses,
+   * and +, -, *, / without using eval. Returns null for blank/invalid input.
+   */
+  const parseArithmeticExpression = (raw) => {
+    if (raw == null) return null;
+    let source = String(raw).trim();
+    if (!source) return null;
+    if (source.startsWith('=')) source = source.slice(1).trim();
+    if (!source) return null;
+
+    let index = 0;
+    const skipSpaces = () => {
+      while (/\s/.test(source[index] || '')) index++;
+    };
+
+    const parseExpression = () => {
+      let value = parseTerm();
+      if (value === null) return null;
+      while (true) {
+        skipSpaces();
+        const operator = source[index];
+        if (operator !== '+' && operator !== '-') return value;
+        index++;
+        const right = parseTerm();
+        if (right === null) return null;
+        value = operator === '+' ? value + right : value - right;
+        if (!Number.isFinite(value)) return null;
+      }
+    };
+
+    const parseTerm = () => {
+      let value = parseFactor();
+      if (value === null) return null;
+      while (true) {
+        skipSpaces();
+        const operator = source[index];
+        if (operator !== '*' && operator !== '/') return value;
+        index++;
+        const right = parseFactor();
+        if (right === null || (operator === '/' && right === 0)) return null;
+        value = operator === '*' ? value * right : value / right;
+        if (!Number.isFinite(value)) return null;
+      }
+    };
+
+    const parseFactor = () => {
+      skipSpaces();
+      const sign = source[index];
+      if (sign === '+' || sign === '-') {
+        index++;
+        const value = parseFactor();
+        return value === null ? null : sign === '-' ? -value : value;
+      }
+
+      if (source[index] === '(') {
+        index++;
+        const value = parseExpression();
+        skipSpaces();
+        if (value === null || source[index] !== ')') return null;
+        index++;
+        return value;
+      }
+
+      const match = /^(?:\d+(?:[.,]\d*)?|[.,]\d+)/.exec(source.slice(index));
+      if (!match) return null;
+      index += match[0].length;
+      const value = Number(match[0].replace(',', '.'));
+      return Number.isFinite(value) ? value : null;
+    };
+
+    const result = parseExpression();
+    skipSpaces();
+    return result !== null && index === source.length ? result : null;
+  };
+
+  /**
    * Parse string "HH:MM" → total menit dari 00:00.
    * Return null kalau format invalid.
    */
@@ -99,14 +176,22 @@ const Utils = (() => {
 
   /**
    * Kategorisasi kode log: 'planned' | 'unplanned' | 'prod' | null.
+   * Hanya kode 1–9 yang valid:
+   *   2         → prod (produksi)
+   *   5,6,7,8   → planned
+   *   1,3,4,9   → unplanned
+   * Selain itu (kosong, non-angka, di luar 1–9) → null (tidak dihitung).
    */
   const catOf = (k) => {
     if (k === '' || k == null) return null;
     const n = parseInt(k, 10);
     if (isNaN(n)) return null;
+    if (CONFIG.VALID_CODES && !CONFIG.VALID_CODES.has(n)) return null;
+    if (n < 1 || n > 9) return null;
     if (CONFIG.PLANNED_CODES.has(n))   return 'planned';
     if (CONFIG.UNPLANNED_CODES.has(n)) return 'unplanned';
-    return 'prod';
+    if (CONFIG.PROD_CODES ? CONFIG.PROD_CODES.has(n) : n === 2) return 'prod';
+    return null;
   };
 
   // ====== KEAMANAN TAMPILAN ======
@@ -119,7 +204,7 @@ const Utils = (() => {
   }[c]));
 
   return {
-    nf0, nf2, parseNumber, parseTime, maskTime, normTime, minutesToHHMM,
+    nf0, nf2, parseNumber, parseArithmeticExpression, parseTime, maskTime, normTime, minutesToHHMM,
     todayLocal, formatDateText, shiftOf, catOf, escapeHtml
   };
 })();

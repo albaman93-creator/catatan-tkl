@@ -33,6 +33,12 @@ const Storage = (() => {
     return `${date}|S${State.evalShift + 1}|L${State.el.fLine.value}|${State.el.fStage.value}`;
   };
 
+  // Baca teks elemen hasil hitung; aman jika elemen tidak ada (tidak melempar error)
+  const txtOf = (id) => {
+    const el = State.el[id] || document.getElementById(id);
+    return el ? el.textContent : '0';
+  };
+
   const labelFilter = () => {
     const rawDate = State.el.fDate.value || Utils.todayLocal();
     return `${Utils.formatDateText(rawDate)} · Shift ${State.evalShift + 1} · Line ${State.el.fLine.value} · ${State.el.fStage.value.toUpperCase()}`;
@@ -54,53 +60,106 @@ const Storage = (() => {
    */
   const collect = () => ({
     products: {
-      p1Name: State.el.prodName1.value, p1Rate: State.el.prodRate1.value, p1Wo: State.el.prodWo1 ? State.el.prodWo1.value : '',
-      p2Name: State.el.prodName2.value, p2Rate: State.el.prodRate2.value, p2Wo: State.el.prodWo2 ? State.el.prodWo2.value : '',
-      p3Name: State.el.prodName3.value, p3Rate: State.el.prodRate3.value, p3Wo: State.el.prodWo3 ? State.el.prodWo3.value : '',
+      p1Name: State.el.prodName1.value,
+      p1Bn: State.el.prodBn1 ? State.el.prodBn1.value.trim() : '',
+      p1Rate: State.el.prodRate1.value,
+      p1Ukuran: State.el.prodUkuran1 ? State.el.prodUkuran1.value : '',
+      p1Wo: State.el.prodWo1 ? State.el.prodWo1.value : '',
+      p2Name: State.el.prodName2.value,
+      p2Bn: State.el.prodBn2 ? State.el.prodBn2.value.trim() : '',
+      p2Rate: State.el.prodRate2.value,
+      p2Ukuran: State.el.prodUkuran2 ? State.el.prodUkuran2.value : '',
+      p2Wo: State.el.prodWo2 ? State.el.prodWo2.value : '',
+      p3Name: State.el.prodName3.value,
+      p3Bn: State.el.prodBn3 ? State.el.prodBn3.value.trim() : '',
+      p3Rate: State.el.prodRate3.value,
+      p3Ukuran: State.el.prodUkuran3 ? State.el.prodUkuran3.value : '',
+      p3Wo: State.el.prodWo3 ? State.el.prodWo3.value : '',
     },
     operators: {
       op1: State.el.op1.value, op2: State.el.op2.value, op3: State.el.op3.value,
       op4: State.el.op4.value, op5: State.el.op5.value, op6: State.el.op6.value,
     },
+    mesin: {
+      nama: (State.el.fMesinNama || document.getElementById('fMesinNama'))?.value || '',
+      kode: (State.el.fMesinKode || document.getElementById('fMesinKode'))?.value || '',
+    },
+    // Jumlah TKL hasil input manual disimpan sebagai bagian dari record Sheet.
     summary: {
-      availability: State.el.oF.textContent,
-      performance:  State.el.oITotal.textContent,
-      quality:      State.el.oM.textContent,
-      oee:          State.el.oee.textContent,
+      availability: txtOf('oF'),
+      performance:  txtOf('oITotal'),
+      quality:      txtOf('oM'),
+      oee:          txtOf('oee'),
+      ope:    (State.lastCalc && State.lastCalc.ope) || null,
+      oee365: (State.lastCalc && State.lastCalc.oee365) || null,
+      produk: (State.lastCalc && State.lastCalc.produk) || [],
     },
     rows: Rows.rows().map(tr => {
       const g = (f) => { const el = tr.querySelector(`[data-f="${f}"]`); return el ? el.value : ''; };
       return {
-        kode: g('kode'), mulai: g('mulai'), panggil: g('panggil'),
-        teknik: g('teknik'), selesai: g('selesai'),
+        kode: g('kode'), op: g('op'), ms: g('ms'), mulai: g('mulai'), panggil: g('panggil'),
+        teknik: g('teknik'), selesai: g('selesai'), durasi: g('durasi'),
         kegiatan: g('kegiatan'), masalah: g('masalah'), disposisi: g('disposisi'),
+        description: g('description'),
         wo: g('wo'), batch: g('batch'), good: g('good'), defect: g('defect'),
       };
     }),
+    // Periode bulan produksi (1-12) — penanda manual cutoff bulan untuk filter dashboard.
+    // Diisi user lewat dropdown "Periode bulan" di header sheet.
+    prodMonth: (document.getElementById('sheetProdMonth') || {}).value || '',
     savedAt: new Date().toISOString(),
   });
+
+
+  /** True jika minimal satu kode produk terdaftar di master sheet. */
+  const hasRegisteredProduct = (rec) => {
+    const p = (rec && rec.products) || {};
+    return [p.p1Name, p.p2Name, p.p3Name].some((n) => String(n || '').trim() !== '');
+  };
 
   /**
    * Apply data ke form (saat load record atau reset).
    */
   const applyRecord = (d) => {
-    // Products
+    // Products — dukung format lama "VTTS1 L030001" (name+BN digabung) & format baru terpisah
+    const splitLegacyName = (raw, bnField) => {
+      const s = String(raw || '').trim();
+      if (bnField != null && String(bnField).trim() !== '') {
+        return { name: s, bn: String(bnField).trim() };
+      }
+      // "VTTS1 L030001" atau "VTTS1 L 030001" → pecah di spasi pertama
+      const m = s.match(/^(\S+)\s+(.+)$/);
+      if (m) return { name: m[1], bn: m[2].trim() };
+      return { name: s, bn: '' };
+    };
     if (d && d.products) {
-      State.el.prodName1.value = d.products.p1Name || '';
+      const p1 = splitLegacyName(d.products.p1Name, d.products.p1Bn);
+      const p2 = splitLegacyName(d.products.p2Name, d.products.p2Bn);
+      const p3 = splitLegacyName(d.products.p3Name, d.products.p3Bn);
+      State.el.prodName1.value = p1.name;
+      if (State.el.prodBn1) State.el.prodBn1.value = p1.bn;
       State.el.prodRate1.value = d.products.p1Rate || '';
+      if (State.el.prodUkuran1) State.el.prodUkuran1.value = d.products.p1Ukuran || '';
       if (State.el.prodWo1) State.el.prodWo1.value = d.products.p1Wo || '';
-      State.el.prodName2.value = d.products.p2Name || '';
+      State.el.prodName2.value = p2.name;
+      if (State.el.prodBn2) State.el.prodBn2.value = p2.bn;
       State.el.prodRate2.value = d.products.p2Rate || '';
+      if (State.el.prodUkuran2) State.el.prodUkuran2.value = d.products.p2Ukuran || '';
       if (State.el.prodWo2) State.el.prodWo2.value = d.products.p2Wo || '';
-      State.el.prodName3.value = d.products.p3Name || '';
+      State.el.prodName3.value = p3.name;
+      if (State.el.prodBn3) State.el.prodBn3.value = p3.bn;
       State.el.prodRate3.value = d.products.p3Rate || '';
+      if (State.el.prodUkuran3) State.el.prodUkuran3.value = d.products.p3Ukuran || '';
       if (State.el.prodWo3) State.el.prodWo3.value = d.products.p3Wo || '';
     } else {
-      State.el.prodName1.value = ''; State.el.prodRate1.value = '';
+      State.el.prodName1.value = ''; if (State.el.prodBn1) State.el.prodBn1.value = ''; State.el.prodRate1.value = '';
+      if (State.el.prodUkuran1) State.el.prodUkuran1.value = '';
       if (State.el.prodWo1) State.el.prodWo1.value = '';
-      State.el.prodName2.value = ''; State.el.prodRate2.value = '';
+      State.el.prodName2.value = ''; if (State.el.prodBn2) State.el.prodBn2.value = ''; State.el.prodRate2.value = '';
+      if (State.el.prodUkuran2) State.el.prodUkuran2.value = '';
       if (State.el.prodWo2) State.el.prodWo2.value = '';
-      State.el.prodName3.value = ''; State.el.prodRate3.value = '';
+      State.el.prodName3.value = ''; if (State.el.prodBn3) State.el.prodBn3.value = ''; State.el.prodRate3.value = '';
+      if (State.el.prodUkuran3) State.el.prodUkuran3.value = '';
       if (State.el.prodWo3) State.el.prodWo3.value = '';
     }
     // Sync ke Master Produk UI
@@ -109,6 +168,33 @@ const Storage = (() => {
       const src = State.el[targetId] || document.getElementById(targetId);
       if (src) el.value = src.value;
     });
+
+    // Periode bulan produksi (penanda manual untuk filter dashboard)
+    {
+      const pm = (d && d.prodMonth != null) ? String(d.prodMonth) : '';
+      const hidden = document.getElementById('sheetProdMonth');
+      if (hidden) hidden.value = pm;
+      if (typeof window.SheetPeriod !== 'undefined' && window.SheetPeriod.set) {
+        const LABELS = { '1':'JAN','2':'FEB','3':'MAR','4':'APR','5':'MEI','6':'JUN',
+          '7':'JUL','8':'AGU','9':'SEP','10':'OKT','11':'NOV','12':'DES' };
+        window.SheetPeriod.set(pm, LABELS[pm] || '');
+      } else {
+        const valEl = document.getElementById('sheetPeriodValue');
+        if (valEl) {
+          const LABELS = { '1':'JAN','2':'FEB','3':'MAR','4':'APR','5':'MEI','6':'JUN',
+            '7':'JUL','8':'AGU','9':'SEP','10':'OKT','11':'NOV','12':'DES' };
+          if (pm && LABELS[pm]) {
+            valEl.textContent = LABELS[pm];
+            valEl.classList.remove('is-empty');
+            valEl.classList.add('is-set');
+          } else {
+            valEl.textContent = 'Periode bulan';
+            valEl.classList.add('is-empty');
+            valEl.classList.remove('is-set');
+          }
+        }
+      }
+    }
 
     // Operators
     if (d && d.operators) {
@@ -123,6 +209,35 @@ const Storage = (() => {
       State.el.op4.value = ''; State.el.op5.value = ''; State.el.op6.value = '';
     }
 
+    // Mesin — rebuild dropdown dulu, lalu terapkan nilai tersimpan
+    const mn = State.el.fMesinNama || document.getElementById('fMesinNama');
+    const mk = State.el.fMesinKode || document.getElementById('fMesinKode');
+    if (typeof UI !== 'undefined' && typeof UI.fillMachineName === 'function') {
+      UI.fillMachineName();
+    }
+    if (d && d.mesin) {
+      if (mn) {
+        const nama = d.mesin.nama || '';
+        // Pastikan opsi ada (data lama / nama custom)
+        if (mn.tagName === 'SELECT' && nama) {
+          const exists = Array.from(mn.options).some((o) => o.value === nama);
+          if (!exists) {
+            const opt = document.createElement('option');
+            opt.value = nama;
+            opt.textContent = nama;
+            mn.appendChild(opt);
+          }
+        }
+        mn.value = nama;
+      }
+      if (mk) mk.value = d.mesin.kode || '';
+    } else {
+      if (mn && !mn.value) mn.value = '';
+      if (mk) mk.value = '';
+    }
+
+    // Restore Jumlah TKL ke Sheet.
+
     // Rows
     State.el.tbody.innerHTML = '';
     Rows.updateAllDropdowns();
@@ -136,6 +251,12 @@ const Storage = (() => {
     Calculation.recalc();
     Calculation.validateAllTimeInputs();
     UI.updateEditChip(d);
+
+    // Record hasil input dari Google Sheets belum punya ringkasan OEE → hitung ulang (recalc di atas)
+    // lalu simpan balik otomatis supaya Supabase & Spreadsheet ikut terisi.
+    if (d && d.meta && d.meta.needsRecalc) {
+      setTimeout(() => { saveData({ silent: true }).catch(() => {}); }, 400);
+    }
 
     // Kalau Mode Form sedang aktif, sinkronkan kartu form ke baris pertama
     // dari data yang baru saja dimuat (data tabel baru saja diganti total).
@@ -191,6 +312,7 @@ const Storage = (() => {
       payload: rec,
       updatedAt: new Date().toISOString(),
       schemaVersion: CONFIG.SCHEMA_VERSION || 1,
+      source: 'app', // dibedakan dari input via Google Sheets (source = 'sheet')
 
       availability: parseIdNumber(rec.summary && rec.summary.availability),
       performance:  parseIdNumber(rec.summary && rec.summary.performance),
@@ -227,6 +349,15 @@ const Storage = (() => {
   const loadRecord = async () => {
     const filter = activeFilter();
 
+    // Mode Offline: selalu baca lokal saja, jangan coba Supabase
+    const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
+    if (offlineMode) {
+      const db = dbGet();
+      applyRecord(db[curKey()] || null);
+      UI.setSyncStatus('err', 'Mode Offline · data lokal saja');
+      return;
+    }
+
     if (isOnline()) {
       UI.setSyncStatus('sync', 'memuat dari Supabase…');
       try {
@@ -260,9 +391,22 @@ const Storage = (() => {
   // ====== SAVE (POST): tombol "Simpan" — online → Supabase, offline → antre ======
   const saveData = async (opts = {}) => {
     const rec = collect();
+    // Hanya simpan bila ada kode produk terdaftar (p1/p2/p3)
+    if (!hasRegisteredProduct(rec)) {
+      if (!opts.silent) {
+        UI.toast('Belum ada produk terdaftar — data tidak disimpan. Isi kode produk dulu.', true);
+      }
+      UI.setSyncStatus('err', '⚠ tidak disimpan · produk kosong');
+      return;
+    }
     const db = dbGet();
     db[curKey()] = rec;
     dbSet(db);
+
+    // Catat kombinasi produk+BN ke history (Issue #8)
+    if (typeof Suggest !== 'undefined' && Suggest.rememberFromMaster) {
+      try { Suggest.rememberFromMaster(); } catch (_) {}
+    }
 
     State.el.lastSaved.textContent = '✓ tersimpan ' + new Date().toLocaleTimeString('id-ID');
     UI.updateEditChip(rec);
@@ -270,6 +414,15 @@ const Storage = (() => {
 
     const filter = activeFilter();
     const row = buildSupabaseRow(rec, filter);
+
+    // Mode Offline (login tanpa kredensial): HANYA lokal, JANGAN antre ke Supabase.
+    // User harus login online dulu jika ingin data naik ke cloud.
+    const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
+    if (offlineMode) {
+      UI.setSyncStatus('err', '✓ tersimpan lokal (Mode Offline · tidak ke Supabase)');
+      if (!opts.silent) UI.toast('Mode Offline — data hanya lokal. Login online untuk simpan ke Supabase.', true);
+      return;
+    }
 
     if (!isOnline()) {
       const n = Sync.queuePush(row);
@@ -296,9 +449,14 @@ const Storage = (() => {
     try {
       if (!State.el.tbody) return; // app belum siap (masih di layar login)
       const rec = collect();
+      // Jangan simpan lokal/cloud jika belum ada produk terdaftar
+      if (!hasRegisteredProduct(rec)) return;
       const db = dbGet();
       db[curKey()] = rec;
       dbSet(db);
+      if (typeof Suggest !== 'undefined' && Suggest.rememberFromMaster) {
+        try { Suggest.rememberFromMaster(); } catch (_) {}
+      }
       if (State.el.lastSaved) {
         State.el.lastSaved.textContent = '💾 auto-save lokal ' + new Date().toLocaleTimeString('id-ID');
       }
@@ -307,8 +465,211 @@ const Storage = (() => {
     }
   };
 
+  // ====== AUTO-SAVE SUPABASE (setiap CONFIG.AUTO_SAVE_SUPABASE_INTERVAL_MS) ======
+  // Senyap, tanpa toast. Hanya saat online + bukan Mode Offline.
+  // Skip jika payload identik dengan yang terakhir berhasil di-push (hemat bandwidth).
+  let _autoSupabaseBusy = false;
+  let _lastAutoSupabaseHash = '';
+
+  const autoSaveSupabase = async () => {
+    try {
+      if (!State.el.tbody) return;
+      if (_autoSupabaseBusy) return;
+
+      const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
+      if (offlineMode) return;
+      if (!isOnline()) return;
+
+      const rec = collect();
+      // Jangan push ke Supabase jika belum ada produk terdaftar
+      if (!hasRegisteredProduct(rec)) return;
+      // Hash ringan: skip upload kalau isi sheet belum berubah sejak auto-save terakhir
+      const hash = JSON.stringify({
+        k: curKey(),
+        rows: rec.rows,
+        products: rec.products,
+        mesin: rec.mesin,
+        summary: rec.summary,
+      });
+      if (hash === _lastAutoSupabaseHash) return;
+
+      _autoSupabaseBusy = true;
+      // Simpan lokal dulu (sama seperti saveData), lalu push ke Supabase senyap
+      const db = dbGet();
+      db[curKey()] = rec;
+      dbSet(db);
+
+      const filter = activeFilter();
+      const row = buildSupabaseRow(rec, filter);
+
+      UI.setSyncStatus('sync', 'auto-save Supabase…');
+      try {
+        await Sync.pushRow(row);
+        _lastAutoSupabaseHash = hash;
+        UI.setSyncStatus('ok', '✓ auto-save Supabase');
+        if (State.el.lastSaved) {
+          State.el.lastSaved.textContent = '☁️ auto-save cloud ' + new Date().toLocaleTimeString('id-ID');
+        }
+      } catch (err) {
+        console.warn('Auto-save Supabase gagal, diantrekan:', err);
+        const n = Sync.queuePush(row);
+        UI.setSyncStatus('err', `⚠ auto-save gagal, antre (${n})`);
+      }
+    } catch (e) {
+      console.warn('Auto-save Supabase error:', e);
+    } finally {
+      _autoSupabaseBusy = false;
+    }
+  };
+
+  /**
+   * Export log sheet aktif ke CSV (UTF-8 BOM, cocok Excel Indonesia).
+   * Satu baris per aktivitas; header memuat meta filter + ringkasan OEE.
+   */
+  const exportCsv = () => {
+    const filter = activeFilter();
+    const rec = collect();
+    const rows = (rec.rows || []).filter(r =>
+      (r.kode && String(r.kode).trim()) ||
+      (r.mulai && String(r.mulai).trim()) ||
+      (r.selesai && String(r.selesai).trim()) ||
+      (r.durasi && String(r.durasi).trim()) ||
+      (r.kegiatan && String(r.kegiatan).trim()) ||
+      (r.good && String(r.good).trim()) ||
+      (r.defect && String(r.defect).trim())
+    );
+
+    if (!rows.length) {
+      if (typeof UI !== 'undefined' && UI.toast) {
+        UI.toast('Tidak ada data baris untuk diexport.', true, 'warn');
+      }
+      return;
+    }
+
+    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const head = [
+      'No', 'Tanggal', 'Shift', 'Line', 'Tahapan',
+      'Kode', 'Man Power', 'Mulai', 'Panggil', 'Teknik', 'Selesai', 'Durasi',
+      'Kegiatan', 'Masalah', 'Disposisi', 'WO', 'Produk', 'Good', 'Defect',
+      'Availability%', 'Performance%', 'Quality%', 'OEE%',
+    ];
+
+    const metaA = rec.summary?.availability ?? '';
+    const metaP = rec.summary?.performance ?? '';
+    const metaQ = rec.summary?.quality ?? '';
+    const metaO = rec.summary?.oee ?? '';
+
+    const body = rows.map((r, i) => [
+      i + 1,
+      filter.rawDate,
+      `S${filter.shift}`,
+      filter.line,
+      filter.stage,
+      r.kode, r.op, r.mulai, r.panggil, r.teknik, r.selesai, r.durasi,
+      r.kegiatan, r.masalah, r.disposisi, r.wo, r.batch, r.good, r.defect,
+      metaA, metaP, metaQ, metaO,
+    ]);
+
+    const csv = [head, ...body].map(row => row.map(esc).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const datePart = filter.rawDate || Utils.todayLocal();
+    a.href = url;
+    a.download = `logsheet-${datePart}-S${filter.shift}-L${filter.line}-${filter.stage}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    if (typeof UI !== 'undefined' && UI.toast) {
+      UI.toast(`CSV diexport (${rows.length} baris) ✓`);
+    }
+  };
+
+  /**
+   * Salin atau pindahkan record dari filter sumber ke filter tujuan.
+   * @param {object} targetFilter { rawDate, shift, line, stage }
+   * @param {'copy'|'move'} mode
+   * @returns {Promise<{ok:boolean, message:string, targetKey:string}>}
+   */
+  const copyOrMoveRecord = async (targetFilter, mode = 'copy') => {
+    const srcFilter = activeFilter();
+    const srcKey = curKey();
+    const targetKey = `${targetFilter.rawDate}|S${targetFilter.shift}|L${targetFilter.line}|${targetFilter.stage}`;
+
+    if (srcKey === targetKey) {
+      return { ok: false, message: 'Tujuan sama dengan sumber. Pilih tanggal/shift/line/tahapan lain.' };
+    }
+
+    // Ambil data sumber: utamakan form yang sedang terbuka (paling up-to-date)
+    const rec = collect();
+    if (!rec) {
+      return { ok: false, message: 'Tidak ada data untuk disalin.' };
+    }
+
+    // Tandai metadata salinan
+    const cloned = JSON.parse(JSON.stringify(rec));
+    cloned.copiedFrom = srcKey;
+    cloned.copiedAt = new Date().toISOString();
+    cloned.savedAt = new Date().toISOString();
+
+    // Simpan ke localStorage di key tujuan
+    const db = dbGet();
+    const targetExisted = !!db[targetKey];
+    db[targetKey] = cloned;
+
+    // Jika mode pindah → hapus sumber lokal
+    if (mode === 'move') {
+      delete db[srcKey];
+    }
+    dbSet(db);
+
+    // Sync ke Supabase (upsert tujuan; hapus sumber jika move)
+    const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
+    const row = buildSupabaseRow(cloned, targetFilter);
+
+    if (!offlineMode && isOnline() && typeof Sync !== 'undefined') {
+      try {
+        await Sync.pushRow(row);
+        if (mode === 'move') {
+          try {
+            const client = SupabaseClient.getClient();
+            if (client) {
+              await client.from('oee_data').delete().eq('key', srcKey);
+            }
+          } catch (delErr) {
+            console.warn('Gagal hapus sumber di Supabase:', delErr);
+          }
+        }
+      } catch (err) {
+        console.warn('Sync copy/move gagal, diantrekan:', err);
+        Sync.queuePush(row);
+      }
+    } else if (!offlineMode && !isOnline() && typeof Sync !== 'undefined') {
+      Sync.queuePush(row);
+    }
+
+    const action = mode === 'move' ? 'dipindahkan' : 'disalin';
+    const label = `${targetFilter.rawDate} · S${targetFilter.shift} · L${targetFilter.line} · ${String(targetFilter.stage).toUpperCase()}`;
+    return {
+      ok: true,
+      message: `Data berhasil ${action} ke ${label}${targetExisted ? ' (data lama ditimpa)' : ''}`,
+      targetKey,
+      targetFilter,
+    };
+  };
+
+  /** Cek apakah slot tujuan sudah berisi data (lokal). */
+  const targetExists = (targetFilter) => {
+    const key = `${targetFilter.rawDate}|S${targetFilter.shift}|L${targetFilter.line}|${targetFilter.stage}`;
+    const db = dbGet();
+    return !!db[key];
+  };
+
   return {
     dbGet, dbSet, curKey, labelFilter, collect, applyRecord,
-    loadRecord, saveData, autoSaveLocal,
+    loadRecord, saveData, autoSaveLocal, autoSaveSupabase, exportCsv,
+    copyOrMoveRecord, targetExists, activeFilter,
   };
 })();

@@ -1,0 +1,111 @@
+/**
+ * VERIFY-AGENT.CSS — hanya untuk js/verify-agent.js
+ * Tidak mempengaruhi wizard / suggest / sheet.
+ */
+
+#verifyAgentOverlay.qm-overlay {
+  z-index: 1300;
+}
+
+#verifyAgentModal.verify-agent-modal {
+  max-width: 520px;
+  width: 94vw;
+}
+
+.va-status {
+  font: 700 14px var(--body, system-ui, sans-serif);
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+.va-status-ok   { background: rgba(18,161,80,.12); color: #0b7a3b; }
+.va-status-warn { background: rgba(245,158,11,.15); color: #b45309; }
+.va-status-bad  { background: rgba(220,38,38,.12); color: #b91c1c; }
+
+.va-apq-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.va-apq {
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+  border: 1px solid var(--line, #e2e8f0);
+  background: var(--card, #fff);
+}
+.va-apq span {
+  display: block;
+  font: 600 10px ui-monospace, monospace;
+  color: #64748b;
+  letter-spacing: .4px;
+  margin-bottom: 4px;
+}
+.va-apq b {
+  font: 700 16px var(--disp, system-ui, sans-serif);
+}
+.va-apq-ok   b { color: #0b7a3b; }
+.va-apq-warn b { color: #b45309; }
+.va-apq-bad  b { color: #b91c1c; }
+.va-apq-na   b { color: #94a3b8; }
+
+.va-stats {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.va-list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  max-height: 260px;
+  overflow: auto;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 10px;
+}
+.va-list li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  border-bottom: 1px solid var(--line, #f1f5f9);
+}
+.va-list li:last-child { border-bottom: 0; }
+.va-list li span { flex: none; font-weight: 700; }
+.va-ok   { color: #0b7a3b; background: rgba(18,161,80,.04); }
+.va-warn { color: #92400e; background: rgba(245,158,11,.06); }
+.va-err  { color: #991b1b; background: rgba(220,38,38,.05); }
+
+.va-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.va-hint {
+  margin: 0;
+  font-size: 11.5px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .va-apq {
+  background: #0f172a;
+  border-color: #334155;
+}
+[data-theme="dark"] .va-list {
+  border-color: #334155;
+}
+[data-theme="dark"] .va-list li {
+  border-color: #1e293b;
+}
+
+@media (max-width: 480px) {
+  .va-apq-row { grid-template-columns: 1fr 1fr; }
+}

@@ -1,0 +1,23 @@
+/**
+ * card-quickmode.css — Input cepat / Paste dari AI / Form TKL
+ * HTML: #qmOverlay / #qmModal
+ * JS:   js/quickmode.js
+ * Catatan: gaya default modal di quickmode.css; override card di sini.
+ */
+#qmOverlay.qm-overlay {
+  z-index: 1200;
+}
+
+#qmModal.qm-modal,
+#qmModal.card-quickmode {
+  max-width: 440px;
+  width: 100%;
+  border-radius: var(--card-radius, 14px);
+}
+
+/* Varian nature (np-modal) ikut quickmode.css — override di sini bila perlu */
+#qmModal.np-modal { }
+
+#qmModal .qm-title { }
+#qmModal .qm-sub { }
+#qmModal .qm-actions { }

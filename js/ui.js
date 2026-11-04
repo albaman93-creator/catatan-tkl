@@ -84,7 +84,7 @@ const UI = (() => {
 
   // ====== SHIFT SELECTION ======
   const applyShiftUI = () => {
-    document.querySelectorAll('.shiftsel button').forEach(b => {
+    document.querySelectorAll('[data-shift]').forEach(b => {
       b.classList.toggle('on', parseInt(b.getAttribute('data-shift'), 10) === State.evalShift);
     });
     const maxMnt = CONFIG.SHIFT_A[State.evalShift];
@@ -92,6 +92,123 @@ const UI = (() => {
     State.el.maxShiftMnt.textContent = maxMnt;
     State.el.maxShiftMnt2.textContent = maxMnt;
     updateShiftIndicator();
+  };
+
+  // ====== LINE & STAGE TOGGLE (filter Data) ======
+  const applyLineUI = () => {
+    const val = State.el.fLine ? String(State.el.fLine.value) : '1';
+    document.querySelectorAll('#fLineSel [data-line]').forEach(b => {
+      b.classList.toggle('on', b.getAttribute('data-line') === val);
+    });
+    fillMachineName();
+  };
+  const applyStageUI = () => {
+    const val = State.el.fStage ? State.el.fStage.value : 'filling';
+    document.querySelectorAll('#fStageSel [data-stage]').forEach(b => {
+      b.classList.toggle('on', b.getAttribute('data-stage') === val);
+    });
+    fillMachineName();
+  };
+  let lastAutoMachine = '';   // dipakai cabang input teks (versi lama)
+
+  /** Daftar nama mesin yang sah untuk kombinasi tahapan|line (default + pilihan ganda). */
+  const machineOptionsFor = (key) => {
+    const names = CONFIG.MACHINE_NAMES || {};
+    const alts = (CONFIG.MACHINE_NAMES_ALT && CONFIG.MACHINE_NAMES_ALT[key]) || [];
+    const primary = names[key] || '';
+    const list = [];
+    const add = (v) => { const t = String(v || '').trim(); if (t && !list.includes(t)) list.push(t); };
+    add(primary);
+    alts.forEach(add);
+    return { primary, list };
+  };
+
+  const currentMachineKey = () =>
+    String(State.el.fStage?.value || 'filling').toLowerCase() + '|' + String(State.el.fLine?.value || '1');
+
+  /**
+   * Isi Nama Mesin sesuai tahapan + line (dipanggil saat tombol Line/Tahapan berganti).
+   * - Dropdown berisi default + pilihan ganda dari CONFIG.MACHINE_NAMES / MACHINE_NAMES_ALT
+   * - Default (urutan pertama) langsung dipilih
+   * - Nama lain yang sudah ada di kolom (data lama / ketikan manual) tetap ditampilkan sebagai opsi
+   */
+  const fillMachineName = () => {
+    const key = currentMachineKey();
+    const { primary, list } = machineOptionsFor(key);
+    const el = State.el.fMesinNama || document.getElementById('fMesinNama');
+    if (!el) return;
+    const cur = (el.value || '').trim();
+    const allNames = Object.values(CONFIG.MACHINE_NAMES || {});
+
+    if (el.tagName === 'SELECT') {
+      // Nama lama dipertahankan hanya jika BUKAN nama mesin milik kombinasi lain
+      // (nama custom / data lama tetap aman).
+      const keepCur = cur && !list.includes(cur) && !allNames.includes(cur);
+      const opts = keepCur ? [...list, cur] : list;
+      el.innerHTML = '<option value="">— Pilih mesin —</option>' +
+        opts.map((o) => `<option value="${String(o).replace(/"/g, '&quot;')}">${o}</option>`).join('');
+      if (primary) el.value = primary;
+      else if (keepCur) el.value = cur;
+      else el.value = '';
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    } else {
+      // fallback input teks (versi lama)
+      if (!cur || cur === lastAutoMachine || allNames.includes(cur)) {
+        el.value = primary || cur;
+        lastAutoMachine = el.value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+  };
+
+  /**
+   * Koreksi setelah data tersimpan dimuat: kalau nama tersimpan adalah mesin milik
+   * kombinasi LAIN (sisa bug lama), ganti dengan default kombinasi yang aktif.
+   * Nama custom yang tidak ada di config dibiarkan.
+   */
+  const reconcileMachineName = () => {
+    const el = State.el.fMesinNama || document.getElementById('fMesinNama');
+    if (!el) return;
+    const key = currentMachineKey();
+    const { primary, list } = machineOptionsFor(key);
+    const cur = (el.value || '').trim();
+    if (!primary || cur === primary || list.includes(cur)) return;
+    const milikLain = Object.values(CONFIG.MACHINE_NAMES || {}).includes(cur);
+    if (!cur || milikLain) {
+      if (el.tagName === 'SELECT' && !Array.from(el.options).some((o) => o.value === primary)) {
+        const opt = document.createElement('option');
+        opt.value = primary; opt.textContent = primary;
+        el.appendChild(opt);
+      }
+      el.value = primary;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  };
+
+  const bindFilterToggles = () => {
+    document.querySelectorAll('#fLineSel [data-line]').forEach(b => {
+      b.addEventListener('click', () => {
+        if (State.el.fLine) {
+          State.el.fLine.value = b.getAttribute('data-line');
+          State.el.fLine.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        applyLineUI();
+        if (typeof updateUnifiedControl === 'function') updateUnifiedControl();
+      });
+    });
+    document.querySelectorAll('#fStageSel [data-stage]').forEach(b => {
+      b.addEventListener('click', () => {
+        if (State.el.fStage) {
+          State.el.fStage.value = b.getAttribute('data-stage');
+          State.el.fStage.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        applyStageUI();
+        if (typeof updateShiftIndicator === 'function') updateShiftIndicator();
+        if (typeof updateUnifiedControl === 'function') updateUnifiedControl();
+      });
+    });
+    applyLineUI();
+    applyStageUI();
   };
 
   // ====== INDIKATOR SHIFT & TANGGAL AKTIF ======
@@ -103,9 +220,13 @@ const UI = (() => {
   };
 
   const updateUnifiedControl = () => {
-    const stageVal = State.el.fStage ? State.el.fStage.value : 'mixing';
+    const stageVal = State.el.fStage ? State.el.fStage.value : 'filling';
     const lineVal = State.el.fLine ? String(State.el.fLine.value) : '1';
     const dateVal = State.el.fDate ? State.el.fDate.value : '';
+    const formatPercent = value => {
+      const raw = String(value ?? '').trim();
+      return raw === '—' ? '—' : `${raw.replace(/\s*%$/, '')}%`;
+    };
 
     const root = State.el.sheetUnifiedControl;
     if (root) root.dataset.stage = stageVal;
@@ -128,16 +249,28 @@ const UI = (() => {
     if (State.el.sheetDateText) State.el.sheetDateText.textContent = formatSheetDate(dateVal);
 
     // KPI mini-bar membaca elemen kalkulasi resmi sehingga tidak ada state ganda.
-    if (State.el.sheetKpiA && State.el.oF) State.el.sheetKpiA.textContent = `${State.el.oF.textContent}%`;
-    if (State.el.sheetKpiP && State.el.oITotal) State.el.sheetKpiP.textContent = `${State.el.oITotal.textContent}%`;
-    if (State.el.sheetKpiQ && State.el.oM) State.el.sheetKpiQ.textContent = `${State.el.oM.textContent}%`;
+    if (State.el.sheetKpiA && State.el.oF) State.el.sheetKpiA.textContent = formatPercent(State.el.oF.textContent);
+    if (State.el.sheetKpiP && State.el.oITotal) State.el.sheetKpiP.textContent = formatPercent(State.el.oITotal.textContent);
+    if (State.el.sheetKpiQ && State.el.oM) State.el.sheetKpiQ.textContent = formatPercent(State.el.oM.textContent);
     if (State.el.sheetKpiOEE && State.el.oee) State.el.sheetKpiOEE.textContent = State.el.oee.textContent;
+
+    // KPI OEE 365 (A365 / P / Q / OEE365)
+    if (State.el.sheetKpiA365 && State.el.o365F) State.el.sheetKpiA365.textContent = formatPercent(State.el.o365F.textContent);
+    if (State.el.sheetKpiP365 && State.el.o365P) State.el.sheetKpiP365.textContent = formatPercent(State.el.o365P.textContent);
+    if (State.el.sheetKpiQ365 && State.el.o365Q) State.el.sheetKpiQ365.textContent = formatPercent(State.el.o365Q.textContent);
+    if (State.el.sheetKpiOEE365 && State.el.oee365) {
+      State.el.sheetKpiOEE365.textContent = State.el.oee365.textContent;
+    }
 
     // Health bar + warna dinamis per KPI (merah/kuning/hijau/biru sesuai target)
     updateKpiHealthBar(State.el.sheetKpiA && State.el.sheetKpiA.closest('.sheet-kpi'), State.el.oF && State.el.oF.textContent);
     updateKpiHealthBar(State.el.sheetKpiP && State.el.sheetKpiP.closest('.sheet-kpi'), State.el.oITotal && State.el.oITotal.textContent);
     updateKpiHealthBar(State.el.sheetKpiQ && State.el.sheetKpiQ.closest('.sheet-kpi'), State.el.oM && State.el.oM.textContent);
     updateKpiHealthBar(State.el.sheetKpiOEE && State.el.sheetKpiOEE.closest('.sheet-kpi'), State.el.oee && State.el.oee.textContent);
+    updateKpiHealthBar(State.el.sheetKpiA365 && State.el.sheetKpiA365.closest('.sheet-kpi'), State.el.o365F && State.el.o365F.textContent);
+    updateKpiHealthBar(State.el.sheetKpiP365 && State.el.sheetKpiP365.closest('.sheet-kpi'), State.el.o365P && State.el.o365P.textContent);
+    updateKpiHealthBar(State.el.sheetKpiQ365 && State.el.sheetKpiQ365.closest('.sheet-kpi'), State.el.o365Q && State.el.o365Q.textContent);
+    updateKpiHealthBar(State.el.sheetKpiOEE365 && State.el.sheetKpiOEE365.closest('.sheet-kpi'), State.el.oee365 && State.el.oee365.textContent);
   };
 
   // ====== KPI HEALTH BAR ======
@@ -152,7 +285,14 @@ const UI = (() => {
     if (!fillEl) return;
 
     const target = parseFloat(kpiEl.getAttribute('data-target'));
-    const value = parseFloat(String(rawValueText || '0').replace(',', '.'));
+    const rawValue = String(rawValueText ?? '').trim();
+    if (rawValue === '—') {
+      fillEl.style.width = '0%';
+      kpiEl.removeAttribute('data-state');
+      kpiEl.classList.remove('kpi-achieved');
+      return;
+    }
+    const value = parseFloat(String(rawValue || '0').replace(',', '.'));
 
     if (!isFinite(target) || target <= 0 || !isFinite(value)) {
       fillEl.style.width = '0%';
@@ -251,8 +391,9 @@ const UI = (() => {
       if (stage && State.el.fStage) {
         e.preventDefault();
         State.el.fStage.value = stage;
+        applyStageUI();
         updateShiftIndicator();
-        // Load record untuk kombinasi filter baru.
+        updateUnifiedControl();
         if (typeof Storage !== 'undefined' && Storage.loadRecord) Storage.loadRecord();
         toast(`Tahapan: ${stage.charAt(0).toUpperCase() + stage.slice(1)}`);
         return;
@@ -262,6 +403,7 @@ const UI = (() => {
       if (line && State.el.fLine) {
         e.preventDefault();
         State.el.fLine.value = line;
+        applyLineUI();
         updateUnifiedControl();
         if (typeof Storage !== 'undefined' && Storage.loadRecord) Storage.loadRecord();
         toast(`Line ${line}`);
@@ -269,20 +411,36 @@ const UI = (() => {
     });
 
     if (State.el.sheetDateTrigger && State.el.fDate) {
-      State.el.sheetDateTrigger.addEventListener('click', () => {
-        try {
-          if (typeof State.el.fDate.showPicker === 'function') State.el.fDate.showPicker();
-          else { State.el.fDate.focus(); State.el.fDate.click(); }
-        } catch (e) {
-          State.el.fDate.focus();
-          State.el.fDate.click();
+      State.el.sheetDateTrigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Custom calendar ber-warna week (ProdWeek); fallback native
+        if (typeof ProdWeek !== 'undefined' && ProdWeek.open) {
+          ProdWeek.open(State.el.fDate, State.el.sheetDateTrigger, () => {
+            updateUnifiedControl();
+            if (ProdWeek.updateSheetBadge) ProdWeek.updateSheetBadge();
+          });
+        } else {
+          try {
+            if (typeof State.el.fDate.showPicker === 'function') State.el.fDate.showPicker();
+            else { State.el.fDate.focus(); State.el.fDate.click(); }
+          } catch (err) {
+            State.el.fDate.focus();
+            State.el.fDate.click();
+          }
         }
       });
     }
 
     if (State.el.fDate) {
-      State.el.fDate.addEventListener('input', updateUnifiedControl);
-      State.el.fDate.addEventListener('change', updateUnifiedControl);
+      State.el.fDate.addEventListener('input', () => {
+        updateUnifiedControl();
+        if (typeof ProdWeek !== 'undefined' && ProdWeek.updateSheetBadge) ProdWeek.updateSheetBadge();
+      });
+      State.el.fDate.addEventListener('change', () => {
+        updateUnifiedControl();
+        if (typeof ProdWeek !== 'undefined' && ProdWeek.updateSheetBadge) ProdWeek.updateSheetBadge();
+      });
     }
 
     updateUnifiedControl();
@@ -296,7 +454,7 @@ const UI = (() => {
   const setSidebarOpen = (open) => {
     document.body.classList.toggle('sidebar-open', open);
     if (State.el.toolbarToggleIcon) {
-      State.el.toolbarToggleIcon.textContent = open ? '✕' : '☰';
+      /* ikon menu/tutup diatur CSS via body.sidebar-open */
     }
     try { localStorage.setItem(CONFIG.TOOLBAR_COLLAPSED_KEY, open ? '0' : '1'); } catch(e){}
   };
@@ -321,8 +479,14 @@ const UI = (() => {
     const sidebar = document.getElementById('sidebar');
     if (sidebar) {
       sidebar.addEventListener('click', (e) => {
-        if (e.target.closest('button')) setSidebarOpen(false);
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        // Jangan tutup saat ganti tema / mode tab / mode warna (pill toggle)
+        if (btn.closest('.pill-group') || btn.hasAttribute('data-app-theme') || btn.hasAttribute('data-mode') || btn.hasAttribute('data-color-mode')) return;
+        setSidebarOpen(false);
       });
+      const closeBtn = document.getElementById('sidebarClose');
+      if (closeBtn) closeBtn.addEventListener('click', () => setSidebarOpen(false));
     }
   };
 
@@ -340,6 +504,8 @@ const UI = (() => {
   // ====== SCREEN NAV ======
   const showScreen = (screenId, silent) => {
     if (!screenId) return;
+    // Dashboard OEE 360° diganti: buka Weekly Meeting (sama seperti tombol Meeting)
+    if (screenId === 'dashboard') screenId = 'weekly';
     document.querySelectorAll('.sheet > .sec[data-screen]').forEach(sec => {
       sec.classList.toggle('active', sec.getAttribute('data-screen') === screenId);
     });
@@ -347,12 +513,34 @@ const UI = (() => {
       tab.classList.toggle('on', tab.getAttribute('data-screen') === screenId);
     });
     try { localStorage.setItem(CONFIG.ACTIVE_SCREEN_KEY, screenId); } catch(e){}
-    // Dashboard baru menarik data dari Supabase saat tabnya benar-benar dibuka
-    if (screenId === 'dashboard' && typeof Dashboard !== 'undefined') Dashboard.open();
+    // Tarik data saat tab benar-benar dibuka
+    if (screenId === 'weekly' && typeof WeeklyDashboard !== 'undefined') WeeklyDashboard.open();
+    if (screenId === 'speed-standar' && typeof SpeedStandar !== 'undefined') SpeedStandar.open();
     if (!silent) {
       const sheet = document.querySelector('.sheet');
       if (sheet) sheet.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  // ====== BUKA RECORD TERTENTU DI LOG SHEET (dipakai Weekly Dashboard) ======
+  // Mengisi filter tanggal / shift / line / tahapan lalu memuat data record itu.
+  // Pemanggil bisa mempertahankan layar aktif untuk navigasi dari toolbar.
+  const openRecord = async ({ date, shift, line, stage, stayOnScreen = false } = {}) => {
+    if (!date || !State.el.fDate || !State.el.fLine || !State.el.fStage) return false;
+    // Amankan isi sheet yang sedang terbuka (auto-save lokal) sebelum diganti.
+    try { if (typeof Storage !== 'undefined' && Storage.autoSaveLocal) Storage.autoSaveLocal(); } catch (e) {}
+    State.el.fDate.value = date;
+    if (line != null && line !== '') State.el.fLine.value = String(line);
+    if (stage) State.el.fStage.value = stage;
+    const sh = Math.max(0, Math.min(2, (parseInt(shift, 10) || 1) - 1));
+    State.evalShift = sh;
+    try { localStorage.setItem(CONFIG.EVAL_SHIFT_KEY, String(sh)); } catch (e) {}
+    applyShiftUI(); applyLineUI(); applyStageUI();
+    updateShiftIndicator(); updateUnifiedControl();
+    if (!stayOnScreen) showScreen('logsheet');
+    if (typeof Storage !== 'undefined' && Storage.loadRecord) await Storage.loadRecord();
+    toast(`Log sheet ${formatSheetDate(date)} · Shift ${sh + 1} · Line ${State.el.fLine.value} · ${State.el.fStage.value}`);
+    return true;
   };
 
   const bindScreenNav = () => {
@@ -466,6 +654,10 @@ const UI = (() => {
     }
     State.el.syncStatus.dataset.edit = base;
     applyChip();
+    // Setelah data tersimpan dimuat, pastikan Nama Mesin cocok dengan Line + Tahapan aktif.
+    // Lewati jika ini hasil simpan barusan (jangan menimpa pilihan user).
+    const baruDisimpan = d && d.savedAt && (Date.now() - new Date(d.savedAt).getTime()) < 3000;
+    if (!baruDisimpan) reconcileMachineName();
   };
 
   const setSyncStatus = (kind, text) => {
@@ -476,30 +668,121 @@ const UI = (() => {
 
   // ====== PWA INSTALL ======
   const setupPWA = () => {
-    const installBtn = State.el['pwa-install-btn'];
+    const installBtn = State.el['pwa-install-btn'] || document.getElementById('pwa-install-btn');
+    const installSub = document.getElementById('pwaInstallSub');
+    const banner = document.getElementById('installBanner');
+    const bannerBtn = document.getElementById('installBannerBtn');
+    const bannerDismiss = document.getElementById('installBannerDismiss');
+    const DISMISS_KEY = 'oee_install_banner_dismissed';
 
+    const isStandalone = () =>
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+
+    const wasDismissed = () => {
+      try { return localStorage.getItem(DISMISS_KEY) === '1'; } catch (e) { return false; }
+    };
+
+    const setSidebarState = (mode) => {
+      // mode: 'ready' | 'installed' | 'manual'
+      if (!installBtn) return;
+      installBtn.style.display = '';
+      installBtn.classList.remove('is-installed', 'is-ready');
+      if (mode === 'installed') {
+        installBtn.classList.add('is-installed');
+        if (installSub) installSub.textContent = 'Sudah terpasang di perangkat ini';
+        installBtn.title = 'Aplikasi sudah terinstall';
+      } else if (mode === 'ready') {
+        installBtn.classList.add('is-ready');
+        if (installSub) installSub.textContent = 'Siap diinstall · ketuk untuk pasang';
+        installBtn.title = 'Install aplikasi ke HP / komputer';
+      } else {
+        if (installSub) installSub.textContent = 'Pasang di perangkat · lebih cepat & offline';
+        installBtn.title = 'Install aplikasi ke HP / komputer';
+      }
+    };
+
+    const showBanner = () => {
+      if (isStandalone() || wasDismissed() || !banner) return;
+      banner.hidden = false;
+      requestAnimationFrame(() => banner.classList.add('is-visible'));
+    };
+
+    const hideBanner = () => {
+      if (!banner) return;
+      banner.classList.remove('is-visible');
+      setTimeout(() => { banner.hidden = true; }, 300);
+    };
+
+    const doInstall = async () => {
+      if (isStandalone()) {
+        toast('Aplikasi sudah terinstall ✓');
+        return;
+      }
+      if (!State.deferredPrompt) {
+        // Fallback petunjuk manual
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        if (isIOS) {
+          toast('iPhone: ketuk Share (□↑) → “Add to Home Screen”');
+        } else {
+          toast('Buka menu browser (⋮) → “Install app” / “Tambahkan ke layar utama”');
+        }
+        return;
+      }
+      State.deferredPrompt.prompt();
+      try {
+        const result = await State.deferredPrompt.userChoice;
+        if (result.outcome === 'accepted') {
+          toast('Aplikasi berhasil diinstall ✓');
+          setSidebarState('installed');
+          hideBanner();
+        } else {
+          toast('Installasi dibatalkan');
+        }
+      } catch (e) {
+        toast('Gagal memulai install');
+      }
+      State.deferredPrompt = null;
+    };
+
+    // Event native browser
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       State.deferredPrompt = e;
-      installBtn.classList.add('show');
-    });
-
-    installBtn.addEventListener('click', () => {
-      if (State.deferredPrompt) {
-        State.deferredPrompt.prompt();
-        State.deferredPrompt.userChoice.then((result) => {
-          if (result.outcome === 'accepted') toast('Aplikasi berhasil diinstall ✓');
-          else toast('Installasi dibatalkan');
-          State.deferredPrompt = null;
-          installBtn.classList.remove('show');
-        });
-      }
+      setSidebarState('ready');
+      setTimeout(showBanner, 1800);
     });
 
     window.addEventListener('appinstalled', () => {
-      installBtn.classList.remove('show');
-      toast('Aplikasi terinstall ✓');
+      setSidebarState('installed');
+      hideBanner();
+      toast('Aplikasi terinstall ✓ Siap dipakai offline');
+      try { localStorage.removeItem(DISMISS_KEY); } catch (e) {}
     });
+
+    // Tombol di sidebar — selalu terlihat
+    if (installBtn) {
+      installBtn.addEventListener('click', doInstall);
+    }
+
+    // Tombol di banner
+    if (bannerBtn) {
+      bannerBtn.addEventListener('click', doInstall);
+    }
+    if (bannerDismiss) {
+      bannerDismiss.addEventListener('click', () => {
+        hideBanner();
+        try { localStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
+      });
+    }
+
+    // State awal
+    if (isStandalone()) {
+      setSidebarState('installed');
+      hideBanner();
+    } else {
+      setSidebarState('manual');
+    }
   };
 
   // ====== REGISTER SERVICE WORKER ======
@@ -519,10 +802,10 @@ const UI = (() => {
   return {
     tick, startClock, toast, autoResizeTextarea,
     applyModeUI, bindModeButtons, loadNavMode,
-    applyShiftUI, bindShiftButtons, loadEvalShift,
-    updateShiftIndicator, updateUnifiedControl, bindUnifiedControls,
+    applyShiftUI, applyLineUI, applyStageUI, fillMachineName, reconcileMachineName, bindFilterToggles, bindShiftButtons, loadEvalShift,
+    updateShiftIndicator, updateUnifiedControl, updateKpiHealthBar, bindUnifiedControls,
     bindToolbarToggle, loadToolbarCollapsed,
-    bindScreenNav, loadActiveScreen, showScreen,
+    bindScreenNav, loadActiveScreen, showScreen, openRecord,
     bindLogsheetHelp,
     setColToggleOpen, bindColToggleCollapse, loadColToggleState,
     setViewMode, bindViewModeToggle, loadViewMode,

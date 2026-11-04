@@ -1,0 +1,20 @@
+/**
+ * card-suggest.css — Sugesti Kegiatan
+ * HTML: #suggestOverlay / #suggestModal.suggest-modal
+ * JS:   (suggest manage di index + suggest.js)
+ * Catatan: ghost-text & dropdown tetap di suggest.css.
+ */
+#suggestOverlay.qm-overlay {
+  z-index: 1300;
+}
+
+#suggestModal.suggest-modal,
+#suggestModal.card-suggest {
+  max-width: 480px;
+  width: 94vw;
+  border-radius: var(--card-radius, 14px);
+}
+
+#suggestModal .cm-header { }
+#suggestModal .cm-body { }
+#suggestModal .cm-footer { }

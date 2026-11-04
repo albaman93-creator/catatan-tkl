@@ -1,339 +1,2628 @@
+/* =====================================================
+   components.css — shared UI leftovers (bukan 1 modul spesifik)
+   Modul fitur: lihat css/<nama-modul>.css berpasangan dengan js/
+   ===================================================== */
+
+/* =====================================================
+   COMPONENTS.CSS — Tombol, form, modal, toast, login, tema
+   ===================================================== */
+
 /* ================================================
    COMPONENTS.CSS — Tombol, input, modal, wizard, toast, dll.
    ================================================ */
 
 /* ====== BUTTONS ====== */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  font: 600 14px var(--body); letter-spacing: .3px;
-  padding: 11px 18px; border-radius: 8px;
-  border: 1px solid transparent; cursor: pointer;
-  transition: transform .12s, box-shadow .12s, background .15s, border-color .15s;
-  text-decoration: none; user-select: none;
+
+/* Tombol di bawah tabel log sheet: Tambah Baris + Export CSV */
+
+.logsheet-row-actions {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  margin-top: 12px;
+  flex-wrap: wrap;
 }
-.btn-primary { background: var(--green-d); color: #fff; box-shadow: 0 2px 0 #085c2d; }
-.btn-primary:hover  { background: var(--green); transform: translateY(-1px); box-shadow: 0 3px 0 #085c2d; }
-.btn-primary:active { transform: translateY(1px); box-shadow: none; }
-.btn-ghost { background: #fff; border-color: var(--line); color: var(--ink2); box-shadow: 0 2px 0 #e2e9ee; }
-.btn-ghost:hover  { border-color: #b8c6d0; color: var(--ink); transform: translateY(-1px); }
-.btn-ghost:active { transform: translateY(1px); box-shadow: none; }
-.btn-logout { background: #fff; border-color: rgba(220,38,38,0.3); color: var(--red); }
-.btn-logout:hover { background: rgba(220,38,38,0.08); border-color: var(--red); }
-.btn-add { background: #fff; border: 1.5px dashed #9fc3ad; color: var(--green-d); padding: 10px 14px; width: 100%; margin-top: 12px; }
-.btn-add:hover { background: var(--green-bg); border-style: solid; }
-.btn-install { background: #0d2135; color: #fff; border: 1px solid #1a3b5c; padding: 8px 14px; font-size: 13px; white-space: nowrap; border-radius: 8px; cursor: pointer; transition: .2s; display: none; }
-.btn-install.show { display: inline-flex; }
+
+.logsheet-row-actions #btnExportCsvSheet {
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
 
 /* ====== FORM FIELDS ====== */
-.field { margin-bottom: 14px; }
-.field:last-child { margin-bottom: 0; }
-.field label {
-  display: flex; justify-content: space-between; align-items: baseline;
-  font: 600 12.5px var(--mono); letter-spacing: .8px;
-  text-transform: uppercase; color: var(--mut); margin-bottom: 6px;
-}
+
 .unit { font-size: 11.5px; color: var(--mut); text-transform: none; }
-.field input, .field select {
-  width: 100%; border: 1px solid var(--line); border-radius: 8px;
-  padding: 12px 14px; font: 600 16px var(--mono);
-  color: var(--ink); background: #fbfcfd; transition: .15s;
-  caret-color: var(--green);
-}
-.field input:hover, .field select:hover { background: #f4f8fa; }
-.field input:focus, .field select:focus {
-  outline: none; border-color: var(--green); background: #fff;
-  box-shadow: 0 0 0 3px rgba(18,161,80,.16);
-}
-.field input.invalid, .field select.invalid, .field textarea.invalid {
-  border-color: var(--red) !important;
-  box-shadow: 0 0 0 3px rgba(220,38,38,.14);
-  animation: shake .3s;
-}
-.field .shiftsel {
-  width: 100%; box-sizing: border-box;
-  background: #fbfcfd; border: 1px solid var(--line); border-radius: 8px; padding: 4px;
-}
-.field .shiftsel button { flex: 1; justify-content: center; padding: 9px 4px; }
 
 /* ====== SYNC CHIP ====== */
+
 .edit-info {
   font: 600 11.5px var(--mono); color: var(--mut);
   background: #f4f7f9; border: 1px dashed var(--line);
   border-radius: 99px; padding: 6px 12px;
   display: inline-flex; align-items: center; gap: 6px; cursor: default;
 }
+
 .edit-info.ok   { color: var(--green-d); border-color: rgba(18,161,80,.4); background: var(--green-bg); }
+
 .edit-info.sync { color: var(--blue);    border-color: rgba(12,99,168,.3); background: rgba(12,99,168,.08); }
+
 .edit-info.err  { color: var(--red);     border-color: rgba(220,38,38,.3); background: rgba(220,38,38,.08); }
+
 .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #b8c6d0; flex: none; }
+
 .edit-info.ok   .sync-dot { background: var(--green-d); }
+
 .edit-info.sync .sync-dot { background: var(--blue); animation: blink 1s steps(2) infinite; }
+
 .edit-info.err  .sync-dot { background: var(--red); }
 
 /* ====== HELP PANEL ====== */
-.help-btn {
-  display: inline-flex; align-items: center; gap: 5px;
-  font: 600 12px var(--mono); color: var(--mut);
-  background: #fff; border: 1px solid var(--line); border-radius: 8px;
-  padding: 7px 12px; cursor: pointer; transition: .15s; white-space: nowrap;
-}
-.help-btn:hover { color: var(--ink); border-color: #b8c6d0; }
-.help-btn[aria-expanded="true"] { color: var(--green-d); border-color: rgba(18,161,80,.4); background: var(--green-bg); }
-.help-panel {
-  background: #f4f7f9; border: 1px solid var(--line); border-radius: 8px;
-  padding: 10px 14px; margin-bottom: 12px;
-}
-.help-panel p { font: 12px var(--mono); color: var(--mut); margin: 0 0 8px; }
-.help-panel .legend { margin-bottom: 0; }
 
 /* ====== VIEW TOGGLE ====== */
-.view-toggle {
-  display: inline-flex; align-items: center; gap: 2px;
-  background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 3px;
-}
-.view-toggle button {
-  border: 0; background: transparent; border-radius: 6px; padding: 7px 12px;
-  font: 600 12px var(--mono); color: var(--mut); cursor: pointer; transition: .2s;
-  white-space: nowrap;
-}
-.view-toggle button.on { background: var(--navy); color: #fff; box-shadow: 0 2px 6px -2px rgba(13,33,53,.5); }
-.view-toggle button:not(.on):hover { color: var(--ink); background: #f2f6f8; }
 
 /* ====== LEGEND ====== */
-.legend { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-.lg {
-  display: inline-flex; align-items: center; gap: 7px;
-  font: 500 12.5px var(--mono); color: var(--ink2);
-  background: #fff; border: 1px solid var(--line);
-  border-radius: 99px; padding: 6px 12px;
-}
+
 .sw { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+
 .sw-a { background: var(--amber); }
+
 .sw-r { background: var(--red); }
+
 .sw-g { background: var(--green); }
 
 /* ====== MODAL / OVERLAY (Quick Mode, Bulk Fill, Wizard) ====== */
-.qm-overlay {
-  position: fixed; inset: 0; z-index: 1200;
-  background: rgba(15, 36, 55, .6);
-  display: flex; align-items: center; justify-content: center;
-  padding: 20px; opacity: 1; visibility: visible;
-  transition: opacity .18s ease, visibility .18s ease;
-}
-.qm-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-.qm-modal {
-  width: 100%; max-width: 440px;
-  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-  box-shadow: 0 20px 60px -18px rgba(0,0,0,.45);
-  padding: 22px 22px 18px;
-}
-.qm-title { font: 800 18px var(--disp); color: var(--ink); margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
-.qm-title .bolt { font-size: 20px; }
-.qm-sub { font: 12.5px var(--mono); color: var(--mut); margin-bottom: 16px; line-height: 1.5; }
-.qm-row { margin-bottom: 12px; }
-.qm-label { display: block; font: 600 11.5px var(--mono); letter-spacing: .5px; text-transform: uppercase; color: var(--mut); margin-bottom: 6px; }
-.qm-choices { display: flex; gap: 8px; flex-wrap: wrap; }
-.qm-choices button {
-  flex: 1; min-width: 70px; padding: 12px 10px; border-radius: 10px;
-  border: 1.5px solid var(--line); background: #fbfcfd; color: var(--ink2);
-  font: 700 14px var(--mono); cursor: pointer; transition: .15s;
-}
-.qm-choices button:hover { border-color: var(--amber); color: var(--ink); }
-.qm-choices button.on { border-color: var(--amber); background: rgba(217,119,6,.1); color: var(--amber); }
-.qm-slot { border: 1px solid var(--line2); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; background: #fbfcfd; }
-.qm-slot .qm-label { margin-bottom: 4px; }
-.qm-slot select, .qm-slot input {
-  width: 100%; border: 1px solid var(--line); border-radius: 8px;
-  padding: 8px 10px; font: 500 14px var(--body); color: var(--ink); background: #fff;
-}
-.qm-slot select { margin-bottom: 8px; }
-.qm-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
-.qm-actions .btn { padding: 10px 18px; }
 
-.qm-time-dropdown {
-  position: absolute; z-index: 60; min-width: 150px;
-  background: #fff; border: 1px solid var(--line); border-radius: 10px;
-  box-shadow: 0 10px 30px -10px rgba(0,0,0,.35); padding: 6px; margin-top: 4px;
-}
-.qm-time-dropdown button {
-  display: block; width: 100%; text-align: left; border: 0; background: transparent;
-  padding: 8px 10px; border-radius: 6px; font: 600 13px var(--mono); color: var(--ink2); cursor: pointer;
-}
-.qm-time-dropdown button:hover { background: var(--green-bg); color: var(--green-d); }
+/* ====== NOTEPAD ISI MASSAL (Kode / Jam Mulai / Durasi) ====== */
 
 /* ====== WIZARD ====== */
-.wizard-modal { max-width: 480px; }
-.wiz-progress { margin-bottom: 16px; }
-.wiz-progress span { font: 700 11px var(--mono); color: var(--mut); letter-spacing: .4px; }
-.wiz-bar { height: 5px; background: var(--line2); border-radius: 99px; margin-top: 6px; overflow: hidden; }
-.wiz-bar-fill { height: 100%; background: var(--green-d); border-radius: 99px; transition: width .25s ease; }
-.wiz-shift-grid, .wiz-stage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
-.wiz-op-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 4px; }
-.wiz-choice {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  border: 1.5px solid var(--line); background: #fff; color: var(--ink2);
-  font: 700 12.5px var(--mono); padding: 14px 6px; border-radius: 10px; cursor: pointer;
-  transition: .15s; text-align: center; line-height: 1.4;
-}
-.wiz-choice small { font-weight: 500; color: var(--mut); }
-.wiz-choice:hover { border-color: #b8c6d0; transform: translateY(-1px); }
-.wiz-choice.on {
-  border-color: var(--green-d); background: var(--green-bg); color: var(--green-d);
-  box-shadow: 0 0 0 3px rgba(18,161,80,.12);
-}
-.wiz-choice-icon { font-size: 20px; display: block; margin-bottom: 2px; }
-.wiz-date-input { width: 100%; margin-bottom: 4px; font-size: 16px; padding: 12px 14px; }
-.wiz-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; gap: 8px; }
-.wiz-actions-right { display: flex; gap: 8px; }
-.wiz-inline-row {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-.wiz-inline-row input[data-prod-name] {
-  flex: 2;
-  min-width: 0;
-}
-.wiz-inline-row input[data-prod-rate] {
-  flex: 1;
-  min-width: 0;
-}
 
 /* ====== BULK FILL ====== */
-.th-bulk-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 20px; height: 20px; margin-left: 4px; padding: 0;
-  border: 1px solid var(--line); border-radius: 6px; background: #fff;
-  font-size: 11px; line-height: 1; cursor: pointer; vertical-align: middle;
-  opacity: .7; transition: .15s;
-}
-.th-bulk-btn:hover { opacity: 1; border-color: var(--amber); background: rgba(217,119,6,.1); }
-.bulk-modal { max-width: 360px; }
-.bulk-list {
-  max-height: 46vh; overflow-y: auto; margin-bottom: 4px;
-  border: 1px solid var(--line2); border-radius: 10px; padding: 8px;
-  background: #fbfcfd;
-}
-.bulk-line { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding: 4px 6px; border-radius: 6px; transition: background-color .15s; }
-.bulk-line:last-child { margin-bottom: 0; }
-.bulk-line .ghost-wrap { flex: 1; }
-.bulk-line.bl-planned   { background-color: rgba(217, 119, 6, 0.18); }
-.bulk-line.bl-unplanned { background-color: rgba(220, 38, 38, 0.20); }
-.bulk-line.bl-prod      { background-color: rgba(18, 161, 80, 0.20); }
-.bulk-num {
-  flex: 0 0 26px; text-align: right; font: 700 13px var(--mono); color: var(--mut);
-}
-.bulk-input {
-  flex: 1; border: 1px solid var(--line); border-radius: 8px;
-  padding: 9px 10px; font: 700 15px var(--mono); text-align: center;
-  color: var(--ink); background: #fff; transition: .15s;
-}
-.bulk-input:focus {
-  outline: none; border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(18,161,80,.16);
-}
-.bulk-count { font: 600 11.5px var(--mono); color: var(--mut); margin-top: 8px; }
-.bulk-startrow {
-  width: 90px; border: 1px solid var(--line); border-radius: 8px;
-  padding: 8px 10px; font: 700 14px var(--mono); text-align: center;
-  color: var(--ink); background: #fff;
-}
-.bulk-modal-wide { max-width: 460px; }
-.bulk-input-text { text-align: left; font: 500 14px var(--body); }
 
 /* ====== INPUTS UMUM (tabel & modal) ====== */
-.in, select.in {
-  width: 100%; border: 1px solid transparent; background: transparent;
-  padding: 9px 10px; border-radius: 7px;
-  font: 500 15px var(--body); color: var(--ink);
-  caret-color: var(--green);
-  transition: background .15s, border-color .15s, box-shadow .15s;
-}
-.in.mono { font-family: var(--mono); font-size: 14.5px; }
-.in.ctr  { text-align: center; }
-textarea.in {
-  resize: none; overflow: hidden; line-height: 1.4;
-  height: 38px; min-height: 38px; display: block;
-}
-.in::placeholder { color: #b6c4cf; }
-.in:hover { background: rgba(255,255,255,0.6); }
-.in:focus {
-  outline: none; background: #fff; border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(18,161,80,.16);
-}
-.in.invalid {
-  border-color: var(--red);
-  box-shadow: 0 0 0 3px rgba(220,38,38,.14);
-  animation: shake .3s;
-}
+
 @keyframes shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
-.in.flash { animation: flashbg .6s; }
+
 @keyframes flashbg { 0% { background: rgba(18,161,80,.3); } 100% { background: transparent; } }
-.in.warn-shift {
-  background-color: #fef08a !important;
-  border-color: #eab308 !important;
-  color: #713f12 !important;
-}
-.in[readonly] { background: #f1f5f9; color: var(--mut); cursor: not-allowed; }
 
 /* ====== GHOST TEXT ====== */
-.ghost-wrap { position: relative; display: block; width: 100%; }
-.ghost-layer {
-  position: absolute; top: 0; left: 0; z-index: 3;
-  pointer-events: none; overflow: hidden;
-  white-space: pre-wrap; word-wrap: break-word; word-break: break-word;
-  background: transparent;
-}
-.ghost-layer .ghost-typed { color: transparent; }
-.ghost-layer .ghost-suggest { color: #a3aeb6; }
-.log .ghost-wrap { height: 100%; }
 
 /* ====== TOAST ====== */
-#toast {
-  position: fixed; left: 50%; top: 20px; bottom: auto;
-  transform: translate(-50%, -10px); opacity: 0; pointer-events: none;
-  background: var(--navy); color: #fff;
-  padding: 14px 22px 14px 18px; border-radius: 10px;
-  border-left: 4px solid var(--green);
-  box-shadow: 0 12px 30px -10px rgba(13,33,53,.5);
-  font: 500 15px var(--body); transition: .3s cubic-bezier(.22,.8,.3,1);
-  z-index: 9999; max-width: calc(100vw - 32px); text-align: center;
-}
+
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
 #toast.err  { border-left-color: var(--red); }
+
 #toast.warn { border-left-color: var(--amber); background: #713f12; color: #fef08a; }
 
 /* ===== Product code autocomplete dropdown ===== */
-.prod-suggest-drop {
-  z-index: 99999;
-  overflow-y: auto;
-  padding: 4px;
-  border-radius: 10px;
-  border: 1px solid rgba(15, 36, 55, 0.12);
-  background: #fff;
-  box-shadow: 0 10px 28px rgba(15, 36, 55, 0.14), 0 2px 8px rgba(15, 36, 55, 0.06);
-  -webkit-overflow-scrolling: touch;
+
+/* z-index harus ≥ compact-popover (2147483647) agar muncul di atas panel Produk */
+
+/* Wizard confirm card */
+
+/* =========================================================
+   ISI MASSAL — MINI SHEET / GRID CEPAT
+   ========================================================= */
+
+/* ===== ISI MASSAL — PEMILIHAN KOLOM RESPONSIF ===== */
+
+/* ===== SUGESTI KEGIATAN — tambah & autocomplete cepat ===== */
+
+/* Bulk Fill — navigasi cepat untuk layar ponsel */
+
+/* --- login.css --- */
+
+/* ================================================
+   LOGIN.CSS — Tema Santai: kartu & form login
+   Background landscape berada di nature.css.
+   ================================================ */
+
+/* Kartu login */
+
+@keyframes loginPop {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
-.prod-suggest-drop[hidden] { display: none !important; }
-.prod-suggest-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  border: 0;
-  border-radius: 7px;
+
+/* FX canvas & flash */
+
+@keyframes flashBlink {
+  0%   { opacity: 0; }
+  10%  { opacity: 0.85; }
+  20%  { opacity: 0.1; }
+  30%  { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+/* ===== Tema Login selector ===== */
+
+/* --- nature.css (login background FX) --- */
+
+/* ================================================
+   NATURE.CSS — Elemen dekoratif background login
+   Scope: .login-theme-santai
+   ================================================ */
+
+/* ================================================
+   LOGIN.CSS — Overlay login, kartu login, background scene
+   ================================================ */
+
+/* ====== LOGIN OVERLAY ====== */
+
+/* ====== BACKGROUND SCENE ====== */
+
+/* Palet waktu */
+
+/* Awan */
+
+@keyframes cloudDrift {
+  from { transform: translateX(-350px); }
+  to   { transform: translateX(2250px); }
+}
+
+/* Matahari, bulan, bintang, burung */
+
+@keyframes twinkle { 50% { opacity: .2; } }
+
+/* Bunga kecil */
+
+/* Preview bar */
+
+/* Weather chip */
+
+/* Pelangi */
+
+/* Efek hujan */
+
+/* ================================================
+   NATURE.CSS — Elemen dekoratif background login
+   ================================================ */
+
+/* Sungai */
+
+@keyframes riverShineFlow { to { stroke-dashoffset: -76; } }
+
+/* Kincir angin */
+
+@keyframes windmillSpin { to { transform: rotate(360deg); } }
+
+/* Pohon rimbun */
+
+/* Gubuk kayu */
+
+/* Tenda Kemah */
+
+/* Api Unggun */
+
+@keyframes flameFlickerA {
+  0%, 100% { transform: scaleY(1) scaleX(1) translateX(0); }
+  50%      { transform: scaleY(1.15) scaleX(.9) translateX(1px); }
+}
+
+@keyframes flameFlickerB {
+  0%, 100% { transform: scaleY(1) scaleX(1) translateX(0); }
+  50%      { transform: scaleY(.9) scaleX(1.1) translateX(-1px); }
+}
+
+/* Bunga matahari */
+
+/* Bunga mawar merah */
+
+/* Rumput liar */
+
+@keyframes wgSway {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(5deg); }
+}
+
+/* Kupu-kupu */
+
+@keyframes bfFlap { from { transform: scaleX(1); } to { transform: scaleX(.35); } }
+
+@keyframes bfBob  { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+@keyframes bfWander {
+  0%   { translate: 0px 0px; rotate: 0deg; }
+  25%  { translate: 18px -14px; rotate: 8deg; }
+  50%  { translate: -6px -26px; rotate: -6deg; }
+  75%  { translate: -22px -10px; rotate: 6deg; }
+  100% { translate: 0px 0px; rotate: 0deg; }
+}
+
+/* Kunang-kunang */
+
+@keyframes ffGlow  { 0%, 100% { opacity: .15; } 50% { opacity: 1; } }
+
+@keyframes ffDrift { 0% { transform: translate(0,0); } 50% { transform: translate(10px,-14px); } 100% { transform: translate(-6px,4px); } }
+
+/* Daun musim gugur */
+
+@keyframes leafFall {
+  0%   { transform: translate(0,0) rotate(0deg);       opacity: 0; }
+  10%  { opacity: .85; }
+  50%  { transform: translate(36px, 560px) rotate(150deg); }
+  90%  { opacity: .85; }
+  100% { transform: translate(-18px, 1150px) rotate(300deg); opacity: 0; }
+}
+
+/* Reduced motion */
+
+/* --- login-professional.css --- */
+
+/* =========================================================
+   LOGIN-PROFESSIONAL.CSS — Tema Profesional
+   Dark navy + glassmorphism. Aktif saat:
+   #loginOverlay.login-theme-professional
+   ========================================================= */
+
+/* FIX: aturan ini sebelumnya tidak ada, sehingga setelah login berhasil
+   (auth.js menambahkan class .hide) overlay tema Profesional tetap
+   full-screen menutupi aplikasi — terlihat seperti tombol "Masuk" tidak
+   merespons. Tema Santai punya aturan setara di nature.css. */
+
+@keyframes professionalBlobA {
+  to { transform: translate(70px, 55px) scale(1.08); }
+}
+
+@keyframes professionalBlobB {
+  to { transform: translate(-60px, -45px) scale(1.1); }
+}
+
+/* Background landscape tidak dipakai pada tema profesional. */
+
+/* Card */
+
+@keyframes professionalCardIn {
+  from { opacity: 0; transform: translateY(18px) scale(.975); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Ensure the professional theme never blocks form interaction. */
+
+/* --- dashboard.css --- */
+
+/* ================================================================
+   DASHBOARD OEE 360°
+   Responsive, theme-aware, no external chart dependency.
+   ================================================================ */
+
+.donut-track{fill:none;stroke:rgba(148,163,184,.16);stroke-width:18;}
+
+.donut-value{fill:none;stroke-width:18;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;}
+
+.donut-center-value{font:800 28px var(--mono);fill:var(--ink);text-anchor:middle;}
+
+.donut-center-label{font:600 11px var(--mono);fill:var(--mut);text-anchor:middle;text-transform:uppercase;letter-spacing:.6px;}
+
+.status-seg{fill:none;stroke-width:24;transform:rotate(-90deg);transform-origin:50% 50%;cursor:pointer;transition:opacity .15s ease;}
+
+.status-seg:hover{opacity:.74}
+
+.small-donut-main{font:800 24px var(--mono);fill:var(--ink);}
+
+.small-donut-sub{font:600 9px var(--mono);fill:var(--mut);}
+
+.code-act{white-space:normal!important;max-width:260px;}
+
+.code-donut-seg{fill:none;stroke-width:25;transform:rotate(-90deg);transform-origin:50% 50%;}
+
+.trend-point.good{fill:var(--green)}
+
+.trend-point.warn{fill:var(--amber)}
+
+.trend-point.bad{fill:var(--red)}
+
+.trend-point.none{fill:var(--mut)}
+
+.trend-label{font:600 8.5px var(--mono);fill:var(--mut)}
+
+.stack-productive,.stack-planned,.stack-unplanned{stroke:none}
+
+/* Existing product-detail styling stays compatible with the dashboard theme. */
+
+.product-detail-list{display:flex;flex-direction:column;gap:18px}
+
+.product-detail-block{border:1px solid var(--line2,#2c2c2c);border-radius:12px;overflow:hidden;background:var(--card,transparent)}
+
+.product-detail-title{display:flex;align-items:baseline;gap:6px;padding:12px 14px 10px;font-size:15px;font-weight:600;border-bottom:1px solid var(--line2,#2c2c2c)}
+
+.product-detail-title strong{font-weight:700}
+
+.product-detail-table,.product-summary-table{width:100%;border-collapse:collapse;table-layout:fixed}
+
+.product-detail-table th,.product-detail-table td,.product-summary-table th,.product-summary-table td{border:1px solid var(--line2,#2c2c2c)}
+
+.product-detail-table th,.product-detail-table td{padding:9px 10px}
+
+.product-detail-table th{text-align:center;font-weight:700}
+
+.product-summary-table{margin-top:12px;border-top:1px solid var(--line2,#2c2c2c)}
+
+.product-summary-table th,.product-summary-table td{padding:8px 10px}
+
+.product-summary-table th:first-child,.product-summary-table td:first-child{text-align:left;width:78%}
+
+.product-summary-table th:last-child,.product-summary-table td:last-child{text-align:right;width:22%}
+
+.product-summary-table .summary-row{transition:background-color .15s ease}
+
+.product-summary-table .summary-total td{background:rgba(148,163,184,.05)}
+
+.product-summary-table .summary-prod td,.product-summary-table .summary-prod-valid td{background:rgba(34,197,94,.08)}
+
+.product-summary-table .summary-planned td{background:rgba(245,158,11,.09)}
+
+.product-summary-table .summary-unplanned td{background:rgba(239,68,68,.09)}
+
+.product-detail-empty{border:1px dashed var(--line2,#2c2c2c);border-radius:10px;padding:20px;text-align:center;color:var(--mut)}
+
+/* =====================================================
+   ANALISIS KODE 1–9 — interaktif + detail tanpa kehilangan filter/scroll
+   ===================================================== */
+
+.activity-code-row{position:relative;cursor:pointer;transition:background .18s ease,transform .18s ease,box-shadow .18s ease}
+
+.activity-code-row:focus{outline:2px solid var(--blue);outline-offset:-2px}
+
+.activity-code-row td{border-bottom:1px solid rgba(224,190,161,.11)!important}
+
+.activity-code-row:hover{transform:translateX(3px);filter:brightness(1.08)}
+
+.activity-code-row.is-unplanned td{background:rgba(235,82,98,.11)}
+
+.activity-code-row.is-unplanned:hover td{background:rgba(235,82,98,.18)}
+
+.activity-code-row.is-productive td{background:rgba(32,215,164,.11)}
+
+.activity-code-row.is-productive td:first-child{border-left:4px solid #20d7a4}
+
+.activity-code-row.is-productive:hover td{background:rgba(32,215,164,.18)}
+
+.activity-code-row.is-planned td{background:rgba(245,172,70,.11)}
+
+.activity-code-row.is-planned td:first-child{border-left:4px solid #f6bd54}
+
+.activity-code-row.is-planned:hover td{background:rgba(245,172,70,.18)}
+
+.code-number{display:inline-grid;width:30px;height:30px;place-items:center;border:1px solid currentColor;border-radius:9px;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+
+.is-productive .code-number{color:#48e6b6;background:rgba(32,215,164,.12)}
+
+.activity-category{display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border:1px solid currentColor;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+
+.is-productive .activity-category{color:#55e9bb;background:rgba(32,215,164,.1)}
+
+.activity-detail-trigger{display:inline-flex;align-items:center;gap:6px;color:#cbbcaf;font-size:12px;white-space:nowrap}
+
+.activity-code-row:hover .activity-detail-trigger{color:var(--ink)}
+
+.activity-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:14px;border-bottom:1px solid var(--line2)}
+
+.activity-detail-head h3{margin:10px 0 4px;font-size:17px}
+
+.activity-detail-head p{margin:0;color:var(--mut);font-size:11px}
+
+.detail-code-stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+.detail-code-stats span{border:1px solid var(--line);background:rgba(148,163,184,.05);padding:7px 9px;border-radius:9px;color:var(--mut);font:600 9px var(--mono)}
+
+.detail-code-stats b{color:var(--ink2);font-weight:800}
+
+.activity-top-summary{padding:12px 14px;border-bottom:1px solid var(--line2);background:rgba(148,163,184,.025)}
+
+.activity-top-summary-title{margin-bottom:8px;color:var(--mut);font:800 9px var(--mono);text-transform:uppercase;letter-spacing:.4px}
+
+.activity-top-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+
+.activity-top-item span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2)}
+
+.activity-top-item b{font:800 9px var(--mono);color:var(--mut);white-space:nowrap}
+
+.activity-top-empty{color:var(--mut);font-size:11px}
+
+.activity-detail-table-wrap{overflow:auto}
+
+.activity-detail-table{width:100%;min-width:980px;border-collapse:collapse;font-size:10.5px}
+
+.activity-detail-table th{position:sticky;top:0;background:var(--navy);color:#dfe9ee;padding:8px 9px;text-align:left;font:700 9px var(--mono);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+
+.activity-detail-table td{padding:8px 9px;border-bottom:1px solid var(--line2);color:var(--ink2);white-space:nowrap}
+
+.activity-detail-table tr:last-child td{border-bottom:0}
+
+.empty-detail{padding:24px!important;text-align:center;color:var(--mut)!important}
+
+@media (max-width:800px){.activity-detail-head{flex-direction:column}.detail-code-stats{justify-content:flex-start}.activity-top-list{grid-template-columns:1fr}.activity-top-item{align-items:flex-start;flex-direction:column;gap:4px}}
+
+/* --- print.css --- */
+
+/* ================================================
+   PRINT.CSS — Khusus aturan cetak (print)
+   Dioptimasi agar mirip form kertas FIMA
+   ================================================ */
+
+/* --- apple-style.css --- */
+
+/* ================================================
+   APPLE-STYLE.CSS — Tema Apple Style 2026
+   Override terakhir, tidak merusak fungsionalitas
+   ================================================ */
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* ====== TOOLBAR / APP BAR ====== */
+
+/* Panel Menu Dropdown */
+
+.menu-item:hover {
+  background: #f5f5f7;
+  transform: scale(1.01);
+}
+
+/* Indikator Shift & OEE */
+
+.shift-indicator {
+  border-radius: 12px;
+  background: linear-gradient(135deg, #34c759, #248a3d);
+  box-shadow: var(--shadow-sm);
+}
+
+.oee-indicator {
+  border-radius: 12px;
+  background: linear-gradient(135deg, #8e8e93, #636366);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ====== SHEET / KARTU UTAMA ====== */
+
+/* ====== BOTTOM NAVIGATION ====== */
+
+/* ====== SECTION ====== */
+
+/* ====== FORM FIELDS ====== */
+
+/* ====== BUTTONS ====== */
+
+/* ====== TABEL ====== */
+
+/* ====== OEE MATRIX ====== */
+
+.oee-matrix-tbl {
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+.oee-matrix-tbl th {
+  background: #f5f5f7;
+  color: var(--ink);
+}
+
+/* ====== DASHBOARD OVERLAY ====== */
+
+/* ====== TOAST ====== */
+
+/* ====== LOGIN CARD ====== */
+
+/* ====== RESPONSIVE ====== */
+
+/* --- clean-live.css --- */
+
+/* =====================================================
+   TKL-OEE - CLEAN LIVE HEADER
+   Menghilangkan jam LIVE, tanggal, status LIVE
+   ===================================================== */
+
+/* Selector umum yang sering dipakai untuk live clock */
+
+/* --- theme-professional.css (skin komponen) --- */
+
+/* =========================================================
+   THEME-PROFESSIONAL.CSS
+   Skin "Profesional" untuk SELURUH aplikasi (bukan cuma layar
+   login) — putih dominan + aksen biru kantoran. Aktif saat
+   <html data-theme="professional"> (lihat tombol "Tema Aplikasi"
+   di sidebar, dan override variabel di base.css).
+
+   Sebagian besar elemen SUDAH otomatis ikut berubah lewat variabel
+   --ink/--navy/--line/--card/dst yang di-override di base.css.
+   File ini HANYA berisi override untuk elemen yang masih pakai
+   warna hex langsung (mis. background:#fff, atau warna hijau
+   sebagai warna brand/tombol, bukan status data).
+
+   Dimuat PALING TERAKHIR supaya spesifisitasnya menang atas file lama.
+   ========================================================= */
+
+:root { --pro-blue: #0B5FA5; --pro-blue-d: #084A82; --pro-blue-lt: #EAF3FB; --pro-navy: #0B2A47; }
+
+[data-theme="professional"] body {
+  background:
+    radial-gradient(900px 420px at 50% -10%, rgba(11,95,165,.07), transparent 60%),
+    linear-gradient(rgba(11,95,165,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11,95,165,.035) 1px, transparent 1px),
+    var(--paper);
+  background-size: auto, 26px 26px, 26px 26px, auto;
+}
+
+/* ====== APP BAR (pinggiran atas) ====== */
+
+[data-theme="professional"] .menu-item:hover {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Badge shift di app bar dipakai sbg identitas brand (bukan status data),
+   jadi diganti biru. Badge OEE tetap abu-abu netral — warna hijau/merah
+   "tercapai/dibawah target" muncul lewat class terpisah .good/.bad,
+   sengaja tidak disentuh di sini supaya makna warnanya tetap jelas. */
+
+[data-theme="professional"] .shift-indicator {
+  background: linear-gradient(135deg, var(--pro-blue), var(--pro-navy));
+  border-color: var(--pro-navy);
+  box-shadow: 0 2px 8px -2px rgba(11,95,165,.5);
+}
+
+/* ====== SIDEBAR (pinggiran kiri) ======
+   Panel sidebar dark glass tetap (sidebar.css). Aksen netral SuperGrok. */
+
+/* ====== BOTTOM NAVIGATION (pinggiran bawah) ====== */
+
+/* ====== SECTION HEADERS ====== */
+
+/* ====== TOMBOL AKSI UTAMA (brand, bukan status data) ====== */
+
+/* ====== TABEL LOG SHEET — garis pinggir & header ====== */
+
+/* ====== SCROLLBAR TIPIS (WebKit) ====== */
+
+[data-theme="professional"] ::-webkit-scrollbar-thumb { background: rgba(11,95,165,.35); }
+
+[data-theme="professional"] ::-webkit-scrollbar-track { background: var(--pro-blue-lt); }
+
+/* --- theme-dark.css (override terakhir) --- */
+
+/* =====================================================
+   THEME-DARK.CSS — SuperGrok premium dark
+   Aktif saat <html data-theme="dark">
+   Sheet, toolbar, bottom-nav, kartu, tabel, input
+   ===================================================== */
+
+/* ---------- Chrome: toolbar / app bar ---------- */
+
+/* ---------- Bottom nav ---------- */
+
+/* ---------- Nav rail ---------- */
+
+[data-theme="dark"] .rail-item {
+  color: #aeaeb2 !important;
+}
+
+[data-theme="dark"] .rail-item:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #f5f5f7 !important;
+}
+
+[data-theme="dark"] .rail-item.on {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #f5f5f7 !important;
+}
+
+/* ---------- Sheet container ---------- */
+
+/* ---------- Sections / cards ---------- */
+
+/* ---------- Log sheet table ---------- */
+
+/* ---------- Form fields ---------- */
+
+/* ---------- Buttons ---------- */
+
+/* ---------- KPI / dashboard cards ---------- */
+
+/* ---------- OEE ---------- */
+
+[data-theme="dark"] .oee-card,
+[data-theme="dark"] .oee-box {
+  background: #161618;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f5f5f7;
+}
+
+/* ---------- Sheet controls (shift/line/date) ---------- */
+
+/* ---------- Shift indicator ---------- */
+
+[data-theme="dark"] .shift-indicator {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f5f5f7 !important;
+  box-shadow: none !important;
+}
+
+/* ---------- Modal / wizard ---------- */
+
+/* ---------- Toast ---------- */
+
+/* ---------- Scrollbar ---------- */
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
   background: transparent;
-  color: #0f2437;
-  font: 700 12.5px 'IBM Plex Mono', ui-monospace, monospace;
-  letter-spacing: 0.4px;
-  padding: 8px 10px;
+}
+
+/* ---------- More panel / menus ---------- */
+
+[data-theme="dark"] .more-panel,
+[data-theme="dark"] .user-menu-panel {
+  background: #161618 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ---------- Modern sheet extras ---------- */
+
+[data-theme="dark"] .modern-sheet,
+[data-theme="dark"] .ms-card {
+  background: #161618;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f5f5f7;
+}
+
+/* =====================================================
+   UPPER SHEET CONTROLS (stage tabs, OP, product, KPI)
+   ===================================================== */
+
+/* Canvas & sheet glass */
+
+[data-theme="dark"] body {
+  background: #0c0c0e !important;
+  background-image: none !important;
+}
+
+[data-theme="dark"] body::before {
+  display: none !important;
+}
+
+/* Unified control card (stage + date + line + OP + product) */
+
+/* Stage tabs (Mixing, Filling, …) — inactive */
+
+/* Active stage keeps color identity */
+
+/* Date trigger */
+
+/* Shift / Line mini segments */
+
+/* OP boxes */
+
+/* Product inputs row */
+
+/* KPI row (P / Q / OEE) */
+
+/* Mode Hitung Cepat / logsheet topbar */
+
+/* Section headers inside sheet */
+
+/* Industrial / floating top status (SHIFT badge area already dark in screenshot) */
+
+/* Any remaining white glass surfaces in sheet */
+
+/* Product bar */
+
+/* KPI badges text */
+
+/* Log sheet title */
+
+/* Col toggle */
+
+/* Bottom nav already dark — ensure active pill */
+
+/* ---- Force dark on sheet-product-bar container ---- */
+
+/* sheet-op from logsheet.css hardcoded */
+
+/* stage btn from logsheet.css #fff */
+
+/* Menu button — selalu kiri, gaya soft */
+
+/* Rincian performa produk */
+
+[data-theme="dark"] .perf-detail-box {
+  background: rgba(255,255,255,0.04) !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #a7b6ca !important;
+}
+
+[data-theme="dark"] .perf-prod-row td {
+  color: #edf4ff !important;
+}
+
+/* =========================================================
+   WEEKLY MEETING DASHBOARD (Looker Studio style)
+   ========================================================= */
+
+/* Gauge setengah lingkaran */
+
+.gauge-track { stroke: #334155; }
+
+.gauge-fill {
+  stroke: #3b82f6;
+  transition: stroke-dashoffset 0.8s ease;
+}
+
+/* Bar list */
+
+.wb-label { font-size: 12px; color: #94a3b8; }
+
+.wb-track {
+  height: 18px;
+  background: #0f172a;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.wb-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  border-radius: 6px;
+  min-width: 4px;
+  transition: width 0.5s ease;
+}
+
+.wb-val { font-size: 12px; font-weight: 600; color: #e2e8f0; text-align: right; }
+
+/* KPI card */
+
+.wk-label { font-size: 11px; color: #64748b; }
+
+.wk-value { font-size: 22px; font-weight: 700; color: #f1f5f9; }
+
+.wk-value.good { color: #34d399; }
+
+.wk-value.small { font-size: 13px; font-weight: 500; color: #94a3b8; }
+
+/* Tombol kembali — selalu terbaca di tema gelap weekly */
+
+/* Responsive — weekly sidebar ponsel */
+
+/* =========================================================
+   OEE PRODUCTION — dual gauge + speed table
+   ========================================================= */
+
+.oee-prod-grid {
+  display: grid;
+  grid-template-columns: 1fr 0.85fr 1fr;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.oee-panel {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.oee-panel-head {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  text-align: center;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.oee-gauge-block { flex: 1; }
+
+.oee-gauge-title {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 4px;
+}
+
+.oee-target-label {
+  font-weight: 500;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.oee-gauge-wrap {
+  position: relative;
+  max-width: 240px;
+  margin: 0 auto;
+}
+
+.oee-gauge-svg { width: 100%; height: auto; display: block; }
+
+.oee-track { stroke: #334155; }
+
+.oee-fill { transition: stroke-dashoffset 0.9s ease; }
+
+.oee-fill-blue { stroke: #3b82f6; }
+
+.oee-fill-green { stroke: #22c55e; }
+
+.oee-target-line { opacity: 0.85; }
+
+.oee-target-text { font-family: inherit; font-weight: 600; }
+
+.oee-gauge-center {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.oee-actual {
+  font-size: 26px;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.1;
+}
+
+.oee-actual-sub {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* A / P / Q breakdown */
+
+.oee-apq-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.oee-apq-item {
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 8px 6px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.oee-apq-item.over { border-color: rgba(34, 197, 94, 0.35); }
+
+.oee-apq-item.under { border-color: rgba(248, 113, 113, 0.35); }
+
+.oee-apq-label {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+.oee-apq-label span { color: #64748b; }
+
+.oee-apq-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.oee-apq-item.over .oee-apq-val { color: #34d399; }
+
+.oee-apq-item.under .oee-apq-val { color: #f87171; }
+
+/* Speed table */
+
+.oee-panel-table { padding: 14px 12px; }
+
+@media (max-width: 1100px) {
+  .oee-prod-grid { grid-template-columns: 1fr; }
+  .oee-gauge-wrap { max-width: 280px; }
+}
+
+/* =========================================================
+   INSTALL BANNER (PWA)
+   ========================================================= */
+
+.install-banner {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 72px; /* di atas bottom-nav */
+  z-index: 9000;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.install-banner.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.install-banner[hidden] { display: none !important; }
+
+.install-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #0d2135 0%, #1a3a5c 100%);
+  color: #f1f5f9;
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(59, 130, 246, 0.25);
+  border: 1px solid rgba(96, 165, 250, 0.35);
+}
+
+.install-banner-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.install-banner-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.install-banner-text span {
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.install-banner-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+/* Saat bottom-nav tidak ada (desktop lebar) */
+
+@media (min-width: 901px) {
+  .install-banner { bottom: 24px; }
+}
+
+/* Sidebar Install row — selalu terlihat */
+
+.menu-row--install {
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.menu-row--install:hover {
+  background: rgba(59, 130, 246, 0.16);
+  border-color: rgba(59, 130, 246, 0.45);
+}
+
+.menu-row--install.is-ready {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.15);
+}
+
+.menu-row--install.is-installed {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.menu-row--install.is-installed .menu-row-title::after {
+  content: ' ✓';
+  color: #22c55e;
+}
+
+/* =========================================================
+   SALIN / PINDAH DATA MODAL
+   ========================================================= */
+
+.copy-move-modal {
+  width: min(440px, 94vw);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line, #e2e9ee);
+}
+
+.cm-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cm-close {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
+  color: #64748b;
+  padding: 4px 8px;
+  border-radius: 6px;
 }
-.prod-suggest-item:hover,
-.prod-suggest-item.on {
-  background: rgba(18, 161, 80, 0.12);
-  color: #0b7a3b;
+
+.cm-close:hover { background: #f1f5f9; color: #0f172a; }
+
+.cm-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }
+
+.cm-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
-.prod-suggest-item:active {
-  background: rgba(18, 161, 80, 0.2);
+
+.cm-source-val {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
 }
+
+.cm-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cm-mode { display: flex; flex-direction: column; gap: 8px; }
+
+.cm-radio {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.cm-radio:has(input:checked) {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.cm-radio input { margin-top: 3px; }
+
+.cm-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line, #e2e9ee);
+}
+
+[data-theme="dark"] .cm-source-val {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .cm-radio {
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .cm-close:hover { background: #1e293b; color: #f1f5f9; }
+
+[data-theme="dark"] .cm-warn {
+  background: #431407;
+  border-color: #9a3412;
+  color: #fed7aa;
+}
+
+@media (max-width: 480px) {
+  .cm-fields { grid-template-columns: 1fr; }
+}
+
+/* =========================================================
+   OEE TREND LINE CHARTS (di bawah gauge OEE PRODUCTION)
+   ========================================================= */
+
+.oee-trend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.oee-trend-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 14px 12px 10px;
+}
+
+.oee-trend-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+.ot-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ot-dot.ot-blue { background: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); }
+
+.ot-dot.ot-green { background: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25); }
+
+.oee-trend-chart-wrap {
+  width: 100%;
+  overflow: hidden;
+}
+
+.oee-trend-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ot-point {
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5));
+}
+
+.ot-point-green {
+  filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.5));
+}
+
+.ot-value {
+  font-family: inherit;
+}
+
+@media (max-width: 900px) {
+  .oee-trend-grid { grid-template-columns: 1fr; }
+}
+
+/* =========================================================
+   OEE CLUSTERED BAR CHARTS (FFS & Overwrapping)
+   ========================================================= */
+
+.ob-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.ob-swatch.ob-green { background: #22c55e; }
+
+.ob-swatch.ob-amber { background: #f59e0b; }
+
+.ob-swatch.ob-rose { background: #f43f5e; }
+
+.ob-swatch.ob-cyan { background: #22d3ee; }
+
+/* ===== OEE PRODUCTION — filter tanggal ===== */
+
+/* ===== OEE PRODUCTION — baris Speed Standar bisa diklik ===== */
+
+/* ===== HALAMAN DETAIL MESIN ===== */
+
+.oee-panel-head small { font-size: 10px; font-weight: 500; color: #94a3b8; letter-spacing: 0.03em; }
+
+.mch-speed-panel { display: flex; flex-direction: column; }
+
+.mch-speed-wrap { max-height: 204px; }
+
+.mch-speed-table td:last-child { text-align: right; }
+
+.mch-speed-table td:nth-child(2) { color: #e2e8f0; font-weight: 600; text-align: left; }
+
+.mch-speed-table th:last-child { text-align: right; }
+
+.mch-batch-chart { margin-top: 8px; background: rgba(15, 23, 42, 0.55); border: 1px solid #1e293b; border-radius: 10px; padding: 4px 6px; }
+
+.mch-batch-chart svg { display: block; width: 100%; height: auto; }
+
+.ob-swatch.ob-lime { background: #a3c93a; }
+
+.ob-swatch.ob-teal { background: #22b8cf; }
+
+.oee-prod-head .oee-prod-head-main { flex: 1 1 260px; min-width: 0; }
+
+/* ===== Menu konteks Speed Standar ===== */
+
+/* ===== Toolbar grafik produk multi-mesin ===== */
+
+/* ===== TABEL PICA ===== */
+
+/* ===== MODAL PICA ===== */
+
+/* Link produk di tabel PICA → buka log sheet */
+
+/* ===== PANEL SHUTDOWN (Looker-style) ===== */
+
+.sd-leg-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: #cbd5e1; min-width: 0; }
+
+.sd-leg-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+
+.sd-leg-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; }
+
+/* ===== SEMENTARA: sembunyikan KPI kartu & panel OEE Hari Ini / Distribusi Status
+   (data sedang dibersihkan — hapus blok CSS ini untuk menampilkan lagi) */
+
+/* ===== MODE 2 PRODUK: sembunyikan seluruh grup & kolom Produk 3 =====
+   (hapus blok ini bila kelak ingin kembali ke 3 produk) */
+
+/* Master Produk (Settings) — grup field Produk 3 */
+
+/* Compact / Mode Cepat — baris produk ke-3 */
+
+/* Header kolom Produk 3 di tabel matriks OEE */
+
+#thProd3 { display: none !important; }
+
+/* Sel nilai per-produk ke-3 (Performance G/H/I) */
+
+td:has(#oG3),
+td:has(#oH3),
+#colI3 { display: none !important; }
+
+/* ===== Minor / Breakdown charts di weekly mesin ===== */
+
+/* =====================================================
+   TABLE.CSS — Log sheet OEE, matriks, sticky header, aksi
+   ===================================================== */
+
+/* ================================================================
+   LOGSHEET.CSS
+   Tabel log sheet, mode form, mode cepat
+   Versi compact + horizontal slide product
+   ================================================================ */
+
+/* ================================================================
+   WRAPPER TABEL
+   ================================================================ */
+
+/* ================================================================
+   TABEL
+   ================================================================ */
+
+/* ================================================================
+   STICKY KOLOM NOMOR
+   ================================================================ */
+
+/* ================================================================
+   STICKY HEADER
+   ================================================================ */
+
+/* Sudut header + kolom nomor (paling atas-kiri) */
+
+/* ================================================================
+   PERFORMA SCROLL: baris di luar viewport di-skip paint sebisa mungkin
+   ================================================================ */
+
+/* ================================================================
+   RESPONSIVE TABEL HP
+   ================================================================ */
+
+/* ================================================================
+   LEBAR KOLOM
+   ================================================================ */
+
+/* DIPERLEBAR */
+
+/* DIPERLEBAR */
+
+/* DIPERLEBAR */
+
+/* Mode Hitung Cepat — kolom rapat, pas dengan isi teks */
+
+/* ================================================================
+   HEADER TABEL
+   ================================================================ */
+
+/* ================================================================
+   SEL DATA
+   ================================================================ */
+
+/* ================================================================
+   STICKY KOLOM NOMOR
+   ================================================================ */
+
+/* ================================================================
+   WARNA KOLOM NOMOR BERDASARKAN KATEGORI
+   ================================================================ */
+
+/* ================================================================
+   INPUT DALAM TABEL
+   ================================================================ */
+
+/* ================================================================
+   ANIMASI BARIS
+   ================================================================ */
+
+/* Animasi masuk hanya untuk baris baru (bukan 25 baris awal) agar scroll tidak lag */
+
+@keyframes rowin {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ================================================================
+   WARNA BARIS BERDASARKAN KATEGORI
+   ================================================================ */
+
+tr.out {
+  opacity: 0;
+  transform: translateX(12px);
+}
+
+/* ================================================================
+   GARIS INDIKATOR KIRI
+   ================================================================ */
+
+tr[data-cat="planned"] td:first-child::before {
+  background: var(--amber);
+}
+
+tr[data-cat="unplanned"] td:first-child::before {
+  background: var(--red);
+}
+
+tr[data-cat="prod"] td:first-child::before {
+  background: var(--green);
+}
+
+/* ================================================================
+   KODE & DOT
+   ================================================================ */
+
+.c-kode {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d7e0e7;
+  flex: none;
+
+  transition:
+    background .2s,
+    box-shadow .2s;
+}
+
+tr[data-cat="planned"] .dot {
+  background: var(--amber);
+  box-shadow: 0 0 0 3px rgba(217,119,6,.15);
+}
+
+tr[data-cat="unplanned"] .dot {
+  background: var(--red);
+  box-shadow: 0 0 0 3px rgba(220,38,38,.15);
+}
+
+tr[data-cat="prod"] .dot {
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(18,161,80,.15);
+}
+
+/* ================================================================
+   DURASI
+   ================================================================ */
+
+td.dur {
+  text-align: center;
+}
+
+.dur-v {
+  font: 600 13px var(--mono);
+  color: var(--ink2);
+}
+
+/* ================================================================
+   AKSI
+   ================================================================ */
+
+.c-aksi {
+  text-align: center;
+  width: 30px;
+}
+
+.c-aksi {
+  white-space: nowrap;
+  text-align: center;
+}
+
+.del:hover {
+  background: rgba(220,38,38,.1);
+  color: var(--red);
+  border-color: rgba(220,38,38,.3);
+  transform: scale(1.08);
+}
+
+/* ================================================================
+   PRESET KOLOM
+   ================================================================ */
+
+/* ================================================================
+   TOGGLE KOLOM
+   ================================================================ */
+
+/* ================================================================
+   MODE FORM RINGKAS
+   ================================================================ */
+
+/* ================================================================
+   MODE FORM LENGKAP
+   ================================================================ */
+
+/* ================================================================
+   MODE CEPAT
+   ================================================================ */
+
+/* Durasi selalu bisa diisi manual (input terlihat, teks auto-calc disembunyikan) */
+
+/* ================================================================
+   NO. WO
+   ================================================================ */
+
+.wo-wrap {
+  white-space: normal !important;
+  word-break: break-all;
+  overflow-wrap: break-word;
+
+  resize: none;
+  overflow: hidden;
+}
+
+/* ================================================================
+   FOOTER TOTAL DURASI
+   ================================================================ */
+
+/* ================================================================
+   SHIFT / LINE
+   ================================================================ */
+
+/* ================================================================
+   SHEET INLINE CONTROLS
+   ================================================================ */
+
+/* ================================================================
+   BARIS ATAS SHEET
+   ================================================================ */
+
+/* ================================================================
+   OP CONTROL
+   ================================================================ */
+
+/* ================================================================
+   BARIS OP
+   ================================================================ */
+
+/* ================================================================
+   OP BOXES
+   ================================================================ */
+
+/* ================================================================
+   DATE
+   ================================================================ */
+
+/* ================================================================
+   UNIFIED SHEET CONTROL
+   ================================================================ */
+
+/* ================================================================
+   PROCESS TABS
+   ================================================================ */
+
+/* ================================================================
+   CONTROL GROUP
+   ================================================================ */
+
+/* ================================================================
+   MINI SEGMENT
+   ================================================================ */
+
+/* ================================================================
+   SHIFT COLORS
+   ================================================================ */
+
+/* ================================================================
+   LINE ACTIVE
+   ================================================================ */
+
+/* ================================================================
+   KPI
+   ================================================================ */
+
+/* ================================================================
+   ================================================================
+   PRODUK — HORIZONTAL SLIDE / SWIPE
+   Produk 1 → Produk 2 → Produk 3
+   ================================================================
+   ================================================================ */
+
+/* Produk individual */
+
+/* Label produk */
+
+/* Jika ada container input terpisah */
+
+/* Input produk */
+
+/* Input nama/rate/WO */
+
+/* Bila field memiliki class product-card */
+
+/* Judul produk */
+
+/* ================================================================
+   PRODUK — MOBILE
+   ================================================================ */
+
+/* ================================================================
+   PRODUK — HP SANGAT KECIL
+   ================================================================ */
+
+/* ================================================================
+   LOGSHEET TOPBAR
+   ================================================================ */
+
+.logsheet-title {
+  display: flex;
+  align-items: center;
+}
+
+.logsheet-top-spacer {
+  flex: 1 1 auto !important;
+
+  min-width: 4px;
+}
+
+/* ================================================================
+   VIEW TOGGLE
+   ================================================================ */
+
+/* ================================================================
+   HELP BUTTON
+   ================================================================ */
+
+/* ================================================================
+   MOBILE TOPBAR
+   ================================================================ */
+
+/* ================================================================
+   MOBILE UNIFIED CONTROL
+   ================================================================ */
+
+/* ================================================================
+   HP ≤ 420px
+   ================================================================ */
+
+/* ================================================================
+   HP ≤ 390px
+   ================================================================ */
+
+/* ================================================================
+   FORM RESPONSIVE
+   ================================================================ */
+
+/* ================================================================
+   TAMBAHAN COMPACT
+   ================================================================ */
+
+/* ================================================================
+   PERBAIKAN KHUSUS LEBAR KOLOM
+   Pastikan width tidak dipatahkan browser
+   ================================================================ */
+
+/* ================================================================
+   BATCH / PRODUK
+   ================================================================ */
+
+/* ================================================================
+   PRODUK BAR — SUPPORT PRODUCT GRID CLASS
+   ================================================================ */
+
+/* ================================================================
+   SINGLE ROW CONTROL
+   ================================================================ */
+
+/* ================================================================
+   JIKA ADA CONTAINER PRODUK 1/2/3
+   ================================================================ */
+
+#sheetProductBar {
+  width: 100%;
+
+  max-width: 100%;
+
+  box-sizing: border-box;
+
+  touch-action: pan-x;
+}
+
+/* ================================================================
+   PRODUK INPUT AGAR TIDAK MEMBUAT SLIDE RUSAK
+   ================================================================ */
+
+#sheetProductBar input,
+#sheetProductBar select,
+#sheetProductBar textarea {
+  max-width: 100%;
+
+  box-sizing: border-box;
+}
+
+/* ================================================================
+   MOBILE: TABEL TETAP BISA SWIPE
+   ================================================================ */
+
+/* ================================================================
+   FINAL COMPACT MOBILE
+   ================================================================ */
+
+/* Kolom OP — 1 karakter di antara Kode dan Mulai */
+
+/* =========================================================
+   COMPACT SHEET HEADER — mobile first
+   Tanggal | Tahapan | Line | Shift | OPR | Produk
+   ========================================================= */
+
+/* Dropdown selalu berada di atas KPI/toolbar dan tidak boleh terpotong oleh Sheet. */
+
+/* =========================================================
+   COMPACT DROPDOWN PORTAL — MOBILE FIX
+   Popup dipindahkan ke <body> oleh compact-controls.js agar tidak
+   terpotong oleh card, sheet, overflow, transform, atau stacking context.
+   ========================================================= */
+
+/* --- oee.css --- */
+
+/* ================================================
+   OEE.CSS — Tabel matriks OEE, performa produk, diagnostik
+   ================================================ */
+
+/* Tabel matriks OEE */
+
+.oee-matrix-tbl th, .oee-matrix-tbl td {
+  border: 1px solid var(--line); padding: 8px 10px; vertical-align: middle;
+}
+
+.oee-matrix-tbl td.code-col {
+  width: 40px; text-align: center; font-weight: 700; background: #fbfcfd;
+}
+
+.oee-matrix-tbl td.desc-col { color: var(--ink2); }
+
+.oee-matrix-tbl td.val-col { text-align: right; font-weight: 600; color: var(--ink); width: 130px; }
+
+.oee-matrix-tbl .oee-title {
+  letter-spacing: 1px; font-family: var(--disp); font-size: 16px;
+}
+
+.oee-matrix-tbl tr.highlight-res td:last-child {
+  text-align: right; font-size: 22px; font-family: var(--disp);
+}
+
+.oee-matrix-tbl small { font-size: 11px; color: var(--mut); }
+
+.oee-matrix-tbl tr.highlight-res small { color: #94a3b8; font-weight: 400; }
+
+/* Performance head & badge average */
+
+.perf-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.badge-avg {
+  background: var(--green-bg); color: var(--green-d);
+  padding: 2px 8px; border-radius: 6px; font-weight: 700;
+  font-size: 13px; border: 1px solid rgba(18,161,80,0.3);
+}
+
+/* Rincian performa produk */
+
+.perf-detail-box {
+  display: flex; flex-direction: column; gap: 3px;
+  width: 100%; box-sizing: border-box;
+}
+
+.perf-detail-box > div {
+  display: block; white-space: normal; word-break: break-word;
+}
+
+/* Diagnostik */
+
+.diag { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+
+.d-item {
+  padding: 10px 14px; border-radius: 8px;
+  font-family: var(--mono); font-size: 13px;
+}
+
+.d-item.ok  { background: rgba(46,226,126,0.12);  border: 1px solid rgba(46,226,126,0.35); color: #0c7c3d; }
+
+.d-item.err { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); color: var(--red); }
+
+/* --- modern-sheet.css --- */
+
+/* ============================================================
+   MODERN-SHEET.CSS — Native-inspired visual layer for TKL-OEE
+   Fokus: sheet/logsheet, mobile-first, glass + soft nature background.
+   Tidak mengubah business logic/state.
+   ============================================================ */
+
+:root {
+  --ms-surface: rgba(255,255,255,.84);
+  --ms-surface-strong: rgba(255,255,255,.94);
+  --ms-border: rgba(255,255,255,.70);
+  --ms-shadow: 0 18px 50px rgba(15, 36, 55, .16);
+}
+
+/* ===== GLOBAL CANVAS ===== */
+
+body {
+  background:
+    linear-gradient(180deg, rgba(244,250,255,.78) 0%, rgba(233,242,247,.90) 48%, rgba(225,236,228,.94) 100%),
+    url('../icons/bg-login.jpg') center top / cover fixed no-repeat;
+  background-attachment: fixed;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(700px 360px at 15% 8%, rgba(255,255,255,.60), transparent 70%),
+    radial-gradient(620px 380px at 88% 20%, rgba(115,190,255,.16), transparent 72%),
+    radial-gradient(680px 420px at 48% 95%, rgba(36,180,100,.11), transparent 75%);
+}
+
+/* ===== APP SHEET ===== */
+
+/* Keep the sheet header crisp while making the shell lighter. */
+
+/* ===== UNIFIED CONTROL ===== */
+
+#sheetLine button.on { background: linear-gradient(180deg,#20b55f,#0c7c3d); }
+
+/* ===== KPI: compact, colorful, modern ===== */
+
+/* ===== KPI HEALTH BAR (dinamis sesuai target) ===== */
+
+/* Bar mengisi dari kiri sesuai persentase capaian terhadap target */
+
+/* Kartu KPI berkedip halus saat target tercapai/terlampaui */
+
+/* Efek bintang emas — muncul otomatis saat kpi-achieved aktif */
+
+.kpi-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.kpi-stars::before,
+.kpi-stars::after {
+  content: '✨';
+  position: absolute;
+  font-size: 11px;
+  line-height: 1;
+  opacity: 0;
+  filter: drop-shadow(0 0 3px rgba(255,205,60,.85));
+}
+
+.kpi-stars::before { top: -3px; right: 3px; }
+
+.kpi-stars::after   { bottom: -3px; left: 5px; }
+
+@keyframes kpiStarPop {
+  0%   { opacity: 0; transform: scale(.4) rotate(-8deg) translateY(3px); }
+  25%  { opacity: 1; transform: scale(1.15) rotate(6deg) translateY(-2px); }
+  65%  { opacity: 1; transform: scale(1) rotate(0deg) translateY(-5px); }
+  100% { opacity: 0; transform: scale(.55) rotate(10deg) translateY(-9px); }
+}
+
+/* ===== SHEET PRODUCT BAR ===== */
+
+/* repeat(3, ...) dipakai (bukan auto-fit) supaya Produk 1/2/3 SELALU 1 baris,
+   tidak pernah turun ke baris baru meski layar sedang. */
+
+/* Mobile: 1 baris horizontal, geser/slide independen (carousel produk) */
+
+/* ===== MODE DESKTOP (>900px): dibesarkan, bukan sekadar versi mobile yang di-scale ===== */
+
+/* ===== LOGSHEET TOOLBAR ===== */
+
+/* ===== TABLE: clean, readable, less rigid ===== */
+
+/* Slightly softer category surfaces; the left stripe carries the stronger signal. */
+
+/* ===== MOBILE NATIVE FEEL ===== */
+
+/* === DARK MODE OVERRIDE (SuperGrok) === */
+
+[data-theme="dark"] {
+  --ms-surface: rgba(22, 22, 24, 0.92);
+  --ms-surface-strong: rgba(28, 28, 31, 0.96);
+  --ms-border: rgba(255, 255, 255, 0.08);
+  --ms-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] body {
+  background: #0c0c0e !important;
+  background-image: none !important;
+}
+
+[data-theme="dark"] body::before { display: none !important; }
+
+[data-theme="dark"] .logsheet-title h2 { color: #f5f5f7 !important; }
+
+/* Animasi dan Interaksi Dasar */
+
+/* Warna Pastel per Kolom Kategori */
+
+/* =====================================================
+   LAYOUT.CSS — Kerangka: app bar, sidebar, shell, mobile
+   ===================================================== */
+
+/* ================================================
+   LAYOUT.CSS — App bar, sheet wrapper, bottom nav, sections
+   ================================================ */
+
+/* ====== APP BAR ====== */
+
+/* Tombol menu SELALU di kiri */
+
+/* Backdrop gelap */
+
+/* Panel Menu */
+
+.more-panel { display: none; }
+
+@keyframes menuDrop { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+.menu-item:hover {
+  border-color: rgba(18, 161, 80, 0.5);
+  box-shadow: 0 4px 10px -2px rgba(18, 161, 80, 0.18);
+  transform: translateY(-1px);
+}
+
+/* Indikator shift & OEE */
+
+.oee-indicator:hover { transform: translateY(-1px); }
+
+.oee-indicator .oi-label { font-size: 10.5px; opacity: .85; letter-spacing: .8px; }
+
+.oee-indicator.good {
+  background: linear-gradient(135deg, var(--green-d), #0c7c3d); border-color: #0a5c2e;
+  box-shadow: 0 2px 8px -2px rgba(12,124,61,.55);
+}
+
+.oee-indicator.bad {
+  background: linear-gradient(135deg, #b91c1c, #7f1d1d); border-color: #7f1d1d;
+  box-shadow: 0 2px 8px -2px rgba(127,29,29,.55);
+}
+
+/* Warna indikator Shift mengikuti Tahapan Proses yang aktif */
+
+.shift-indicator.stage-mixing {
+  background: linear-gradient(135deg, var(--green-d), #0c7c3d); border-color: #0a5c2e;
+  box-shadow: 0 2px 8px -2px rgba(12,124,61,.55);
+}
+
+.shift-indicator.stage-filling {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8); border-color: #1e40af;
+  box-shadow: 0 2px 8px -2px rgba(29,78,216,.55);
+}
+
+.shift-indicator.stage-steril {
+  background: linear-gradient(135deg, #ec4899, #db2777); border-color: #be185d;
+  box-shadow: 0 2px 8px -2px rgba(219,39,119,.55);
+}
+
+.shift-indicator.stage-kemas {
+  background: linear-gradient(135deg, #f97316, #ea580c); border-color: #c2410c;
+  box-shadow: 0 2px 8px -2px rgba(234,88,12,.55);
+}
+
+.shift-indicator.stage-visual {
+  background: linear-gradient(135deg, #9333ea, #7e22ce); border-color: #6b21a8;
+  box-shadow: 0 2px 8px -2px rgba(126,34,206,.55);
+}
+
+.pos-dot { width: 9px; height: 9px; background: var(--green); border-radius: 2px; animation: blink 1.2s steps(2) infinite; flex: none; }
+
+@keyframes blink { 50% { opacity: .25; } }
+
+/* Navigasi mode & shift selector */
+
+.nm-cap { font: 600 10px var(--mono); letter-spacing: 1.5px; color: var(--mut); padding: 0 5px 0 9px; }
+
+.navmode button, .shiftsel button {
+  border: 0; background: transparent; font: 600 12.5px var(--mono);
+  letter-spacing: .6px; padding: 9px 12px; border-radius: 7px;
+  color: var(--mut); cursor: pointer; transition: .2s;
+  display: inline-flex; gap: 6px; align-items: center;
+}
+
+.navmode button:not(.on):hover, .shiftsel button:not(.on):hover { color: var(--ink); background: #f2f6f8; }
+
+.inputmode button {
+  border: 0; background: transparent; border-radius: 6px; padding: 6px 10px;
+  font: 600 12px var(--mono); color: var(--mut); cursor: pointer; transition: .2s;
+}
+
+.inputmode button:not(.on):hover { color: var(--ink); background: #f2f6f8; }
+
+.hint { font-size: 12px; font-family: var(--mono); color: var(--mut); flex-basis: 100%; }
+
+#lastSaved { font: 12px var(--mono); color: var(--green-d); }
+
+/* ====== SHEET WRAPPER ====== */
+
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+
+.brand { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
+
+.kicker { font: 600 10.5px var(--mono); letter-spacing: 2.5px; color: #6fd39c; margin-bottom: 3px; }
+
+h1 { font: 700 clamp(24px,5vw,34px)/1 var(--disp); letter-spacing: .8px; text-transform: uppercase; }
+
+.sub { font-size: 12.5px; color: #93a9bc; margin-top: 4px; }
+
+.hud { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
+
+.clock { font: 600 26px var(--mono); letter-spacing: 1px; font-variant-numeric: tabular-nums; }
+
+.date { font: 11.5px var(--mono); color: #93a9bc; }
+
+.led {
+  display: inline-flex; align-items: center; gap: 7px;
+  font: 600 10.5px var(--mono); letter-spacing: 1.5px;
+  color: #7fd7a8; border: 1px solid rgba(127,215,168,.4);
+  padding: 6px 11px; border-radius: 99px;
+}
+
+.led i { width: 8px; height: 8px; border-radius: 50%; background: #2ee27e; animation: pulse 1.6s infinite; }
+
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(46,226,126,.5); }
+  70%  { box-shadow: 0 0 0 7px rgba(46,226,126,0); }
+  100% { box-shadow: 0 0 0 0 rgba(46,226,126,0); }
+}
+
+/* ====== BOTTOM NAVIGATION BAR ====== */
+
+/* ====== SECTIONS ====== */
+
+.filter-grid { display: grid; grid-template-columns: 1.1fr 1.1fr .9fr 1fr; gap: 12px; }
+
+.operator-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+
+.split-input   { display: flex; gap: 6px; }
+
+.split-input input:first-child { flex: 2; }
+
+.split-input input:last-child  { flex: 1; }
+
+.split-input-3 input:first-child { flex: 2; }
+
+.split-input-3 input:nth-child(2) { flex: 1; }
+
+.split-input-3 input:last-child { flex: 1.2; }
+
+.split-input-4 { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.split-input-4 input:nth-child(1) { flex: 2.2; min-width: 120px; }
+
+.split-input-4 input:nth-child(2) { flex: 1; min-width: 72px; }
+
+.split-input-4 input:nth-child(3) { flex: 0.85; min-width: 64px; }
+
+.split-input-4 input:nth-child(4) { flex: 1.1; min-width: 80px; }
+
+/* Produk + BN (prefix L tetap) + Rate + Ukuran + WO */
+.split-input-prod-bn {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+.split-input-prod-bn > input:first-child { flex: 1.4; min-width: 88px; }
+.split-input-prod-bn > .bn-group { flex: 1.2; min-width: 110px; }
+.split-input-prod-bn > input[type="number"],
+.split-input-prod-bn > select { flex: 0.9; min-width: 72px; }
+.split-input-prod-bn > input.mono:last-child { flex: 1; min-width: 80px; }
+
+.bn-group {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line, #cbd5e1);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--card, #fff);
+}
+.bn-group .bn-prefix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  font: 700 13px var(--mono, ui-monospace, monospace);
+  color: var(--ink2, #475569);
+  background: var(--bg2, #f1f5f9);
+  border-right: 1px solid var(--line, #cbd5e1);
+  user-select: none;
+}
+.bn-group input {
+  border: none !important;
+  border-radius: 0 !important;
+  flex: 1;
+  min-width: 0;
+  box-shadow: none !important;
+}
+.bn-prefix-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  font: 700 12px var(--mono, ui-monospace, monospace);
+  color: var(--ink2, #475569);
+  background: var(--bg2, #f1f5f9);
+  border: 1px solid var(--line, #cbd5e1);
+  border-radius: 6px;
+  user-select: none;
+  flex: none;
+}
+[data-theme="dark"] .bn-group {
+  border-color: #334155;
+  background: #0f172a;
+}
+[data-theme="dark"] .bn-group .bn-prefix,
+[data-theme="dark"] .bn-prefix-inline {
+  background: #1e293b;
+  color: #94a3b8;
+  border-color: #334155;
+}
+
+/* Footer sheet */
+
+/* Mobile layout */
+
+/* ================================================
+   SEMBUNYIKAN HEADER SHEET
+   (hapus jika ingin menampilkan kembali)
+   ================================================ */
+
+/* =====================================================
+   MOBILE-FIRST NAV — bottom bar always (mudah di ponsel)
+   Desktop (≥1024px): bottom bar tetap di bawah, lebih lega
+   ===================================================== */
+
+/* Bottom nav: selalu di bawah, horizontal */
+
+/* Ruang konten supaya tidak tertutup bottom nav */
+
+#appContainer {
+  margin-left: 0 !important;
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Sidebar mobile: overlay, jangan dorong konten */
+
+/* Desktop: konten lebih lega, nav tetap di bawah */
+
+/* Screen-reader only (hidden selects kept for compatibility) */
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Line & Stage toggle groups (same look as Shift) */
+
+.linesel button,
+.stagesel button {
+  flex: 1;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.stagesel {
+  flex-wrap: wrap;
+}
+
+.stagesel button {
+  flex: 1 1 auto;
+  min-width: 4.5em;
+  font-size: 12px;
+  padding: 9px 6px;
+}
+
+@media (max-width: 480px) {
+  .stagesel button {
+    font-size: 11px;
+    padding: 8px 4px;
+    min-width: 3.8em;
+  }
+}
+
+/* Garis tipis coklat pada toggle Shift / Line / Tahapan */
+
+.shiftsel,
+.linesel,
+.stagesel,
+#fShift,
+#fLineSel,
+#fStageSel {
+  border: 1px solid #c4a484 !important;
+  box-shadow: 0 0 0 1px rgba(196, 164, 132, 0.25);
+}
+
+.shiftsel button,
+.linesel button,
+.stagesel button {
+  border: 1px solid transparent;
+}
+
+.shiftsel button:not(.on),
+.linesel button:not(.on),
+.stagesel button:not(.on) {
+  border-color: rgba(196, 164, 132, 0.35);
+}
+
+.shiftsel button.on,
+.linesel button.on,
+.stagesel button.on {
+  border-color: #a67c52;
+}
+
+/* --- sidebar.css --- */
+
+/* ================================================
+   SIDEBAR.CSS — Menu & Pengaturan (optimized)
+   Light default · Dark via [data-theme="dark"] tokens
+   ================================================ */
+
+/* ---- Design tokens (light) ---- */
+
+/* Dark tokens — only variables change, layout stays the same */
+
+/* Backdrop */
+
+/* Dorong konten hanya di desktop — mobile pakai overlay (lihat layout.css) */
+
+/* Header */
+
+/* Labels */
+
+/* Menu rows */
+
+.menu-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: var(--sb-radius);
+  border: 1px solid var(--sb-border);
+  background: var(--sb-row);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: background var(--sb-ease), border-color var(--sb-ease);
+}
+
+.menu-row:hover {
+  background: var(--sb-row-hover);
+  border-color: var(--sb-border-strong);
+}
+
+.menu-row:active { transform: scale(0.985); }
+
+.menu-row--static {
+  cursor: default;
+  flex-wrap: wrap;
+  row-gap: 12px;
+}
+
+.menu-row--static:hover {
+  background: var(--sb-row);
+  border-color: var(--sb-border);
+}
+
+.menu-row--static:active { transform: none; }
+
+/* Primary CTA */
+
+.menu-row--primary {
+  background: var(--sb-primary-bg);
+  border-color: transparent;
+  color: var(--sb-primary-fg);
+}
+
+.menu-row--primary:hover {
+  filter: brightness(1.08);
+  border-color: transparent;
+}
+
+.menu-row--primary .menu-row-title { color: var(--sb-primary-fg); }
+
+.menu-row--primary .menu-row-sub { color: var(--sb-primary-muted); }
+
+.menu-row--primary .menu-row-chevron { color: var(--sb-muted); }
+
+.menu-row--primary .menu-row-icon {
+  background: color-mix(in srgb, var(--sb-primary-fg) 10%, transparent);
+  border-color: color-mix(in srgb, var(--sb-primary-fg) 12%, transparent);
+  color: var(--sb-primary-fg);
+}
+
+/* Danger */
+
+.menu-row--danger {
+  background: var(--sb-danger-bg);
+  border-color: var(--sb-danger-border);
+}
+
+.menu-row--danger:hover {
+  background: var(--sb-danger-hover);
+  border-color: var(--sb-danger-fg);
+}
+
+.menu-row--danger .menu-row-title { color: var(--sb-danger-fg); }
+
+/* Icon */
+
+.menu-row-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--sb-radius-sm);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  flex: none;
+  background: var(--sb-icon-bg);
+  border: 1px solid var(--sb-border);
+  color: var(--sb-icon-fg);
+}
+
+.menu-row-icon--red {
+  background: color-mix(in srgb, var(--sb-danger-fg) 12%, transparent);
+  border-color: color-mix(in srgb, var(--sb-danger-fg) 20%, transparent);
+  color: var(--sb-danger-fg);
+}
+
+.menu-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.menu-row-title {
+  font: 560 14px var(--sb-font);
+  color: var(--sb-fg);
+  letter-spacing: -0.2px;
+}
+
+.menu-row-sub {
+  font: 400 12px var(--sb-font);
+  color: var(--sb-muted);
+}
+
+.menu-row-chevron {
+  font-size: 18px;
+  color: var(--sb-faint);
+  flex: none;
+  line-height: 1;
+  padding-right: 2px;
+}
+
+/* Pills */
+
+.pill-group {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--sb-pill-track);
+  border: 1px solid var(--sb-border);
+  flex: none;
+  margin-left: auto;
+}
+
+.menu-row--static .pill-group {
+  width: 100%;
+  margin-left: 0;
+  flex-basis: 100%;
+}
+
+.pill-group button {
+  border: 0;
+  background: transparent;
+  font: 550 12.5px var(--sb-font);
+  letter-spacing: -0.1px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: var(--sb-muted);
+  cursor: pointer;
+  flex: 1;
+  white-space: nowrap;
+  transition: background var(--sb-ease), color var(--sb-ease), box-shadow var(--sb-ease);
+}
+
+.pill-group button.on {
+  background: var(--sb-pill-on-bg);
+  color: var(--sb-pill-on-fg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.pill-group button:not(.on):hover {
+  background: var(--sb-row-hover);
+  color: var(--sb-fg);
+}
+
+/* Legacy cleanup */
+
+/* Responsive */
+
+/* Scrollbar */
+
+/* --- shell.css --- */
+
+/* =====================================================
+   SHELL.CSS — Topbar, nav rail desktop, command palette,
+   halaman Pengaturan, empty-state.
+   Dimuat SETELAH tokens.css & layout.css. Tidak mengubah
+   struktur .toolbar/.bottom-nav lama — hanya menambah
+   elemen baru di sekitarnya & sedikit override warna aktif.
+   ===================================================== */
+
+:root { --rail-w: 232px; --rail-w-collapsed: 68px; --topbar-h: 56px; }
+
+/* ---------- TOPBAR ---------- */
+
+.topbar {
+  position: sticky; top: 0; z-index: 70;
+  background: var(--bg-surface); border-bottom: 1px solid var(--border-default);
+  height: var(--topbar-h);
+}
+
+.topbar-inner {
+  height: 100%; display: flex; align-items: center; gap: 10px;
+  padding: 0 16px; max-width: none;
+}
+
+.rail-toggle-btn, .top-icon-btn {
+  flex: none; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid transparent; border-radius: var(--radius-control);
+  color: var(--text-secondary); cursor: pointer; transition: var(--transition-fast);
+}
+
+.rail-toggle-btn:hover, .top-icon-btn:hover { background: var(--bg-surface-hover); color: var(--text-primary); }
+
+.rail-toggle-btn { display: none; }
+
+/* muncul hanya di desktop, lihat media query bawah */
+
+.breadcrumb { font: 600 14px var(--font-sans); color: var(--text-primary); white-space: nowrap; }
+
+.top-sync {
+  display: flex; align-items: center; gap: 6px; font: 500 12.5px var(--font-sans);
+  padding: 6px 10px; border-radius: var(--radius-pill); white-space: nowrap; flex: none;
+}
+
+.top-sync--ok   { color: var(--success-600); background: var(--success-bg); }
+
+.top-sync--busy { color: var(--brand-600); background: var(--brand-50); }
+
+.top-sync--busy .icon { animation: shellSpin 0.9s linear infinite; }
+
+.top-sync--err  { color: var(--text-secondary); background: var(--slate-100); }
+
+@keyframes shellSpin { to { transform: rotate(360deg); } }
+
+.user-menu { position: relative; flex: none; }
+
+.user-menu-btn {
+  display: flex; align-items: center; gap: 8px; background: transparent; border: 1px solid var(--border-default);
+  border-radius: var(--radius-control); padding: 5px 8px 5px 6px; cursor: pointer; color: var(--text-primary);
+  transition: var(--transition-fast);
+}
+
+.user-menu-btn:hover { background: var(--bg-surface-hover); }
+
+.user-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--brand-50); color: var(--brand-600); display: flex; align-items: center; justify-content: center; }
+
+.user-menu-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; }
+
+.user-menu-name { font: 600 12.5px var(--font-sans); }
+
+.user-menu-role { font: 500 10.5px var(--font-sans); color: var(--text-muted); text-transform: capitalize; }
+
+.user-menu-panel {
+  position: absolute; right: 0; top: calc(100% + 6px); min-width: 160px;
+  background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-control);
+  box-shadow: var(--shadow-overlay); padding: 6px; z-index: 80;
+}
+
+.user-menu-item {
+  width: 100%; display: flex; align-items: center; gap: 8px; background: transparent; border: 0;
+  padding: 8px 10px; border-radius: 6px; font: 500 13px var(--font-sans); color: var(--danger-600); cursor: pointer;
+}
+
+.user-menu-item:hover { background: var(--danger-bg); }
+
+/* ---------- NAV RAIL (desktop) ---------- */
+
+/* default mobile: disembunyikan, lihat media query bawah */
+
+.rail-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; background: transparent; border: 0;
+  padding: 8px 8px; border-radius: var(--radius-control); color: var(--text-secondary);
+  font: 500 13px var(--font-sans); cursor: pointer; transition: var(--transition-fast); text-align: left;
+  white-space: nowrap; overflow: hidden;
+}
+
+.rail-item .icon { flex: none; }
+
+.rail-item span { overflow: hidden; text-overflow: ellipsis; }
+
+.rail-item:hover { background: var(--bg-surface-hover); color: var(--text-primary); }
+
+.rail-item.on { background: var(--brand-50); color: var(--brand-600); font-weight: 600; }
+
+.rail-item[hidden] { display: none; }
+
+/* menang atas .rail-item{display:flex} yang spesifisitasnya sama */
+
+/* ---------- COMMAND PALETTE ---------- */
+
+/* ---------- Perbaikan warna aktif bottom-nav (dulu hijau -> sekarang biru brand,
+   hijau dikhususkan utk makna "tercapai target") ---------- */
+
+/* ---------- EMPTY STATE (Laporan & Admin placeholder) ---------- */
+
+.empty-state {
+  max-width: 380px; margin: 60px auto; text-align: center;
+  color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+
+.empty-state .icon { color: var(--slate-300); width: 40px; height: 40px; }
+
+.empty-state h3 { font: 600 16px var(--font-sans); color: var(--text-primary); }
+
+.empty-state p { font: 13.5px var(--font-sans); line-height: 1.6; }
+
+.empty-state code { background: var(--slate-100); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+
+/* ---------- LOGIN THEME SELECTOR ---------- */
+
+/* ---------- PENGATURAN ---------- */
+
+.switch { position: relative; display: inline-block; width: 40px; height: 22px; flex: none; cursor: pointer; }
+
+.switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+
+.switch-track { position: absolute; inset: 0; background: var(--slate-300); border-radius: var(--radius-pill); transition: var(--transition-base); }
+
+.switch input:checked + .switch-track { background: var(--brand-600); }
+
+.switch input:checked + .switch-track .switch-thumb { transform: translateX(18px); }
+
+.switch input:focus-visible + .switch-track { outline: 2px solid var(--brand-500); outline-offset: 2px; }
+
+/* ---------- LAYOUT DESKTOP (>=1024px): tampilkan rail, sembunyikan bottom-nav ---------- */
+
+/* --- industrial-toolbar.css --- */
+
+/* =====================================================
+   TKL-OEE - INDUSTRIAL TOOLBAR
+   Biru tua gelap + garis vertikal + zig-zag hijau
+   ===================================================== */
+
+/* Toolbar industrial */
+
+/* Wrapper branding */
+
+/* Ikon kotak hijau neon TKL */
+
+/* Teks kecil hijau di atas */
+
+/* Judul utama putih tebal */
+
+/* Subteks abu-abu */
+
+/* Dekorasi zig-zag putus-putus hijau di bawah toolbar */
+
+/* Tombol di dalam toolbar industrial tetap terbaca */
+
+/* =====================================================
+   BUANG BAGIAN BAWAH (hero dashboard jam/LIVE/tanggal)
+   ===================================================== */
+
+/* Mobile: judul lebih kecil supaya muat */
+
+/* --- mobile-native.css --- */
+
+/* ================================================
+   MOBILE-NATIVE.CSS — TKL OEE System
+   Optimasi tampilan mobile: tombol ringkas, spacing hemat, layout compact
+   Import setelah style.css di HTML: <link rel="stylesheet" href="./css/mobile-native.css">
+   ================================================ */
+
+/* ====== RESPONSIVE: Max Width 768px (Tablet & Mobile) ====== */
+
+/* ====== RESPONSIVE: Max Width 480px (Smartphone) ====== */
+
+/* ====== EXTRA SMALL (max-width 360px): Very tight optimization ====== */
+
+/* ====== ACCESSIBILITY: Reduce motion ====== */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =====================================================
+   DESKTOP FULL SHEET — manfaatkan lebar layar
+   ===================================================== */

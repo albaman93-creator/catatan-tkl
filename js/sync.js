@@ -40,11 +40,32 @@ const Sync = (() => {
     const client = SupabaseClient.getClient();
     if (!client) throw new Error('Supabase client tidak aktif');
 
-    const { error } = await client
+    let { error } = await client
       .from(CONFIG.DB_TABLE)
       .upsert(row, { onConflict: 'key' });
 
-    if (error) throw error;
+    // Kolom `source` belum ada (SQL sinkron Sheets belum dijalankan) → ulangi tanpa kolom itu
+    if (error && /source/i.test(error.message || '') && 'source' in row) {
+      const { source, ...noSource } = row;
+      row = noSource;
+      ({ error } = await client.from(CONFIG.DB_TABLE).upsert(row, { onConflict: 'key' }));
+    }
+
+    if (!error) return;
+
+    // 409 / 23505: baris untuk (date, shift, line, tahapan) yang sama sudah ada dengan `key` berbeda.
+    // Upsert via `key` tidak menemukannya → UPDATE langsung berdasarkan 4 kolom itu.
+    const isConflict = error.code === '23505' || error.status === 409 || /duplicate key/i.test(error.message || '');
+    if (!isConflict) throw error;
+
+    const { key, ...rest } = row;
+    const { data, error: err2 } = await client
+      .from(CONFIG.DB_TABLE)
+      .update(rest)
+      .match({ date: row.date, shift: row.shift, line: row.line, tahapan: row.tahapan })
+      .select('key');
+    if (err2) throw err2;
+    if (!data || !data.length) throw error; // tidak ada baris ter-update (mis. RLS) → laporkan error asli
   };
 
   /**

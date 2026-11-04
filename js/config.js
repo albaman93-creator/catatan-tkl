@@ -11,6 +11,7 @@ const CONFIG = Object.freeze({
 
   // Nama tabel Supabase tempat data OEE disimpan (lihat supabase-setup.sql)
   DB_TABLE: 'oee_data',
+  DB_SPEED_STANDAR_TABLE: 'speed_standar',
   SCHEMA_VERSION: 1,
 
   // ====== AUTENTIKASI ======
@@ -34,10 +35,17 @@ const CONFIG = Object.freeze({
 
   // Auto-save LOKAL (localStorage) setiap N ms. Tidak menyentuh Supabase —
   // hanya menjaga-jaga data tidak hilang kalau browser/tab tertutup tiba-tiba.
-  AUTO_SAVE_INTERVAL_MS: 60000, // 1 menit
+  AUTO_SAVE_INTERVAL_MS: 10000, // 10 detik
+
+  // Auto-save ke Supabase setiap N ms (senyap, tanpa tombol Simpan).
+  // Hanya jalan saat online + login cloud; skip jika offline / Mode Offline.
+  // Interval lebih jarang dari lokal (10 dtk lokal, 30 dtk cloud) agar tidak membebani jaringan.
+  AUTO_SAVE_SUPABASE_INTERVAL_MS: 30000, // 30 detik
 
   // ====== DEFAULTS ======
-  DEFAULT_ROWS: 10,
+  // Jumlah baris awal saat sheet kosong. Viewport tabel menampilkan ~10 baris;
+  // baris 11–25 (dan tambahan) digulir di dalam .tbl-wrap.
+  DEFAULT_ROWS: 25,
 
   // ====== SHIFT (menit) ======
   // S1=510, S2=480, S3=450
@@ -55,10 +63,15 @@ const CONFIG = Object.freeze({
     { from: 0,    to: 420,  index: 2 }, // S3 (setelah tengah malam)
   ],
 
-  // ====== KODE LOG SHEET ======
-  PLANNED_CODES:   new Set([5, 6, 7, 8]), // Planned Down Time (putih/amber)
-  UNPLANNED_CODES: new Set([1, 3, 4, 9]), // Unplanned Down Time (merah)
-  // Lainnya → produksi (hijau)
+  // ====== KODE LOG SHEET (hanya 1–9 yang valid) ======
+  // 2           → Produksi / produktif (hijau)
+  // 5, 6, 7, 8  → Planned Down Time (amber)
+  // 1, 3, 4, 9  → Unplanned Down Time (merah)
+  // selain 1–9 → tidak valid, tidak dihitung
+  PLANNED_CODES:   new Set([5, 6, 7, 8]),
+  UNPLANNED_CODES: new Set([1, 3, 4, 9]),
+  PROD_CODES:      new Set([2]),
+  VALID_CODES:     new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]),
 
   // ====== TARGET OEE ======
   TARGET: {
@@ -66,6 +79,7 @@ const CONFIG = Object.freeze({
     PERFORMANCE:  98,     // %
     QUALITY:      99.50,  // %
     OEE:          88,     // %
+    OEE365:       55,     // % ← DIUBAH: target khusus OEE 365 (badge toolbar & health bar)
   },
 
   // ====== URUTAN KOLOM NAVIGASI (tab order) ======
@@ -73,18 +87,29 @@ const CONFIG = Object.freeze({
   // (disembunyikan otomatis di Mode Normal, tidak ikut tab order berkat
   // filter offsetParent di Navigation.navCells).
   NAV_FIELDS: [
-    'kode', 'mulai', 'panggil', 'teknik', 'selesai', 'durasi',
-    'kegiatan', 'masalah', 'disposisi', 'wo', 'batch',
+    'kode', 'op', 'mulai', 'panggil', 'teknik', 'selesai', 'durasi',
+    'kegiatan', 'masalah', 'ms', 'disposisi', 'description', 'wo', 'batch',
     'good', 'defect'
   ],
 
   // ====== LABEL KOLOM (untuk indikator posisi) ======
   FIELD_LABELS: {
-    kode: 'KODE', mulai: 'JAM MULAI', panggil: 'PANGGIL TEKNIK',
+    kode: 'KODE', op: 'MAN POWER', ms: 'FREKUENSI MINOR STOP (x)', mulai: 'JAM MULAI', panggil: 'PANGGIL TEKNIK',
     teknik: 'TEKNIK DATANG', selesai: 'JAM SELESAI', durasi: 'DURASI (MENIT)',
     kegiatan: 'KEGIATAN',
-    masalah: 'MASALAH', disposisi: 'DISPOSISI', wo: 'NOMOR WO',
+    masalah: 'MASALAH', disposisi: 'DISPOSISI', description: 'DESCRIPTION',
+    wo: 'NOMOR WO',
     batch: 'PRODUK & BATCH', good: 'GOOD', defect: 'DEFECT'
+  },
+
+  // ====== RATE KEMAS L1 / L2 (bag per menit) by man power ======
+  // L1: OP < 3 → 8; OP ≥ 3 → 12 (batas mesin)
+  // L2: by ukuran ml + OP band
+  KEMAS_L1_RATE: { low: 8, high: 12, opThreshold: 3 },
+  KEMAS_L2_RATE: {
+    100: { le3: 14, gt3: 18 },
+    250: { le3: 10, gt3: 14 },
+    500: { le3: 8,  gt3: 12 },
   },
 
   // ====== SUGESTI KEGIATAN (ghost-text) ======
@@ -97,10 +122,12 @@ const CONFIG = Object.freeze({
     mixing: [
       'Loading Lot A', 'Loading Lot B', 'Loading Lot C', 'Loading Lot D',
       'Mixing', 'Persiapan', 'Ganti Lot', 'Ganti Baju',
+      'Merapihkan Media', 'Papar Media', 'Tutup Media', 'Ganti SP Media',
     ],
     filling: [
       'Filling Lot A', 'Filling Lot B', 'Filling Lot C', 'Filling Lot D',
       'Persiapan',
+      'Merapihkan Media', 'Papar Media', 'Tutup Media', 'Ganti SP Media',
     ],
     steril: [
       'Sterilisasi', 'Persiapan', 'Loading Chamber', 'Unloading Chamber',
@@ -113,7 +140,38 @@ const CONFIG = Object.freeze({
     ],
     common: [
       'Cleaning', 'Istirahat', 'Menunggu Instruksi',
+      'Merapihkan Media', 'Papar Media', 'Tutup Media', 'Ganti SP Media',
     ],
+  },
+
+  // ====== STANDARISASI KOSA KATA (Issue #9) ======
+  // Alias (tulisan bervariasi) → bentuk baku.
+  // Saat user mengetik alias lalu blur / pilih, teks diganti ke bentuk baku.
+  // Key & value dibandingkan case-insensitive; value yang disimpan = penulisan baku.
+  // Tambah baris di sini untuk kegiatan lain yang sering ditulis berbeda-beda.
+  KEGIATAN_ALIASES: {
+    // Merapihkan Media
+    'merapihkan media': 'Merapihkan Media',
+    'rapihkan media': 'Merapihkan Media',
+    'beberes media': 'Merapihkan Media',
+    'beres media': 'Merapihkan Media',
+    'bungkus media': 'Merapihkan Media',
+    'rapihin media': 'Merapihkan Media',
+    'merapikan media': 'Merapihkan Media',
+    'rapi media': 'Merapihkan Media',
+    // Papar Media
+    'papar media': 'Papar Media',
+    'memapar media': 'Papar Media',
+    'buka media': 'Papar Media',
+    // Tutup Media
+    'tutup media': 'Tutup Media',
+    'menutup media': 'Tutup Media',
+    'nutup media': 'Tutup Media',
+    // Ganti SP Media
+    'ganti sp media': 'Ganti SP Media',
+    'ganti sp': 'Ganti SP Media',
+    'ganti media': 'Ganti SP Media',
+    'ganti sampel media': 'Ganti SP Media',
   },
 
   // ====== KODE PRODUK REFERENSI (autocomplete nama produk) ======
@@ -128,6 +186,37 @@ mixing: ['VTTS1 Mixing L', 'VTTS1 Loading L', 'VKAM1 Mixing L', 'VKAM1 Loading L
     steril:  ['VTTS1','VKAM1','VLON1','VMON1','VTRA1','VCLN2','VMNT1','VTRM1','VPEL1','ITTC2','VTTC1'],
     visual:  ['VTTSA','VKAMA','VLONA','VMONA','VTRAB','VCLNB','VMNTA','VTRME','VPELA','ITTCB','VTTCA'],
     kemas:   ['VTTSA','VKAMA','VLONA','VMONA','VTRAB','VCLNB','VMNTA','VTRME','VPELA','ITTCB','VTTCA'],
+  },
+
+  // ====== NAMA MESIN (auto-isi sesuai Tahapan + Line) ======
+  // Dipakai oleh UI.fillMachineName() untuk mengisi field "Nama Mesin"
+  // (#fMesinNama di Data & Penyimpanan, dicerminkan juga di header Log Sheet)
+  // secara otomatis begitu Line / Tahapan Proses diganti.
+  // Key = '<tahapan>|<line>' (huruf kecil). Silakan tambah/ubah daftar di
+  // sini sesuka hati — tidak perlu sentuh js/ui.js.
+    MACHINE_NAMES: {
+    'mixing|1':  'Mixing Tank OLSA PCBS 2500',
+    'filling|1': 'Automatic Form Fill Seal Machine Shinva RSYG2-1-23005',
+    'steril|1':  'Autoclave Getinge 2',
+    'visual|1':  'Mesin Bonfiglioli',
+    'kemas|1':   'Overwrapping Machine Sysflex Line 1',
+
+    'mixing|2':  'Mixing Tank Tofflon APLS 3500',
+    'filling|2': 'Automatic Form Fill Seal Machine Plumat FFS 991',
+    'steril|2':  'Autoclave Shinva',
+    'visual|2':  'NIKKA DENSOK',
+    'kemas|2':   'Overwrapping Machine Sysflex Line 2',
+
+    'mixing|4':  'Mixing TANK LB4000/1',
+    'filling|4': 'Automatic Form Fill Seal Machine Plumat FFS 892',
+    'steril|4':  'Autoclave Getinge 4',
+    'visual|4':  'NIKKA DENSOK',
+    'kemas|4':   'Overwrapping Machine Plumat OW 834',
+  },
+
+  // Pilihan ganda untuk kombinasi tertentu (urutan pertama = default)
+  MACHINE_NAMES_ALT: {
+    'kemas|1': ['Overwrapping Machine Sysflex Line 1', 'Mesin Colimatic'],
   },
 
   // ====== MODE INPUT (Normal / Cepat 1 / Cepat 2) ======

@@ -1,0 +1,31 @@
+/* Auto-paired 1:1 with js/settings.js — edit styles for that module here */
+
+.field:has(#masterProdName3) { display: none !important; }
+
+.settings-grid { display: grid; gap: 16px; max-width: 620px; }
+
+.settings-card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-card); padding: 18px 20px; }
+
+.settings-card--muted { background: var(--slate-50); }
+
+.settings-card-h { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+
+.settings-card-h .icon { color: var(--brand-600); margin-top: 2px; }
+
+.settings-card-h h3 { font: 600 14.5px var(--font-sans); color: var(--text-primary); }
+
+.settings-card-h p { font: 12.5px var(--font-sans); color: var(--text-muted); margin-top: 2px; }
+
+.settings-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--border-default); }
+
+.settings-row:first-of-type { border-top: 0; padding-top: 0; }
+
+.settings-row strong { font: 600 13px var(--font-sans); color: var(--text-primary); }
+
+.settings-row p { font: 12px var(--font-sans); color: var(--text-muted); margin-top: 2px; }
+
+.settings-soon-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+.settings-soon-list li { font: 13px var(--font-sans); color: var(--text-secondary); padding-left: 16px; position: relative; }
+
+.settings-soon-list li::before { content: ''; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--slate-300); }

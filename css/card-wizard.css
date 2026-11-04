@@ -1,0 +1,21 @@
+/**
+ * card-wizard.css — Wizard setup shift/line/tahapan
+ * HTML: #wizardOverlay / #wizardModal.wizard-modal
+ * JS:   js/wizard.js
+ */
+#wizardOverlay.qm-overlay {
+  z-index: 1270;
+}
+
+#wizardModal.wizard-modal,
+#wizardModal.card-wizard {
+  max-width: 480px;
+  width: 94vw;
+  border-radius: var(--card-radius, 14px);
+}
+
+#wizardModal .wiz-progress { }
+#wizardModal .wiz-bar { }
+#wizardModal .wiz-shift-grid,
+#wizardModal .wiz-stage-grid,
+#wizardModal .wiz-op-grid { }

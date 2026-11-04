@@ -11,8 +11,8 @@ const Shell = (() => {
   const RAIL_KEY = 'fima_rail_collapsed';
 
   const BREADCRUMB_LABEL = {
-    filter: 'Data', 'master-produk': 'Master Produk', logsheet: 'Log Sheet',
-    operator: 'Inisial Operator', 'perf-produk': 'Rincian Performa', oee: 'Perhitungan OEE',
+    filter: 'Shift', 'master-produk': 'Produk', logsheet: 'Sheet',
+    operator: 'Inisial', 'perf-produk': 'Performa', oee: 'OEE',
     dashboard: 'Dashboard', laporan: 'Laporan', admin: 'Admin', pengaturan: 'Pengaturan',
   };
 

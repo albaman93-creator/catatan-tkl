@@ -1,29 +1,5 @@
-/* =====================================================
-   TKL-OEE - INDUSTRIAL TOOLBAR
-   Biru tua gelap + garis vertikal + zig-zag hijau
-   ===================================================== */
+/* Auto-paired 1:1 with js/industrial-toolbar.js — edit styles for that module here */
 
-/* Toolbar industrial */
-.industrial-toolbar {
-  position: relative;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.05) 0px,
-      rgba(255, 255, 255, 0.05) 1px,
-      transparent 1px,
-      transparent 14px
-    ),
-    linear-gradient(180deg, #0c1b30 0%, #0a1628 100%) !important;
-  color: #ffffff !important;
-  padding: 14px 16px 16px !important;
-  border-radius: 0 !important;
-  border: none !important;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35) !important;
-  overflow: hidden;
-}
-
-/* Wrapper branding */
 .it-inner {
   display: flex;
   align-items: center;
@@ -31,27 +7,6 @@
   padding: 2px 0 10px;
 }
 
-/* Ikon kotak hijau neon TKL */
-.it-logo {
-  flex: 0 0 auto;
-  width: 46px;
-  height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 3px solid #4ade80;
-  border-radius: 8px;
-  background: rgba(74, 222, 128, 0.10);
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 16px;
-  letter-spacing: 0.06em;
-  box-shadow:
-    0 0 10px rgba(74, 222, 128, 0.55),
-    inset 0 0 8px rgba(74, 222, 128, 0.25);
-}
-
-/* Teks kecil hijau di atas */
 .it-top {
   color: #86efac;
   font-size: 11px;
@@ -61,16 +16,6 @@
   margin-bottom: 2px;
 }
 
-/* Judul utama putih tebal */
-.it-title {
-  color: #ffffff;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  line-height: 1.15;
-}
-
-/* Subteks abu-abu */
 .it-sub {
   color: #94a3b8;
   font-size: 11px;
@@ -78,7 +23,6 @@
   margin-top: 3px;
 }
 
-/* Dekorasi zig-zag putus-putus hijau di bawah toolbar */
 .it-zigzag {
   height: 7px;
   margin-top: 4px;
@@ -93,7 +37,6 @@
   opacity: 0.9;
 }
 
-/* Tombol di dalam toolbar industrial tetap terbaca */
 .industrial-toolbar .btn {
   background: rgba(255, 255, 255, 0.08) !important;
   color: #e2e8f0 !important;
@@ -103,10 +46,6 @@
 .industrial-toolbar .btn:hover {
   background: rgba(255, 255, 255, 0.16) !important;
 }
-
-/* =====================================================
-   BUANG BAGIAN BAWAH (hero dashboard jam/LIVE/tanggal)
-   ===================================================== */
 
 .dashboard-hero,
 .hero,
@@ -135,7 +74,6 @@
   overflow: hidden !important;
 }
 
-/* Mobile: judul lebih kecil supaya muat */
 @media (max-width: 768px) {
   .it-inner {
     gap: 10px;

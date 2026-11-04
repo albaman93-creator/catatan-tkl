@@ -4,6 +4,10 @@
  * Session otomatis di-cache oleh Supabase SDK di localStorage,
  * sehingga user tetap login walau browser ditutup/offline
  * (selama tidak logout manual atau token benar-benar kedaluwarsa).
+ *
+ * Mode Offline: tombol di halaman login → masuk tanpa kredensial.
+ * Data hanya lokal; tidak boleh / tidak akan di-upload ke Supabase
+ * sampai user login online secara normal.
  */
 const Auth = (() => {
   'use strict';
@@ -13,7 +17,7 @@ const Auth = (() => {
   const getClient = () => (typeof SupabaseClient !== 'undefined' ? SupabaseClient.getClient() : null);
 
   const showError = (msg) => {
-    State.el.loginError.textContent = msg || 'Email atau password salah. Silakan coba lagi.';
+    State.el.loginError.textContent = msg || 'Inisial atau password salah. Silakan coba lagi.';
     State.el.loginError.classList.add('show');
   };
 
@@ -24,11 +28,28 @@ const Auth = (() => {
   const setLoading = (loading) => {
     if (!State.el.loginBtn) return;
     State.el.loginBtn.disabled = loading;
-    State.el.loginBtn.textContent = loading ? 'Memeriksa…' : 'Masuk Aplikasi';
+    const lbl = State.el.loginBtn.querySelector('.btn-label') || State.el.loginBtn;
+    lbl.textContent = loading ? 'Memeriksa…' : 'Masuk Aplikasi';
   };
 
   /**
-   * Submit form login (email + password).
+   * Apakah sedang Mode Offline (masuk tanpa login Supabase).
+   */
+  const isOfflineMode = () => !!(currentUser && (currentUser.offlineMode || currentUser.pinMode));
+
+  /**
+   * Role untuk gate UI. Mode offline = operator.
+   */
+  const getCurrentRole = () => {
+    if (!currentUser) return null;
+    if (currentUser.offlineMode || currentUser.pinMode) return 'operator';
+    // Metadata role dari Supabase user_metadata jika ada
+    const meta = currentUser.user_metadata || currentUser.app_metadata || {};
+    return meta.role || 'operator';
+  };
+
+  /**
+   * Submit form login (Inisial + password).
    */
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -41,16 +62,22 @@ const Auth = (() => {
     }
 
     if (!navigator.onLine) {
-      showError('Tidak ada koneksi internet. Login pertama kali wajib online.');
+      showError('Tidak ada koneksi internet. Login pertama kali wajib online. Gunakan tombol Mode Offline untuk akses lokal.');
       return;
     }
 
-    const email = State.el.loginEmail.value.trim();
+    const rawInput = State.el.loginEmail.value.trim();
     const password = State.el.loginPassword.value;
 
-    if (!email || !password) {
-      showError('Email dan password wajib diisi.');
+    if (!rawInput || !password) {
+      showError('Inisial dan password wajib diisi.');
       return;
+    }
+
+    // MODIFIKASI: Jika tidak mengandung '@', otomatis tambahkan '@pabrik.com'
+    let email = rawInput;
+    if (!email.includes('@')) {
+      email = email.toLowerCase() + '@pabrik.com';
     }
 
     setLoading(true);
@@ -60,7 +87,7 @@ const Auth = (() => {
     if (error) {
       showError(
         /invalid login credentials/i.test(error.message)
-          ? 'Email atau password salah.'
+          ? 'Inisial atau password salah.'
           : error.message
       );
       State.el.loginPassword.value = '';
@@ -73,26 +100,48 @@ const Auth = (() => {
   };
 
   /**
+   * Masuk Mode Offline — tanpa email/password, tanpa Supabase.
+   * Bisa dipakai kapan saja (online maupun offline).
+   * Data hanya tersimpan di localStorage; tidak di-upload ke Supabase.
+   */
+  const handleOfflineMode = () => {
+    hideError();
+    currentUser = {
+      offlineMode: true,
+      pinMode: true,
+      email: 'offline@local',
+      id: 'offline-local',
+    };
+    if (typeof UI !== 'undefined' && UI.toast) {
+      UI.toast('Mode Offline aktif — data hanya lokal, tidak ke Supabase ⚠', true);
+    }
+    onLoginSuccess();
+  };
+
+  /**
    * Logout dari Supabase & kembali ke layar login.
    */
   const handleLogout = async () => {
     const client = getClient();
-    if (client) {
+    if (client && !isOfflineMode()) {
       try { await client.auth.signOut(); } catch (e) { /* abaikan jika offline */ }
     }
     currentUser = null;
+    if (typeof ProfileAvatar !== 'undefined') ProfileAvatar.closeMenu();
     State.el.appContainer.classList.remove('show');
     State.el.loginOverlay.classList.remove('hide');
 
     // ✅ Tutup sidebar saat logout
     document.body.classList.remove('sidebar-open');
     if (State.el.toolbarToggleIcon) {
-      State.el.toolbarToggleIcon.textContent = '☰';
+      /* ikon menu diatur CSS via body.sidebar-open */
     }
 
     State.el.loginPassword.value = '';
     if (State.el.loginEmail) State.el.loginEmail.focus();
-    UI.toast('Sesi diakhiri, Anda telah keluar 🔒');
+    if (typeof UI !== 'undefined' && UI.toast) {
+      UI.toast('Sesi diakhiri, Anda telah keluar 🔒');
+    }
   };
 
   const onLoginSuccess = () => {
@@ -108,6 +157,14 @@ const Auth = (() => {
     State.el.loginOverlay.classList.add('hide');
     State.el.appContainer.classList.add('show');
     App.startMain();
+
+    // Perbarui ikon profil (foto / inisial email)
+    if (typeof ProfileAvatar !== 'undefined') ProfileAvatar.refresh();
+
+    // Update indikator mode offline di UI (jika ada)
+    if (typeof Shell !== 'undefined' && Shell.applyRoleVisibility) {
+      try { Shell.applyRoleVisibility(); } catch (e) { /* optional */ }
+    }
   };
 
   /**
@@ -146,6 +203,8 @@ const Auth = (() => {
     // Jika sesi berakhir/di-logout dari tab/perangkat lain → paksa kembali ke login
     client.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
+        // Jangan ganggu Mode Offline
+        if (isOfflineMode()) return;
         currentUser = null;
         State.el.appContainer.classList.remove('show');
         State.el.loginOverlay.classList.remove('hide');
@@ -153,7 +212,7 @@ const Auth = (() => {
         // ✅ Tutup sidebar juga ketika session berakhir
         document.body.classList.remove('sidebar-open');
         if (State.el.toolbarToggleIcon) {
-          State.el.toolbarToggleIcon.textContent = '☰';
+          /* ikon menu diatur CSS via body.sidebar-open */
         }
       }
     });
@@ -171,5 +230,13 @@ const Auth = (() => {
 
   const getCurrentUser = () => currentUser;
 
-  return { handleLogin, handleLogout, initSession, getCurrentUser };
+  return {
+    handleLogin,
+    handleLogout,
+    handleOfflineMode,
+    initSession,
+    getCurrentUser,
+    getCurrentRole,
+    isOfflineMode,
+  };
 })();

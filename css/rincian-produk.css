@@ -1,0 +1,144 @@
+/* Rincian per Produk — Issue #14 */
+.rp-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 10px;
+  flex-wrap: wrap;
+}
+.rp-tab {
+  background: var(--bg-surface, #1e293b);
+  border: 1px solid var(--border-default, #334155);
+  color: var(--text-secondary, #94a3b8);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font: 600 12.5px var(--font-sans, 'IBM Plex Sans', sans-serif);
+  cursor: pointer;
+}
+.rp-tab.is-on {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: #3b82f6;
+  color: #93c5fd;
+}
+.rp-table-wrap {
+  overflow: auto;
+  max-height: min(62vh, 640px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgba(15, 25, 45, 0.55);
+}
+.rp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 400 12px var(--font-sans, 'IBM Plex Sans', sans-serif);
+  min-width: 960px;
+  background: transparent;
+}
+.rp-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(16, 36, 60, 0.92);
+  color: #dbe7f3;
+  font-weight: 700;
+  font-size: 11px;
+  text-align: left;
+  padding: 9px 8px;
+  border-bottom: 1px solid rgba(36, 70, 107, 0.8);
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+}
+.rp-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  vertical-align: top;
+  background: transparent !important;
+}
+.rp-table tbody tr td {
+  background: transparent !important;
+}
+.rp-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+.rp-table td.ctr { text-align: center; white-space: nowrap; }
+.rp-table td.mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+.rp-table tbody tr:hover td { background: rgba(59, 130, 246, 0.08) !important; }
+#rpDownload { margin-left: 4px; }
+
+.rp-table tbody tr.rp-row-link { cursor: pointer; }
+.rp-table tbody tr.rp-row-link:hover td {
+  background: rgba(59, 130, 246, 0.12) !important;
+}
+.rp-table tbody tr.rp-row-link:hover td:first-child { color: #93c5fd; }
+
+/* Pembatas antar shift/tanggal: 1 baris kosong (bukan bilah merah) */
+.rp-table tbody tr.rp-shift-sep td {
+  background: transparent !important;
+  height: 14px;
+  padding: 0 !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(248, 113, 113, 0.35) !important;
+  line-height: 0;
+  font-size: 0;
+}
+
+/* Light theme tetap legible */
+:root[data-wd-theme="light"] .rp-table-wrap,
+:root[data-theme="light"] .rp-table-wrap {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+:root[data-wd-theme="light"] .rp-table thead th,
+:root[data-theme="light"] .rp-table thead th {
+  background: #f1f5f9;
+  color: #334155;
+  border-bottom-color: #cbd5e1;
+}
+:root[data-wd-theme="light"] .rp-table td,
+:root[data-theme="light"] .rp-table td {
+  color: #0f172a;
+  background: #fff !important;
+  border-bottom-color: #e2e8f0;
+}
+:root[data-wd-theme="light"] .rp-table tbody tr:nth-child(even) td,
+:root[data-theme="light"] .rp-table tbody tr:nth-child(even) td {
+  background: #f8fafc !important;
+}
+:root[data-wd-theme="light"] .rp-table tbody tr.rp-shift-sep td,
+:root[data-theme="light"] .rp-table tbody tr.rp-shift-sep td {
+  background: transparent !important;
+  border-bottom: 1px solid #f87171 !important;
+}
+
+/* Issue #25 — warna OEE di Rekap Per Batch (override !important default & theme) */
+body .rp-table thead th.rp-th-ope,
+body .weekly-layout .rp-table thead th.rp-th-ope,
+body .rp-table tbody td.rp-ope-ok,
+body .weekly-layout .rp-table tbody td.rp-ope-ok {
+  background: #00FFFF !important;
+  color: #000 !important;
+}
+body .rp-table tbody td.rp-ope-fail,
+body .weekly-layout .rp-table tbody td.rp-ope-fail {
+  background: #E9967A !important;
+  color: #000 !important;
+}
+body .rp-table thead th.rp-th-365,
+body .weekly-layout .rp-table thead th.rp-th-365,
+body .rp-table tbody td.rp-365-ok,
+body .weekly-layout .rp-table tbody td.rp-365-ok {
+  background: #7FFF00 !important;
+  color: #000 !important;
+}
+body .rp-table tbody td.rp-365-fail,
+body .weekly-layout .rp-table tbody td.rp-365-fail {
+  background: #FF7F50 !important;
+  color: #000 !important;
+}
+/* hover tidak menghapus warna status */
+body .rp-table tbody tr:hover td.rp-ope-ok,
+body .rp-table tbody tr:hover td.rp-ope-fail,
+body .rp-table tbody tr:hover td.rp-365-ok,
+body .rp-table tbody tr:hover td.rp-365-fail {
+  filter: brightness(0.95);
+}

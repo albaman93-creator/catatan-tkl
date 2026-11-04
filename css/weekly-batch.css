@@ -1,0 +1,126 @@
+/* ==========================================================
+   WEEKLY-BATCH.CSS — panel "Hitungan OEE per Batch" (issue #12)
+   Dipakai oleh js/weekly-batch.js di halaman detail mesin.
+   Warna memakai token global (variables.css) → ikut tema terang/gelap.
+   ========================================================== */
+.wb-panel {
+  background: var(--bg-surface, #161618);
+  border: 1px solid var(--border-default, rgba(255,255,255,.08));
+  border-radius: 12px;
+  padding: 14px 16px 16px;
+  margin: 14px 0;
+  min-width: 0;
+}
+.wb-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 10px; }
+.wb-title {
+  font: 700 13px var(--font-sans, 'IBM Plex Sans', sans-serif);
+  letter-spacing: .6px;
+  color: var(--text-primary, #f5f5f7);
+}
+.wb-sub {
+  font: 400 12px var(--font-sans, 'IBM Plex Sans', sans-serif);
+  color: var(--text-secondary, #aeaeb2);
+}
+.wb-empty {
+  padding: 14px 4px;
+  font: 400 13px var(--font-sans, 'IBM Plex Sans', sans-serif);
+  color: var(--text-muted, #8e8e93);
+}
+.wb-empty[hidden], .wb-table-wrap[hidden] { display: none; }
+
+/* ---------- tabel ---------- */
+.wb-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.wb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 400 13px var(--font-sans, 'IBM Plex Sans', sans-serif);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary, #f5f5f7);
+}
+.wb-table th {
+  position: sticky; top: 0;
+  text-align: right;
+  white-space: nowrap;
+  padding: 8px 10px;
+  font-weight: 600;
+  font-size: 11.5px;
+  color: var(--text-muted, #8e8e93);
+  border-bottom: 1px solid var(--border-default, rgba(255,255,255,.08));
+}
+.wb-table th:first-child, .wb-table td:first-child { text-align: left; }
+.wb-table td {
+  text-align: right;
+  white-space: nowrap;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border-default, rgba(255,255,255,.06));
+}
+.wb-table tbody tr:nth-child(even) { background: var(--bg-surface-hover, rgba(255,255,255,.025)); }
+.wb-row { cursor: pointer; }
+.wb-row:hover, .wb-row:focus-visible { background: var(--bg-surface-hover, #1c1c1f); outline: none; }
+.wb-row.is-sel { box-shadow: inset 3px 0 0 #159A8A; background: var(--bg-surface-hover, #1c1c1f); }
+.wb-name { font-weight: 600; }
+.wb-name small {
+  display: block;
+  margin-top: 1px;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--text-muted, #8e8e93);
+}
+.wb-total td { font-weight: 700; border-top: 2px solid var(--border-default, rgba(255,255,255,.14)); border-bottom: 0; }
+.wb-pct { font-weight: 600; }
+.wb-oee { font-weight: 700; }
+.wb-ok  { color: #16a34a; }
+.wb-low { color: #d97706; }
+
+/* ---------- rumus & angka ---------- */
+.wb-detail { margin-top: 14px; }
+.wb-detail-head {
+  font: 500 12px var(--font-sans, 'IBM Plex Sans', sans-serif);
+  color: var(--text-secondary, #aeaeb2);
+  margin-bottom: 8px;
+}
+.wb-detail-head b { color: var(--text-primary, #f5f5f7); }
+.wb-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.wb-step {
+  display: flex; gap: 10px;
+  background: var(--bg-surface-hover, rgba(255,255,255,.03));
+  border: 1px solid var(--border-default, rgba(255,255,255,.08));
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+.wb-step-key {
+  flex: none;
+  align-self: flex-start;
+  min-width: 30px;
+  text-align: center;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: #159A8A;
+  color: #fff;
+  font: 700 12px var(--font-sans, 'IBM Plex Sans', sans-serif);
+}
+.wb-step-body { min-width: 0; }
+.wb-step-name { font: 600 13px var(--font-sans, 'IBM Plex Sans', sans-serif); color: var(--text-primary, #f5f5f7); }
+.wb-step-formula { font: 400 11.5px var(--font-sans, 'IBM Plex Sans', sans-serif); color: var(--text-muted, #8e8e93); margin: 2px 0 6px; }
+.wb-step-calc {
+  font: 400 13px var(--font-sans, 'IBM Plex Sans', sans-serif);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary, #aeaeb2);
+  overflow-wrap: anywhere;
+}
+.wb-step-calc b { color: var(--text-primary, #f5f5f7); font-size: 15px; }
+.wb-step-sub { margin-top: 6px; font: 400 11.5px/1.45 var(--font-sans, 'IBM Plex Sans', sans-serif); color: var(--text-muted, #8e8e93); }
+.wb-note { margin-top: 10px; font: 400 11.5px/1.5 var(--font-sans, 'IBM Plex Sans', sans-serif); color: var(--text-muted, #8e8e93); }
+
+@media (max-width: 1100px) { .wb-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .wb-panel { padding: 12px; }
+  .wb-steps { grid-template-columns: 1fr; }
+}
+@media print {
+  .wb-panel, .wb-step { background: #fff !important; border-color: #cbd5e1 !important; }
+  .wb-table, .wb-table td, .wb-name, .wb-step-name, .wb-title, .wb-detail-head b, .wb-step-calc b { color: #0f172a !important; }
+  .wb-table th, .wb-name small, .wb-step-formula, .wb-step-calc, .wb-step-sub, .wb-note, .wb-sub, .wb-detail-head { color: #475569 !important; }
+  .wb-row.is-sel { box-shadow: none; }
+}

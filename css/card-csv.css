@@ -1,0 +1,15 @@
+/**
+ * card-csv.css — Import CSV / Excel
+ * JS: js/csv-import.js
+ */
+.qm-overlay:has(.csv-import-modal),
+#csvImportOverlay.qm-overlay {
+  z-index: 1290;
+}
+
+.csv-import-modal,
+.card-csv {
+  max-width: 640px;
+  width: 94vw;
+  border-radius: var(--card-radius, 14px);
+}
