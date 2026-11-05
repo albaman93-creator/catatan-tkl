@@ -713,7 +713,12 @@ const App = (() => {
       if (el) el.addEventListener('change', updateCmWarn);
     });
     if (State.el.btnCopyMove) {
-      State.el.btnCopyMove.addEventListener('click', cmOpen);
+      if (CONFIG.COPY_MOVE_ENABLED === false) {
+        State.el.btnCopyMove.hidden = true;
+        State.el.btnCopyMove.style.display = 'none';
+      } else {
+        State.el.btnCopyMove.addEventListener('click', cmOpen);
+      }
     }
     document.getElementById('copyMoveClose')?.addEventListener('click', cmClose);
     document.getElementById('copyMoveCancel')?.addEventListener('click', cmClose);
@@ -728,7 +733,9 @@ const App = (() => {
       }
       const mode = document.querySelector('input[name="cmMode"]:checked')?.value || 'copy';
       const modeLabel = mode === 'move' ? 'pindahkan' : 'salin';
-      if (!confirm(`Yakin ${modeLabel} data ke ${target.rawDate} · S${target.shift} · L${target.line} · ${target.stage.toUpperCase()}?`)) return;
+      const willOverwrite = await Storage.targetExistsAnywhere(target);
+      const warnTxt = willOverwrite ? '\n\n⚠ Slot tujuan SUDAH berisi data dan akan DITIMPA.' : '';
+      if (!confirm(`Yakin ${modeLabel} data ke ${target.rawDate} · S${target.shift} · L${target.line} · ${target.stage.toUpperCase()}?${warnTxt}`)) return;
 
       const btn = document.getElementById('copyMoveConfirm');
       if (btn) { btn.disabled = true; btn.textContent = 'Memproses…'; }

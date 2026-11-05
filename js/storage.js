@@ -33,6 +33,26 @@ const Storage = (() => {
     return `${date}|S${State.evalShift + 1}|L${State.el.fLine.value}|${State.el.fStage.value}`;
   };
 
+  /** Key dari objek filter { rawDate, shift, line, stage } (tidak membaca DOM). */
+  const keyOf = (f) => `${f.rawDate}|S${f.shift}|L${f.line}|${f.stage}`;
+
+  /** Kebalikan keyOf: "2026-11-02|S1|L1|filling" → filter. */
+  const filterFromKey = (key) => {
+    const [rawDate, s, l, stage] = String(key).split('|');
+    return { rawDate, shift: Number(String(s).replace('S', '')), line: String(l).replace('L', ''), stage };
+  };
+
+  // ====== PENGAMAN DATA DOBEL ======
+  // formKey  = key milik data yang SEDANG tampil di form (diisi hanya setelah applyRecord selesai).
+  // loading  = true selama data filter baru belum selesai dimuat → semua simpan DITAHAN.
+  // loadSeq  = nomor pemuatan; respons lama yang datang telat dibuang.
+  // Sebelumnya, simpan memakai curKey() (membaca filter BARU) padahal form masih berisi data
+  // filter LAMA → data tanggal/shift sebelumnya tertulis ke tanggal/shift baru.
+  let formKey = null;
+  let loading = false;
+  let loadSeq = 0;
+  let loadPromise = Promise.resolve();
+
   // Baca teks elemen hasil hitung; aman jika elemen tidak ada (tidak melempar error)
   const txtOf = (id) => {
     const el = State.el[id] || document.getElementById(id);
@@ -107,8 +127,30 @@ const Storage = (() => {
     // Periode bulan produksi (1-12) — penanda manual cutoff bulan untuk filter dashboard.
     // Diisi user lewat dropdown "Periode bulan" di header sheet.
     prodMonth: (document.getElementById('sheetProdMonth') || {}).value || '',
+    // Penanda pemilik record: dipakai saat load untuk menolak salinan nyasar.
+    formKey: formKey || curKey(),
     savedAt: new Date().toISOString(),
   });
+
+  /** Record boleh dipakai untuk key ini? (record lama tanpa formKey tetap diterima) */
+  const isRecordForKey = (rec, key) => !rec || !rec.formKey || rec.formKey === key;
+  const pickValid = (rec, key) => {
+    if (!rec) return null;
+    if (isRecordForKey(rec, key)) return rec;
+    console.warn('[Storage] Record diabaikan: milik', rec.formKey, 'bukan', key);
+    return null;
+  };
+
+  /** Aman menyimpan? Tidak sedang memuat & isi form memang milik filter aktif. */
+  const canSave = () => {
+    if (loading || formKey === null) return false;
+    if (formKey !== curKey()) {
+      // Filter berubah tanpa loadRecord (mis. import) → simpan form lama ke key-nya, lalu muat ulang.
+      loadRecord();
+      return false;
+    }
+    return true;
+  };
 
 
   /** True jika minimal satu kode produk terdaftar di master sheet. */
@@ -303,7 +345,7 @@ const Storage = (() => {
     );
 
     return {
-      key:     curKey(),
+      key:     keyOf(filter),
       date:    filter.rawDate,
       shift:   filter.shift,
       line:    String(filter.line),
@@ -345,51 +387,90 @@ const Storage = (() => {
     return data ? data.payload : null;
   };
 
-  // ====== LOAD (GET): tarik data — otomatis dipanggil saat app start & saat filter berubah ======
-  const loadRecord = async () => {
-    const filter = activeFilter();
-
-    // Mode Offline: selalu baca lokal saja, jangan coba Supabase
-    const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
-    if (offlineMode) {
+  // ====== SIMPAN FORM LAMA KE KEY-NYA SENDIRI sebelum filter berpindah ======
+  // Dipanggil di awal loadRecord (filter DOM sudah berubah, tapi isi form belum).
+  // Lokal + dorong ke cloud, supaya edit < 30 dtk tidak hilang / tertimpa data cloud lama.
+  const flushPrevious = () => {
+    if (!formKey || !State.el.tbody) return;
+    try {
+      const rec = collect(); // rec.formKey = formKey (key lama), bukan curKey()
+      if (!hasRegisteredProduct(rec)) return;
       const db = dbGet();
-      applyRecord(db[curKey()] || null);
-      UI.setSyncStatus('err', 'Mode Offline · data lokal saja');
-      return;
+      db[formKey] = rec;
+      dbSet(db);
+      const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
+      if (offlineMode || typeof Sync === 'undefined') return;
+      const row = buildSupabaseRow(rec, filterFromKey(formKey));
+      if (isOnline()) Sync.pushRow(row).catch(() => Sync.queuePush(row));
+      else Sync.queuePush(row);
+    } catch (e) {
+      console.warn('flushPrevious gagal:', e);
     }
+  };
 
-    if (isOnline()) {
-      UI.setSyncStatus('sync', 'memuat dari Supabase…');
-      try {
-        const data = await supabaseSelect(filter);
+  // ====== LOAD (GET): tarik data — otomatis dipanggil saat app start & saat filter berubah ======
+  const loadRecord = () => (loadPromise = _loadRecord());
+
+  const _loadRecord = async () => {
+    flushPrevious();
+    const filter = activeFilter();
+    const key = keyOf(filter); // dibekukan SEKARANG; jangan baca ulang setelah await
+    const seq = ++loadSeq;
+    loading = true;
+
+    const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
+    const localGet = () => pickValid(dbGet()[key] || null, key);
+    let rec = null;
+    let st = ['ok', ''];
+
+    try {
+      if (offlineMode) {
+        rec = localGet();
+        st = ['err', 'Mode Offline · data lokal saja'];
+      } else if (isOnline()) {
+        UI.setSyncStatus('sync', 'memuat dari Supabase…');
+        const data = pickValid(await supabaseSelect(filter), key);
         if (data) {
           const db = dbGet();
-          db[curKey()] = data;
+          db[key] = data; // pakai key hasil bekuan, bukan curKey() (filter bisa sudah berganti)
           dbSet(db);
-          applyRecord(data);
-          UI.setSyncStatus('ok', '✓ dimuat dari Supabase');
+          rec = data;
+          st = ['ok', '✓ dimuat dari Supabase'];
         } else {
           // belum ada di Supabase → cek cache lokal (mis. belum sempat sync)
-          const db = dbGet();
-          const local = db[curKey()] || null;
-          applyRecord(local);
-          UI.setSyncStatus('ok', local ? '✓ dimuat dari cache lokal' : 'data kosong (belum ada di cloud)');
+          rec = localGet();
+          st = ['ok', rec ? '✓ dimuat dari cache lokal' : 'data kosong (belum ada di cloud)'];
         }
-        return;
-      } catch (err) {
-        console.warn('Gagal memuat dari Supabase, fallback ke lokal:', err);
-        UI.setSyncStatus('err', '⚠ gagal load cloud, pakai data lokal');
+      } else {
+        rec = localGet();
+        st = ['err', 'offline · mode lokal'];
       }
+    } catch (err) {
+      console.warn('Gagal memuat dari Supabase, fallback ke lokal:', err);
+      rec = localGet();
+      st = ['err', '⚠ gagal load cloud, pakai data lokal'];
     }
 
-    // OFFLINE atau Supabase gagal → localStorage
-    const db = dbGet();
-    applyRecord(db[curKey()] || null);
-    if (!isOnline()) UI.setSyncStatus('err', 'offline · mode lokal');
+    // Ada pemuatan yang lebih baru (user ganti filter lagi) → buang hasil ini.
+    if (seq !== loadSeq) return;
+
+    try {
+      applyRecord(rec);
+    } catch (e) {
+      console.error('applyRecord gagal:', e);
+    }
+    formKey = key;
+    loading = false;
+    UI.setSyncStatus(st[0], st[1]);
   };
 
   // ====== SAVE (POST): tombol "Simpan" — online → Supabase, offline → antre ======
   const saveData = async (opts = {}) => {
+    while (loading) await loadPromise; // tunggu data filter baru selesai dimuat
+    if (!canSave()) {
+      if (!opts.silent) UI.toast('Sheet sedang berpindah — coba simpan lagi sebentar.', true);
+      return;
+    }
     const rec = collect();
     // Hanya simpan bila ada kode produk terdaftar (p1/p2/p3)
     if (!hasRegisteredProduct(rec)) {
@@ -400,7 +481,7 @@ const Storage = (() => {
       return;
     }
     const db = dbGet();
-    db[curKey()] = rec;
+    db[formKey] = rec;
     dbSet(db);
 
     // Catat kombinasi produk+BN ke history (Issue #8)
@@ -448,11 +529,12 @@ const Storage = (() => {
   const autoSaveLocal = () => {
     try {
       if (!State.el.tbody) return; // app belum siap (masih di layar login)
+      if (!canSave()) return;      // sedang memuat / filter baru belum termuat
       const rec = collect();
       // Jangan simpan lokal/cloud jika belum ada produk terdaftar
       if (!hasRegisteredProduct(rec)) return;
       const db = dbGet();
-      db[curKey()] = rec;
+      db[formKey] = rec;
       dbSet(db);
       if (typeof Suggest !== 'undefined' && Suggest.rememberFromMaster) {
         try { Suggest.rememberFromMaster(); } catch (_) {}
@@ -475,6 +557,7 @@ const Storage = (() => {
     try {
       if (!State.el.tbody) return;
       if (_autoSupabaseBusy) return;
+      if (!canSave()) return;
 
       const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
       if (offlineMode) return;
@@ -496,7 +579,7 @@ const Storage = (() => {
       _autoSupabaseBusy = true;
       // Simpan lokal dulu (sama seperti saveData), lalu push ke Supabase senyap
       const db = dbGet();
-      db[curKey()] = rec;
+      db[formKey] = rec;
       dbSet(db);
 
       const filter = activeFilter();
@@ -594,9 +677,14 @@ const Storage = (() => {
    * @returns {Promise<{ok:boolean, message:string, targetKey:string}>}
    */
   const copyOrMoveRecord = async (targetFilter, mode = 'copy') => {
+    while (loading) await loadPromise;
+    if (!canSave()) {
+      return { ok: false, message: 'Sheet sedang berpindah — coba lagi sebentar.' };
+    }
+
     const srcFilter = activeFilter();
-    const srcKey = curKey();
-    const targetKey = `${targetFilter.rawDate}|S${targetFilter.shift}|L${targetFilter.line}|${targetFilter.stage}`;
+    const srcKey = keyOf(srcFilter);
+    const targetKey = keyOf(targetFilter);
 
     if (srcKey === targetKey) {
       return { ok: false, message: 'Tujuan sama dengan sumber. Pilih tanggal/shift/line/tahapan lain.' };
@@ -604,12 +692,13 @@ const Storage = (() => {
 
     // Ambil data sumber: utamakan form yang sedang terbuka (paling up-to-date)
     const rec = collect();
-    if (!rec) {
-      return { ok: false, message: 'Tidak ada data untuk disalin.' };
+    if (!hasRegisteredProduct(rec)) {
+      return { ok: false, message: 'Sheet sumber kosong (belum ada produk) — tidak ada data untuk disalin.' };
     }
 
-    // Tandai metadata salinan
+    // Tandai metadata salinan. formKey = pemilik baru → lolos pemeriksaan saat dimuat.
     const cloned = JSON.parse(JSON.stringify(rec));
+    cloned.formKey = targetKey;
     cloned.copiedFrom = srcKey;
     cloned.copiedAt = new Date().toISOString();
     cloned.savedAt = new Date().toISOString();
@@ -619,15 +708,17 @@ const Storage = (() => {
     const targetExisted = !!db[targetKey];
     db[targetKey] = cloned;
 
-    // Jika mode pindah → hapus sumber lokal
+    // Jika mode pindah → hapus sumber lokal. Form tidak lagi milik key mana pun,
+    // supaya flush/auto-save tidak "menghidupkan" kembali sumber yang baru dihapus.
     if (mode === 'move') {
       delete db[srcKey];
+      formKey = null;
     }
     dbSet(db);
 
     // Sync ke Supabase (upsert tujuan; hapus sumber jika move)
     const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
-    const row = buildSupabaseRow(cloned, targetFilter);
+    const row = buildSupabaseRow(cloned, targetFilter); // key = targetKey
 
     if (!offlineMode && isOnline() && typeof Sync !== 'undefined') {
       try {
@@ -636,7 +727,11 @@ const Storage = (() => {
           try {
             const client = SupabaseClient.getClient();
             if (client) {
-              await client.from('oee_data').delete().eq('key', srcKey);
+              // Hapus lewat 4 kolom filter sumber (tahan terhadap baris lama yang key-nya tidak standar)
+              await client.from(CONFIG.DB_TABLE).delete().match({
+                date: srcFilter.rawDate, shift: srcFilter.shift,
+                line: String(srcFilter.line), tahapan: srcFilter.stage,
+              });
             }
           } catch (delErr) {
             console.warn('Gagal hapus sumber di Supabase:', delErr);
@@ -661,15 +756,40 @@ const Storage = (() => {
   };
 
   /** Cek apakah slot tujuan sudah berisi data (lokal). */
-  const targetExists = (targetFilter) => {
-    const key = `${targetFilter.rawDate}|S${targetFilter.shift}|L${targetFilter.line}|${targetFilter.stage}`;
+  const targetExists = (targetFilter) => !!dbGet()[keyOf(targetFilter)];
+
+  /** Cek slot tujuan di lokal DAN Supabase (untuk peringatan "akan ditimpa"). */
+  const targetExistsAnywhere = async (targetFilter) => {
+    if (targetExists(targetFilter)) return true;
+    try {
+      if (isOnline()) return !!(await supabaseSelect(targetFilter));
+    } catch (_) { /* abaikan */ }
+    return false;
+  };
+
+  /**
+   * Diagnostik: cari sheet LOKAL yang isinya identik di key berbeda (jejak data dobel).
+   * Jalankan di Console browser:  Storage.scanDuplicates()
+   */
+  const scanDuplicates = () => {
     const db = dbGet();
-    return !!db[key];
+    const groups = {};
+    Object.entries(db).forEach(([key, rec]) => {
+      const rows = ((rec && rec.rows) || []).filter(r => r.kode || r.mulai || r.selesai || r.kegiatan);
+      if (!rows.length) return;
+      const sig = JSON.stringify(rows.map(r => [r.kode, r.mulai, r.selesai, r.durasi, r.kegiatan, r.good, r.defect]));
+      (groups[sig] = groups[sig] || []).push(key);
+    });
+    const dup = Object.values(groups).filter(g => g.length > 1);
+    if (!dup.length) { console.log('✓ Tidak ada sheet lokal dengan isi identik.'); return []; }
+    console.warn(`${dup.length} grup sheet identik (kemungkinan salinan nyasar):`);
+    dup.forEach(g => console.log('  •', g.sort().join('  ⇄  ')));
+    return dup;
   };
 
   return {
     dbGet, dbSet, curKey, labelFilter, collect, applyRecord,
     loadRecord, saveData, autoSaveLocal, autoSaveSupabase, exportCsv,
-    copyOrMoveRecord, targetExists, activeFilter,
+    copyOrMoveRecord, targetExists, targetExistsAnywhere, scanDuplicates, activeFilter,
   };
 })();

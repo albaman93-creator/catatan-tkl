@@ -331,7 +331,7 @@ const CsvImport = (() => {
     return built;
   };
 
-  const applyToSheet = (rows, opts = {}) => {
+  const applyToSheet = async (rows, opts = {}) => {
     if (!rows.length) {
       if (typeof UI !== 'undefined') UI.toast('Tidak ada baris untuk diimpor', true);
       return;
@@ -364,6 +364,10 @@ const CsvImport = (() => {
       if (v != null) b.classList.toggle('on', parseInt(v, 10) === shiftIdx);
     });
     if (State.el.fShift) State.el.fShift.value = String(shiftIdx + 1);
+
+    // Filter sudah berganti → muat dulu record tujuan. Tanpa ini form masih berisi
+    // produk/operator/mesin dari tanggal lama dan ikut tersimpan ke tanggal baru.
+    if (typeof Storage !== 'undefined' && Storage.loadRecord) await Storage.loadRecord();
 
     // Produk dari lot
     const lot = sample.lot || '';

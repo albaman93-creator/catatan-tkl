@@ -42,6 +42,9 @@ const CONFIG = Object.freeze({
   // Interval lebih jarang dari lokal (10 dtk lokal, 30 dtk cloud) agar tidak membebani jaringan.
   AUTO_SAVE_SUPABASE_INTERVAL_MS: 30000, // 30 detik
 
+  // Fitur "Salin / Pindah Data". Set false untuk menyembunyikan & menonaktifkan sepenuhnya.
+  COPY_MOVE_ENABLED: true,
+
   // ====== DEFAULTS ======
   // Jumlah baris awal saat sheet kosong. Viewport tabel menampilkan ~10 baris;
   // baris 11–25 (dan tambahan) digulir di dalam .tbl-wrap.
