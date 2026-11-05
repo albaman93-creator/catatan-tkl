@@ -464,6 +464,100 @@ const Storage = (() => {
     UI.setSyncStatus(st[0], st[1]);
   };
 
+  // ====== SHEET KOSONG ======
+  const ROW_FIELDS = ['kode','op','ms','mulai','panggil','teknik','selesai','durasi','kegiatan',
+    'masalah','disposisi','description','wo','batch','good','defect'];
+  const has = (v) => String(v == null ? '' : v).trim() !== '';
+
+  /**
+   * Sheet dianggap kosong bila tak ada produk, BN/WO/rate, operator, maupun isi baris.
+   * Jam mulai baris yang sama dengan default awal shift (terisi otomatis) tidak dihitung.
+   */
+  const isSheetEmpty = (rec) => {
+    const p = (rec && rec.products) || {};
+    const prodFields = ['p1Name','p1Bn','p1Rate','p1Wo','p2Name','p2Bn','p2Rate','p2Wo','p3Name','p3Bn','p3Rate','p3Wo'];
+    if (prodFields.some(f => has(p[f]))) return false;
+    if (Object.values((rec && rec.operators) || {}).some(has)) return false;
+    const defaults = (typeof CONFIG !== 'undefined' && CONFIG.SHIFT_START_TIMES) || ['07:00','15:30','23:30'];
+    return !((rec && rec.rows) || []).some(r => ROW_FIELDS.some(f => {
+      if (!has(r[f])) return false;
+      if (f === 'mulai' && defaults.includes(String(r[f]).trim())) return false;
+      return true;
+    }));
+  };
+
+  /**
+   * Simpan manual pada sheet KOSONG = hapus data tersimpan untuk filter ini (lokal + cloud).
+   * RLS v3: hanya admin yang boleh DELETE → untuk non-admin, baris di cloud dikosongkan (UPDATE).
+   */
+  const clearCurrentRecord = async () => {
+    const key = formKey;
+    const filter = filterFromKey(key);
+    const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
+    const online = !offlineMode && isOnline();
+
+    if (!offlineMode && !online) {
+      UI.toast('Offline — sheet kosong baru bisa disimpan (dihapus dari cloud) saat online.', true);
+      return;
+    }
+
+    const hadLocal = !!dbGet()[key];
+    let hadCloud = false;
+    if (online) {
+      try { hadCloud = !!(await supabaseSelect(filter)); }
+      catch (e) {
+        UI.toast('Gagal mengecek cloud — data tidak diubah. Coba lagi.', true);
+        return;
+      }
+    }
+    if (!hadLocal && !hadCloud) {
+      UI.toast('Sheet kosong & belum ada data tersimpan untuk filter ini.', false, 'warn');
+      UI.setSyncStatus('ok', 'sheet kosong · tidak ada data tersimpan');
+      return;
+    }
+    if (!confirm(`Sheet ini KOSONG.\nHapus data tersimpan untuk\n${labelFilter()}?`)) return;
+
+    let note = '';
+    if (online) {
+      UI.setSyncStatus('sync', 'menghapus data…');
+      try {
+        const client = SupabaseClient.getClient();
+        const { data, error } = await client.from(CONFIG.DB_TABLE).delete()
+          .match({ date: filter.rawDate, shift: filter.shift, line: String(filter.line), tahapan: filter.stage })
+          .select('key');
+        if (error) throw error;
+        if (hadCloud && (!data || !data.length)) {
+          // Tidak berhak DELETE (RLS) → kosongkan isinya lewat UPDATE yang diizinkan
+          const rec = collect();
+          const row = buildSupabaseRow(rec, filter);
+          Object.assign(row, {
+            availability: null, performance: null, quality: null, oee: null,
+            total_downtime: null, total_good: null, total_defect: null,
+            keterangan_masalah: '', penanggulangan: '', produk_batch: '', inisial_operator: '',
+          });
+          await Sync.pushRow(row);
+          note = ' (dikosongkan di cloud)';
+        }
+      } catch (err) {
+        console.warn('Hapus/kosongkan di cloud gagal:', err);
+        UI.setSyncStatus('err', '⚠ gagal hapus di cloud: ' + (err.message || ''));
+        UI.toast('Gagal menghapus di cloud — data TIDAK diubah. ' + (err.message || ''), true);
+        return;
+      }
+    }
+
+    // Cloud beres → bersihkan lokal, antrean, dan cache hash auto-save
+    const db = dbGet();
+    delete db[key];
+    dbSet(db);
+    if (typeof Sync !== 'undefined' && Sync.dequeue) Sync.dequeue(key);
+    _lastAutoSupabaseHash = '';
+    UI.updateEditChip(null);
+    State.el.lastSaved.textContent = '🗑 data dihapus ' + new Date().toLocaleTimeString('id-ID');
+    UI.setSyncStatus('ok', '✓ sheet kosong · data tersimpan dihapus' + note);
+    UI.toast('Data sheet dihapus ✓ ' + labelFilter() + note);
+  };
+
   // ====== SAVE (POST): tombol "Simpan" — online → Supabase, offline → antre ======
   const saveData = async (opts = {}) => {
     while (loading) await loadPromise; // tunggu data filter baru selesai dimuat
@@ -472,13 +566,18 @@ const Storage = (() => {
       return;
     }
     const rec = collect();
-    // Hanya simpan bila ada kode produk terdaftar (p1/p2/p3)
+    // Simpan otomatis/senyap: hanya bila ada kode produk terdaftar (p1/p2/p3).
+    // Simpan MANUAL (tombol / Ctrl+S): sheet kosong → hapus data tersimpan;
+    // ada isi walau produk belum diisi → tetap disimpan.
     if (!hasRegisteredProduct(rec)) {
-      if (!opts.silent) {
-        UI.toast('Belum ada produk terdaftar — data tidak disimpan. Isi kode produk dulu.', true);
+      if (opts.silent) {
+        UI.setSyncStatus('err', '⚠ tidak disimpan · produk kosong');
+        return;
       }
-      UI.setSyncStatus('err', '⚠ tidak disimpan · produk kosong');
-      return;
+      if (isSheetEmpty(rec)) {
+        await clearCurrentRecord();
+        return;
+      }
     }
     const db = dbGet();
     db[formKey] = rec;

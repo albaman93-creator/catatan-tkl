@@ -33,6 +33,13 @@ const Sync = (() => {
     return q.length;
   };
 
+  /** Buang item antrean untuk key tertentu (mis. sheet sudah dikosongkan/dihapus). */
+  const dequeue = (key) => {
+    const q = getQueue().filter(x => x.key !== key);
+    setQueue(q);
+    return q.length;
+  };
+
   /**
    * Kirim satu row ke Supabase (upsert berdasarkan kolom `key`).
    */
@@ -104,5 +111,5 @@ const Sync = (() => {
   if (typeof Perf !== 'undefined') Perf.every(30000, flushQueue);
   else setInterval(flushQueue, 30000);
 
-  return { queuePush, queueLength, pushRow, flushQueue };
+  return { queuePush, dequeue, queueLength, pushRow, flushQueue };
 })();
