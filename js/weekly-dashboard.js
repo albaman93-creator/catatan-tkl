@@ -846,7 +846,7 @@ const WeeklyDashboard = (() => {
       }
       inited = true;
     }
-    showPage('yield');
+    showPage('oee-prod');
     if (typeof IssueDashboard !== 'undefined' && IssueDashboard.refreshBadge) IssueDashboard.refreshBadge();
   };
 

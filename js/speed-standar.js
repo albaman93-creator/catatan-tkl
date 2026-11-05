@@ -143,9 +143,30 @@ const SpeedStandar = (() => {
     setStatus(`✓ Tabel 1: ${rows.length} produk unik · ${monthLabel(cursor.year, cursor.month)}`);
   };
 
+  /** Bulan produksi record: utamakan payload.prodMonth, fallback bulan kalender (sama Rincian/Dashboard). */
+  const recordMonth = (rec) => {
+    const pm = rec?.payload && rec.payload.prodMonth != null ? String(rec.payload.prodMonth).trim() : '';
+    if (pm) {
+      let n = parseInt(pm, 10);
+      if (!n) {
+        const map = {
+          JAN: 1, FEB: 2, MAR: 3, APR: 4, MEI: 5, MAY: 5, JUN: 6,
+          JUL: 7, AGU: 8, AUG: 8, SEP: 9, OKT: 10, OCT: 10, NOV: 11, DES: 12, DEC: 12
+        };
+        n = map[pm.toUpperCase().slice(0, 3)] || 0;
+      }
+      if (n) return n;
+    }
+    const ymd = String(rec?.date || '').slice(0, 10);
+    return parseInt(ymd.slice(5, 7), 10) || 0;
+  };
+
   const fetchMonth = async () => {
     if (loading) return;
-    const { from, to } = monthRange(cursor.year, cursor.month);
+    // Ambil tahun penuh agar record dengan prodMonth di luar kalender bulan tetap ikut
+    const yearFrom = `${cursor.year}-01-01`;
+    const yearTo = `${cursor.year}-12-31`;
+    const wantMonth = cursor.month + 1; // 1–12
     const client = getClient();
     if (!client) {
       setTbody1(`<tr class="ss-empty-row"><td colspan="4">Supabase belum terhubung</td></tr>`);
@@ -161,16 +182,18 @@ const SpeedStandar = (() => {
       const { data, error } = await client
         .from(oeeTable())
         .select('date, line, payload, "updatedAt"')
-        .gte('date', from)
-        .lte('date', to)
+        .gte('date', yearFrom)
+        .lte('date', yearTo)
         .order('date', { ascending: false })
-        .limit(5000);
+        .limit(8000);
 
       if (error) throw error;
 
       const records = Array.isArray(data) ? data : [];
+      // Filter: prodMonth (tag di sheet) > bulan kalender — konsisten dengan Rincian per Produk
+      const inMonth = records.filter((rec) => recordMonth(rec) === wantMonth);
       const extracted = [];
-      records.forEach((rec) => {
+      inMonth.forEach((rec) => {
         extractProducts(rec).forEach((item) => extracted.push(item));
       });
       renderTable1(dedupe(extracted));

@@ -253,6 +253,8 @@ const RincianProduk = (() => {
           q365: qOpe,
           oee365,
           inisial,
+          recKey: r.key || '',
+          slotIdx: i + 1, // 1-based p1/p2/p3
         });
       });
     });
@@ -444,9 +446,12 @@ const RincianProduk = (() => {
         const oeeOpe = (aOpe * pOpe * qOpe) / 10000;
         const a365 = e.timeAvailable > 0 ? (e.waktuOperasional / e.timeAvailable) * 100 : 0;
         const oee365 = (a365 * pOpe * qOpe) / 10000;
+        // Speed standar efektif = total standart output ÷ total waktu operasional
+        const rate = e.waktuOperasional > 0 ? e.standartOutput / e.waktuOperasional : 0;
         return {
           ...e,
           tglLabel: fmtDateRange(e.dates),
+          rate,
           aOpe, pOpe, qOpe, oeeOpe,
           a365, p365: pOpe, q365: qOpe, oee365,
         };
@@ -472,7 +477,7 @@ const RincianProduk = (() => {
     const body = $('rpBatchBody');
     if (!body) return;
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="20">Tidak ada data rekap batch.</td></tr>';
+      body.innerHTML = '<tr><td colspan="21">Tidak ada data rekap batch.</td></tr>';
       return;
     }
     const max = 500;
@@ -487,6 +492,7 @@ const RincianProduk = (() => {
       <td class="ctr">${r.waktuProduksiTerencana}</td>
       <td class="ctr">${r.breakdownUnplanned}</td>
       <td class="ctr">${r.waktuOperasional}</td>
+      <td class="ctr">${fmtRate(r.rate)}</td>
       <td class="ctr">${r.standartOutput}</td>
       <td class="ctr">${r.good}</td>
       <td class="ctr">${r.defect}</td>
@@ -500,22 +506,28 @@ const RincianProduk = (() => {
       <td class="ctr ${cls365(r.oee365, tgt.OEE365)}">${pct(r.oee365)}</td>
     </tr>`).join('');
     if (rows.length > max) {
-      body.innerHTML += `<tr><td colspan="20"><i>Menampilkan ${max} dari ${rows.length} baris — unduh Excel untuk data lengkap.</i></td></tr>`;
+      body.innerHTML += `<tr><td colspan="21"><i>Menampilkan ${max} dari ${rows.length} baris — unduh Excel untuk data lengkap.</i></td></tr>`;
     }
   };
 
   const pct = (v) => (Number.isFinite(v) ? Number(v).toFixed(2) + '%' : '—');
 
+  const fmtRate = (v) => {
+    const n = Number(v);
+    if (!Number.isFinite(n) || n <= 0) return '—';
+    return Number.isInteger(n) ? String(n) : n.toFixed(2);
+  };
+
   const renderSummaryTable = (rows) => {
     const body = $('rpSummaryBody');
     if (!body) return;
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="22">Tidak ada data rekap batch per shift.</td></tr>';
+      body.innerHTML = '<tr><td colspan="23">Tidak ada data rekap batch per shift.</td></tr>';
       return;
     }
     const max = 500;
     const slice = rows.slice(0, max);
-    body.innerHTML = slice.map((r) => {
+    body.innerHTML = slice.map((r, idx) => {
       const attrs = [
         'class="rp-row-link"',
         'title="Buka log sheet record ini"',
@@ -523,7 +535,9 @@ const RincianProduk = (() => {
         'data-shift="' + esc(r.shift || '') + '"',
         'data-line="' + esc(r.line || '') + '"',
         'data-stage="' + esc(r.tahapan || '') + '"',
+        'data-row-idx="' + idx + '"',
       ].join(' ');
+      const rateVal = Number.isFinite(Number(r.rate)) && Number(r.rate) > 0 ? Number(r.rate) : '';
       return `<tr ${attrs}>
       <td>${esc(r.produk)}</td>
       <td class="mono">${esc(r.batch)}</td>
@@ -535,22 +549,135 @@ const RincianProduk = (() => {
       <td class="ctr">${r.waktuProduksiTerencana}</td>
       <td class="ctr">${r.breakdownUnplanned}</td>
       <td class="ctr">${r.waktuOperasional}</td>
-      <td class="ctr">${r.standartOutput}</td>
+      <td class="ctr rp-rate-cell">
+        <input type="number" class="rp-rate-input" min="0" step="any"
+          value="${rateVal}"
+          data-rec-key="${esc(r.recKey || '')}"
+          data-slot="${esc(String(r.slotIdx || 1))}"
+          data-row-idx="${idx}"
+          title="Edit Speed Standar — tersimpan ke log sheet & hitung ulang OEE"
+          aria-label="Speed Standar" />
+      </td>
+      <td class="ctr rp-stdout">${r.standartOutput}</td>
       <td class="ctr">${r.good}</td>
       <td class="ctr">${r.defect}</td>
-      <td class="ctr">${pct(r.aOpe)}</td>
-      <td class="ctr">${pct(r.pOpe)}</td>
-      <td class="ctr">${pct(r.qOpe)}</td>
-      <td class="ctr">${pct(r.oeeOpe)}</td>
-      <td class="ctr">${pct(r.a365)}</td>
-      <td class="ctr">${pct(r.p365)}</td>
-      <td class="ctr">${pct(r.q365)}</td>
-      <td class="ctr">${pct(r.oee365)}</td>
+      <td class="ctr rp-aope">${pct(r.aOpe)}</td>
+      <td class="ctr rp-pope">${pct(r.pOpe)}</td>
+      <td class="ctr rp-qope">${pct(r.qOpe)}</td>
+      <td class="ctr rp-oeeope">${pct(r.oeeOpe)}</td>
+      <td class="ctr rp-a365">${pct(r.a365)}</td>
+      <td class="ctr rp-p365">${pct(r.p365)}</td>
+      <td class="ctr rp-q365">${pct(r.q365)}</td>
+      <td class="ctr rp-oee365">${pct(r.oee365)}</td>
       <td>${esc(r.inisial)}</td>
     </tr>`;
     }).join('');
     if (rows.length > max) {
-      body.innerHTML += `<tr><td colspan="22"><i>Menampilkan ${max} dari ${rows.length} baris — unduh Excel untuk data lengkap.</i></td></tr>`;
+      body.innerHTML += `<tr><td colspan="23"><i>Menampilkan ${max} dari ${rows.length} baris — unduh Excel untuk data lengkap.</i></td></tr>`;
+    }
+  };
+
+  /** Simpan rate baru ke payload produk di Supabase, update cache lokal, hitung ulang OEE baris. */
+  const saveRateFromInput = async (input) => {
+    if (!input || input.disabled) return;
+    const recKey = String(input.dataset.recKey || '').trim();
+    const slotIdx = parseInt(input.dataset.slot, 10) || 1;
+    const rowIdx = parseInt(input.dataset.rowIdx, 10);
+    const newRate = Number(String(input.value || '').replace(',', '.').trim());
+    if (!recKey) {
+      say('Tidak bisa simpan: key record tidak ditemukan.', true);
+      return;
+    }
+    if (!Number.isFinite(newRate) || newRate < 0) {
+      say('Speed Standar harus angka ≥ 0.', true);
+      return;
+    }
+
+    const client = typeof SupabaseClient !== 'undefined' ? SupabaseClient.getClient() : null;
+    if (!client) {
+      say('Supabase belum terhubung.', true);
+      return;
+    }
+
+    input.disabled = true;
+    input.classList.add('is-saving');
+    say('Menyimpan Speed Standar…');
+
+    try {
+      // Ambil record terkini
+      const { data: rows, error: fetchErr } = await client
+        .from(CONFIG.DB_TABLE)
+        .select('key,payload')
+        .eq('key', recKey)
+        .limit(1);
+      if (fetchErr) throw fetchErr;
+      const rec = Array.isArray(rows) && rows[0] ? rows[0] : null;
+      if (!rec) throw new Error('Record tidak ditemukan');
+
+      const payload = rec.payload && typeof rec.payload === 'object' ? { ...rec.payload } : {};
+      const products = payload.products && typeof payload.products === 'object'
+        ? { ...payload.products }
+        : {};
+      const rateKey = 'p' + slotIdx + 'Rate';
+      products[rateKey] = String(newRate);
+      payload.products = products;
+
+      const { error: upErr } = await client
+        .from(CONFIG.DB_TABLE)
+        .update({ payload })
+        .eq('key', recKey);
+      if (upErr) throw upErr;
+
+      // Update cache lokal raw
+      const local = raw.find((r) => r.key === recKey);
+      if (local) {
+        local.payload = payload;
+      }
+
+      // Hitung ulang baris di summaryRows + UI
+      if (Number.isFinite(rowIdx) && summaryRows[rowIdx]) {
+        const row = summaryRows[rowIdx];
+        row.rate = newRate;
+        row.standartOutput = Math.round(newRate * (Number(row.waktuOperasional) || 0));
+        const actualOut = (Number(row.good) || 0) + (Number(row.defect) || 0);
+        row.pOpe = row.standartOutput > 0 ? (actualOut / row.standartOutput) * 100 : 0;
+        row.p365 = row.pOpe;
+        row.qOpe = actualOut > 0 ? ((Number(row.good) || 0) / actualOut) * 100 : 0;
+        row.q365 = row.qOpe;
+        row.oeeOpe = (row.aOpe * row.pOpe * row.qOpe) / 10000;
+        row.oee365 = (row.a365 * row.p365 * row.q365) / 10000;
+
+        const tr = input.closest('tr');
+        if (tr) {
+          const setCell = (sel, val) => {
+            const el = tr.querySelector(sel);
+            if (el) el.textContent = val;
+          };
+          setCell('.rp-stdout', String(row.standartOutput));
+          setCell('.rp-pope', pct(row.pOpe));
+          setCell('.rp-qope', pct(row.qOpe));
+          setCell('.rp-oeeope', pct(row.oeeOpe));
+          setCell('.rp-p365', pct(row.p365));
+          setCell('.rp-q365', pct(row.q365));
+          setCell('.rp-oee365', pct(row.oee365));
+        }
+      }
+
+      // Agregat batch juga perlu di-refresh
+      batchRows = aggregateByBatch(summaryRows);
+      const batchPanel = $('rpPanelBatch');
+      if (batchPanel && !batchPanel.hidden) renderBatchTable(batchRows);
+
+      input.classList.remove('is-saving');
+      input.classList.add('is-saved');
+      say('✓ Speed Standar disimpan & OEE dihitung ulang.');
+      setTimeout(() => input.classList.remove('is-saved'), 1200);
+    } catch (err) {
+      console.warn('[RincianProduk] save rate', err);
+      say('Gagal simpan Speed Standar: ' + (err.message || err), true);
+      input.classList.remove('is-saving');
+    } finally {
+      input.disabled = false;
     }
   };
 
@@ -666,7 +793,7 @@ const RincianProduk = (() => {
   const SUMMARY_HEADER = [
     'Produk', 'batch number', 'TGL', 'shift', 'Line', 'tahapan proses',
     'Time Available', 'Waktu Produksi Terencana', 'waktu breakdown tidak terencana',
-    'Waktu Operasional', 'standart output', 'good', 'defect',
+    'Waktu Operasional', 'Speed Standar', 'standart output', 'good', 'defect',
     'A OPE', 'P OPE', 'Q OPE', 'OEE OPE',
     'A 365', 'P 365', 'Q 365', 'OEE 365',
     'inisial operator'
@@ -689,7 +816,7 @@ const RincianProduk = (() => {
       aoa.push([
         r.produk, r.batch, r.tgl, r.shift, r.line, r.tahapan,
         r.timeAvailable, r.waktuProduksiTerencana, r.breakdownUnplanned,
-        r.waktuOperasional, r.standartOutput, r.good, r.defect,
+        r.waktuOperasional, fmtRate(r.rate), r.standartOutput, r.good, r.defect,
         Number.isFinite(r.aOpe) ? Number(r.aOpe).toFixed(2) + '%' : '',
         Number.isFinite(r.pOpe) ? Number(r.pOpe).toFixed(2) + '%' : '',
         Number.isFinite(r.qOpe) ? Number(r.qOpe).toFixed(2) + '%' : '',
@@ -731,7 +858,7 @@ const RincianProduk = (() => {
       const batchHeader = [
         'Produk', 'Batch', 'TGL', 'Line', 'tahapan proses',
         'Time Available', 'Waktu Produksi Terencana', 'waktu breakdown tidak terencana',
-        'Waktu Operasional', 'standart output', 'good', 'defect',
+        'Waktu Operasional', 'Speed Standar', 'standart output', 'good', 'defect',
         'A OPE', 'P OPE', 'Q OPE', 'OEE OPE',
         'A 365', 'P 365', 'Q 365', 'OEE 365'
       ];
@@ -740,7 +867,7 @@ const RincianProduk = (() => {
         batchAoa.push([
           r.produk, r.batch, r.tglLabel, r.line, r.tahapan,
           r.timeAvailable, r.waktuProduksiTerencana, r.breakdownUnplanned,
-          r.waktuOperasional, r.standartOutput, r.good, r.defect,
+          r.waktuOperasional, fmtRate(r.rate), r.standartOutput, r.good, r.defect,
           Number.isFinite(r.aOpe) ? Number(r.aOpe).toFixed(2) + '%' : '',
           Number.isFinite(r.pOpe) ? Number(r.pOpe).toFixed(2) + '%' : '',
           Number.isFinite(r.qOpe) ? Number(r.qOpe).toFixed(2) + '%' : '',
@@ -808,8 +935,24 @@ const RincianProduk = (() => {
       b.addEventListener('click', () => showTab(b.dataset.rpTab));
     });
     $('rpSummaryBody')?.addEventListener('click', (e) => {
+      // Jangan buka log sheet saat klik input Speed Standar
+      if (e.target.closest('.rp-rate-input, .rp-rate-cell')) return;
       const tr = e.target.closest('tr.rp-row-link');
       if (tr) openSummaryRow(tr);
+    });
+    // Edit Speed Standar langsung dari tabel
+    $('rpSummaryBody')?.addEventListener('change', (e) => {
+      const inp = e.target.closest('.rp-rate-input');
+      if (inp) saveRateFromInput(inp);
+    });
+    $('rpSummaryBody')?.addEventListener('keydown', (e) => {
+      const inp = e.target.closest('.rp-rate-input');
+      if (!inp) return;
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        inp.blur();
+      }
+      e.stopPropagation();
     });
     // Tahun/Bulan/Week → fetch ulang; Produk → filter lokal
     ['rpYear', 'rpMonth', 'rpWeek'].forEach((id) => {

@@ -142,3 +142,38 @@ body .rp-table tbody tr:hover td.rp-365-ok,
 body .rp-table tbody tr:hover td.rp-365-fail {
   filter: brightness(0.95);
 }
+
+/* Edit Speed Standar inline di Rekap batch per shift */
+.rp-table td.rp-rate-cell {
+  padding: 2px 4px !important;
+  vertical-align: middle;
+}
+.rp-table .rp-rate-input {
+  width: 4.5rem;
+  max-width: 100%;
+  padding: 4px 6px;
+  border: 1px solid rgba(59, 130, 246, 0.45);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  font: 600 12px var(--font-sans, 'IBM Plex Sans', sans-serif);
+  text-align: center;
+  box-sizing: border-box;
+}
+.rp-table .rp-rate-input:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+  border-color: #3b82f6;
+}
+.rp-table .rp-rate-input.is-saving {
+  opacity: 0.6;
+}
+.rp-table .rp-rate-input.is-saved {
+  border-color: #22c55e;
+  background: #dcfce7;
+}
+:root[data-wd-theme="light"] .rp-table .rp-rate-input,
+:root[data-theme="light"] .rp-table .rp-rate-input {
+  background: #fff;
+  color: #0f172a;
+}
