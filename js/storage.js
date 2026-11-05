@@ -110,6 +110,13 @@ const Storage = (() => {
     savedAt: new Date().toISOString(),
   });
 
+
+  /** True jika minimal satu kode produk terdaftar di master sheet. */
+  const hasRegisteredProduct = (rec) => {
+    const p = (rec && rec.products) || {};
+    return [p.p1Name, p.p2Name, p.p3Name].some((n) => String(n || '').trim() !== '');
+  };
+
   /**
    * Apply data ke form (saat load record atau reset).
    */
@@ -384,6 +391,14 @@ const Storage = (() => {
   // ====== SAVE (POST): tombol "Simpan" — online → Supabase, offline → antre ======
   const saveData = async (opts = {}) => {
     const rec = collect();
+    // Hanya simpan bila ada kode produk terdaftar (p1/p2/p3)
+    if (!hasRegisteredProduct(rec)) {
+      if (!opts.silent) {
+        UI.toast('Belum ada produk terdaftar — data tidak disimpan. Isi kode produk dulu.', true);
+      }
+      UI.setSyncStatus('err', '⚠ tidak disimpan · produk kosong');
+      return;
+    }
     const db = dbGet();
     db[curKey()] = rec;
     dbSet(db);
@@ -434,6 +449,8 @@ const Storage = (() => {
     try {
       if (!State.el.tbody) return; // app belum siap (masih di layar login)
       const rec = collect();
+      // Jangan simpan lokal/cloud jika belum ada produk terdaftar
+      if (!hasRegisteredProduct(rec)) return;
       const db = dbGet();
       db[curKey()] = rec;
       dbSet(db);
@@ -464,6 +481,8 @@ const Storage = (() => {
       if (!isOnline()) return;
 
       const rec = collect();
+      // Jangan push ke Supabase jika belum ada produk terdaftar
+      if (!hasRegisteredProduct(rec)) return;
       // Hash ringan: skip upload kalau isi sheet belum berubah sejak auto-save terakhir
       const hash = JSON.stringify({
         k: curKey(),

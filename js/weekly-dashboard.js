@@ -175,7 +175,29 @@ const WeeklyDashboard = (() => {
   };
 
   /** Isi kartu ringkasan waktu/output (Issue #12: rumus Σ). A/P/Q/OEE ada di gauge. */
-  const setTotals = (all, prefix) => {
+  /** Hitung jumlah unik produk+batch dari record (mengikuti filter produk). */
+  const countBatches = (recs, product) => {
+    const set = new Set();
+    (recs || []).forEach((r) => {
+      const p = (r.payload && r.payload.products) || {};
+      [1, 2, 3].forEach((i) => {
+        const name = String(p['p' + i + 'Name'] || '').trim();
+        if (!name) return;
+        const bn = String(p['p' + i + 'Bn'] || '').trim();
+        const label = bn ? name + ' ' + bn : name;
+        if (product && typeof WeeklyCalc !== 'undefined' && WeeklyCalc.matches) {
+          if (!WeeklyCalc.matches(label, product) && !WeeklyCalc.matches(name, product)) return;
+        } else if (product) {
+          const q = String(product).trim().toLowerCase();
+          if (!label.toLowerCase().includes(q) && !name.toLowerCase().includes(q)) return;
+        }
+        set.add((name + '|' + bn).toLowerCase());
+      });
+    });
+    return set.size;
+  };
+
+  const setTotals = (all, prefix, recs, product) => {
     const t = (all && all.totals) || {};
     const fmt = (n) => (n == null || !Number.isFinite(Number(n))) ? '—' : Number(n).toLocaleString('id-ID');
     // Speed Standar: tampilkan angka rate (bukan total Σ), max 2 desimal jika perlu
@@ -195,6 +217,8 @@ const WeeklyDashboard = (() => {
     set(prefix + 'TotActual', fmt(t.actual));
     set(prefix + 'TotGood', fmt(t.good));
     set(prefix + 'TotDefect', fmt(t.defect));
+    const nBatch = recs ? countBatches(recs, product) : null;
+    set(prefix + 'TotBatch', nBatch != null ? fmt(nBatch) : '—');
   };
 
   // Sumber tiap baris Speed Standar: record terbaru (tanggal, lalu shift) yang memuat produk itu.
@@ -305,7 +329,7 @@ const WeeklyDashboard = (() => {
     const recs = oeeRaw; // shift dihapus — semua shift
     const all = calcFor(recs, f, dayDiff(from, to));
     setOeeGauges(all);
-    setTotals(all, 'oee');
+    setTotals(all, 'oee', recs, f.product);
     renderSpeed(recs, f.product);
     const byMonth = {};
     recs.forEach((r) => { const k = String(r.date).slice(0, 7); (byMonth[k] = byMonth[k] || []).push(r); });
@@ -578,7 +602,7 @@ const WeeklyDashboard = (() => {
     const recs = mchRaw;
     const all = calcFor(recs, f, dayDiff(from, to));
     setOeeGauges(all, 'mch');
-    setTotals(all, 'mch');
+    setTotals(all, 'mch', recs, f.product);
     const batches = calcBatches(recs, f.product, 'all');
     const counts = {};
     batches.forEach((b) => { if (b.code) counts[b.code] = (counts[b.code] || 0) + 1; });
@@ -846,7 +870,7 @@ const WeeklyDashboard = (() => {
       }
       inited = true;
     }
-    showPage('yield');
+    showPage('oee-prod');
     if (typeof IssueDashboard !== 'undefined' && IssueDashboard.refreshBadge) IssueDashboard.refreshBadge();
   };
 

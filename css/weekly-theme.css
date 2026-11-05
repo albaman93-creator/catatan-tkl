@@ -737,3 +737,25 @@
 :root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .shutdown-summary strong {
   color: #f1f5f9 !important;
 }
+
+/* Rincian per Produk — tabel gelap transparan (override redesign abu-abu) */
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .rp-table-wrap {
+  background: rgba(15, 25, 45, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .rp-table thead th {
+  background: rgba(16, 36, 60, 0.92) !important;
+  color: #dbe7f3 !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .rp-table td {
+  color: #e2e8f0 !important;
+  background: transparent !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .rp-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+:root:not([data-wd-theme="light"]):not([data-wd-theme="pink"]) body .rp-table tbody tr.rp-shift-sep td {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(248, 113, 113, 0.35) !important;
+  height: 14px;
+}

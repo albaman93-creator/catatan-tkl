@@ -1985,11 +1985,13 @@
               </div>
             </div>
             <nav class="weekly-nav" id="weeklyNav">
-              <button type="button" class="weekly-nav-item is-active" data-weekly-page="yield">
+              <!-- Capaian Yield Produksi disembunyikan sementara
+              <button type="button" class="weekly-nav-item" data-weekly-page="yield" hidden>
                 <span class="wn-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg></span>
                 <span class="wn-label"><span class="wn-full">Capaian Yield Produksi</span><span class="wn-short">Yield</span></span>
               </button>
-              <button type="button" class="weekly-nav-item" data-weekly-page="oee-prod">
+              -->
+              <button type="button" class="weekly-nav-item is-active" data-weekly-page="oee-prod">
                 <span class="wn-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg></span>
                 <span class="wn-label"><span class="wn-full">OEE PRODUCTION</span><span class="wn-short">OEE</span></span>
               </button>
@@ -2043,8 +2045,8 @@
                 <button type="button" class="wd-tbtn" data-wd-mode="pink" role="radio" aria-checked="false" title="Tema pink"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span>Pink</span></button>
               </div>
             </div>
-            <!-- PAGE: Capaian Yield Produksi -->
-            <div class="weekly-page is-active" data-weekly-page="yield" id="weeklyPageYield">
+            <!-- PAGE: Capaian Yield Produksi (disembunyikan sementara) -->
+            <div class="weekly-page" data-weekly-page="yield" id="weeklyPageYield" hidden>
               <div class="weekly-hero">
                 <div class="weekly-hero-title">DASHBOARD YIELD</div>
                 <div class="weekly-hero-sub">PRODUCTION</div>
@@ -2112,7 +2114,7 @@
             </div>
 
             <!-- PAGE: OEE PRODUCTION -->
-            <div class="weekly-page" data-weekly-page="oee-prod" id="weeklyPageOee">
+            <div class="weekly-page is-active" data-weekly-page="oee-prod" id="weeklyPageOee">
               <div class="weekly-hero compact oee-prod-head">
                 <div class="oee-prod-head-main">
                   <div class="weekly-hero-title">OEE PRODUCTION</div>
@@ -2162,9 +2164,9 @@
                 </div>
                 <div class="oee-filter-status" id="oeeStatus"></div>
                                 <div class="wd-totals" id="oeeTotals" aria-label="Ringkasan waktu dan output per filter">
-                  <div class="wd-tot-card wd-tot-ops">
-                    <div class="wd-tot-label">Waktu Operasional</div>
-                    <div class="wd-tot-val" id="oeeTotE">—</div>
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Time Available</div>
+                    <div class="wd-tot-val" id="oeeTotAvail">—</div>
                     <div class="wd-tot-unit">menit</div>
                   </div>
                   <div class="wd-tot-card wd-tot-plane">
@@ -2177,9 +2179,9 @@
                     <div class="wd-tot-val" id="oeeTotUnplane">—</div>
                     <div class="wd-tot-unit">menit</div>
                   </div>
-                  <div class="wd-tot-card">
-                    <div class="wd-tot-label">Time Available</div>
-                    <div class="wd-tot-val" id="oeeTotAvail">—</div>
+                  <div class="wd-tot-card wd-tot-ops">
+                    <div class="wd-tot-label">Waktu Operasional</div>
+                    <div class="wd-tot-val" id="oeeTotE">—</div>
                     <div class="wd-tot-unit">menit</div>
                   </div>
                   <div class="wd-tot-card">
@@ -2206,6 +2208,11 @@
                     <div class="wd-tot-label">Output Defect</div>
                     <div class="wd-tot-val" id="oeeTotDefect">—</div>
                     <div class="wd-tot-unit">unit</div>
+                  </div>
+                  <div class="wd-tot-card wd-tot-batch">
+                    <div class="wd-tot-label">TOTAL BATCH</div>
+                    <div class="wd-tot-val" id="oeeTotBatch">—</div>
+                    <div class="wd-tot-unit">batch</div>
                   </div>
                 </div>
               </div>
@@ -2399,9 +2406,9 @@
                 </div>
                 <div class="oee-filter-status" id="mchStatus"></div>
                                 <div class="wd-totals" id="mchTotals" aria-label="Ringkasan waktu dan output per filter">
-                  <div class="wd-tot-card wd-tot-ops">
-                    <div class="wd-tot-label">Waktu Operasional</div>
-                    <div class="wd-tot-val" id="mchTotE">—</div>
+                  <div class="wd-tot-card">
+                    <div class="wd-tot-label">Time Available</div>
+                    <div class="wd-tot-val" id="mchTotAvail">—</div>
                     <div class="wd-tot-unit">menit</div>
                   </div>
                   <div class="wd-tot-card wd-tot-plane">
@@ -2414,9 +2421,9 @@
                     <div class="wd-tot-val" id="mchTotUnplane">—</div>
                     <div class="wd-tot-unit">menit</div>
                   </div>
-                  <div class="wd-tot-card">
-                    <div class="wd-tot-label">Time Available</div>
-                    <div class="wd-tot-val" id="mchTotAvail">—</div>
+                  <div class="wd-tot-card wd-tot-ops">
+                    <div class="wd-tot-label">Waktu Operasional</div>
+                    <div class="wd-tot-val" id="mchTotE">—</div>
                     <div class="wd-tot-unit">menit</div>
                   </div>
                   <div class="wd-tot-card">
@@ -2443,6 +2450,11 @@
                     <div class="wd-tot-label">Output Defect</div>
                     <div class="wd-tot-val" id="mchTotDefect">—</div>
                     <div class="wd-tot-unit">unit</div>
+                  </div>
+                  <div class="wd-tot-card wd-tot-batch">
+                    <div class="wd-tot-label">TOTAL BATCH</div>
+                    <div class="wd-tot-val" id="mchTotBatch">—</div>
+                    <div class="wd-tot-unit">batch</div>
                   </div>
                 </div>
               </div>
@@ -2785,11 +2797,11 @@
                 <div class="rp-table-wrap">
                   <table class="rp-table">
                     <thead><tr>
-                      <th>Produk</th><th>Batch Number</th><th>TGL</th><th>Shift</th><th>Tahapan</th><th>Line</th>
+                      <th>Produk</th><th>Batch Number</th><th>Hari</th><th>TGL</th><th>Shift</th><th>Tahapan</th><th>Line</th>
                       <th>Jam mulai</th><th>Jam selesai</th><th>Kegiatan</th><th>Durasi</th><th>Masalah</th>
                       <th>Good</th><th>Defect</th><th>Operator</th>
                     </tr></thead>
-                    <tbody id="rpDetailBody"><tr><td colspan="15">Pilih rentang tanggal lalu klik Terapkan.</td></tr></tbody>
+                    <tbody id="rpDetailBody"><tr><td colspan="15">Pilih filter lalu lalu klik Terapkan.</td></tr></tbody>
                   </table>
                 </div>
               </div>
@@ -2800,9 +2812,12 @@
                     <thead><tr>
                       <th>Produk</th><th>Batch</th><th>TGL</th><th>Shift</th><th>Line</th><th>Tahapan</th>
                       <th>Time Available</th><th>Waktu Produksi Terencana</th><th>Breakdown tidak terencana</th>
-                      <th>Waktu Operasional</th><th>Standart output</th><th>Good</th><th>Defect</th>
+                      <th>Waktu Operasional</th><th>Speed Standar</th><th>Standart output</th><th>Good</th><th>Defect</th>
+                      <th>A OPE</th><th>P OPE</th><th>Q OPE</th><th>OEE OPE</th>
+                      <th>A 365</th><th>P 365</th><th>Q 365</th><th>OEE 365</th>
+                      <th>inisial operator</th>
                     </tr></thead>
-                    <tbody id="rpSummaryBody"><tr><td colspan="13">Pilih rentang tanggal lalu klik Terapkan.</td></tr></tbody>
+                    <tbody id="rpSummaryBody"><tr><td colspan="23">Pilih rentang tanggal lalu klik Terapkan.</td></tr></tbody>
                   </table>
                 </div>
               </div>
@@ -2813,9 +2828,17 @@
                     <thead><tr>
                       <th>Produk</th><th>Batch</th><th>TGL</th><th>Line</th><th>Tahapan</th>
                       <th>Time Available</th><th>Waktu Produksi Terencana</th><th>Breakdown tidak terencana</th>
-                      <th>Waktu Operasional</th><th>Standart output</th><th>Good</th><th>Defect</th>
+                      <th>Waktu Operasional</th><th>Speed Standar</th><th>Standart output</th><th>Good</th><th>Defect</th>
+                      <th class="rp-th-ope">A OPE</th>
+                      <th class="rp-th-ope">P OPE</th>
+                      <th class="rp-th-ope">Q OPE</th>
+                      <th class="rp-th-ope">OEE OPE</th>
+                      <th class="rp-th-365">A 365</th>
+                      <th class="rp-th-365">P 365</th>
+                      <th class="rp-th-365">Q 365</th>
+                      <th class="rp-th-365">OEE 365</th>
                     </tr></thead>
-                    <tbody id="rpBatchBody"><tr><td colspan="12">Pilih rentang tanggal lalu klik Terapkan.</td></tr></tbody>
+                    <tbody id="rpBatchBody"><tr><td colspan="21">Pilih rentang tanggal lalu klik Terapkan.</td></tr></tbody>
                   </table>
                 </div>
               </div>
@@ -2913,7 +2936,7 @@
                       <th>Durasi (min)</th><th>Why 1</th><th>Why 2</th><th>Why 3</th>
                       <th>Corrective Action</th><th>Preventive Action</th><th>PIC</th><th>Status</th>
                     </tr></thead>
-                    <tbody id="issueOpenBody"><tr><td colspan="15">Pilih rentang tanggal lalu klik Terapkan.</td></tr></tbody>
+                    <tbody id="issueOpenBody"><tr><td colspan="15">Pilih filter lalu lalu klik Terapkan.</td></tr></tbody>
                   </table>
                 </div>
               </div>
