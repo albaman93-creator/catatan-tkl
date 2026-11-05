@@ -653,6 +653,16 @@ const App = (() => {
       Storage.applyRecord(null);
       UI.toast('Form dikosongkan ↺');
     });
+    // Tombol Simpan & Reset versi cepat, ditaruh langsung di halaman Log Sheet
+    // (toolbar input) supaya tidak perlu buka sidebar saat sedang input data.
+    const sheetPageSave = document.getElementById('sheetPageSave');
+    if (sheetPageSave) sheetPageSave.addEventListener('click', () => Storage.saveData());
+    const sheetPageReset = document.getElementById('sheetPageReset');
+    if (sheetPageReset) sheetPageReset.addEventListener('click', () => {
+      if (!confirm('Reset seluruh form? Data yang belum disimpan akan hilang.')) return;
+      Storage.applyRecord(null);
+      UI.toast('Form dikosongkan ↺');
+    });
     State.el.btnAdd.addEventListener('click', () => {
       const tr = Rows.makeRow();
       Rows.updateRowNumbers();

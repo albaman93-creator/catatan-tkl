@@ -41,16 +41,22 @@
   box-shadow: 0 0 0 3px rgba(18,161,80,.16);
 }
 
+/* Notifikasi (toast) ditaruh di TENGAH-TENGAH halaman supaya langsung
+   kelihatan user — baik untuk "simpan berhasil", "simpan gagal", "belum
+   disimpan karena tidak ada perubahan", maupun "data autosave berhasil
+   disimpan" saat pindah shift/tanggal/sheet. Kotak dibuat secukupnya saja
+   (tidak terlalu besar), dengan efek pop kecil saat muncul. */
 #toast {
-  position: fixed; left: 50%; top: 20px; bottom: auto;
-  transform: translate(-50%, -10px); opacity: 0; pointer-events: none;
+  position: fixed; left: 50%; top: 50%; bottom: auto;
+  transform: translate(-50%, -50%) scale(.95); opacity: 0; pointer-events: none;
   background: var(--navy); color: #fff;
-  padding: 14px 22px 14px 18px; border-radius: 10px;
+  padding: 14px 22px 14px 18px; border-radius: 12px;
   border-left: 4px solid var(--green);
-  box-shadow: 0 12px 30px -10px rgba(13,33,53,.5);
-  font: 500 15px var(--body); transition: .3s cubic-bezier(.22,.8,.3,1);
-  z-index: 9999; max-width: calc(100vw - 32px); text-align: center;
+  box-shadow: 0 16px 40px -12px rgba(13,33,53,.55);
+  font: 500 15px var(--body); line-height: 1.4; transition: .25s cubic-bezier(.22,.8,.3,1);
+  z-index: 9999; width: max-content; max-width: min(360px, calc(100vw - 48px)); text-align: center;
 }
+#toast.show { transform: translate(-50%, -50%) scale(1); }
 
 /* Dropdown sugesti dipindah ke css/suggest.css (satu tempat, tidak
    menembus wizard). Jangan kembalikan z-index ekstrem di sini. */

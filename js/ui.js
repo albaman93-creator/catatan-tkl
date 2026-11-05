@@ -506,6 +506,10 @@ const UI = (() => {
     if (!screenId) return;
     // Dashboard OEE 360° diganti: buka Weekly Meeting (sama seperti tombol Meeting)
     if (screenId === 'dashboard') screenId = 'weekly';
+    // Amankan dulu isian sheet yang sedang terbuka sebelum pindah halaman,
+    // supaya ketikan yang belum ditekan Simpan tidak hilang begitu user
+    // berpindah ke tab Shift&Produk / Inisial / OEE / dsb.
+    try { if (typeof Storage !== 'undefined' && Storage.autoSaveLocal) Storage.autoSaveLocal(); } catch (e) {}
     document.querySelectorAll('.sheet > .sec[data-screen]').forEach(sec => {
       sec.classList.toggle('active', sec.getAttribute('data-screen') === screenId);
     });

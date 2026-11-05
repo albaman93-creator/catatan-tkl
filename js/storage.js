@@ -160,6 +160,21 @@ const Storage = (() => {
   };
 
   /**
+   * Bandingkan isi dua record (abaikan field "waktu" yang selalu berubah:
+   * savedAt/copiedAt/updatedAt) supaya bisa tahu apakah benar-benar ADA
+   * perubahan sebelum menyimpan/menampilkan notifikasi.
+   */
+  const stripVolatile = (rec) => {
+    if (!rec || typeof rec !== 'object') return rec;
+    const { savedAt, copiedAt, copiedFrom, ...rest } = rec;
+    return rest;
+  };
+  const sameContent = (a, b) => {
+    try { return JSON.stringify(stripVolatile(a)) === JSON.stringify(stripVolatile(b)); }
+    catch (e) { return false; }
+  };
+
+  /**
    * Apply data ke form (saat load record atau reset).
    */
   const applyRecord = (d) => {
@@ -394,12 +409,26 @@ const Storage = (() => {
     if (!formKey || !State.el.tbody) return;
     try {
       const rec = collect(); // rec.formKey = formKey (key lama), bukan curKey()
-      if (!hasRegisteredProduct(rec)) return;
+      // PENTING: dulu di sini dicek hasRegisteredProduct() — kalau user baru
+      // sempat isi baris/operator/mesin TAPI belum ketik kode produk, autosave
+      // saat pindah tanggal/shift/line/tahapan jadi SKIP dan isian itu hilang.
+      // Sekarang dicek isSheetEmpty() saja (sama seperti simpan manual): apa pun
+      // yang sudah diisi tetap diamankan sebelum form berpindah ke filter lain.
+      if (isSheetEmpty(rec)) return;
       const db = dbGet();
+      const prev = db[formKey];
+      const changed = !prev || !sameContent(prev, rec);
       db[formKey] = rec;
       dbSet(db);
+      if (changed && State.el.lastSaved) {
+        State.el.lastSaved.textContent = '💾 auto-save ' + new Date().toLocaleTimeString('id-ID');
+      }
+      if (changed && typeof UI !== 'undefined' && UI.toast) {
+        UI.toast('💾 Data autosave berhasil disimpan');
+      }
       const offlineMode = typeof Auth !== 'undefined' && Auth.isOfflineMode && Auth.isOfflineMode();
       if (offlineMode || typeof Sync === 'undefined') return;
+      if (!changed) return; // tidak ada perubahan → tidak perlu dorong ulang ke Supabase
       const row = buildSupabaseRow(rec, filterFromKey(formKey));
       if (isOnline()) Sync.pushRow(row).catch(() => Sync.queuePush(row));
       else Sync.queuePush(row);
@@ -579,6 +608,17 @@ const Storage = (() => {
         return;
       }
     }
+
+    // Simpan manual tapi isinya persis sama dengan yang sudah tersimpan → tidak perlu
+    // menulis ulang / menyinkron ulang, cukup beri tahu user tidak ada perubahan.
+    if (!opts.silent) {
+      const existing = dbGet()[formKey];
+      if (existing && sameContent(existing, rec)) {
+        UI.toast('Belum disimpan — tidak ada perubahan', false, 'warn');
+        return;
+      }
+    }
+
     const db = dbGet();
     db[formKey] = rec;
     dbSet(db);
@@ -630,8 +670,10 @@ const Storage = (() => {
       if (!State.el.tbody) return; // app belum siap (masih di layar login)
       if (!canSave()) return;      // sedang memuat / filter baru belum termuat
       const rec = collect();
-      // Jangan simpan lokal/cloud jika belum ada produk terdaftar
-      if (!hasRegisteredProduct(rec)) return;
+      // Simpan selama sheet TIDAK kosong (bukan hanya saat produk sudah terdaftar) —
+      // supaya baris/operator/mesin yang sudah diisi tidak hilang sebelum sempat
+      // mengetik kode produk.
+      if (isSheetEmpty(rec)) return;
       const db = dbGet();
       db[formKey] = rec;
       dbSet(db);

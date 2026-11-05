@@ -226,6 +226,49 @@
   white-space: nowrap;
 }
 
+/* Tombol Simpan / Reset khusus di halaman Log Sheet (dekat input, cepat dijangkau).
+   !important dipakai supaya tetap menang dari aturan tema gelap generik
+   ([data-theme="dark"] .col-preset-btn { background:#1c1c1f !important; ... }) di atas. */
+.col-preset-btn--save {
+  background: #12a150 !important;
+  border-color: #0e8a43 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+}
+.col-preset-btn--save:hover,
+.col-preset-btn--save.on {
+  background: #0e8a43 !important;
+  border-color: #0e8a43 !important;
+  color: #fff !important;
+}
+
+.col-preset-btn--reset {
+  background: #e23b3b !important;
+  border-color: #c42f2f !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+}
+.col-preset-btn--reset:hover,
+.col-preset-btn--reset.on {
+  background: #c42f2f !important;
+  border-color: #c42f2f !important;
+  color: #fff !important;
+}
+
+[data-theme="dark"] .col-preset-btn--save {
+  background: #16b457 !important;
+  border-color: #0e8a43 !important;
+  color: #fff !important;
+}
+[data-theme="dark"] .col-preset-btn--save:hover { background: #12a150 !important; }
+
+[data-theme="dark"] .col-preset-btn--reset {
+  background: #ef4444 !important;
+  border-color: #c42f2f !important;
+  color: #fff !important;
+}
+[data-theme="dark"] .col-preset-btn--reset:hover { background: #d93333 !important; }
+
 .logsheet-topbar .col-toggle-wrap {
   position: relative;
 
