@@ -17,6 +17,52 @@ const RincianProduk = (() => {
   let summaryRows = [];
   let batchRows = [];
 
+  // ====== SORT HEADER (tabel Rekap batch per shift) ======
+  // key = nama field baris; dir: 1 naik, -1 turun; key null = urutan bawaan (_ord)
+  let summarySort = { key: null, dir: 1 };
+  const SORT_TEXT_FIELDS = new Set(['produk', 'batch', 'tgl', 'line', 'tahapan', 'inisial']);
+  const sortValue = (r, key) => {
+    const v = r[key];
+    if (SORT_TEXT_FIELDS.has(key)) {
+      const t = String(v == null ? '' : v).trim();
+      return (t === '' || t === '—') ? null : t;
+    }
+    if (v == null || String(v).trim() === '') return null;   // kosong ≠ 0
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+  /** Urutkan di tempat. Nilai kosong selalu di bawah; seri → urutan bawaan (_ord). */
+  const sortRowsBy = (rows, key, dir) => {
+    if (!key) return rows.sort((a, b) => (a._ord || 0) - (b._ord || 0));
+    return rows.sort((a, b) => {
+      const va = sortValue(a, key), vb = sortValue(b, key);
+      if (va === null && vb !== null) return 1;
+      if (vb === null && va !== null) return -1;
+      let c = 0;
+      if (va !== null) {
+        c = typeof va === 'number'
+          ? va - vb
+          : va.localeCompare(vb, 'id', { numeric: true, sensitivity: 'base' });
+      }
+      return c * dir || ((a._ord || 0) - (b._ord || 0));
+    });
+  };
+  const paintSortHeader = () => {
+    document.querySelectorAll('#rpSummaryHead th[data-sort]').forEach((th) => {
+      const on = th.dataset.sort === summarySort.key;
+      th.setAttribute('aria-sort', on ? (summarySort.dir === 1 ? 'ascending' : 'descending') : 'none');
+    });
+  };
+  /** Klik header: urut naik → turun → kembali ke urutan bawaan. */
+  const toggleSummarySort = (key) => {
+    if (summarySort.key !== key) summarySort = { key, dir: 1 };
+    else if (summarySort.dir === 1) summarySort = { key, dir: -1 };
+    else summarySort = { key: null, dir: 1 };
+    sortRowsBy(summaryRows, summarySort.key, summarySort.dir);
+    renderSummaryTable(summaryRows);
+    paintSortHeader();
+  };
+
   const num = (v) => {
     if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
     if (v == null || v === '') return 0;
@@ -237,8 +283,9 @@ const RincianProduk = (() => {
           line: String(r.line ?? ''),
           tahapan: String(r.tahapan || '').toLowerCase(),
           timeAvailable: re.availBase,
-          waktuProduksiTerencana: re.C,
-          breakdownUnplanned: re.D,
+          waktuProduksiTerencana: re.C, // C = shift − planned (dipakai hitung A OPE)
+          planeShutdown: re.B,          // Planned Shutdown = total downtime terencana
+          breakdownUnplanned: re.D,     // Unplanned Shutdown
           waktuOperasional: re.E,
           standartOutput: stdOut,
           good,
@@ -522,7 +569,7 @@ const RincianProduk = (() => {
     const body = $('rpSummaryBody');
     if (!body) return;
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="23">Tidak ada data rekap batch per shift.</td></tr>';
+      body.innerHTML = '<tr><td colspan="24">Tidak ada data rekap batch per shift.</td></tr>';
       return;
     }
     const max = 500;
@@ -546,6 +593,7 @@ const RincianProduk = (() => {
       <td class="ctr">${esc(r.line)}</td>
       <td>${esc(r.tahapan)}</td>
       <td class="ctr">${r.timeAvailable}</td>
+      <td class="ctr">${r.planeShutdown}</td>
       <td class="ctr">${r.waktuProduksiTerencana}</td>
       <td class="ctr">${r.breakdownUnplanned}</td>
       <td class="ctr">${r.waktuOperasional}</td>
@@ -573,7 +621,7 @@ const RincianProduk = (() => {
     </tr>`;
     }).join('');
     if (rows.length > max) {
-      body.innerHTML += `<tr><td colspan="23"><i>Menampilkan ${max} dari ${rows.length} baris — unduh Excel untuk data lengkap.</i></td></tr>`;
+      body.innerHTML += `<tr><td colspan="24"><i>Menampilkan ${max} dari ${rows.length} baris — unduh Excel untuk data lengkap.</i></td></tr>`;
     }
   };
 
@@ -700,10 +748,13 @@ const RincianProduk = (() => {
     const filtered = filterLocal(raw);
     detailRows = buildDetail(filtered);
     summaryRows = buildSummary(filtered);
+    summaryRows.forEach((r, i) => { r._ord = i; });          // simpan urutan bawaan
     batchRows = aggregateByBatch(summaryRows);
+    if (summarySort.key) sortRowsBy(summaryRows, summarySort.key, summarySort.dir);
     renderDetailTable(detailRows);
     renderSummaryTable(summaryRows);
     renderBatchTable(batchRows);
+    paintSortHeader();
     const rangeTxt = ($('rpStatus') && $('rpStatus').dataset.range) || '';
     say(`✓ ${filtered.length} record · ${detailRows.length} kegiatan · ${summaryRows.length} rekap produk · ${batchRows.length} rekap batch` + (rangeTxt ? ' · ' + rangeTxt : ''));
   };
@@ -792,7 +843,7 @@ const RincianProduk = (() => {
   ];
   const SUMMARY_HEADER = [
     'Produk', 'batch number', 'TGL', 'shift', 'Line', 'tahapan proses',
-    'Time Available', 'Waktu Produksi Terencana', 'waktu breakdown tidak terencana',
+    'Time Available', 'Planned Shutdown', 'Waktu Produksi Terencana', 'Unplanned Shutdown',
     'Waktu Operasional', 'Speed Standar', 'standart output', 'good', 'defect',
     'A OPE', 'P OPE', 'Q OPE', 'OEE OPE',
     'A 365', 'P 365', 'Q 365', 'OEE 365',
@@ -815,7 +866,7 @@ const RincianProduk = (() => {
     rows.forEach((r) => {
       aoa.push([
         r.produk, r.batch, r.tgl, r.shift, r.line, r.tahapan,
-        r.timeAvailable, r.waktuProduksiTerencana, r.breakdownUnplanned,
+        r.timeAvailable, r.planeShutdown, r.waktuProduksiTerencana, r.breakdownUnplanned,
         r.waktuOperasional, fmtRate(r.rate), r.standartOutput, r.good, r.defect,
         Number.isFinite(r.aOpe) ? Number(r.aOpe).toFixed(2) + '%' : '',
         Number.isFinite(r.pOpe) ? Number(r.pOpe).toFixed(2) + '%' : '',
@@ -934,6 +985,20 @@ const RincianProduk = (() => {
     document.querySelectorAll('.rp-tab').forEach((b) => {
       b.addEventListener('click', () => showTab(b.dataset.rpTab));
     });
+    const head = $('rpSummaryHead');
+    if (head) {
+      head.addEventListener('click', (e) => {
+        const th = e.target.closest('th[data-sort]');
+        if (th) toggleSummarySort(th.dataset.sort);
+      });
+      head.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const th = e.target.closest('th[data-sort]');
+        if (!th) return;
+        e.preventDefault();
+        toggleSummarySort(th.dataset.sort);
+      });
+    }
     $('rpSummaryBody')?.addEventListener('click', (e) => {
       // Jangan buka log sheet saat klik input Speed Standar
       if (e.target.closest('.rp-rate-input, .rp-rate-cell')) return;

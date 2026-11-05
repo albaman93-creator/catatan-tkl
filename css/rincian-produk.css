@@ -177,3 +177,18 @@ body .rp-table tbody tr:hover td.rp-365-fail {
   background: #fff;
   color: #0f172a;
 }
+
+
+/* Header bisa diurutkan (Rekap batch per shift) */
+.rp-table thead th.rp-sortable { cursor: pointer; user-select: none; }
+.rp-table thead th.rp-sortable::after {
+  content: '\2195'; /* ↕ */
+  margin-left: 6px; font-size: 10px; opacity: .35;
+}
+.rp-table thead th.rp-sortable:hover { color: #fff; }
+.rp-table thead th.rp-sortable:hover::after { opacity: .8; }
+.rp-table thead th.rp-sortable[aria-sort="ascending"]::after  { content: '\25B2'; opacity: 1; color: #60a5fa; } /* ▲ */
+.rp-table thead th.rp-sortable[aria-sort="descending"]::after { content: '\25BC'; opacity: 1; color: #60a5fa; } /* ▼ */
+.rp-table thead th.rp-sortable:focus-visible { outline: 2px solid #60a5fa; outline-offset: -2px; }
+:root[data-wd-theme="light"] .rp-table thead th.rp-sortable:hover,
+:root[data-theme="light"] .rp-table thead th.rp-sortable:hover { color: #0f172a; }
