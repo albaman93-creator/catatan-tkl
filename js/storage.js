@@ -409,11 +409,8 @@ const Storage = (() => {
     if (!formKey || !State.el.tbody) return;
     try {
       const rec = collect(); // rec.formKey = formKey (key lama), bukan curKey()
-      // PENTING: dulu di sini dicek hasRegisteredProduct() — kalau user baru
-      // sempat isi baris/operator/mesin TAPI belum ketik kode produk, autosave
-      // saat pindah tanggal/shift/line/tahapan jadi SKIP dan isian itu hilang.
-      // Sekarang dicek isSheetEmpty() saja (sama seperti simpan manual): apa pun
-      // yang sudah diisi tetap diamankan sebelum form berpindah ke filter lain.
+      // PENTING: dicek isSheetEmpty() supaya apa pun yang sudah diisi tetap diamankan
+      // sebelum form berpindah ke filter lain.
       if (isSheetEmpty(rec)) return;
       const db = dbGet();
       const prev = db[formKey];
@@ -595,9 +592,11 @@ const Storage = (() => {
       return;
     }
     const rec = collect();
-    // Simpan otomatis/senyap: hanya bila ada kode produk terdaftar (p1/p2/p3).
-    // Simpan MANUAL (tombol / Ctrl+S): sheet kosong → hapus data tersimpan;
-    // ada isi walau produk belum diisi → tetap disimpan.
+    
+    // Simpan otomatis/senyap (silent): hanya bila ada kode produk terdaftar.
+    // Simpan MANUAL (tombol / Ctrl+S): 
+    // - Jika sheet kosong → bertindak sebagai perintah hapus data tersimpan (atau tampilkan info jika memang tidak ada data).
+    // - Jika ada isi → TETAP disimpan dan dipush ke cloud meskipun isinya tidak berubah (sameContent).
     if (!hasRegisteredProduct(rec)) {
       if (opts.silent) {
         UI.setSyncStatus('err', '⚠ tidak disimpan · produk kosong');
@@ -609,17 +608,10 @@ const Storage = (() => {
       }
     }
 
-    // Simpan manual tapi isinya persis sama dengan yang sudah tersimpan → tidak perlu
-    // menulis ulang / menyinkron ulang, cukup beri tahu user tidak ada perubahan.
-    if (!opts.silent) {
-      const existing = dbGet()[formKey];
-      if (existing && sameContent(existing, rec)) {
-        UI.toast('Belum disimpan — tidak ada perubahan', false, 'warn');
-        return;
-      }
-    }
-
     const db = dbGet();
+    // PENTING: Untuk simpan manual, kita sengaja TIDAK mencegat proses (return) 
+    // walau isi form sama persis dengan db[formKey]. Aplikasi tetap akan menimpa cache
+    // lokal (memperbarui timestamp) dan mencoba push/sync ke Supabase.
     db[formKey] = rec;
     dbSet(db);
 
