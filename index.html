@@ -2989,19 +2989,23 @@
         <button type="button" class="cm-close" id="suggestClose" aria-label="Tutup">×</button>
       </div>
       <div class="cm-body" style="display:flex;flex-direction:column;gap:12px">
-        <p style="margin:0;font-size:12.5px;color:#94a3b8;line-height:1.45">
-          Tambah teks yang sering dipakai di kolom <b>Kegiatan</b>. Sugesti muncul otomatis saat mengetik (ghost text). Mengikuti <b>tahapan proses</b> yang sedang aktif.
+        <p style="margin:0;font-size:12.5px;color:#475569;line-height:1.45">
+          Tambah teks yang sering dipakai di kolom <b>Kegiatan</b> beserta pasangan <b>Kode</b>. Sugesti kegiatan dan kodenya akan muncul otomatis saat Anda mengetik.
         </p>
         <div class="field">
-          <label for="suggestInput">Kegiatan baru</label>
+          <label>Kegiatan &amp; Kode baru</label>
           <div style="display:flex;gap:8px;align-items:stretch">
-            <input type="text" id="suggestInput" placeholder="Mis. Line Clearance / Tunggu Visual…" style="flex:1">
+            <input type="text" id="suggestInput" placeholder="Mis. Line Clearance…" style="flex:1">
+            <input type="tel" id="suggestKodeInput" placeholder="Kode" style="width:65px; text-align:center;" maxlength="1" inputmode="numeric">
             <button type="button" class="btn btn-primary" id="suggestAddBtn">Tambah</button>
           </div>
         </div>
         <div>
-          <div style="font:600 11px 'IBM Plex Mono',monospace;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Daftar khusus (bisa dihapus)</div>
-          <ul id="suggestCustomList" style="list-style:none;margin:0;padding:0;max-height:220px;overflow:auto;border:1px solid #1e3a5f;border-radius:8px"></ul>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="font:600 11px 'IBM Plex Mono',monospace;color:#475569;text-transform:uppercase;letter-spacing:.5px">Daftar Tersimpan</div>
+            <button type="button" class="btn btn-ghost btn-sm" id="suggestToggleListBtn" style="font-size:11px; padding:4px 8px;">Tampilkan Data</button>
+          </div>
+          <ul id="suggestCustomList" style="list-style:none;margin:0;padding:0;max-height:220px;overflow:auto;border:1px solid #cbd5e1;border-radius:8px; display:none;"></ul>
         </div>
         <div style="display:flex;justify-content:flex-end;gap:8px">
           <button type="button" class="btn btn-ghost" id="suggestDoneBtn">Selesai</button>

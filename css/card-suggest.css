@@ -1,8 +1,5 @@
 /**
  * card-suggest.css — Sugesti Kegiatan
- * HTML: #suggestOverlay / #suggestModal.suggest-modal
- * JS:   (suggest manage di index + suggest.js)
- * Catatan: ghost-text & dropdown tetap di suggest.css.
  */
 #suggestOverlay.qm-overlay {
   z-index: 1300;
@@ -13,8 +10,74 @@
   max-width: 480px;
   width: 94vw;
   border-radius: var(--card-radius, 14px);
+  
+  /* Latar belakang putih transparan dengan efek blur kaca */
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  color: #1e293b; 
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-#suggestModal .cm-header { }
-#suggestModal .cm-body { }
-#suggestModal .cm-footer { }
+#suggestModal .cm-header {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+#suggestModal .cm-header h3 {
+  color: #0f172a;
+}
+
+#suggestModal .cm-close {
+  color: #64748b;
+}
+
+#suggestModal .cm-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+#suggestModal input {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+}
+
+#suggestModal input::placeholder {
+  color: #94a3b8;
+}
+
+#suggestModal .suggest-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 13px;
+  color: #334155;
+}
+
+#suggestModal .suggest-list-item:last-child {
+  border-bottom: none;
+}
+
+#suggestModal .suggest-kode-badge {
+  background: #e2e8f0;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+}
+
+#suggestModal .btn-ghost {
+  color: #475569;
+  border-color: #cbd5e1;
+}
+
+#suggestModal .btn-ghost:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
