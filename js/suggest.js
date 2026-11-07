@@ -195,50 +195,76 @@ const Suggest = (() => {
     else setTimeout(run, 300);
   };
 
-  const addSuggestion = (text, kode) => {
+const addSuggestion = (text, kode) => {
     const value = String(text || '').trim().replace(/\s+/g, ' ');
     if (!value) return false;
 
-    // Pastikan kode terkirim dengan benar (null jika kosong)
     const finalKode = kode ? String(kode).trim() : null;
-
-    // Selalu perbarui kode di penyimpanan lokal
-    if (finalKode) setKodeForKegiatan(value, finalKode);
-    else setKodeForKegiatan(value, '');
-
+    const lowerValue = value.toLowerCase();
     const stage = getStage();
     const client = getClient();
     
-    // Cek apakah kegiatan sudah ada di daftar sugesti lokal
-    const exists = getSuggestions().some(v => v.toLowerCase() === value.toLowerCase());
-
-    if (exists) {
-      // JIKA DATA SUDAH ADA: Lakukan UPDATE ke Supabase
+    // 1. Ambil data lokal yang ada saat ini
+    const currentList = loadCustomSuggestions();
+    
+    // 2. Cek apakah ada data lama dengan teks yang sama (abaikan kapitalisasi)
+    const existingIndex = currentList.findIndex(v => v.toLowerCase() === lowerValue);
+    
+    if (existingIndex !== -1) {
+      // JIKA DATA SUDAH ADA (EDIT)
+      const oldText = currentList[existingIndex];
+      
+      // Update di penyimpanan lokal secara instan
+      setKodeForKegiatan(oldText, ''); 
+      if (finalKode) {
+        setKodeForKegiatan(value, finalKode); 
+      }
+      
+      currentList[existingIndex] = value;
+      saveCustomSuggestions(currentList);
+      
+      const memIndex = remoteSuggestions.findIndex(
+        x => x.suggestion.toLowerCase() === lowerValue && x.stage === stage
+      );
+      if (memIndex !== -1) {
+        remoteSuggestions[memIndex].suggestion = value;
+        remoteSuggestions[memIndex].kode = finalKode;
+      }
+      
+      // MENGGUNAKAN TRIK "HAPUS LALU TAMBAH" UNTUK SUPABASE
+      // Karena fungsi Delete dan Insert diizinkan, kita hindari penggunaan Update.
       if (client) {
+        // Hapus data lama
         client.from(REMOTE_TABLE)
-          .update({ kode: finalKode })
-          .match({ suggestion: value, stage: stage })
-          .then(({ error }) => {
-            if (error) console.warn('Gagal update ke Supabase:', error);
-            else refreshRemoteSuggestions();
+          .delete()
+          .match({ suggestion: oldText, stage: stage })
+          .then(() => {
+            // Setelah berhasil dihapus, Tambahkan data baru
+            client.from(REMOTE_TABLE)
+              .insert({ stage: stage, suggestion: value, kode: finalKode })
+              .then(({ error }) => {
+                if (error) console.warn('Gagal menyimpan editan ke Supabase:', error);
+              });
           });
       }
-      return true; // Sukses update di lokal, background proses ke server berjalan
+      return true;
     }
 
-    // JIKA DATA BELUM ADA: Lakukan INSERT baru
-    const list = loadCustomSuggestions();
-    list.push(value);
-    saveCustomSuggestions(list);
+    // JIKA DATA BELUM ADA SAMA SEKALI (INSERT BARU)
+    if (finalKode) {
+      setKodeForKegiatan(value, finalKode);
+    }
+    
+    currentList.push(value);
+    saveCustomSuggestions(currentList);
 
-    remoteSuggestions.push({ id: `local-${Date.now()}`, stage, suggestion: value, _local: true });
+    remoteSuggestions.push({ id: `local-${Date.now()}`, stage, suggestion: value, kode: finalKode, _local: true });
 
     if (client) {
       client.from(REMOTE_TABLE)
         .insert({ stage: stage, suggestion: value, kode: finalKode })
         .then(({ error }) => {
           if (error) console.warn('Gagal menyimpan sugesti ke Supabase:', error);
-          else refreshRemoteSuggestions();
         });
     }
     return true;
