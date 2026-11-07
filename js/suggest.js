@@ -199,34 +199,46 @@ const Suggest = (() => {
     const value = String(text || '').trim().replace(/\s+/g, ' ');
     if (!value) return false;
 
-    // Simpan relasi kode ke penyimpanan lokal jika ada
-    if (kode) setKodeForKegiatan(value, kode);
+    // Pastikan kode terkirim dengan benar (null jika kosong)
+    const finalKode = kode ? String(kode).trim() : null;
 
-    const exists = getSuggestions().some(v => v.toLowerCase() === value.toLowerCase());
-    if (exists) return true; // Anggap sukses (hanya memperbarui kodenya di lokal)
+    // Selalu perbarui kode di penyimpanan lokal
+    if (finalKode) setKodeForKegiatan(value, finalKode);
+    else setKodeForKegiatan(value, '');
 
     const stage = getStage();
+    const client = getClient();
+    
+    // Cek apakah kegiatan sudah ada di daftar sugesti lokal
+    const exists = getSuggestions().some(v => v.toLowerCase() === value.toLowerCase());
+
+    if (exists) {
+      // JIKA DATA SUDAH ADA: Lakukan UPDATE ke Supabase
+      if (client) {
+        client.from(REMOTE_TABLE)
+          .update({ kode: finalKode })
+          .match({ suggestion: value, stage: stage })
+          .then(({ error }) => {
+            if (error) console.warn('Gagal update ke Supabase:', error);
+            else refreshRemoteSuggestions();
+          });
+      }
+      return true; // Sukses update di lokal, background proses ke server berjalan
+    }
+
+    // JIKA DATA BELUM ADA: Lakukan INSERT baru
     const list = loadCustomSuggestions();
     list.push(value);
     saveCustomSuggestions(list);
 
     remoteSuggestions.push({ id: `local-${Date.now()}`, stage, suggestion: value, _local: true });
 
-    const client = getClient();
     if (client) {
-      // Kita buat objek insert. Jika kode ada isinya, kita coba masukkan.
-      // Catatan: Jika kolom kode belum ada di tabel Supabase, ini akan menyebabkan error, 
-      // tapi data tetap akan tersimpan secara lokal dan aplikasi bisa jalan.
-      const payload = { stage, suggestion: value };
-      if (kode) payload.kode = kode; 
-
-      client.from(REMOTE_TABLE).insert(payload)
+      client.from(REMOTE_TABLE)
+        .insert({ stage: stage, suggestion: value, kode: finalKode })
         .then(({ error }) => {
-          if (error) {
-            console.warn('Gagal menyimpan ke Supabase (mungkin kolom kode belum dibuat?). Data tersimpan lokal.', error);
-          } else {
-            refreshRemoteSuggestions();
-          }
+          if (error) console.warn('Gagal menyimpan sugesti ke Supabase:', error);
+          else refreshRemoteSuggestions();
         });
     }
     return true;
@@ -1189,7 +1201,7 @@ const Suggest = (() => {
       }
     });
 
-    // Toggle button untuk menampilkan list data yang disembunyikan agar modal lebih ringkas
+    // Toggle button untuk menampilkan list data yang disembunyikan
     const toggleBtn = document.getElementById('suggestToggleListBtn');
     const listEl = document.getElementById('suggestCustomList');
     if (toggleBtn && listEl) {
@@ -1220,13 +1232,32 @@ const Suggest = (() => {
 
     document.getElementById('suggestCustomList')?.addEventListener('click', (e) => {
       const btn = e.target.closest('.suggest-del');
+      
+      // Jika yang diklik adalah tombol Hapus (X)
       if (btn) {
         removeSuggestion(btn.getAttribute('data-text') || '');
         refreshCustomList();
         if (typeof UI !== 'undefined' && UI.toast) UI.toast('Sugesti dihapus');
+        return;
       }
-    });
-  };
+
+      // Jika yang diklik adalah area daftar (Aksi Edit)
+      const listItem = e.target.closest('.suggest-list-item');
+      if (listItem) {
+        const textVal = listItem.querySelector('span').textContent;
+        const badgeVal = listItem.querySelector('.suggest-kode-badge')?.textContent || '';
+        
+        const inp = document.getElementById('suggestInput');
+        const kodeInp = document.getElementById('suggestKodeInput');
+        
+        if (inp) inp.value = textVal;
+        if (kodeInp) {
+          kodeInp.value = badgeVal;
+          kodeInp.focus(); // Arahkan kursor langsung ke kotak kode agar siap diedit
+        }
+      }
+    }); // <-- Ini penutup untuk addEventListener suggestCustomList
+  }; // <-- Ini penutup untuk fungsi bindManageUI
 
   // Panggil auto-bind di akhir file
   if (document.readyState === 'loading') {
@@ -1235,11 +1266,11 @@ const Suggest = (() => {
     bindManageUI();
   }
 
-  // EXPORT FUNCTIONS (Pastikan getKodeForKegiatan ditambahkan agar dikenali oleh baris tabel di rows.js)
+  // EXPORT FUNCTIONS
   return {
     attachGhost, attachAll, getSuggestions, addSuggestion, removeSuggestion, getCustomSuggestions,
     initRemote, refreshRemoteSuggestions, attachProductAll, openManage,
     rememberProduct, rememberFromMaster, historyBnFor, historyCodes, seedHistoryFromDb,
     getKodeForKegiatan
   };
-})();
+})(); // <-- Ini penutup untuk blok utama const Suggest = (() => {
