@@ -367,11 +367,28 @@ const Rows = (() => {
       if (batchEl) batchEl.value = prods[0];
     }
 
-    State.el.tbody.appendChild(tr);
+  State.el.tbody.appendChild(tr);
     applyCat(tr);
     Navigation.syncColumnVisibility();
+
     const kegiatanEl = tr.querySelector('[data-f="kegiatan"]');
-    if (kegiatanEl && typeof Suggest !== 'undefined') Suggest.attachGhost(kegiatanEl);
+    const kodeEl = tr.querySelector('[data-f="kode"]');
+    if (kegiatanEl && typeof Suggest !== 'undefined') {
+      Suggest.attachGhost(kegiatanEl);
+
+      // Auto-fill kode berdasarkan kegiatan (jika ada pasangannya)
+      if (kodeEl && Suggest.getKodeForKegiatan) {
+        kegiatanEl.addEventListener('input', () => {
+          const matchedKode = Suggest.getKodeForKegiatan(kegiatanEl.value);
+          // Hanya timpa jika kodenya berubah; kolom tetap bisa diedit manual
+          if (matchedKode && kodeEl.value !== matchedKode) {
+            kodeEl.value = matchedKode;
+            kodeEl.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        });
+      }
+    }
+
     applyWoFromBatch(tr);
     // Baris baru kosong (bukan hasil load data lama) -> kalau ini baris
     // pertama, isi jam mulai otomatis sesuai Shift yang sedang dipilih.

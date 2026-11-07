@@ -24,9 +24,52 @@ const Suggest = (() => {
   // Pemisah antar-kegiatan dalam satu kotak yang sama (koma, titik-koma, baris baru)
   const SEGMENT_DELIMS = /[,;\n]/;
 
-  // ====== DAFTAR SUGESTI SESUAI TAHAPAN PROSES AKTIF ======
+// ====== DAFTAR SUGESTI SESUAI TAHAPAN PROSES AKTIF ======
   const CUSTOM_KEY = 'TKL_KEGIATAN_SUGGESTIONS_CUSTOM_V2';
   const REMOTE_TABLE = 'kegiatan_suggestions';
+
+  // --- Pengelola State Kode (localStorage) ---
+  const KODE_MAP_KEY = 'TKL_KEGIATAN_KODE_MAP';
+  const loadKodeMap = () => {
+    try { return JSON.parse(localStorage.getItem(KODE_MAP_KEY)) || {}; }
+    catch (_) { return {}; }
+  };
+  const saveKodeMap = (map) => {
+    try { localStorage.setItem(KODE_MAP_KEY, JSON.stringify(map)); }
+    catch (_) {}
+  };
+
+  const getKodeForKegiatan = (kegiatan) => {
+    return loadKodeMap()[String(kegiatan || '').trim().toLowerCase()] || '';
+  };
+
+  const setKodeForKegiatan = (kegiatan, kode) => {
+    const map = loadKodeMap();
+    const key = String(kegiatan || '').trim().toLowerCase();
+    if (kode) map[key] = kode;
+    else delete map[key];
+    saveKodeMap(map);
+  };
+
+  const applyKodeFromKegiatan = (el, text) => {
+    const kode = getKodeForKegiatan(text);
+    if (!kode) return;
+
+    let kodeEl = null;
+    if (el.id === 'fpKegiatan') kodeEl = document.getElementById('fpKode');
+    else if (el.id === 'ffKegiatan') kodeEl = document.getElementById('ffKode');
+    else {
+      const tr = el.closest('tr');
+      if (tr) kodeEl = tr.querySelector('[data-f="kode"]');
+    }
+
+    // Autofill hanya jika kodenya berbeda. Tidak mengunci, user bebas ubah.
+    if (kodeEl && kodeEl.value !== kode) {
+      kodeEl.value = kode;
+      kodeEl.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  };
+
   let remoteSuggestions = [];
   let remoteReady = false;
   let remoteLoading = false;
@@ -93,7 +136,7 @@ const Suggest = (() => {
     return changed ? parts.join('') : null;
   };
 
-  /** Resolve alias → bentuk baku untuk matching sugesti. */
+ /** Resolve alias → bentuk baku untuk matching sugesti. */
   const resolveAlias = (q) => {
     const key = String(q || '').trim().toLowerCase().replace(/\s+/g, ' ');
     const aliases = CONFIG.KEGIATAN_ALIASES || {};
@@ -108,16 +151,38 @@ const Suggest = (() => {
     if (!client || remoteLoading) return remoteSuggestions;
     remoteLoading = true;
     try {
+      // Kita coba tarik kolom kode. Jika error karena kolom belum dibuat, 
+      // Supabase biasanya mengembalikan pesan error tertentu.
       const { data, error } = await client
         .from(REMOTE_TABLE)
-        .select('id,stage,suggestion,created_at')
+        .select('id,stage,suggestion,kode,created_at') 
         .order('suggestion', { ascending: true });
-      if (error) throw error;
-      remoteSuggestions = Array.isArray(data) ? data : [];
+        
+      if (error) {
+        // Jika error, kita asumsikan kolom 'kode' belum ada di Supabase.
+        // Kita coba tarik tanpa kolom 'kode' agar data lama tetap masuk.
+        console.warn('Kolom kode mungkin belum ada di Supabase. Mencoba tarik data tanpa kode...');
+        const fallback = await client
+          .from(REMOTE_TABLE)
+          .select('id,stage,suggestion,created_at')
+          .order('suggestion', { ascending: true });
+          
+        if (fallback.error) throw fallback.error;
+        remoteSuggestions = Array.isArray(fallback.data) ? fallback.data : [];
+      } else {
+        remoteSuggestions = Array.isArray(data) ? data : [];
+      }
+      
+      // Sinkronkan data ke lokal
+      remoteSuggestions.forEach(item => {
+        // Jika dari Supabase ada kodenya, masukkan ke local storage
+        if (item.kode) setKodeForKegiatan(item.suggestion, item.kode);
+      });
+
       remoteReady = true;
       return remoteSuggestions;
     } catch (err) {
-      console.warn('Sugesti Supabase tidak dapat dimuat:', err);
+      console.error('Gagal menarik data dari Supabase:', err);
       return remoteSuggestions;
     } finally {
       remoteLoading = false;
@@ -125,30 +190,43 @@ const Suggest = (() => {
   };
 
   const initRemote = () => {
-    // Supabase diinisialisasi setelah suggest.js dimuat, jadi beri kesempatan
-    // satu tick dan retry singkat jika client belum siap.
     const run = () => refreshRemoteSuggestions();
     if (getClient()) run();
     else setTimeout(run, 300);
   };
 
-  const addSuggestion = (text) => {
+  const addSuggestion = (text, kode) => {
     const value = String(text || '').trim().replace(/\s+/g, ' ');
     if (!value) return false;
+
+    // Simpan relasi kode ke penyimpanan lokal jika ada
+    if (kode) setKodeForKegiatan(value, kode);
+
     const exists = getSuggestions().some(v => v.toLowerCase() === value.toLowerCase());
-    if (exists) return false;
+    if (exists) return true; // Anggap sukses (hanya memperbarui kodenya di lokal)
+
     const stage = getStage();
     const list = loadCustomSuggestions();
     list.push(value);
     saveCustomSuggestions(list);
+
     remoteSuggestions.push({ id: `local-${Date.now()}`, stage, suggestion: value, _local: true });
 
     const client = getClient();
     if (client) {
-      client.from(REMOTE_TABLE).insert({ stage, suggestion: value })
+      // Kita buat objek insert. Jika kode ada isinya, kita coba masukkan.
+      // Catatan: Jika kolom kode belum ada di tabel Supabase, ini akan menyebabkan error, 
+      // tapi data tetap akan tersimpan secara lokal dan aplikasi bisa jalan.
+      const payload = { stage, suggestion: value };
+      if (kode) payload.kode = kode; 
+
+      client.from(REMOTE_TABLE).insert(payload)
         .then(({ error }) => {
-          if (error) console.warn('Gagal menyimpan sugesti ke Supabase:', error);
-          else refreshRemoteSuggestions();
+          if (error) {
+            console.warn('Gagal menyimpan ke Supabase (mungkin kolom kode belum dibuat?). Data tersimpan lokal.', error);
+          } else {
+            refreshRemoteSuggestions();
+          }
         });
     }
     return true;
@@ -157,8 +235,10 @@ const Suggest = (() => {
   const removeSuggestion = (text) => {
     const value = String(text || '').trim();
     const lower = value.toLowerCase();
+    setKodeForKegiatan(value, ''); // Hapus relasi kode
     saveCustomSuggestions(loadCustomSuggestions().filter(v => v.toLowerCase() !== lower));
     remoteSuggestions = remoteSuggestions.filter(x => x.suggestion.toLowerCase() !== lower);
+    
     const client = getClient();
     if (client) {
       client.from(REMOTE_TABLE).delete().eq('suggestion', value)
@@ -176,10 +256,7 @@ const Suggest = (() => {
   };
 
   /**
-   * Ambil "kata/frasa yang sedang aktif diketik" dari seluruh isi kotak —
-   * yaitu bagian setelah tanda pemisah (koma/titik-koma/baris baru) TERAKHIR,
-   * spasi di depannya dibuang. segStart = posisi awal frasa ini di `value`
-   * asli (dipakai nanti untuk menyisipkan sugesti di tempat yang tepat).
+   * Ambil "kata/frasa yang sedang aktif diketik" dari seluruh isi kotak.
    */
   const getActiveSegment = (value) => {
     let lastDelimIdx = -1;
@@ -193,9 +270,6 @@ const Suggest = (() => {
     return { segStart, segment: value.slice(segStart) };
   };
 
-  // Mode cepat untuk HP: setelah spasi, kata berikutnya dianggap token baru.
-  // Jadi setelah memilih "Loading Lot A", aplikasi menambahkan spasi dan saat
-  // operator mengetik "L" lagi, daftar sugesti muncul lagi.
   const getActiveToken = (value, caret = value.length) => {
     const before = value.slice(0, caret);
     const m = before.match(/(^|[\s,;\n])([^\s,;\n]*)$/);
@@ -206,15 +280,12 @@ const Suggest = (() => {
 
   /**
    * Cari alias yang diawali / cocok dengan query (partial).
-   * "rapihkan" → "Merapihkan Media" via alias "rapihkan media".
    */
   const findAliasMatch = (query) => {
     const q = String(query || '').trim().toLowerCase().replace(/\s+/g, ' ');
     if (!q || q.length < 3) return null;
     const aliases = CONFIG.KEGIATAN_ALIASES || {};
-    // Exact dulu
     if (aliases[q]) return aliases[q];
-    // Alias yang diawali query, atau query yang diawali alias
     let best = null;
     for (const [alias, canon] of Object.entries(aliases)) {
       if (alias === q) return canon;
@@ -225,22 +296,17 @@ const Suggest = (() => {
     return best ? best.canon : null;
   };
 
-  // Cari sugesti terbaik untuk ghost-text / Tab-accept.
-  // Alias non-prefix TIDAK dipakai untuk ghost append (hanya dropdown + blur).
   const bestMatch = (segment) => {
     if (!segment) return null;
     const lower = segment.toLowerCase();
-
     const list = getSuggestions();
-    // 1) Prefix penuh saja — aman untuk ghost text "ketikan|sisanya"
+
     const prefix = list.find(s => {
       const t = s.toLowerCase();
       return t.startsWith(lower) && t !== lower;
     });
     if (prefix) return prefix;
 
-    // 2) Kata di tengah yang diawali query — untuk Tab-accept, bukan ghost
-    //    (ghost tidak ditampilkan karena isPrefixMatch = false)
     const mid = list.find(s => {
       const t = s.toLowerCase();
       if (t === lower) return false;
@@ -248,22 +314,17 @@ const Suggest = (() => {
     });
     if (mid) return mid;
 
-    // 3) Alias partial ("rapihkan" → Merapihkan Media) — Tab/blur, bukan ghost
     const aliasHit = findAliasMatch(lower);
     if (aliasHit && aliasHit.toLowerCase() !== lower) return aliasHit;
 
     return null;
   };
 
-  // Ghost text HANYA jika match benar-benar diawali teks yang diketik
-  // (kalau tidak, "rapihkan" + "Merapihkan Media" jadi tampilan rusak).
   const isPrefixMatch = (segment, match) => {
     if (!segment || !match) return false;
     return match.toLowerCase().startsWith(segment.toLowerCase());
   };
 
-  // Salin metrik visual (font, padding, dsb) dari elemen asli ke layer ghost
-  // supaya teks abu-abu presis nyambung di posisi yang sama.
   const syncMetrics = (el, ghost) => {
     const cs = getComputedStyle(el);
     [
@@ -277,19 +338,12 @@ const Suggest = (() => {
   };
 
   // ====== DROPDOWN TAP-UNTUK-PILIH (kolom Kegiatan) ======
-  // Sama seperti dropdown kode produk, tapi sumbernya CONFIG.KEGIATAN_SUGGESTIONS
-  // dan penyisipannya per-kata-aktif (segmen), bukan seluruh isi kotak — jadi
-  // tetap jalan walau sudah ada kegiatan sebelumnya (dipisah koma). Dibuat
-  // karena HP tidak punya tombol Tab, jadi user harus bisa pilih dengan tap.
-  // Filter dropdown: kata tengah + alias (Issue #9).
-  // Ranking: alias-baku > prefix > awal-kata > substring.
   const filterActivities = (segment) => {
     const q = (segment || '').trim().toLowerCase();
     const all = [...new Set(getSuggestions())];
     if (!q) return all.slice(0, 12);
 
     const canon = findAliasMatch(q);
-
     const scored = [];
     for (const s of all) {
       const t = s.toLowerCase();
@@ -302,7 +356,6 @@ const Suggest = (() => {
       } else if (t.split(/[\s\-_/]+/).some(w => w.startsWith(q))) {
         rank = 1;
       } else if (q.length >= 4 && t.includes(q)) {
-        // Substring hanya jika query cukup panjang (hindari "a" mencocok semua)
         rank = 2;
       } else {
         continue;
@@ -356,17 +409,10 @@ const Suggest = (() => {
     }
   };
 
-  /** True jika wizard / modal manapun sedang terbuka — dropdown disembunyikan. */
   const isAnyOverlayOpen = () => {
     return !!document.querySelector(
       '.qm-overlay:not(.hide), #wizardOverlay:not(.hide), #suggestOverlay:not(.hide), #qmOverlay:not(.hide), #bulkOverlay:not(.hide)'
     );
-  };
-
-  const hideAllSuggestDropdowns = () => {
-    hideActDropdown();
-    if (typeof hideProdDropdown === 'function') hideProdDropdown();
-    if (typeof hideBnDropdown === 'function') hideBnDropdown();
   };
 
   const hideActDropdown = () => {
@@ -375,16 +421,10 @@ const Suggest = (() => {
     _actHighlight = -1;
   };
 
-  /**
-   * Pilih kegiatan dari dropdown: ganti SELURUH segmen aktif (bukan hanya
-   * kata terakhir), supaya "rapihkan" + pilih "Merapihkan Media" tidak jadi
-   * "rapihkan Merapihkan Media".
-   */
   const selectActivity = (el, text, _tokenStart) => {
     if (!el || !text) return;
     const info = getActiveSegment(el.value);
     const before = el.value.slice(0, info.segStart);
-    // Setelah segmen aktif: buang sisa segmen lama, sisakan pemisah berikutnya jika ada
     const afterRaw = el.value.slice(info.segStart + info.segment.length);
     const canon = text.trim();
     el.value = before + canon + (afterRaw.match(/^[,;\n]/) ? afterRaw : ' ' + afterRaw.replace(/^\s+/, ''));
@@ -392,6 +432,7 @@ const Suggest = (() => {
     el.selectionStart = el.selectionEnd = pos;
     el.focus();
     hideActDropdown();
+    applyKodeFromKegiatan(el, canon); // Terapkan kode
     el.dispatchEvent(new Event('input', { bubbles: true }));
   };
 
@@ -418,16 +459,10 @@ const Suggest = (() => {
     drop.hidden = false;
   };
 
-  /**
-   * Pasang sugesti ghost-text ke satu <input> atau <textarea>.
-   * Aman dipanggil berkali-kali pada elemen yang sama (idempotent).
-   */
   const attachGhost = (el) => {
     if (!el || el.dataset.ghostAttached) return;
     el.dataset.ghostAttached = '1';
 
-    // Bungkus elemen dengan wrapper posisi relatif (kalau induknya belum
-    // cocok, biar layer ghost bisa presisi menumpuk di atasnya).
     const wrap = document.createElement('span');
     wrap.className = 'ghost-wrap';
     el.parentNode.insertBefore(wrap, el);
@@ -444,9 +479,6 @@ const Suggest = (() => {
     const render = () => {
       syncMetrics(el, ghost);
       const typed = el.value;
-      // Sugesti cuma ditampilkan kalau kursor persis di ujung teks — supaya
-      // posisi teks abu-abu (yang selalu digambar setelah SELURUH isi kotak)
-      // tidak menyesatkan saat user sedang menyunting di tengah teks.
       const atEnd = el.selectionStart === typed.length && el.selectionEnd === typed.length;
       let match = null;
       let segStart = typed.length;
@@ -457,13 +489,17 @@ const Suggest = (() => {
         segment = info.segment;
         segStart = info.segStart;
         match = bestMatch(segment);
+
+        // Cek dan terapkan autofill kode secara real-time jika teks valid cocok
+        if (segment) {
+          const matchedKode = getKodeForKegiatan(segment);
+          if (matchedKode) applyKodeFromKegiatan(el, segment);
+        }
       }
 
       currentSuggestion = match || '';
       currentSegStart = segStart;
 
-      // Ghost text hanya ditampilkan untuk prefix-match (aman secara visual).
-      // Match kata-tengah tetap tersedia lewat dropdown + Tab/Enter.
       if (match && isPrefixMatch(segment, match)) {
         const seg = typed.slice(segStart);
         const rest = match.slice(seg.length);
@@ -474,8 +510,6 @@ const Suggest = (() => {
         ghost.textContent = '';
       }
 
-      // Dropdown tap-untuk-pilih — supaya bisa dipakai tanpa tombol Tab
-      // (penting di HP, karena keyboard mobile tidak punya tombol Tab).
       if (document.activeElement === el && atEnd) {
         const tokenInfo = getActiveToken(typed, typed.length);
         renderActDropdown(el, filterActivities(tokenInfo.token), tokenInfo.tokenStart);
@@ -486,7 +520,6 @@ const Suggest = (() => {
 
     const acceptSuggestion = () => {
       if (!currentSuggestion) return;
-      // Ganti seluruh segmen aktif (bukan append), termasuk match alias
       const info = getActiveSegment(el.value);
       const before = el.value.slice(0, info.segStart);
       const afterRaw = el.value.slice(info.segStart + info.segment.length);
@@ -496,18 +529,18 @@ const Suggest = (() => {
       currentSuggestion = '';
       ghost.textContent = '';
       hideActDropdown();
+      applyKodeFromKegiatan(el, canon); // Terapkan kode
       el.dispatchEvent(new Event('input', { bubbles: true }));
     };
 
     el.addEventListener('input', render);
     el.addEventListener('focus', render);
-    el.addEventListener('click', render);   // klik untuk pindah posisi kursor juga perlu re-cek
+    el.addEventListener('click', render);
     el.addEventListener('keyup', (e) => {
       if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) render();
     });
     el.addEventListener('blur', () => {
       ghost.textContent = '';
-      // Standarisasi kosa kata: alias → bentuk baku (Issue #9)
       setTimeout(() => {
         if (document.activeElement === el) return;
         hideActDropdown();
@@ -519,7 +552,6 @@ const Suggest = (() => {
       }, 150);
     });
     el.addEventListener('keydown', (e) => {
-      // Navigasi dropdown (panah atas/bawah + Enter) kalau dropdown sedang tampil
       if (_actDrop && !_actDrop.hidden && _actActiveInput === el) {
         const items = [..._actDrop.querySelectorAll('.kegiatan-suggest-item')];
         if (items.length) {
@@ -563,28 +595,18 @@ const Suggest = (() => {
       }
     });
 
-    // Textarea kegiatan di tabel bisa berubah tinggi (auto-resize) — layer
-    // ghost ikut menyesuaikan supaya tetap presisi menumpuk.
     if (window.ResizeObserver) {
       const ro = new ResizeObserver(() => syncMetrics(el, ghost));
       ro.observe(el);
     }
   };
 
-  /** Pasang ghost-text ke semua elemen yang cocok sebuah selector, sekali jalan. */
   const attachAll = (selector) => {
     document.querySelectorAll(selector).forEach(attachGhost);
   };
 
   // ====== AUTOCOMPLETE KODE PRODUK (dropdown, kolom Nama Produk) ======
-  // Beda dari ghost-text di atas: ini dropdown pilihan yang tampil begitu
-  // kursor fokus di kolom Nama Produk (Sheet + Master Produk), difilter
-  // sesuai huruf yang diketik, dan tinggal diklik. Daftar kode ikut
-  // Tahapan Proses yang aktif (dropdown "Tahapan" di Data & Penyimpanan) —
-  // lihat CONFIG.PRODUCT_CODE_SUGGESTIONS di js/config.js.
-
   const getActiveStage = () => {
-    // Utama: dropdown fStage; cadangan: tab sheet yang aktif
     let stage = (State.el.fStage && State.el.fStage.value) || '';
     if (!stage) {
       const on = document.querySelector('.sheet-stage-btn.on, .sheet-stage-btn[aria-selected="true"]');
@@ -602,8 +624,6 @@ const Suggest = (() => {
   };
 
   // ====== HISTORY PRODUK + BN (Issue #8) ======
-  // Menyimpan kombinasi kode+BN yang pernah diisi, agar bisa dipilih lagi
-  // tanpa mengetik ulang. Disimpan di localStorage per browser.
   const PROD_HISTORY_KEY = 'TKL_PRODUCT_HISTORY_V1';
   const PROD_HISTORY_MAX = 80;
 
@@ -621,10 +641,6 @@ const Suggest = (() => {
     } catch (_) {}
   };
 
-  /**
-   * Catat kombinasi kode produk + BN ke history.
-   * Dipanggil saat user mengisi/menyimpan master produk.
-   */
   const rememberProduct = (code, bn) => {
     const c = String(code || '').trim();
     if (!c) return;
@@ -638,7 +654,6 @@ const Suggest = (() => {
     saveProdHistory(list);
   };
 
-  /** Semua kode unik dari history (paling baru dulu). */
   const historyCodes = () => {
     const seen = new Set();
     const out = [];
@@ -651,11 +666,9 @@ const Suggest = (() => {
     return out;
   };
 
-  /** BN unik yang pernah dipakai untuk kode produk tertentu (paling baru dulu). */
   const historyBnFor = (code) => {
     const c = String(code || '').trim().toUpperCase();
     if (!c) {
-      // Tanpa kode: tampilkan semua BN unik dari history
       const seen = new Set();
       const out = [];
       for (const x of loadProdHistory()) {
@@ -678,10 +691,6 @@ const Suggest = (() => {
     return out;
   };
 
-  /**
-   * Seed history dari data sheet yang sudah tersimpan di localStorage
-   * (supaya produk/BN lama langsung muncul tanpa harus simpan ulang).
-   */
   const seedHistoryFromDb = () => {
     try {
       if (typeof Storage === 'undefined' || !Storage.dbGet) return;
@@ -704,7 +713,6 @@ const Suggest = (() => {
     } catch (_) {}
   };
 
-  /** Scan 3 slot master produk & catat ke history. */
   const rememberFromMaster = () => {
     for (let i = 1; i <= 3; i++) {
       const nameEl = document.getElementById('prodName' + i) || document.getElementById('masterProdName' + i);
@@ -720,7 +728,6 @@ const Suggest = (() => {
     const map = (typeof CONFIG !== 'undefined' && CONFIG.PRODUCT_CODE_SUGGESTIONS)
       || FALLBACK_PRODUCT_CODES;
     const list = map[stage] || map.mixing || FALLBACK_PRODUCT_CODES.mixing;
-    // History dulu: tampilkan "KODE · BN" jika ada BN, supaya user langsung lihat batch
     const histItems = [];
     const seenCode = new Set();
     for (const x of loadProdHistory()) {
@@ -732,7 +739,6 @@ const Suggest = (() => {
       seenCode.add(label.toUpperCase());
       histItems.push(label);
     }
-    // Kode unik history (tanpa BN) + daftar standar
     const codes = [...historyCodes(), ...list];
     const merged = [];
     const seen = new Set();
@@ -809,7 +815,6 @@ const Suggest = (() => {
 
   const selectProductCode = (input, code) => {
     if (!input || !code) return;
-    // Bisa "VTTS1" atau "VTTS1 · L030101" dari history
     let pureCode = code;
     let bnFromLabel = '';
     const sep = code.indexOf(' · ');
@@ -824,7 +829,6 @@ const Suggest = (() => {
     input.dispatchEvent(new Event('input', { bubbles: true }));
     hideProdDropdown();
 
-    // Isi BN: dari label history, atau BN terakhir untuk kode ini
     const id = input.id || '';
     const slotMatch = id.match(/(?:master)?[Pp]rodName(\d)/);
     if (slotMatch) {
@@ -865,7 +869,6 @@ const Suggest = (() => {
   const refreshProdDropdown = (input) => {
     const val = input.value || '';
     const caret = typeof input.selectionStart === 'number' ? input.selectionStart : val.length;
-    // Setelah spasi = user sedang ketik bebas di belakang kode
     const spaceIdx = val.search(/\s/);
     if (spaceIdx >= 0 && caret > spaceIdx) {
       hideProdDropdown();
@@ -993,7 +996,7 @@ const Suggest = (() => {
         selectBn(input, btn.getAttribute('data-bn'));
       });
     });
-    // Reuse positioning logic
+
     const r = input.getBoundingClientRect();
     const spaceBelow = window.innerHeight - r.bottom;
     const maxH = Math.min(220, Math.max(120, spaceBelow - 8));
@@ -1058,7 +1061,6 @@ const Suggest = (() => {
     });
     el.addEventListener('blur', () => {
       setTimeout(() => { if (document.activeElement !== el) hideBnDropdown(); }, 150);
-      // Catat ke history saat blur jika ada kode+BN
       const code = relatedProductCode(el);
       const bn = el.value.trim();
       if (code && bn) rememberProduct(code, bn);
@@ -1071,14 +1073,12 @@ const Suggest = (() => {
     return /^prodBn[123]$/.test(id) || /^masterProdBn[123]$/.test(id);
   };
 
-  // Delegasi global: tetap jalan meski input di-render ulang / user belum attach manual
   const isProductNameInput = (el) => {
     if (!el || el.tagName !== 'INPUT') return false;
     if (el.type && el.type !== 'text' && el.type !== 'search') return false;
     const id = el.id || '';
     if (/^prodName[123]$/.test(id) || /^masterProdName[123]$/.test(id)) return true;
     if (el.classList.contains('sheet-product-name')) return true;
-    // Wizard Setup Awal — input [data-prod-name]
     if (el.hasAttribute('data-prod-name')) return true;
     if (el.classList.contains('wiz-prod-name')) return true;
     if (el.dataset && el.dataset.field === 'name' && el.closest('.sheet-product-slot, .sheet-product-bar, .product-grid, .wizard-modal, #wizardModal')) return true;
@@ -1112,36 +1112,24 @@ const Suggest = (() => {
     }, true);
   };
 
-  // Auto-bind saat script termuat
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bindProductDelegation);
   } else {
     bindProductDelegation();
   }
 
-
-  // ====== UI: kelola sugesti dari tombol di sheet =====
-  const refreshCustomList = () => {
-    const ul = document.getElementById('suggestCustomList');
-    if (!ul) return;
-    const customs = getCustomSuggestions();
-    if (!customs.length) {
-      ul.innerHTML = '<li style="padding:12px;color:#64748b;font-size:12.5px;font-style:italic">Belum ada sugesti tambahan.</li>';
-      return;
-    }
-    ul.innerHTML = customs.map((txt) => {
-      const safe = String(txt).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-      return `<li style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid #16324c;font-size:13px;color:#e2e8f0">`
-        + `<span style="flex:1;word-break:break-word">${safe}</span>`
-        + `<button type="button" class="btn btn-ghost btn-sm suggest-del" data-text="${safe}" title="Hapus">✕</button></li>`;
-    }).join('');
-  };
-
+  // ====== UI: KELOLA SUGESTI DARI TOMBOL DI SHEET ======
+  
   const openManage = () => {
     const ov = document.getElementById('suggestOverlay');
     if (!ov) return;
     const inp = document.getElementById('suggestInput');
+    const kodeInp = document.getElementById('suggestKodeInput');
+    
+    // Kosongkan form saat modal baru dibuka
     if (inp) inp.value = '';
+    if (kodeInp) kodeInp.value = '';
+    
     refreshCustomList();
     ov.classList.remove('hide');
     setTimeout(() => inp?.focus(), 40);
@@ -1151,6 +1139,27 @@ const Suggest = (() => {
     document.getElementById('suggestOverlay')?.classList.add('hide');
   };
 
+  const refreshCustomList = () => {
+    const ul = document.getElementById('suggestCustomList');
+    if (!ul) return;
+    const customs = getCustomSuggestions();
+    if (!customs.length) {
+      ul.innerHTML = '<li style="padding:12px;color:#94a3b8;font-size:12.5px;font-style:italic">Belum ada data tersimpan.</li>';
+      return;
+    }
+    ul.innerHTML = customs.map((txt) => {
+      const safe = String(txt).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+      const kode = getKodeForKegiatan(txt);
+      
+      // Jika ada kode yang tersimpan, tampilkan sebagai badge kecil di sebelah teks kegiatan
+      const badge = kode ? `<span class="suggest-kode-badge">${kode}</span>` : '';
+      
+      return `<li class="suggest-list-item">`
+        + `<div style="display:flex;align-items:center;gap:8px;flex:1;word-break:break-word"><span>${safe}</span>${badge}</div>`
+        + `<button type="button" class="btn btn-ghost btn-sm suggest-del" data-text="${safe}" title="Hapus">✕</button></li>`;
+    }).join('');
+  };
+
   const bindManageUI = () => {
     document.getElementById('btnSuggestKegiatan')?.addEventListener('click', openManage);
     document.getElementById('suggestClose')?.addEventListener('click', closeManage);
@@ -1158,47 +1167,79 @@ const Suggest = (() => {
     document.getElementById('suggestOverlay')?.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'suggestOverlay') closeManage();
     });
+
+    // Menangani aksi klik Tambah Kegiatan & Kode
     document.getElementById('suggestAddBtn')?.addEventListener('click', () => {
       const inp = document.getElementById('suggestInput');
+      const kodeInp = document.getElementById('suggestKodeInput');
       const val = (inp?.value || '').trim();
+      const kodeVal = (kodeInp?.value || '').trim();
+      
       if (!val) {
         if (typeof UI !== 'undefined' && UI.toast) UI.toast('Isi teks kegiatan dulu', true);
         return;
       }
-      const ok = addSuggestion(val);
-      if (ok) {
-        if (typeof UI !== 'undefined' && UI.toast) UI.toast('✓ Sugesti ditambahkan');
+      
+      // Simpan kegiatan beserta kodenya
+      if (addSuggestion(val, kodeVal)) {
+        if (typeof UI !== 'undefined' && UI.toast) UI.toast('✓ Kegiatan & Kode disimpan');
         if (inp) inp.value = '';
+        if (kodeInp) kodeInp.value = '';
         refreshCustomList();
-      } else {
-        if (typeof UI !== 'undefined' && UI.toast) UI.toast('Sudah ada di daftar sugesti', true);
       }
     });
+
+    // Toggle button untuk menampilkan list data yang disembunyikan agar modal lebih ringkas
+    const toggleBtn = document.getElementById('suggestToggleListBtn');
+    const listEl = document.getElementById('suggestCustomList');
+    if (toggleBtn && listEl) {
+      toggleBtn.addEventListener('click', () => {
+        if (listEl.style.display === 'none') {
+          listEl.style.display = 'block';
+          toggleBtn.textContent = 'Sembunyikan';
+        } else {
+          listEl.style.display = 'none';
+          toggleBtn.textContent = 'Tampilkan Data';
+        }
+      });
+    }
+
     document.getElementById('suggestInput')?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         document.getElementById('suggestAddBtn')?.click();
       }
     });
+
+    document.getElementById('suggestKodeInput')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('suggestAddBtn')?.click();
+      }
+    });
+
     document.getElementById('suggestCustomList')?.addEventListener('click', (e) => {
       const btn = e.target.closest('.suggest-del');
-      if (!btn) return;
-      const text = btn.getAttribute('data-text') || '';
-      removeSuggestion(text);
-      refreshCustomList();
-      if (typeof UI !== 'undefined' && UI.toast) UI.toast('Sugesti dihapus');
+      if (btn) {
+        removeSuggestion(btn.getAttribute('data-text') || '');
+        refreshCustomList();
+        if (typeof UI !== 'undefined' && UI.toast) UI.toast('Sugesti dihapus');
+      }
     });
   };
 
+  // Panggil auto-bind di akhir file
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bindManageUI);
   } else {
     bindManageUI();
   }
 
+  // EXPORT FUNCTIONS (Pastikan getKodeForKegiatan ditambahkan agar dikenali oleh baris tabel di rows.js)
   return {
     attachGhost, attachAll, getSuggestions, addSuggestion, removeSuggestion, getCustomSuggestions,
     initRemote, refreshRemoteSuggestions, attachProductAll, openManage,
     rememberProduct, rememberFromMaster, historyBnFor, historyCodes, seedHistoryFromDb,
+    getKodeForKegiatan
   };
 })();
