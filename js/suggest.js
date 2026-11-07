@@ -1132,17 +1132,18 @@ const Suggest = (() => {
 
   // ====== UI: KELOLA SUGESTI DARI TOMBOL DI SHEET ======
   
+  // ====== UI: KELOLA SUGESTI DARI TOMBOL DI SHEET ======
+  
   const openManage = () => {
     const ov = document.getElementById('suggestOverlay');
     if (!ov) return;
     const inp = document.getElementById('suggestInput');
     const kodeInp = document.getElementById('suggestKodeInput');
     
-    // Kosongkan form saat modal baru dibuka
     if (inp) inp.value = '';
     if (kodeInp) kodeInp.value = '';
     
-    refreshCustomList();
+    refreshCustomList(); // Panggil tanpa filter saat pertama dibuka
     ov.classList.remove('hide');
     setTimeout(() => inp?.focus(), 40);
   };
@@ -1151,19 +1152,27 @@ const Suggest = (() => {
     document.getElementById('suggestOverlay')?.classList.add('hide');
   };
 
-  const refreshCustomList = () => {
+  // Tambahkan parameter 'query' untuk fitur Live Search
+  const refreshCustomList = (query = '') => {
     const ul = document.getElementById('suggestCustomList');
     if (!ul) return;
-    const customs = getCustomSuggestions();
+    
+    let customs = getCustomSuggestions();
+    
+    // Filter data berdasarkan ketikan pengguna
+    if (query) {
+      const q = query.toLowerCase();
+      customs = customs.filter(txt => txt.toLowerCase().includes(q));
+    }
+
     if (!customs.length) {
-      ul.innerHTML = '<li style="padding:12px;color:#94a3b8;font-size:12.5px;font-style:italic">Belum ada data tersimpan.</li>';
+      ul.innerHTML = '<li style="padding:12px;color:#94a3b8;font-size:12.5px;font-style:italic">Tidak ada data ditemukan.</li>';
       return;
     }
+    
     ul.innerHTML = customs.map((txt) => {
       const safe = String(txt).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
       const kode = getKodeForKegiatan(txt);
-      
-      // Jika ada kode yang tersimpan, tampilkan sebagai badge kecil di sebelah teks kegiatan
       const badge = kode ? `<span class="suggest-kode-badge">${kode}</span>` : '';
       
       return `<li class="suggest-list-item">`
@@ -1180,9 +1189,40 @@ const Suggest = (() => {
       if (e.target && e.target.id === 'suggestOverlay') closeManage();
     });
 
-    // Menangani aksi klik Tambah Kegiatan & Kode
+    const inp = document.getElementById('suggestInput');
+    const listEl = document.getElementById('suggestCustomList');
+    const toggleBtn = document.getElementById('suggestToggleListBtn');
+
+    // FITUR AUTO-CAPITALIZE & LIVE SEARCH
+    if (inp) {
+      inp.addEventListener('input', (e) => {
+        // 1. Simpan posisi kursor agar tidak melompat ke belakang saat diketik
+        const start = e.target.selectionStart;
+        const end = e.target.selectionEnd;
+        
+        // 2. Auto-Capitalize (Title Case): Huruf pertama tiap kata jadi kapital
+        let val = e.target.value;
+        val = val.split(' ').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+        
+        e.target.value = val;
+        
+        // Kembalikan posisi kursor
+        e.target.setSelectionRange(start, end);
+
+        // 3. Buka daftar secara otomatis saat user mulai mengetik
+        if (listEl && listEl.style.display === 'none' && val.trim().length > 0) {
+          listEl.style.display = 'block';
+          if (toggleBtn) toggleBtn.textContent = 'Sembunyikan';
+        }
+
+        // 4. Jalankan pencarian (Live Search)
+        refreshCustomList(val);
+      });
+    }
+
     document.getElementById('suggestAddBtn')?.addEventListener('click', () => {
-      const inp = document.getElementById('suggestInput');
       const kodeInp = document.getElementById('suggestKodeInput');
       const val = (inp?.value || '').trim();
       const kodeVal = (kodeInp?.value || '').trim();
@@ -1192,18 +1232,14 @@ const Suggest = (() => {
         return;
       }
       
-      // Simpan kegiatan beserta kodenya
       if (addSuggestion(val, kodeVal)) {
         if (typeof UI !== 'undefined' && UI.toast) UI.toast('✓ Kegiatan & Kode disimpan');
         if (inp) inp.value = '';
         if (kodeInp) kodeInp.value = '';
-        refreshCustomList();
+        refreshCustomList(); // Reset list ke tampilan semua data
       }
     });
 
-    // Toggle button untuk menampilkan list data yang disembunyikan
-    const toggleBtn = document.getElementById('suggestToggleListBtn');
-    const listEl = document.getElementById('suggestCustomList');
     if (toggleBtn && listEl) {
       toggleBtn.addEventListener('click', () => {
         if (listEl.style.display === 'none') {
@@ -1232,45 +1268,40 @@ const Suggest = (() => {
 
     document.getElementById('suggestCustomList')?.addEventListener('click', (e) => {
       const btn = e.target.closest('.suggest-del');
-      
-      // Jika yang diklik adalah tombol Hapus (X)
       if (btn) {
         removeSuggestion(btn.getAttribute('data-text') || '');
-        refreshCustomList();
+        // Tetap terapkan filter search jika user sedang mencari sesuatu lalu menghapusnya
+        const currentSearch = inp ? inp.value : '';
+        refreshCustomList(currentSearch);
         if (typeof UI !== 'undefined' && UI.toast) UI.toast('Sugesti dihapus');
         return;
       }
 
-      // Jika yang diklik adalah area daftar (Aksi Edit)
       const listItem = e.target.closest('.suggest-list-item');
       if (listItem) {
         const textVal = listItem.querySelector('span').textContent;
         const badgeVal = listItem.querySelector('.suggest-kode-badge')?.textContent || '';
-        
-        const inp = document.getElementById('suggestInput');
         const kodeInp = document.getElementById('suggestKodeInput');
         
         if (inp) inp.value = textVal;
         if (kodeInp) {
           kodeInp.value = badgeVal;
-          kodeInp.focus(); // Arahkan kursor langsung ke kotak kode agar siap diedit
+          kodeInp.focus();
         }
       }
-    }); // <-- Ini penutup untuk addEventListener suggestCustomList
-  }; // <-- Ini penutup untuk fungsi bindManageUI
+    });
+  };
 
-  // Panggil auto-bind di akhir file
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bindManageUI);
   } else {
     bindManageUI();
   }
 
-  // EXPORT FUNCTIONS
   return {
     attachGhost, attachAll, getSuggestions, addSuggestion, removeSuggestion, getCustomSuggestions,
     initRemote, refreshRemoteSuggestions, attachProductAll, openManage,
     rememberProduct, rememberFromMaster, historyBnFor, historyCodes, seedHistoryFromDb,
     getKodeForKegiatan
   };
-})(); // <-- Ini penutup untuk blok utama const Suggest = (() => {
+})();
